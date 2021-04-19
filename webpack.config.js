@@ -6,10 +6,6 @@ const config = {
   common: {
     entry: {
       index: './build/js/src/web-frontends/index.js',
-      ide: './build/js/src/web-frontends/ide/index.js',
-      explorer: './build/js/src/web-frontends/explorer/index.js',
-      monaco: './build/js/src/web-frontends/ide/monaco/index.js',
-      'editor.worker': 'monaco-editor/esm/vs/editor/editor.worker.js',
     },
     module: {
       rules: [

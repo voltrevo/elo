@@ -4,12 +4,12 @@
   "description": "",
   "scripts": {
     "build-js": "tsc",
-    "build-css": "# sass style/index.scss build/css/style.css",
-    "build-web": "# webpack",
+    "build-css": "sass style/index.scss build/css/style.css",
+    "build-web": "webpack",
     "build": "rm -rf build && concurrently npm:build-js npm:build-css && npm run build-web",
     "watch-js": "tsc -w --pretty",
-    "watch-css": "# npm run build-css -- --watch",
-    "watch-web": "# webpack -w",
+    "watch-css": "npm run build-css -- --watch",
+    "watch-web": "webpack -w",
     "watch": "rm -rf build && concurrently npm:build-js npm:build-css && concurrently npm:watch-*"
   },
   "author": "Andrew Morris",
