@@ -1,12 +1,23 @@
 import * as preact from 'preact';
+
 import never from '../../helpers/never';
+import audio from './audio';
 import RecordButton from './RecordButton';
 
 type State = {
   full: (
     { name: 'init' } |
-    { name: 'recording', startTime: number, previewDuration: number } |
-    { name: 'recorded', duration: number }
+    {
+      name: 'recording',
+      startTime: number,
+      previewDuration: number,
+      recorder: audio.Recorder,
+    } |
+    {
+      name: 'recorded',
+      duration: number,
+      recording: audio.Recording,
+    }
   )
 }
 
@@ -34,14 +45,17 @@ export default class App extends preact.Component<{}, State> {
     }
   }
 
-  onRecordToggle() {
+  async onRecordToggle() {
     switch (this.state.full.name) {
       case 'init':
+        const recorder = await audio.record();
+
         this.setState({
           full: {
             name: 'recording',
             startTime: Date.now(),
             previewDuration: 0,
+            recorder,
           },
         });
 
@@ -50,10 +64,13 @@ export default class App extends preact.Component<{}, State> {
         break;
 
       case 'recording':
+        const recording = await this.state.full.recorder.stop();
+
         this.setState({
           full: {
             name: 'recorded',
             duration: Date.now() - this.state.full.startTime,
+            recording,
           },
         });
 

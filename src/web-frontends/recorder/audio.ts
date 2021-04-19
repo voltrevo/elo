@@ -4,7 +4,11 @@ namespace audio {
     blob: Blob,
   };
 
-  export async function record(): Promise<{ stop(): Promise<Recording> }> {
+  export type Recorder = {
+    stop: () => Promise<Recording>,
+  };
+
+  export async function record(): Promise<Recorder> {
     const recordedBlobs: BlobPart[] = [];
     const options = { mimeType: 'audio/webm;codecs=opus' };
 
