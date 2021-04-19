@@ -17,6 +17,7 @@
   "private": true,
   "dependencies": {
     "@msgpack/msgpack": "^2.4.1",
+    "@types/dom-mediacapture-record": "^1.0.7",
     "@types/koa": "^2.13.1",
     "@types/koa-route": "^3.2.4",
     "@types/koa-static-cache": "^5.1.0",
