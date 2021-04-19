@@ -25,6 +25,7 @@
     "chalk": "^4.1.0",
     "concurrently": "^6.0.0",
     "copy-webpack-plugin": "^8.1.0",
+    "deepspeech": "^0.9.3",
     "koa": "^2.13.1",
     "koa-route": "^3.2.0",
     "koa-static": "^5.0.0",
