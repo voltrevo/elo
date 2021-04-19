@@ -4,9 +4,10 @@ import { Analysis } from '../../analyze';
 import never from '../../helpers/never';
 import audio from './audio';
 import RecordButton from './RecordButton';
+import TranscriptionPlayer from './TranscriptionPlayer';
 
 type State = {
-  full: (
+  recorder: (
     { name: 'init' } |
     {
       name: 'recording',
@@ -23,13 +24,18 @@ type State = {
       name: 'transcribed',
       analysis: Analysis,
     }
-  )
+  ),
+  transcriptions: {
+    recording: audio.Recording,
+    analysis: Analysis,
+  }[],
 }
 
 const initialState: State = {
-  full: {
+  recorder: {
     name: 'init',
   },
+  transcriptions: [],
 };
 
 export default class App extends preact.Component<{}, State> {
@@ -38,11 +44,11 @@ export default class App extends preact.Component<{}, State> {
   async updateLoop() {
     await new Promise(resolve => setTimeout(resolve, 110));
 
-    while (this.state.full.name === 'recording') {
+    while (this.state.recorder.name === 'recording') {
       this.setState({
-        full: {
-          ...this.state.full,
-          previewDuration: Date.now() - this.state.full.startTime,
+        recorder: {
+          ...this.state.recorder,
+          previewDuration: Date.now() - this.state.recorder.startTime,
         },
       });
 
@@ -51,13 +57,13 @@ export default class App extends preact.Component<{}, State> {
   }
 
   async onRecordToggle() {
-    switch (this.state.full.name) {
+    switch (this.state.recorder.name) {
       case 'init':
       case 'transcribed':
         const recorder = await audio.record();
 
         this.setState({
-          full: {
+          recorder: {
             name: 'recording',
             startTime: Date.now(),
             previewDuration: 0,
@@ -70,12 +76,12 @@ export default class App extends preact.Component<{}, State> {
         break;
 
       case 'recording':
-        const recording = await this.state.full.recorder.stop();
+        const recording = await this.state.recorder.recorder.stop();
 
         this.setState({
-          full: {
+          recorder: {
             name: 'recorded',
-            duration: Date.now() - this.state.full.startTime,
+            duration: Date.now() - this.state.recorder.startTime,
             recording,
           },
         });
@@ -88,10 +94,17 @@ export default class App extends preact.Component<{}, State> {
         const analysis: Analysis = await response.json();
 
         this.setState({
-          full: {
+          recorder: {
             name: 'transcribed',
             analysis,
           },
+          transcriptions: [
+            ...this.state.transcriptions,
+            {
+              recording,
+              analysis,
+            },
+          ],
         });
 
         break;
@@ -101,29 +114,31 @@ export default class App extends preact.Component<{}, State> {
         break;
 
       default:
-        never(this.state.full);
+        never(this.state.recorder);
     }
   }
 
   render() {
     const text: preact.JSX.Element = (() => {
-      switch (this.state.full.name) {
+      switch (this.state.recorder.name) {
         case 'init':
           return <p>⬅ Click the record button to start</p>;
 
         case 'recording':
-          return <p>Recording... ({(this.state.full.previewDuration / 1000).toFixed(1)}s)</p>;
+          return <p>Recording... ({(this.state.recorder.previewDuration / 1000).toFixed(1)}s)</p>;
 
         case 'recorded':
-          return <p>Recorded {(this.state.full.duration / 1000).toFixed(1)}s, transcribing...</p>;
+          return <p>
+            Recorded {(this.state.recorder.duration / 1000).toFixed(1)}s, transcribing...
+          </p>;
 
         case 'transcribed':
           return <p>
             Transcribed: {
-              this.state.full.analysis.transcripts.length === 1
-                ? this.state.full.analysis.transcripts[0].tokens.map(t => t.text).join('')
+              this.state.recorder.analysis.transcripts.length === 1
+                ? this.state.recorder.analysis.transcripts[0].tokens.map(t => t.text).join('')
                 : <ol>{
-                  this.state.full.analysis.transcripts.map(
+                  this.state.recorder.analysis.transcripts.map(
                     transcript => <li>{transcript.tokens.map(t => t.text).join('')}</li>,
                   )
                 }</ol>
@@ -131,18 +146,19 @@ export default class App extends preact.Component<{}, State> {
           </p>;
 
         default:
-          never(this.state.full);
+          never(this.state.recorder);
       }
     })();
 
     return <div class="recorder-app">
       <div style={{ display: 'flex', flexDirection: 'row', padding: '2em' }}>
         <RecordButton
-          active={this.state.full.name === 'recording'}
+          active={this.state.recorder.name === 'recording'}
           onClick={() => this.onRecordToggle()}
         />
         <div style={{ marginLeft: '2em' }}>{text}</div>
       </div>
+      {this.state.transcriptions.map(data => <TranscriptionPlayer data={data}/>)}
     </div>;
   }
 }

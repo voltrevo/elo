@@ -12,6 +12,10 @@ body {
 }
 
 .recorder-app {
+  .clickable {
+    cursor: pointer;
+  }
+
   .record-btn {
     border: 3px solid $record-color-dull;
     border-radius: 100%;
@@ -36,7 +40,29 @@ body {
     }
   }
 
-  .clickable {
-    cursor: pointer;
+  .transcription-player {
+    .play-btn {
+      height: 7em;
+      position: relative;
+      width: 7em;
+
+      .play-btn-text {
+        font-size: 3em;
+        left: 50%;
+        position: absolute;
+        top: 50%;
+        transform: translate(-38%, -50%);
+      }
+    }
+
+    .transcription-box {
+      position: relative;
+
+      .transcription-text {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+    }
   }
 }
