@@ -31,6 +31,7 @@ launch(async (emit) => {
 
     const ffmpegCtx = (await (new ffmpeg(saveFile)));
     ffmpegCtx.setDisableVideo();
+    ffmpegCtx.setAudioFrequency(16000);
     await ffmpegCtx.save(saveFile.replace(/\.webm$/, '.wav'));
 
     ctx.body = JSON.stringify({ msg: 'todo' });
