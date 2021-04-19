@@ -17,6 +17,10 @@ type State = {
       name: 'recorded',
       duration: number,
       recording: audio.Recording,
+    } |
+    {
+      name: 'transcribed',
+      text: string,
     }
   )
 }
@@ -80,11 +84,18 @@ export default class App extends preact.Component<{}, State> {
         });
 
         const responseJson = await response.json();
-        console.log(responseJson);
+
+        this.setState({
+          full: {
+            name: 'transcribed',
+            text: responseJson.text,
+          },
+        });
 
         break;
 
       case 'recorded':
+      case 'transcribed':
         console.log('Refusing to make another recording');
         break;
 
@@ -103,7 +114,10 @@ export default class App extends preact.Component<{}, State> {
           return `Recording... (${(this.state.full.previewDuration / 1000).toFixed(1)}s)`;
 
         case 'recorded':
-          return `Recorded ${(this.state.full.duration / 1000).toFixed(1)}s`;
+          return `Recorded ${(this.state.full.duration / 1000).toFixed(1)}s, transcribing...`;
+
+        case 'transcribed':
+          return `Transcribed: ${this.state.full.text}`;
 
         default:
           never(this.state.full);
