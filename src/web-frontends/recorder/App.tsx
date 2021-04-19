@@ -1,11 +1,23 @@
 import * as preact from 'preact';
 import RecordButton from './RecordButton';
 
-export default class App extends preact.Component {
+type State = Readonly<{
+  recording: boolean,
+}>;
+
+const initialState: State = {
+  recording: false,
+};
+
+export default class App extends preact.Component<{}, State> {
+  state = initialState;
+
   render() {
-    this;
     return <div class="recorder-app">
-      <RecordButton active={false}></RecordButton>
+      <RecordButton
+        active={this.state.recording}
+        onClick={() => this.setState({ ...this.state, recording: !this.state.recording })}
+      />
     </div>;
   }
 }

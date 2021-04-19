@@ -1,14 +1,36 @@
+$bgcolor: #222;
+$record-color: rgba(255, 0, 0, 1);
+$record-color-dull: rgba(255, 0, 0, .5);
+$bright: #fff;
+
 body {
-  background-color: #222;
+  background-color: $bgcolor;
   margin: 0;
 }
 
 .recorder-app {
   .record-btn {
-    background-color: red;
+    border: 3px solid $record-color-dull;
     border-radius: 100%;
     height: 3em;
+    position: relative;
     width: 3em;
+
+    .record-btn-inner {
+      background-color: $record-color;
+      border-radius: 100%;
+      display: inline-block;
+      height: calc(3em - 9px);
+      left: 50%;
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: calc(3em - 9px);
+    }
+
+    &.active {
+      border: 3px solid $record-color;
+    }
   }
 
   .clickable {
