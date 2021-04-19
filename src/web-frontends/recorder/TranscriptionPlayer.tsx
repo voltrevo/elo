@@ -13,7 +13,7 @@ type Props = {
 type State = {
   playback: (
     { playing: false } |
-    { playing: true, time: number }
+    { playing: true, time: number, totalTime?: number }
   ),
 };
 
@@ -25,6 +25,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
   };
 
   tokenRefs: (HTMLSpanElement | null)[] = [];
+  textRef: HTMLDivElement | null = null;
   cursorEl: HTMLDivElement | null = null;
 
   async play() {
@@ -64,6 +65,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         playback: {
           playing: true,
           time: (Date.now() - startTime) / 1000,
+          totalTime: Number.isFinite(audioElement.duration) ? audioElement.duration : undefined,
         },
       });
 
@@ -79,9 +81,6 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         resolve();
       };
     });
-
-    this.cursorEl?.remove();
-    this.cursorEl = null;
 
     this.setState({
       playback: {
@@ -129,6 +128,15 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         }
       }
 
+      if (!rightDetails && this.textRef && this.state.playback.totalTime !== undefined) {
+        const rect = this.textRef.getBoundingClientRect();
+
+        rightDetails = {
+          x: rect.right,
+          t: this.state.playback.totalTime,
+        };
+      }
+
       if (leftDetails && rightDetails) {
         const progress = (
           (this.state.playback.time - leftDetails.t) /
@@ -139,6 +147,14 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
           x: leftDetails.x + progress * (rightDetails.x - leftDetails.x),
           top: leftDetails.top,
           bottom: leftDetails.bottom,
+        };
+      } else if (!leftDetails && rightDetails && this.textRef) {
+        const rect = this.textRef.getBoundingClientRect();
+
+        cursorPos = {
+          x: rect.left,
+          top: rect.top,
+          bottom: rect.bottom,
         };
       }
     }
@@ -155,9 +171,6 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
       cursorEl.style.left = `${cursorPos.x}px`;
       cursorEl.style.top = `${cursorPos.bottom + 2}px`;
-    } else if (cursorEl !== null) {
-      cursorEl.remove();
-      this.cursorEl = null;
     }
 
     return <div class="transcription-player" style={{ display: 'flex', flexDirection: 'row' }}>
@@ -165,7 +178,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         <div class="play-btn-text">{this.state.playback.playing ? '| |' : '▶'}</div>
       </div>
       <div class="transcription-box" style={{ flexGrow: 1 }}>
-        <div class="transcription-text">
+        <div class="transcription-text" ref={r => { this.textRef = r; }}>
           {this.props.data.analysis.transcripts[0].tokens.map((t, i) => (
             <span class="token" ref={r => { this.tokenRefs[i] = r; }}>{t.text}</span>
           ))}
