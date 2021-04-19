@@ -74,6 +74,14 @@ export default class App extends preact.Component<{}, State> {
           },
         });
 
+        const response = await fetch('/analyze', {
+          method: 'POST',
+          body: recording.blob,
+        });
+
+        const responseJson = await response.json();
+        console.log(responseJson);
+
         break;
 
       case 'recorded':
