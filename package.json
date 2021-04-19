@@ -10,7 +10,8 @@
     "watch-js": "tsc -w --pretty",
     "watch-css": "npm run build-css -- --watch",
     "watch-web": "webpack -w",
-    "watch": "rm -rf build && concurrently npm:build-js npm:build-css && concurrently npm:watch-*"
+    "watch": "rm -rf build && concurrently npm:build-js npm:build-css && concurrently npm:watch-*",
+    "start": "node build/js/src/server.js"
   },
   "author": "Andrew Morris",
   "private": true,
