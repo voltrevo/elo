@@ -119,11 +119,15 @@ export default class App extends preact.Component<{}, State> {
 
         case 'transcribed':
           return <p>
-            Transcribed: <ol>{
-              this.state.full.analysis.transcripts.map(
-                transcript => <li>{transcript.tokens.map(t => t.text).join('')}</li>,
-              )
-            }</ol>
+            Transcribed: {
+              this.state.full.analysis.transcripts.length === 1
+                ? this.state.full.analysis.transcripts[0].tokens.map(t => t.text).join('')
+                : <ol>{
+                  this.state.full.analysis.transcripts.map(
+                    transcript => <li>{transcript.tokens.map(t => t.text).join('')}</li>,
+                  )
+                }</ol>
+            }
           </p>;
 
         default:
