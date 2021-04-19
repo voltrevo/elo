@@ -1,9 +1,10 @@
 import * as preact from 'preact';
 
+import App from './App';
 import audio from './audio';
 
 window.addEventListener('load', () => {
-  preact.render(<div>Hello world!</div>, document.body);
+  preact.render(<App/>, document.body);
 });
 
 (window as any).audio = audio;
