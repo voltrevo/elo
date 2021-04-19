@@ -49,7 +49,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
     let startTime = Date.now();
 
-    audioElement.ontimeupdate = (e) => {
+    audioElement.ontimeupdate = () => {
       const predictedTime = (Date.now() - startTime) / 1000;
       const actualTime = audioElement.currentTime;
       startTime -= (actualTime - predictedTime) * 1000;
@@ -110,7 +110,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
           const rect = tokenRef.getBoundingClientRect();
 
           leftDetails = {
-            x: rect.left,
+            x: 0.5 * (rect.left + rect.right),
             t: transcript.tokens[i].start_time,
             top: rect.top,
             bottom: rect.bottom,
@@ -118,8 +118,10 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         }
 
         if (transcript.tokens[i].start_time >= this.state.playback.time) {
+          const rect = tokenRef.getBoundingClientRect();
+
           rightDetails = {
-            x: tokenRef.getBoundingClientRect().left,
+            x: 0.5 * (rect.left + rect.right),
             t: transcript.tokens[i].start_time,
           };
 
