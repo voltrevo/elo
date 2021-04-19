@@ -26,7 +26,6 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
   tokenRefs: (HTMLSpanElement | null)[] = [];
   textRef: HTMLDivElement | null = null;
-  cursorEl: HTMLDivElement | null = null;
 
   async play() {
     if (this.state.playback.playing) {
@@ -154,23 +153,22 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         cursorPos = {
           x: rect.left,
           top: rect.top,
-          bottom: rect.bottom,
+          bottom: rect.bottom - 1,
         };
       }
     }
 
-    let cursorEl = this.cursorEl;
-
     if (cursorPos) {
-      if (cursorEl === null) {
-        cursorEl = document.createElement('div');
-        cursorEl.classList.add('transcription-cursor');
-        document.body.appendChild(cursorEl);
-        this.cursorEl = cursorEl;
-      }
+      const cursorEl = document.createElement('div');
+      cursorEl.classList.add('transcription-cursor');
+      document.body.appendChild(cursorEl);
 
       cursorEl.style.left = `${cursorPos.x}px`;
       cursorEl.style.top = `${cursorPos.bottom + 2}px`;
+
+      setTimeout(() => {
+        cursorEl.remove();
+      }, 250);
     }
 
     return <div class="transcription-player" style={{ display: 'flex', flexDirection: 'row' }}>
