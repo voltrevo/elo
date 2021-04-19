@@ -71,6 +71,9 @@ body {
 
 .transcription-cursor {
   background-color: $highlight-color;
+  border-radius: 100%;
+  height: 5px;
   position: absolute;
-  width: 1px;
+  transform: translateY(-50%, -50%);
+  width: 5px;
 }

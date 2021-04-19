@@ -154,8 +154,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       }
 
       cursorEl.style.left = `${cursorPos.x}px`;
-      cursorEl.style.top = `${cursorPos.top}px`;
-      cursorEl.style.height = `${cursorPos.bottom - cursorPos.top}px`;
+      cursorEl.style.top = `${cursorPos.bottom + 2}px`;
     } else if (cursorEl !== null) {
       cursorEl.remove();
       this.cursorEl = null;
