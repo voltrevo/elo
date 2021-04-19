@@ -1,10 +1,13 @@
 $bgcolor: #222;
+$fgcolor: #fff;
+
 $record-color: rgba(255, 0, 0, 1);
 $record-color-dull: rgba(255, 0, 0, .5);
-$bright: #fff;
 
 body {
   background-color: $bgcolor;
+  color: $fgcolor;
+  font-family: sans-serif;
   margin: 0;
 }
 

@@ -14,10 +14,13 @@ export default class App extends preact.Component<{}, State> {
 
   render() {
     return <div class="recorder-app">
-      <RecordButton
-        active={this.state.recording}
-        onClick={() => this.setState({ ...this.state, recording: !this.state.recording })}
-      />
+      <div style={{ display: 'flex', flexDirection: 'row', padding: '2em' }}>
+        <RecordButton
+          active={this.state.recording}
+          onClick={() => this.setState({ ...this.state, recording: !this.state.recording })}
+        />
+        <div style={{ marginLeft: '2em' }}>Text goes here</div>
+      </div>
     </div>;
   }
 }
