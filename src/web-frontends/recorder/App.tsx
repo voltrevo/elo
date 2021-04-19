@@ -52,6 +52,7 @@ export default class App extends preact.Component<{}, State> {
   async onRecordToggle() {
     switch (this.state.full.name) {
       case 'init':
+      case 'transcribed':
         const recorder = await audio.record();
 
         this.setState({
@@ -95,8 +96,7 @@ export default class App extends preact.Component<{}, State> {
         break;
 
       case 'recorded':
-      case 'transcribed':
-        console.log('Refusing to make another recording');
+        console.log('Not implemented: starting a new recording while transcription is in progress');
         break;
 
       default:
