@@ -1,10 +1,13 @@
 /* eslint-disable no-console */
 
+import fs from 'fs';
 import path from 'path';
 
 import Koa from 'koa';
 import route from 'koa-route';
 import serveStaticCache from 'koa-static-cache';
+import { streamToBuffer } from '@jorgeferrero/stream-to-buffer';
+import ffmpeg from 'ffmpeg';
 
 import dirs from './dirs';
 import launch from './helpers/launch';
@@ -18,8 +21,18 @@ launch(async (emit) => {
     },
   }));
 
-  app.use(route.post('/analyze', ctx => {
+  app.use(route.post('/analyze', async ctx => {
     console.log(ctx.req.headers['content-length']);
+
+    const saveFile = `${dirs.data}/recordings/${Date.now()}.webm`;
+
+    const buffer = await streamToBuffer(ctx.req);
+    await fs.promises.writeFile(saveFile, buffer);
+
+    const ffmpegCtx = (await (new ffmpeg(saveFile)));
+    ffmpegCtx.setDisableVideo();
+    await ffmpegCtx.save(saveFile.replace(/\.webm$/, '.wav'));
+
     ctx.body = JSON.stringify({ msg: 'todo' });
   }));
 
