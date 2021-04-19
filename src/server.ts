@@ -8,7 +8,7 @@ import serveStaticCache from 'koa-static-cache';
 
 import dirs from './dirs';
 import launch from './helpers/launch';
-import webmToText from './webmToText';
+import analyze from './analyze';
 
 launch(async (emit) => {
   const app = new Koa();
@@ -20,9 +20,7 @@ launch(async (emit) => {
   }));
 
   app.use(route.post('/analyze', async ctx => {
-    const text = await webmToText(ctx.req);
-
-    ctx.body = JSON.stringify({ text });
+    ctx.body = JSON.stringify(await analyze(ctx.req));
   }));
 
   await new Promise(resolve => app.listen(8080, '127.0.0.1', () => { resolve(null); }));

@@ -1,5 +1,6 @@
 import * as preact from 'preact';
 
+import { Analysis } from '../../analyze';
 import never from '../../helpers/never';
 import audio from './audio';
 import RecordButton from './RecordButton';
@@ -20,7 +21,7 @@ type State = {
     } |
     {
       name: 'transcribed',
-      text: string,
+      analysis: Analysis,
     }
   )
 }
@@ -84,12 +85,12 @@ export default class App extends preact.Component<{}, State> {
           body: recording.blob,
         });
 
-        const responseJson = await response.json();
+        const analysis: Analysis = await response.json();
 
         this.setState({
           full: {
             name: 'transcribed',
-            text: responseJson.text,
+            analysis,
           },
         });
 
@@ -105,19 +106,25 @@ export default class App extends preact.Component<{}, State> {
   }
 
   render() {
-    const text: string = (() => {
+    const text: preact.JSX.Element = (() => {
       switch (this.state.full.name) {
         case 'init':
-          return '⬅ Click the record button to start';
+          return <p>⬅ Click the record button to start</p>;
 
         case 'recording':
-          return `Recording... (${(this.state.full.previewDuration / 1000).toFixed(1)}s)`;
+          return <p>Recording... ({(this.state.full.previewDuration / 1000).toFixed(1)}s)</p>;
 
         case 'recorded':
-          return `Recorded ${(this.state.full.duration / 1000).toFixed(1)}s, transcribing...`;
+          return <p>Recorded {(this.state.full.duration / 1000).toFixed(1)}s, transcribing...</p>;
 
         case 'transcribed':
-          return `Transcribed: ${this.state.full.text}`;
+          return <p>
+            Transcribed: <ol>{
+              this.state.full.analysis.transcripts.map(
+                transcript => <li>{transcript.tokens.map(t => t.text).join('')}</li>,
+              )
+            }</ol>
+          </p>;
 
         default:
           never(this.state.full);

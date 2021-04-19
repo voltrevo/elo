@@ -19,7 +19,9 @@ const model = new deepspeech.Model(modelPath);
 const modelLoadEnd = process.hrtime(modelLoadStart);
 console.error('Loaded model in %ds.', totalTime(modelLoadEnd));
 
-export default async function webmToText(webmStream: ReadableStream): Promise<string> {
+export type Analysis = deepspeech.Metadata;
+
+export default async function analyze(webmStream: ReadableStream): Promise<Analysis> {
   const webmFile = `${dirs.data}/recordings/${Date.now()}.webm`;
   const wavFile = webmFile.replace(/\.webm$/, '.wav');
 
@@ -31,7 +33,7 @@ export default async function webmToText(webmStream: ReadableStream): Promise<st
   ffmpegCtx.setAudioFrequency(16000);
   await ffmpegCtx.save(wavFile);
 
-  const output = model.stt(
+  const output = model.sttWithMetadata(
     await fs.promises.readFile(wavFile),
   );
 
