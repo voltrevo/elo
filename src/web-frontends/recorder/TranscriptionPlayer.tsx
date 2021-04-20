@@ -19,6 +19,12 @@ type State = {
   totalTime?: number,
 };
 
+type CursorPos = {
+  x: number,
+  top: number,
+  bottom: number,
+};
+
 export default class TranscriptionPlayer extends preact.Component<Props, State> {
   state: State = {
     playback: {
@@ -94,7 +100,11 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     });
   }
 
-  render() {
+  findCursorPos(): CursorPos | null {
+    if (!this.state.playback.playing) {
+      return null;
+    }
+
     const [transcript] = this.props.data.analysis.transcripts;
 
     let leftDetails: { x: number, t: number, top: number, bottom: number } | null = null;
@@ -120,52 +130,55 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       };
     }
 
-    let cursorPos: { x: number, top: number, bottom: number } | null = null;
-
-    if (this.state.playback.playing) {
-      for (const [iStr, tokenRef] of Object.entries(this.tokenRefs)) {
-        if (!tokenRef) {
-          continue;
-        }
-
-        const i = Number(iStr);
-
-        if (transcript.tokens[i].start_time <= this.state.playback.time) {
-          const rect = tokenRef.getBoundingClientRect();
-
-          leftDetails = {
-            x: 0.5 * (rect.left + rect.right),
-            t: transcript.tokens[i].start_time,
-            top: rect.top,
-            bottom: rect.bottom,
-          };
-        }
-
-        if (transcript.tokens[i].start_time >= this.state.playback.time) {
-          const rect = tokenRef.getBoundingClientRect();
-
-          rightDetails = {
-            x: 0.5 * (rect.left + rect.right),
-            t: transcript.tokens[i].start_time,
-          };
-
-          break;
-        }
+    for (const [iStr, tokenRef] of Object.entries(this.tokenRefs)) {
+      if (!tokenRef) {
+        continue;
       }
 
-      if (leftDetails && rightDetails) {
-        const progress = (
-          (this.state.playback.time - leftDetails.t) /
-          (rightDetails.t - leftDetails.t)
-        );
+      const i = Number(iStr);
 
-        cursorPos = {
-          x: leftDetails.x + progress * (rightDetails.x - leftDetails.x),
-          top: leftDetails.top,
-          bottom: leftDetails.bottom,
+      if (transcript.tokens[i].start_time <= this.state.playback.time) {
+        const rect = tokenRef.getBoundingClientRect();
+
+        leftDetails = {
+          x: 0.5 * (rect.left + rect.right),
+          t: transcript.tokens[i].start_time,
+          top: rect.top,
+          bottom: rect.bottom,
         };
       }
+
+      if (transcript.tokens[i].start_time >= this.state.playback.time) {
+        const rect = tokenRef.getBoundingClientRect();
+
+        rightDetails = {
+          x: 0.5 * (rect.left + rect.right),
+          t: transcript.tokens[i].start_time,
+        };
+
+        break;
+      }
     }
+
+    if (!leftDetails || !rightDetails) {
+      return null;
+    }
+
+    const progress = (
+      (this.state.playback.time - leftDetails.t) /
+      (rightDetails.t - leftDetails.t)
+    );
+
+    return {
+      x: leftDetails.x + progress * (rightDetails.x - leftDetails.x),
+      top: leftDetails.top,
+      bottom: leftDetails.bottom,
+    };
+  }
+
+  render() {
+    const [transcript] = this.props.data.analysis.transcripts;
+    const cursorPos = this.findCursorPos();
 
     if (cursorPos) {
       const cursorEl = document.createElement('div');
