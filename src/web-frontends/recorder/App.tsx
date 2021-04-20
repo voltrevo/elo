@@ -158,7 +158,7 @@ export default class App extends preact.Component<{}, State> {
         />
         <div style={{ marginLeft: '2em' }}>{text}</div>
       </div>
-      {this.state.transcriptions.map(data => <TranscriptionPlayer data={data}/>)}
+      {this.state.transcriptions.reverse().map(data => <TranscriptionPlayer data={data}/>)}
     </div>;
   }
 }
