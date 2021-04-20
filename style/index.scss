@@ -65,6 +65,7 @@ body {
       .transcription-text {
         border-left: 1px solid $subtle-mark-color;
         border-right: 1px solid $subtle-mark-color;
+        line-height: 2em;
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
