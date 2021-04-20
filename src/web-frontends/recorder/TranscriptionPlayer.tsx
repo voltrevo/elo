@@ -255,7 +255,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       }
 
       if (i !== 0 && i !== expandedTokens.length - 1) {
-        return <>&nbsp;</>;
+        return ' ';
       }
 
       return <span

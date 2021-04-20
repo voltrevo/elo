@@ -9,7 +9,7 @@ type Props = {
 
 export default class SettingsPanel extends preact.Component<Props> {
   render() {
-    const maximumGapStr = this.props.settings.maximumGap.toFixed(2);
+    const maximumGapStr = this.props.settings.maximumGap.toFixed(3);
 
     return <div class="panel">
       <div>Settings</div>
