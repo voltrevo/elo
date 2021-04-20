@@ -18,7 +18,7 @@ type State = {
     { playing: false } |
     { playing: true, time: number }
   ),
-  totalTime?: number,
+  loadedTotalTime?: number,
 };
 
 type CursorPos = {
@@ -77,9 +77,9 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
           playing: true,
           time: (Date.now() - startTime) / 1000,
         },
-        totalTime: Number.isFinite(audioElement.duration)
+        loadedTotalTime: Number.isFinite(audioElement.duration)
           ? audioElement.duration
-          : this.state.totalTime,
+          : this.state.loadedTotalTime,
       });
 
       window.requestAnimationFrame(updateTimeLoop);
@@ -124,12 +124,12 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       };
     }
 
-    if (this.state.totalTime !== undefined && this.cursorEndRef) {
+    if (this.cursorEndRef) {
       const rect = this.cursorEndRef.getBoundingClientRect();
 
       rightDetails = {
         x: rect.right,
-        t: this.state.totalTime,
+        t: this.props.data.recording.duration / 1000,
       };
     }
 
@@ -215,8 +215,8 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
     const lastToken = transcript.tokens[transcript.tokens.length - 1];
 
-    if (lastToken && this.state.totalTime !== undefined) {
-      let gap = this.state.totalTime - lastToken.start_time;
+    if (lastToken) {
+      let gap = (this.props.data.recording.duration / 1000) - lastToken.start_time;
 
       while (gap > this.props.maximumGap) {
         expandedTokens.push(null);
