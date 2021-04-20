@@ -6,6 +6,8 @@ $record-color-dull: rgba(255, 0, 0, .5);
 
 $highlight-color: rgba(255, 255, 0, 1);
 
+$subtle-mark-color: rgba(255, 255, 255, .2);
+
 body {
   background-color: $bgcolor;
   color: $fgcolor;
@@ -61,6 +63,8 @@ body {
       position: relative;
 
       .transcription-text {
+        border-left: 1px solid $subtle-mark-color;
+        border-right: 1px solid $subtle-mark-color;
         position: absolute;
         top: 50%;
         transform: translateY(-50%);

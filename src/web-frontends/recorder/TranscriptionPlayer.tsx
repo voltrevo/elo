@@ -1,3 +1,4 @@
+import type { TokenMetadata } from 'deepspeech';
 import * as preact from 'preact';
 
 import { Analysis } from '../../analyze';
@@ -13,8 +14,9 @@ type Props = {
 type State = {
   playback: (
     { playing: false } |
-    { playing: true, time: number, totalTime?: number }
+    { playing: true, time: number }
   ),
+  totalTime?: number,
 };
 
 export default class TranscriptionPlayer extends preact.Component<Props, State> {
@@ -64,8 +66,10 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         playback: {
           playing: true,
           time: (Date.now() - startTime) / 1000,
-          totalTime: Number.isFinite(audioElement.duration) ? audioElement.duration : undefined,
         },
+        totalTime: Number.isFinite(audioElement.duration)
+          ? audioElement.duration
+          : this.state.totalTime,
       });
 
       window.requestAnimationFrame(updateTimeLoop);
@@ -98,7 +102,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
     if (this.state.playback.playing) {
       for (const [iStr, tokenRef] of Object.entries(this.tokenRefs)) {
-        if (tokenRef === null) {
+        if (!tokenRef) {
           continue;
         }
 
@@ -127,12 +131,23 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         }
       }
 
-      if (!rightDetails && this.textRef && this.state.playback.totalTime !== undefined) {
+      if (!rightDetails && this.textRef && this.state.totalTime !== undefined) {
         const rect = this.textRef.getBoundingClientRect();
 
         rightDetails = {
           x: rect.right,
-          t: this.state.playback.totalTime,
+          t: this.state.totalTime,
+        };
+      }
+
+      if (!leftDetails && this.textRef) {
+        const rect = this.textRef.getBoundingClientRect();
+
+        leftDetails = {
+          x: rect.left,
+          t: 0,
+          top: rect.top,
+          bottom: rect.bottom - 1,
         };
       }
 
@@ -171,14 +186,44 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       }, 250);
     }
 
+    const maximumGap = 0.15; // seconds between tokens
+
+    const expandedTokens: (preact.JSX.Element | TokenMetadata)[] = [];
+    let prevToken: TokenMetadata | null = null;
+
+    for (const token of transcript.tokens) {
+      let gap = token.start_time - (prevToken?.start_time ?? 0);
+
+      while (gap > maximumGap) {
+        expandedTokens.push(<>&nbsp;</>);
+        gap -= maximumGap;
+      }
+
+      expandedTokens.push(token);
+      prevToken = token;
+    }
+
+    const lastToken = transcript.tokens[transcript.tokens.length - 1];
+
+    if (lastToken && this.state.totalTime !== undefined) {
+      let gap = this.state.totalTime - lastToken.start_time;
+
+      while (gap > maximumGap) {
+        expandedTokens.push(<>&nbsp;</>);
+        gap -= maximumGap;
+      }
+    }
+
     return <div class="transcription-player" style={{ display: 'flex', flexDirection: 'row' }}>
       <div class="clickable play-btn" onClick={() => this.play()}>
         <div class="play-btn-text">{this.state.playback.playing ? '| |' : '▶'}</div>
       </div>
       <div class="transcription-box" style={{ flexGrow: 1 }}>
         <div class="transcription-text" ref={r => { this.textRef = r; }}>
-          {this.props.data.analysis.transcripts[0].tokens.map((t, i) => (
-            <span class="token" ref={r => { this.tokenRefs[i] = r; }}>{t.text}</span>
+          {expandedTokens.map((t) => (
+            'start_time' in t
+              ? <span class="token" ref={r => { this.tokenRefs[transcript.tokens.indexOf(t)] = r; }}>{t.text}</span>
+              : t
           ))}
         </div>
       </div>
