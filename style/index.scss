@@ -7,6 +7,7 @@ $record-color-dull: rgba(255, 0, 0, .5);
 $highlight-color: rgba(255, 255, 0, 1);
 
 $subtle-mark-color: rgba(255, 255, 255, .2);
+$subtle-brighten: rgba(255, 255, 255, 5%);
 
 body {
   background-color: $bgcolor;
@@ -45,10 +46,21 @@ body {
   }
 
   .transcription-player {
+    background-color: $subtle-brighten;
+    border-bottom: 1px solid $subtle-brighten;
+    border-top: 1px solid $subtle-brighten;
+    margin-bottom: 2em;
+
     .play-btn {
+      border-right: 1px solid $subtle-brighten;
       height: 7em;
       position: relative;
+      transition: background-color 100ms;
       width: 7em;
+
+      &:hover {
+        background-color: $subtle-brighten;
+      }
 
       .play-btn-text {
         font-size: 3em;
@@ -64,6 +76,7 @@ body {
 
       .transcription-text {
         line-height: 2em;
+        padding: 0 2em;
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
