@@ -63,11 +63,13 @@ export default class RecorderPanel extends preact.Component<Props> {
   }
 
   render() {
-    return <div style={{ display: 'flex', flexDirection: 'row', padding: '2em' }}>
-      <RecordButton
-        active={this.props.recordingState.name === 'recording'}
-        onClick={this.props.onRecordToggle}
-      />
+    return <div class="recorder panel">
+      <div class="clickable left-box" onClick={this.props.onRecordToggle}>
+        <RecordButton
+          active={this.props.recordingState.name === 'recording'}
+          onClick={this.props.onRecordToggle}
+        />
+      </div>
       <div style={{ marginLeft: '2em' }}>{this.renderText()}</div>
     </div>;
   }

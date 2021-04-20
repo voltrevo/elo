@@ -8,7 +8,7 @@ type Props = Readonly<{
 export default class RecordButton extends preact.Component<Props> {
   render() {
     return <div
-      class={`clickable record-btn${this.props.active ? ' active' : ''}`}
+      class={`record-btn${this.props.active ? ' active' : ''}`}
       onClick={this.props.onClick}
     >
       <div class="record-btn-inner"></div>

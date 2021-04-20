@@ -45,13 +45,15 @@ body {
     }
   }
 
-  .transcription-player {
+  .panel {
     background-color: $subtle-brighten;
     border-bottom: 1px solid $subtle-brighten;
     border-top: 1px solid $subtle-brighten;
+    display: flex;
+    flex-direction: row;
     margin-bottom: 2em;
 
-    .play-btn {
+    .left-box {
       border-right: 1px solid $subtle-brighten;
       height: 7em;
       position: relative;
@@ -62,11 +64,19 @@ body {
         background-color: $subtle-brighten;
       }
 
-      .play-btn-text {
-        font-size: 3em;
+      > * {
         left: 50%;
         position: absolute;
         top: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+  }
+
+  .transcription-player {
+    .play-btn {
+      .play-btn-text {
+        font-size: 3em;
         transform: translate(-38%, -50%);
       }
     }

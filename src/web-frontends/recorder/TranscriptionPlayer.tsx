@@ -263,8 +263,8 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       </span>;
     };
 
-    return <div class="transcription-player" style={{ display: 'flex', flexDirection: 'row' }}>
-      <div class="clickable play-btn" onClick={() => this.play()}>
+    return <div class="transcription-player panel">
+      <div class="clickable left-box play-btn" onClick={() => this.play()}>
         <div class="play-btn-text">{this.state.playback.playing ? '| |' : '▶'}</div>
       </div>
       <div class="transcription-box" style={{ flexGrow: 1 }}>
