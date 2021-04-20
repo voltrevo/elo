@@ -3,7 +3,7 @@ import * as preact from 'preact';
 import { Analysis } from '../../analyze';
 import never from '../../helpers/never';
 import audio from './audio';
-import RecordButton from './RecordButton';
+import RecorderPanel from './RecorderPanel';
 import TranscriptionPlayer from './TranscriptionPlayer';
 
 type State = {
@@ -119,45 +119,11 @@ export default class App extends preact.Component<{}, State> {
   }
 
   render() {
-    const text: preact.JSX.Element = (() => {
-      switch (this.state.recorder.name) {
-        case 'init':
-          return <p>⬅ Click the record button to start</p>;
-
-        case 'recording':
-          return <p>Recording... ({(this.state.recorder.previewDuration / 1000).toFixed(1)}s)</p>;
-
-        case 'recorded':
-          return <p>
-            Recorded {(this.state.recorder.duration / 1000).toFixed(1)}s, transcribing...
-          </p>;
-
-        case 'transcribed':
-          return <p>
-            Transcribed: {
-              this.state.recorder.analysis.transcripts.length === 1
-                ? this.state.recorder.analysis.transcripts[0].tokens.map(t => t.text).join('')
-                : <ol>{
-                  this.state.recorder.analysis.transcripts.map(
-                    transcript => <li>{transcript.tokens.map(t => t.text).join('')}</li>,
-                  )
-                }</ol>
-            }
-          </p>;
-
-        default:
-          never(this.state.recorder);
-      }
-    })();
-
     return <div class="recorder-app">
-      <div style={{ display: 'flex', flexDirection: 'row', padding: '2em' }}>
-        <RecordButton
-          active={this.state.recorder.name === 'recording'}
-          onClick={() => this.onRecordToggle()}
-        />
-        <div style={{ marginLeft: '2em' }}>{text}</div>
-      </div>
+      <RecorderPanel
+        recordingState={this.state.recorder}
+        onRecordToggle={() => this.onRecordToggle()}
+      />
       {this.state.transcriptions.reverse().map(data => <TranscriptionPlayer data={data}/>)}
     </div>;
   }
