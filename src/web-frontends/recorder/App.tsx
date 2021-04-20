@@ -56,6 +56,7 @@ const initialState: State = {
 
 export default class App extends preact.Component<{}, State> {
   state = initialState;
+  targetTranscriptRef: HTMLInputElement | undefined;
 
   async updateLoop() {
     await new Promise(resolve => setTimeout(resolve, 110));
@@ -104,8 +105,16 @@ export default class App extends preact.Component<{}, State> {
 
         const startTranscriptionTime = Date.now();
 
+        const headers: Record<string, string> = {};
+        const targetTranscript = this.targetTranscriptRef?.value || undefined;
+
+        if (targetTranscript !== undefined) {
+          headers['x-target-transcript'] = targetTranscript;
+        }
+
         const response = await fetch('/analyze', {
           method: 'POST',
+          headers,
           body: recording.blob,
         });
 
@@ -144,6 +153,7 @@ export default class App extends preact.Component<{}, State> {
       <RecorderPanel
         recordingState={this.state.recorder}
         onRecordToggle={() => this.onRecordToggle()}
+        onTargetTranscriptRef={r => { this.targetTranscriptRef = r; }}
       />
       <SettingsPanel
         settings={this.state.settings}

@@ -7,6 +7,7 @@ import RecordButton from './RecordButton';
 type Props = {
   recordingState: RecordingState,
   onRecordToggle: () => void,
+  onTargetTranscriptRef: (ref: HTMLInputElement) => void,
 };
 
 export default class RecorderPanel extends preact.Component<Props> {
@@ -51,6 +52,11 @@ export default class RecorderPanel extends preact.Component<Props> {
           type="text"
           placeholder="Optional: Target transcript"
           style={{ width: '100%' }}
+          ref={r => {
+            if (r && this.props.onTargetTranscriptRef) {
+              this.props.onTargetTranscriptRef(r);
+            }
+          }}
         />
       </div>
     </div>;

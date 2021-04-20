@@ -8,6 +8,7 @@ $highlight-color: rgba(255, 255, 0, 1);
 
 $subtle-mark-color: rgba(255, 255, 255, .2);
 $subtle-brighten: rgba(255, 255, 255, 5%);
+$subtle-brighten-2: rgba(255, 255, 255, 10%);
 
 body {
   background-color: $bgcolor;
@@ -103,6 +104,11 @@ body {
       border: 0;
       color: $fgcolor;
       padding: .5em;
+
+      &:focus {
+        outline-color: $subtle-brighten-2;
+        outline-style: solid;
+      }
     }
   }
 }

@@ -20,6 +20,8 @@ launch(async (emit) => {
   }));
 
   app.use(route.post('/analyze', async ctx => {
+    const targetTranscript = ctx.headers['x-target-transcript'] ?? null;
+    emit({ targetTranscript });
     ctx.body = JSON.stringify(await analyze(ctx.req));
   }));
 
