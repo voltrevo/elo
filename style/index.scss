@@ -24,6 +24,7 @@ body {
     display: grid;
     grid-auto-rows: minmax(7.5em, auto);
     grid-template-columns: 7em 1fr;
+    margin-bottom: 2em;
 
     > div {
       align-items: center;
@@ -44,8 +45,6 @@ body {
   }
 
   .transcription-player {
-    margin-top: 2em;
-
     .play-btn-text {
       font-size: 3em;
     }

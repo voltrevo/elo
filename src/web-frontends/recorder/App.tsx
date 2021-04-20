@@ -4,9 +4,15 @@ import { Analysis } from '../../analyze';
 import never from '../../helpers/never';
 import audio from './audio';
 import RecorderPanel from './RecorderPanel';
+import SettingsPanel from './SettingsPanel';
 import TranscriptionPlayer from './TranscriptionPlayer';
 
+export type Settings = {
+  maximumGap: number,
+};
+
 type State = {
+  settings: Settings,
   recorder: (
     { name: 'init' } |
     {
@@ -34,6 +40,9 @@ type State = {
 const initialState: State = {
   recorder: {
     name: 'init',
+  },
+  settings: {
+    maximumGap: 0.15,
   },
   transcriptions: [],
 };
@@ -124,8 +133,12 @@ export default class App extends preact.Component<{}, State> {
         recordingState={this.state.recorder}
         onRecordToggle={() => this.onRecordToggle()}
       />
+      <SettingsPanel
+        settings={this.state.settings}
+        onChange={settings => this.setState({ settings })}
+      />
       {this.state.transcriptions.slice().reverse().map(data => (
-        <TranscriptionPlayer data={data} maximumGap={0.15}/>
+        <TranscriptionPlayer data={data} maximumGap={this.state.settings.maximumGap}/>
       ))}
     </div>;
   }
