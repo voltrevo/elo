@@ -3,6 +3,7 @@ import * as preact from 'preact';
 
 import { Analysis } from '../../analyze';
 import audio from './audio';
+import FlexVertCenter from './FlexVertCenter';
 
 type Props = {
   data: {
@@ -267,9 +268,11 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         <div class="play-btn-text box-content">{this.state.playback.playing ? '| |' : '▶'}</div>
       </div>
       <div class="transcription-box right-box">
-        <div class="transcription-text box-content">
-          {expandedTokens.map((t, i) => renderExpandedToken(i))}
-        </div>
+        <FlexVertCenter>
+          <div class="transcription-text right-text">
+            {expandedTokens.map((t, i) => renderExpandedToken(i))}
+          </div>
+        </FlexVertCenter>
       </div>
     </div>;
   }

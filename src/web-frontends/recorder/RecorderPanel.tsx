@@ -3,7 +3,7 @@ import * as preact from 'preact';
 import type { Analysis } from '../../analyze';
 import never from '../../helpers/never';
 import audio from './audio';
-
+import FlexVertCenter from './FlexVertCenter';
 import RecordButton from './RecordButton';
 
 type Props = {
@@ -71,7 +71,11 @@ export default class RecorderPanel extends preact.Component<Props> {
         />
       </div>
       <div class="right-box">
-        <div class="box-content">{this.renderText()}</div>
+        <FlexVertCenter>
+          <div class="right-text">
+            {this.renderText()}
+          </div>
+        </FlexVertCenter>
       </div>
     </div>;
   }

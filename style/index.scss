@@ -56,9 +56,9 @@ body {
     .left-box {
       border-right: 1px solid $subtle-brighten;
       height: 7em;
+      min-width: 7em;
       position: relative;
       transition: background-color 100ms;
-      width: 7em;
 
       &:hover {
         background-color: $subtle-brighten;
@@ -73,14 +73,12 @@ body {
     }
 
     .right-box {
+      display: flex;
+      flex-direction: column;
       flex-grow: 1;
-      position: relative;
 
-      .box-content {
-        padding: 0 2em;
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
+      .right-text {
+        padding: 2em;
       }
     }
   }
