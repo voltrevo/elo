@@ -9,6 +9,7 @@ type Props = {
     recording: audio.Recording,
     analysis: Analysis,
   },
+  maximumGap: number,
 };
 
 type State = {
@@ -193,8 +194,6 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       }, 250);
     }
 
-    const maximumGap = 0.15; // seconds between tokens
-
     type ExpandedToken = TokenMetadata | null;
 
     const expandedTokens: ExpandedToken[] = [];
@@ -203,9 +202,9 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     for (const token of transcript.tokens) {
       let gap = token.start_time - (prevToken?.start_time ?? 0);
 
-      while (gap > maximumGap) {
+      while (gap > this.props.maximumGap) {
         expandedTokens.push(null);
-        gap -= maximumGap;
+        gap -= this.props.maximumGap;
       }
 
       expandedTokens.push(token);
@@ -217,9 +216,9 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     if (lastToken && this.state.totalTime !== undefined) {
       let gap = this.state.totalTime - lastToken.start_time;
 
-      while (gap > maximumGap) {
+      while (gap > this.props.maximumGap) {
         expandedTokens.push(null);
-        gap -= maximumGap;
+        gap -= this.props.maximumGap;
       }
     }
 

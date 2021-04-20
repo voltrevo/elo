@@ -124,7 +124,9 @@ export default class App extends preact.Component<{}, State> {
         recordingState={this.state.recorder}
         onRecordToggle={() => this.onRecordToggle()}
       />
-      {this.state.transcriptions.slice().reverse().map(data => <TranscriptionPlayer data={data}/>)}
+      {this.state.transcriptions.slice().reverse().map(data => (
+        <TranscriptionPlayer data={data} maximumGap={0.15}/>
+      ))}
     </div>;
   }
 }
