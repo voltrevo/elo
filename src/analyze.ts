@@ -21,9 +21,15 @@ const model = new deepspeech.Model(modelPath);
 const modelLoadEnd = process.hrtime(modelLoadStart);
 console.error('Loaded model in %ds.', totalTime(modelLoadEnd));
 
+type TargetAnalysis = {
+  targetTranscript: string,
+  speechTranscript: string,
+  tokens: AnalysisToken[],
+};
+
 export type Analysis = {
   deepspeech: deepspeech.Metadata,
-  targetTranscript?: AnalysisToken[],
+  target?: TargetAnalysis,
 };
 
 export type AnalysisToken = deepspeech.TokenMetadata & { correct?: boolean };
@@ -36,7 +42,7 @@ export default async function analyze(
   const analysis: Analysis = { deepspeech: deepspeechAnalysis };
 
   if (targetTranscript) {
-    analysis.targetTranscript = analyzeTargetTranscript(deepspeechAnalysis, targetTranscript);
+    analysis.target = analyzeTargetTranscript(deepspeechAnalysis, targetTranscript);
   }
 
   return analysis;
@@ -45,12 +51,14 @@ export default async function analyze(
 function analyzeTargetTranscript(
   deepspeechAnalysis: Analysis['deepspeech'],
   targetTranscript: string,
-): AnalysisToken[] {
+): TargetAnalysis {
   const deepspeechTranscript = deepspeechAnalysis.transcripts[0].tokens.map(t => t.text).join('');
 
-  const hunks = diff.diffChars(targetTranscript, deepspeechTranscript);
+  const rawTargetTranscript = targetTranscript.toLowerCase().replace(/[^a-z ]/g, '');
 
-  const analysis: AnalysisToken[] = [];
+  const hunks = diff.diffChars(rawTargetTranscript, deepspeechTranscript);
+
+  const tokens: AnalysisToken[] = [];
   let tokenPos = 0;
 
   for (const hunk of hunks) {
@@ -59,7 +67,7 @@ function analyzeTargetTranscript(
         continue;
       }
 
-      analysis.push({
+      tokens.push({
         ...deepspeechAnalysis.transcripts[0].tokens[tokenPos],
         correct: !hunk.added,
       });
@@ -70,7 +78,11 @@ function analyzeTargetTranscript(
 
   assert(tokenPos === deepspeechTranscript.length);
 
-  return analysis;
+  return {
+    targetTranscript,
+    speechTranscript: deepspeechTranscript,
+    tokens,
+  };
 }
 
 async function analyzeDeepspeech(webmStream: ReadableStream): Promise<Analysis['deepspeech']> {

@@ -103,8 +103,8 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
   }
 
   getTokens(): AnalysisToken[] {
-    if (this.props.data.analysis.targetTranscript) {
-      return this.props.data.analysis.targetTranscript;
+    if (this.props.data.analysis.target) {
+      return this.props.data.analysis.target.tokens;
     }
 
     return this.props.data.analysis.deepspeech.transcripts[0].tokens;
