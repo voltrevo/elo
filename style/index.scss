@@ -71,6 +71,18 @@ body {
         transform: translate(-50%, -50%);
       }
     }
+
+    .right-box {
+      flex-grow: 1;
+      position: relative;
+
+      > * {
+        padding: 0 2em;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+    }
   }
 
   .transcription-player {
@@ -82,14 +94,8 @@ body {
     }
 
     .transcription-box {
-      position: relative;
-
       .transcription-text {
         line-height: 2em;
-        padding: 0 2em;
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
       }
 
       .text-start {

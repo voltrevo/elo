@@ -70,7 +70,9 @@ export default class RecorderPanel extends preact.Component<Props> {
           onClick={this.props.onRecordToggle}
         />
       </div>
-      <div style={{ marginLeft: '2em' }}>{this.renderText()}</div>
+      <div class="right-box">
+        <div>{this.renderText()}</div>
+      </div>
     </div>;
   }
 }
