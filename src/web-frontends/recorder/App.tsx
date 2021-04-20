@@ -9,6 +9,7 @@ import TranscriptionPlayer from './TranscriptionPlayer';
 
 export type Settings = {
   maximumGap: number,
+  cursorCorrection: number,
 };
 
 type State = {
@@ -43,6 +44,7 @@ const initialState: State = {
   },
   settings: {
     maximumGap: 0.15,
+    cursorCorrection: 0.24,
   },
   transcriptions: [],
 };
@@ -138,7 +140,11 @@ export default class App extends preact.Component<{}, State> {
         onChange={settings => this.setState({ settings })}
       />
       {this.state.transcriptions.slice().reverse().map(data => (
-        <TranscriptionPlayer data={data} maximumGap={this.state.settings.maximumGap}/>
+        <TranscriptionPlayer
+          data={data}
+          cursorCorrection={this.state.settings.cursorCorrection}
+          maximumGap={this.state.settings.maximumGap}
+        />
       ))}
     </div>;
   }

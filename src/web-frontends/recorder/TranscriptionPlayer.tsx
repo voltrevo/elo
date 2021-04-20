@@ -10,6 +10,7 @@ type Props = {
     analysis: Analysis,
   },
   maximumGap: number,
+  cursorCorrection: number,
 };
 
 type State = {
@@ -107,6 +108,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     }
 
     const [transcript] = this.props.data.analysis.transcripts;
+    const cursorTime = this.state.playback.time + this.props.cursorCorrection;
 
     let leftDetails: { x: number, t: number, top: number, bottom: number } | null = null;
     let rightDetails: { x: number, t: number } | null = null;
@@ -138,7 +140,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
       const i = Number(iStr);
 
-      if (transcript.tokens[i].start_time <= this.state.playback.time) {
+      if (transcript.tokens[i].start_time <= cursorTime) {
         const rect = tokenRef.getBoundingClientRect();
 
         leftDetails = {
@@ -149,7 +151,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         };
       }
 
-      if (transcript.tokens[i].start_time >= this.state.playback.time) {
+      if (transcript.tokens[i].start_time >= cursorTime) {
         const rect = tokenRef.getBoundingClientRect();
 
         rightDetails = {
@@ -166,7 +168,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     }
 
     const progress = (
-      (this.state.playback.time - leftDetails.t) /
+      (cursorTime - leftDetails.t) /
       (rightDetails.t - leftDetails.t)
     );
 

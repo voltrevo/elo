@@ -9,7 +9,10 @@ type Props = {
 
 export default class SettingsPanel extends preact.Component<Props> {
   render() {
-    const maximumGapStr = this.props.settings.maximumGap.toFixed(3);
+    const { maximumGap, cursorCorrection } = this.props.settings;
+
+    const maximumGapStr = maximumGap.toFixed(3);
+    const cursorCorrectionStr = (cursorCorrection >= 0 ? '+' : '') + cursorCorrection.toFixed(3);
 
     return <div class="panel">
       <div>Settings</div>
@@ -19,7 +22,7 @@ export default class SettingsPanel extends preact.Component<Props> {
           <div>
             <input
               type="range"
-              value={Math.log(this.props.settings.maximumGap)}
+              value={Math.log(maximumGap)}
               min="-5"
               max="0"
               step="0.01"
@@ -29,6 +32,26 @@ export default class SettingsPanel extends preact.Component<Props> {
                 this.props.onChange({
                   ...this.props.settings,
                   maximumGap: value,
+                });
+              }}
+            />
+          </div>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '2em' }}>
+          <div style={{ textAlign: 'center' }}>Cursor Correction: {cursorCorrectionStr}s</div>
+          <div>
+            <input
+              type="range"
+              value={cursorCorrection}
+              min="-0.5"
+              max="0.5"
+              step="0.01"
+              onInput={e => {
+                const value = Number((e.target as HTMLInputElement).value);
+
+                this.props.onChange({
+                  ...this.props.settings,
+                  cursorCorrection: value,
                 });
               }}
             />
