@@ -17,78 +17,37 @@ body {
 }
 
 .recorder-app {
-  .clickable {
-    cursor: pointer;
-  }
-
-  .record-btn {
-    border: 3px solid $record-color-dull;
-    border-radius: 100%;
-    height: 3em;
-    position: relative;
-    width: 3em;
-
-    .record-btn-inner {
-      background-color: $record-color;
-      border-radius: 100%;
-      display: inline-block;
-      height: calc(3em - 9px);
-      left: 50%;
-      position: absolute;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: calc(3em - 9px);
-    }
-
-    &.active {
-      border: 3px solid $record-color;
-    }
-  }
-
   .panel {
     background-color: $subtle-brighten;
     border-bottom: 1px solid $subtle-brighten;
     border-top: 1px solid $subtle-brighten;
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 2em;
+    display: grid;
+    grid-auto-rows: minmax(7.5em, auto);
+    grid-template-columns: 7em 1fr;
 
-    .left-box {
-      border-right: 1px solid $subtle-brighten;
-      height: 7em;
-      min-width: 7em;
-      position: relative;
-      transition: background-color 100ms;
-
-      &:hover {
-        background-color: $subtle-brighten;
-      }
-
-      .box-content {
-        left: 50%;
-        position: absolute;
-        top: 50%;
-        transform: translate(-50%, -50%);
-      }
-    }
-
-    .right-box {
+    > div {
+      align-items: center;
       display: flex;
-      flex-direction: column;
-      flex-grow: 1;
+      padding: 2em;
 
-      .right-text {
-        padding: 2em;
+      &:nth-child(odd) {
+        border-right: 1px solid $subtle-brighten;
+        cursor: pointer;
+        justify-content: center;
+        transition: background-color 100ms;
+
+        &:hover {
+          background-color: $subtle-brighten;
+        }
       }
     }
   }
 
   .transcription-player {
-    .play-btn {
-      .play-btn-text {
-        font-size: 3em;
-        transform: translate(-38%, -50%);
-      }
+    margin-top: 2em;
+
+    .play-btn-text {
+      font-size: 3em;
     }
 
     .transcription-box {
@@ -102,6 +61,34 @@ body {
 
       .text-end {
         border-right: 1px solid $subtle-mark-color;
+      }
+    }
+  }
+
+  .record-btn {
+    .record-btn-outer {
+      border: 3px solid $record-color-dull;
+      border-radius: 100%;
+      height: 3em;
+      position: relative;
+      width: 3em;
+
+      .record-btn-inner {
+        background-color: $record-color;
+        border-radius: 100%;
+        display: inline-block;
+        height: calc(3em - 9px);
+        left: 50%;
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: calc(3em - 9px);
+      }
+    }
+
+    &.active {
+      .record-btn-outer {
+        border: 3px solid $record-color;
       }
     }
   }

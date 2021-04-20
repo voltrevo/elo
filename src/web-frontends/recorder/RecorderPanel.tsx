@@ -3,7 +3,6 @@ import * as preact from 'preact';
 import type { Analysis } from '../../analyze';
 import never from '../../helpers/never';
 import audio from './audio';
-import FlexVertCenter from './FlexVertCenter';
 import RecordButton from './RecordButton';
 
 type Props = {
@@ -64,19 +63,11 @@ export default class RecorderPanel extends preact.Component<Props> {
 
   render() {
     return <div class="recorder panel">
-      <div class="clickable left-box" onClick={this.props.onRecordToggle}>
-        <RecordButton
-          active={this.props.recordingState.name === 'recording'}
-          onClick={this.props.onRecordToggle}
-        />
-      </div>
-      <div class="right-box">
-        <FlexVertCenter>
-          <div class="right-text">
-            {this.renderText()}
-          </div>
-        </FlexVertCenter>
-      </div>
+      <RecordButton
+        active={this.props.recordingState.name === 'recording'}
+        onClick={this.props.onRecordToggle}
+      />
+      <div>{this.renderText()}</div>
     </div>;
   }
 }
