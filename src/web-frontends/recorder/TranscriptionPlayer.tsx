@@ -29,6 +29,9 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
   tokenRefs: (HTMLSpanElement | null)[] = [];
   textRef: HTMLDivElement | null = null;
 
+  cursorStartRef: HTMLSpanElement | null = null;
+  cursorEndRef: HTMLSpanElement | null = null;
+
   async play() {
     if (this.state.playback.playing) {
       return;
@@ -98,6 +101,26 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     let leftDetails: { x: number, t: number, top: number, bottom: number } | null = null;
     let rightDetails: { x: number, t: number } | null = null;
 
+    if (this.cursorStartRef) {
+      const rect = this.cursorStartRef.getBoundingClientRect();
+
+      leftDetails = {
+        x: 0.5 * (rect.left + rect.right),
+        t: 0,
+        top: rect.top,
+        bottom: rect.bottom,
+      };
+    }
+
+    if (this.state.totalTime !== undefined && this.cursorEndRef) {
+      const rect = this.cursorEndRef.getBoundingClientRect();
+
+      rightDetails = {
+        x: rect.right,
+        t: this.state.totalTime,
+      };
+    }
+
     let cursorPos: { x: number, top: number, bottom: number } | null = null;
 
     if (this.state.playback.playing) {
@@ -131,26 +154,6 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         }
       }
 
-      if (!rightDetails && this.textRef && this.state.totalTime !== undefined) {
-        const rect = this.textRef.getBoundingClientRect();
-
-        rightDetails = {
-          x: rect.right,
-          t: this.state.totalTime,
-        };
-      }
-
-      if (!leftDetails && this.textRef) {
-        const rect = this.textRef.getBoundingClientRect();
-
-        leftDetails = {
-          x: rect.left,
-          t: 0,
-          top: rect.top,
-          bottom: rect.bottom - 1,
-        };
-      }
-
       if (leftDetails && rightDetails) {
         const progress = (
           (this.state.playback.time - leftDetails.t) /
@@ -161,14 +164,6 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
           x: leftDetails.x + progress * (rightDetails.x - leftDetails.x),
           top: leftDetails.top,
           bottom: leftDetails.bottom,
-        };
-      } else if (!leftDetails && rightDetails && this.textRef) {
-        const rect = this.textRef.getBoundingClientRect();
-
-        cursorPos = {
-          x: rect.left,
-          top: rect.top,
-          bottom: rect.bottom - 1,
         };
       }
     }
@@ -188,14 +183,16 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
     const maximumGap = 0.15; // seconds between tokens
 
-    const expandedTokens: (preact.JSX.Element | TokenMetadata)[] = [];
+    type ExpandedToken = TokenMetadata | null;
+
+    const expandedTokens: ExpandedToken[] = [];
     let prevToken: TokenMetadata | null = null;
 
     for (const token of transcript.tokens) {
       let gap = token.start_time - (prevToken?.start_time ?? 0);
 
       while (gap > maximumGap) {
-        expandedTokens.push(<>&nbsp;</>);
+        expandedTokens.push(null);
         gap -= maximumGap;
       }
 
@@ -209,10 +206,62 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       let gap = this.state.totalTime - lastToken.start_time;
 
       while (gap > maximumGap) {
-        expandedTokens.push(<>&nbsp;</>);
+        expandedTokens.push(null);
         gap -= maximumGap;
       }
     }
+
+    const renderExpandedToken = (i: number) => {
+      const token = expandedTokens[i];
+
+      const classes = [];
+
+      if (i === 0) {
+        classes.push('text-start');
+      }
+
+      if (i === expandedTokens.length - 1) {
+        classes.push('text-end');
+      }
+
+      if (token !== null && 'start_time' in token) {
+        return <span
+          class={['token', ...classes].join(' ')}
+          ref={r => {
+            this.tokenRefs[transcript.tokens.indexOf(token)] = r;
+
+            if (i === 0) {
+              this.cursorStartRef = r;
+            }
+
+            if (i === expandedTokens.length - 1) {
+              this.cursorEndRef = r;
+            }
+          }}
+        >
+          {token.text}
+        </span>;
+      }
+
+      if (i !== 0 && i !== expandedTokens.length - 1) {
+        return <>&nbsp;</>;
+      }
+
+      return <span
+        class={classes.join(' ')}
+        ref={r => {
+          if (i === 0) {
+            this.cursorStartRef = r;
+          }
+
+          if (i === expandedTokens.length - 1) {
+            this.cursorEndRef = r;
+          }
+        }}
+      >
+        &nbsp;
+      </span>;
+    };
 
     return <div class="transcription-player" style={{ display: 'flex', flexDirection: 'row' }}>
       <div class="clickable play-btn" onClick={() => this.play()}>
@@ -220,11 +269,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       </div>
       <div class="transcription-box" style={{ flexGrow: 1 }}>
         <div class="transcription-text" ref={r => { this.textRef = r; }}>
-          {expandedTokens.map((t) => (
-            'start_time' in t
-              ? <span class="token" ref={r => { this.tokenRefs[transcript.tokens.indexOf(t)] = r; }}>{t.text}</span>
-              : t
-          ))}
+          {expandedTokens.map((t, i) => renderExpandedToken(i))}
         </div>
       </div>
     </div>;
