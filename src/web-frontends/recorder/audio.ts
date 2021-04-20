@@ -1,6 +1,7 @@
 namespace audio {
   export type Recording = {
     type: 'audio.Recording',
+    duration: number,
     blob: Blob,
   };
 
@@ -9,6 +10,7 @@ namespace audio {
   };
 
   export async function record(): Promise<Recorder> {
+    const startTime = Date.now();
     const recordedBlobs: BlobPart[] = [];
     const options = { mimeType: 'audio/webm;codecs=opus' };
 
@@ -26,6 +28,7 @@ namespace audio {
 
         resolve({
           type: 'audio.Recording',
+          duration: Date.now() - startTime,
           blob: new Blob(recordedBlobs, { type: 'audio/webm' }),
         });
       };

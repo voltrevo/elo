@@ -1,29 +1,11 @@
 import * as preact from 'preact';
 
-import type { Analysis } from '../../analyze';
+import type { RecordingState } from './App';
 import never from '../../helpers/never';
-import audio from './audio';
 import RecordButton from './RecordButton';
 
 type Props = {
-  recordingState: (
-    { name: 'init' } |
-    {
-      name: 'recording',
-      startTime: number,
-      previewDuration: number,
-      recorder: audio.Recorder,
-    } |
-    {
-      name: 'recorded',
-      duration: number,
-      recording: audio.Recording,
-    } |
-    {
-      name: 'transcribed',
-      analysis: Analysis,
-    }
-  ),
+  recordingState: RecordingState,
   onRecordToggle: () => void,
 };
 
@@ -44,17 +26,13 @@ export default class RecorderPanel extends preact.Component<Props> {
         </p>;
 
       case 'transcribed':
-        return <p>
-          Transcribed: {
-            recordingState.analysis.transcripts.length === 1
-              ? recordingState.analysis.transcripts[0].tokens.map(t => t.text).join('')
-              : <ol>{
-                recordingState.analysis.transcripts.map(
-                  transcript => <li>{transcript.tokens.map(t => t.text).join('')}</li>,
-                )
-              }</ol>
-          }
-        </p>;
+        const timeStr = `${(recordingState.transcription.transcriptionTime / 1000).toFixed(1)}s`;
+
+        const recordingDuration = recordingState.transcription.recording.duration;
+        const transcriptionTime = recordingState.transcription.transcriptionTime;
+        const speedStr = `${(100 * recordingDuration / transcriptionTime).toFixed(0)}%`;
+
+        return <p>Transcribed in {timeStr} (speed: {speedStr})</p>;
 
       default:
         never(recordingState);

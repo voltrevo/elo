@@ -12,30 +12,35 @@ export type Settings = {
   cursorCorrection: number,
 };
 
+export type RecordingState = (
+  { name: 'init' } |
+  {
+    name: 'recording',
+    startTime: number,
+    previewDuration: number,
+    recorder: audio.Recorder,
+  } |
+  {
+    name: 'recorded',
+    duration: number,
+    recording: audio.Recording,
+  } |
+  {
+    name: 'transcribed',
+    transcription: Transcription,
+  }
+);
+
+export type Transcription = {
+  recording: audio.Recording,
+  analysis: Analysis,
+  transcriptionTime: number,
+};
+
 type State = {
   settings: Settings,
-  recorder: (
-    { name: 'init' } |
-    {
-      name: 'recording',
-      startTime: number,
-      previewDuration: number,
-      recorder: audio.Recorder,
-    } |
-    {
-      name: 'recorded',
-      duration: number,
-      recording: audio.Recording,
-    } |
-    {
-      name: 'transcribed',
-      analysis: Analysis,
-    }
-  ),
-  transcriptions: {
-    recording: audio.Recording,
-    analysis: Analysis,
-  }[],
+  recorder: RecordingState,
+  transcriptions: Transcription[],
 }
 
 const initialState: State = {
@@ -97,6 +102,8 @@ export default class App extends preact.Component<{}, State> {
           },
         });
 
+        const startTranscriptionTime = Date.now();
+
         const response = await fetch('/analyze', {
           method: 'POST',
           body: recording.blob,
@@ -104,17 +111,20 @@ export default class App extends preact.Component<{}, State> {
 
         const analysis: Analysis = await response.json();
 
+        const transcription = {
+          recording,
+          analysis,
+          transcriptionTime: Date.now() - startTranscriptionTime,
+        };
+
         this.setState({
           recorder: {
             name: 'transcribed',
-            analysis,
+            transcription,
           },
           transcriptions: [
             ...this.state.transcriptions,
-            {
-              recording,
-              analysis,
-            },
+            transcription,
           ],
         });
 
