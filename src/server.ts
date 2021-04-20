@@ -10,6 +10,14 @@ import dirs from './dirs';
 import launch from './helpers/launch';
 import analyze from './analyze';
 
+function sanitizeHeader(headerValue: string | string[] | undefined): string | null {
+  if (Array.isArray(headerValue)) {
+    return headerValue[headerValue.length - 1] ?? null;
+  }
+
+  return headerValue ?? null;
+}
+
 launch(async (emit) => {
   const app = new Koa();
 
@@ -20,9 +28,8 @@ launch(async (emit) => {
   }));
 
   app.use(route.post('/analyze', async ctx => {
-    const targetTranscript = ctx.headers['x-target-transcript'] ?? null;
-    emit({ targetTranscript });
-    ctx.body = JSON.stringify(await analyze(ctx.req));
+    const targetTranscript = sanitizeHeader(ctx.headers['x-target-transcript']);
+    ctx.body = JSON.stringify(await analyze(ctx.req, targetTranscript));
   }));
 
   await new Promise(resolve => app.listen(8080, '127.0.0.1', () => { resolve(null); }));

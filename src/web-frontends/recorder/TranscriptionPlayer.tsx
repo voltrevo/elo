@@ -1,7 +1,7 @@
 import type { TokenMetadata } from 'deepspeech';
 import * as preact from 'preact';
 
-import { Analysis } from '../../analyze';
+import type { Analysis, AnalysisToken } from '../../analyze';
 import audio from './audio';
 
 type Props = {
@@ -102,12 +102,21 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     });
   }
 
+  getTokens(): AnalysisToken[] {
+    if (this.props.data.analysis.targetTranscript) {
+      return this.props.data.analysis.targetTranscript;
+    }
+
+    return this.props.data.analysis.deepspeech.transcripts[0].tokens;
+  }
+
   findCursorPos(): CursorPos | null {
     if (!this.state.playback.playing) {
       return null;
     }
 
-    const [transcript] = this.props.data.analysis.transcripts;
+    const tokens = this.getTokens();
+
     const cursorTime = this.state.playback.time + this.props.cursorCorrection;
 
     let leftDetails: { x: number, t: number, top: number, bottom: number } | null = null;
@@ -140,23 +149,23 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
       const i = Number(iStr);
 
-      if (transcript.tokens[i].start_time <= cursorTime) {
+      if (tokens[i].start_time <= cursorTime) {
         const rect = tokenRef.getBoundingClientRect();
 
         leftDetails = {
           x: 0.5 * (rect.left + rect.right),
-          t: transcript.tokens[i].start_time,
+          t: tokens[i].start_time,
           top: rect.top,
           bottom: rect.bottom,
         };
       }
 
-      if (transcript.tokens[i].start_time >= cursorTime) {
+      if (tokens[i].start_time >= cursorTime) {
         const rect = tokenRef.getBoundingClientRect();
 
         rightDetails = {
           x: 0.5 * (rect.left + rect.right),
-          t: transcript.tokens[i].start_time,
+          t: tokens[i].start_time,
         };
 
         break;
@@ -180,7 +189,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
   }
 
   render() {
-    const [transcript] = this.props.data.analysis.transcripts;
+    const tokens = this.getTokens();
     const cursorPos = this.findCursorPos();
 
     if (cursorPos) {
@@ -196,12 +205,12 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       }, 250);
     }
 
-    type ExpandedToken = TokenMetadata | null;
+    type ExpandedToken = AnalysisToken | null;
 
     const expandedTokens: ExpandedToken[] = [];
     let prevToken: TokenMetadata | null = null;
 
-    for (const token of transcript.tokens) {
+    for (const token of tokens) {
       let gap = token.start_time - (prevToken?.start_time ?? 0);
 
       while (gap > this.props.maximumGap) {
@@ -213,7 +222,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       prevToken = token;
     }
 
-    const lastToken = transcript.tokens[transcript.tokens.length - 1];
+    const lastToken = tokens[tokens.length - 1];
 
     if (lastToken) {
       let gap = (this.props.data.recording.duration / 1000) - lastToken.start_time;
@@ -238,10 +247,14 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       }
 
       if (token !== null && 'start_time' in token) {
+        if (token.correct === false) {
+          classes.push('incorrect');
+        }
+
         return <span
           class={['token', ...classes].join(' ')}
           ref={r => {
-            this.tokenRefs[transcript.tokens.indexOf(token)] = r;
+            this.tokenRefs[tokens.indexOf(token)] = r;
 
             if (i === 0) {
               this.cursorStartRef = r;

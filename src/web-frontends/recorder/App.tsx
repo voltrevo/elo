@@ -120,6 +120,8 @@ export default class App extends preact.Component<{}, State> {
 
         const analysis: Analysis = await response.json();
 
+        console.log({ analysis });
+
         const transcription = {
           recording,
           analysis,
