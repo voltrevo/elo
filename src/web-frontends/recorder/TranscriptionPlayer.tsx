@@ -27,7 +27,6 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
   };
 
   tokenRefs: (HTMLSpanElement | null)[] = [];
-  textRef: HTMLDivElement | null = null;
 
   cursorStartRef: HTMLSpanElement | null = null;
   cursorEndRef: HTMLSpanElement | null = null;
@@ -268,7 +267,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         <div class="play-btn-text box-content">{this.state.playback.playing ? '| |' : '▶'}</div>
       </div>
       <div class="transcription-box right-box">
-        <div class="transcription-text box-content" ref={r => { this.textRef = r; }}>
+        <div class="transcription-text box-content">
           {expandedTokens.map((t, i) => renderExpandedToken(i))}
         </div>
       </div>
