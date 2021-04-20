@@ -44,7 +44,7 @@ const initialState: State = {
   },
   settings: {
     maximumGap: 0.15,
-    cursorCorrection: 0.24,
+    cursorCorrection: 0.31,
   },
   transcriptions: [],
 };

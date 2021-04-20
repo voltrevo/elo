@@ -167,10 +167,10 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       return null;
     }
 
-    const progress = (
+    const progress = Math.min(1, (
       (cursorTime - leftDetails.t) /
       (rightDetails.t - leftDetails.t)
-    );
+    ));
 
     return {
       x: leftDetails.x + progress * (rightDetails.x - leftDetails.x),
