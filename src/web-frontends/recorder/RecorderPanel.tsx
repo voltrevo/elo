@@ -71,7 +71,7 @@ export default class RecorderPanel extends preact.Component<Props> {
         />
       </div>
       <div class="right-box">
-        <div>{this.renderText()}</div>
+        <div class="box-content">{this.renderText()}</div>
       </div>
     </div>;
   }

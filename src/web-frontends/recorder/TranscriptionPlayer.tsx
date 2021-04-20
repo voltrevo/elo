@@ -265,10 +265,10 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
     return <div class="transcription-player panel">
       <div class="clickable left-box play-btn" onClick={() => this.play()}>
-        <div class="play-btn-text">{this.state.playback.playing ? '| |' : '▶'}</div>
+        <div class="play-btn-text box-content">{this.state.playback.playing ? '| |' : '▶'}</div>
       </div>
       <div class="transcription-box right-box">
-        <div class="transcription-text" ref={r => { this.textRef = r; }}>
+        <div class="transcription-text box-content" ref={r => { this.textRef = r; }}>
           {expandedTokens.map((t, i) => renderExpandedToken(i))}
         </div>
       </div>

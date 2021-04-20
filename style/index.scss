@@ -64,7 +64,7 @@ body {
         background-color: $subtle-brighten;
       }
 
-      > * {
+      .box-content {
         left: 50%;
         position: absolute;
         top: 50%;
@@ -76,7 +76,7 @@ body {
       flex-grow: 1;
       position: relative;
 
-      > * {
+      .box-content {
         padding: 0 2em;
         position: absolute;
         top: 50%;
