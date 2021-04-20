@@ -45,7 +45,14 @@ export default class RecorderPanel extends preact.Component<Props> {
         active={this.props.recordingState.name === 'recording'}
         onClick={this.props.onRecordToggle}
       />
-      <div>{this.renderText()}</div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+        <div>{this.renderText()}</div>
+        <input
+          type="text"
+          placeholder="Optional: Target transcript"
+          style={{ width: '100%' }}
+        />
+      </div>
     </div>;
   }
 }

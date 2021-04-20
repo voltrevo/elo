@@ -16,6 +16,10 @@ body {
   margin: 0;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 .recorder-app {
   .panel {
     background-color: $subtle-brighten;
@@ -90,6 +94,15 @@ body {
       .record-btn-outer {
         border: 3px solid $record-color;
       }
+    }
+  }
+
+  input {
+    &[type='text'] {
+      background-color: $subtle-brighten;
+      border: 0;
+      color: $fgcolor;
+      padding: .5em;
     }
   }
 }
