@@ -120,13 +120,13 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     const cursorTime = this.state.playback.time + this.props.cursorCorrection;
 
     let leftDetails: { x: number, t: number, top: number, bottom: number } | null = null;
-    let rightDetails: { x: number, t: number } | null = null;
+    let rightDetails: { x: number, t: number, top: number, bottom: number } | null = null;
 
     if (this.cursorStartRef) {
       const rect = getBoundingPageRect(this.cursorStartRef);
 
       leftDetails = {
-        x: 0.5 * (rect.left + rect.right),
+        x: rect.left,
         t: 0,
         top: rect.top,
         bottom: rect.bottom,
@@ -139,6 +139,8 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       rightDetails = {
         x: rect.right,
         t: this.props.data.recording.duration / 1000,
+        top: rect.top,
+        bottom: rect.bottom,
       };
     }
 
@@ -172,6 +174,8 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         rightDetails = {
           x: 0.5 * (rect.left + rect.right),
           t: token.start_time,
+          top: rect.top,
+          bottom: rect.bottom,
         };
 
         break;
@@ -189,8 +193,8 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
     return {
       x: leftDetails.x + progress * (rightDetails.x - leftDetails.x),
-      top: leftDetails.top,
-      bottom: leftDetails.bottom,
+      top: leftDetails.top + progress * (rightDetails.top - leftDetails.top),
+      bottom: leftDetails.bottom + progress * (rightDetails.bottom - leftDetails.bottom),
     };
   }
 
