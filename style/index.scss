@@ -52,6 +52,10 @@ body {
     }
   }
 
+  .monospace {
+    font-family: consolas, monospace;
+  }
+
   .transcription-player {
     .play-btn-text {
       font-size: 3em;
@@ -59,7 +63,6 @@ body {
 
     .transcription-box {
       .transcription-text {
-        font-family: consolas, monospace;
         line-height: 3em;
         white-space: pre-wrap;
 

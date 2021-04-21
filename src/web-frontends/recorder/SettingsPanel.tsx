@@ -57,6 +57,21 @@ export default class SettingsPanel extends preact.Component<Props> {
             />
           </div>
         </div>
+        <div style={{ marginLeft: '2em' }}>
+          Monospace:
+          <input
+            type="checkbox"
+            checked={this.props.settings.monospace}
+            onInput={e => {
+              const value = (e.target as HTMLInputElement).checked;
+
+              this.props.onChange({
+                ...this.props.settings,
+                monospace: value,
+              });
+            }}
+          />
+        </div>
       </div>
     </div>;
   }

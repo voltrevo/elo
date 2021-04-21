@@ -10,6 +10,7 @@ type Props = {
   },
   maximumGap: number,
   cursorCorrection: number,
+  monospace: boolean,
 };
 
 type State = {
@@ -324,12 +325,18 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       </span>;
     };
 
+    const textClasses = ['transcription-text'];
+
+    if (this.props.monospace) {
+      textClasses.push('monospace');
+    }
+
     return <div class="transcription-player panel">
       <div class="play-btn" onClick={() => this.play()}>
         <div class="play-btn-text">{this.state.playback.playing ? '| |' : '▶'}</div>
       </div>
       <div class="transcription-box">
-        <div class="transcription-text">
+        <div class={textClasses.join(' ')}>
           {expandedTokens.map((t, i) => renderExpandedToken(i))}
         </div>
       </div>
