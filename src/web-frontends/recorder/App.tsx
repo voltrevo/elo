@@ -12,7 +12,7 @@ export type Settings = {
   maximumGap: number,
   monospace: boolean,
   cursorCorrection: number,
-  tokenDisplay: 'both' | 'correct' | 'incorrect',
+  tokenDisplay: 'both' | 'target' | 'spoken',
 };
 
 export type RecordingState = (

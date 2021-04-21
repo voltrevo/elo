@@ -265,14 +265,14 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       if (token !== null && token.type !== undefined) {
         if (
           token.type === 'spoken-incorrect' &&
-          this.props.settings.tokenDisplay === 'correct'
+          this.props.settings.tokenDisplay === 'target'
         ) {
           return null;
         }
 
         if (
           token.type === 'missed' &&
-          this.props.settings.tokenDisplay === 'incorrect'
+          this.props.settings.tokenDisplay === 'spoken'
         ) {
           return null;
         }

@@ -87,22 +87,22 @@ export default class SettingsPanel extends preact.Component<Props> {
           <div>
             <input
               type="radio"
-              checked={this.props.settings.tokenDisplay === 'correct'}
+              checked={this.props.settings.tokenDisplay === 'target'}
               onInput={() => this.props.onChange({
                 ...this.props.settings,
-                tokenDisplay: 'correct',
+                tokenDisplay: 'target',
               })}
-            /> Correct
+            /> Target
           </div>
           <div>
             <input
               type="radio"
-              checked={this.props.settings.tokenDisplay === 'incorrect'}
+              checked={this.props.settings.tokenDisplay === 'spoken'}
               onInput={() => this.props.onChange({
                 ...this.props.settings,
-                tokenDisplay: 'incorrect',
+                tokenDisplay: 'spoken',
               })}
-            /> Incorrect
+            /> Spoken
           </div>
         </div>
       </div>
