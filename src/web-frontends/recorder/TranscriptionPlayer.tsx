@@ -123,7 +123,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     let rightDetails: { x: number, t: number } | null = null;
 
     if (this.cursorStartRef) {
-      const rect = this.cursorStartRef.getBoundingClientRect();
+      const rect = getBoundingPageRect(this.cursorStartRef);
 
       leftDetails = {
         x: 0.5 * (rect.left + rect.right),
@@ -134,7 +134,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     }
 
     if (this.cursorEndRef) {
-      const rect = this.cursorEndRef.getBoundingClientRect();
+      const rect = getBoundingPageRect(this.cursorEndRef);
 
       rightDetails = {
         x: rect.right,
@@ -156,7 +156,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       }
 
       if (token.start_time <= cursorTime) {
-        const rect = tokenRef.getBoundingClientRect();
+        const rect = getBoundingPageRect(tokenRef);
 
         leftDetails = {
           x: 0.5 * (rect.left + rect.right),
@@ -167,7 +167,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       }
 
       if (token.start_time >= cursorTime) {
-        const rect = tokenRef.getBoundingClientRect();
+        const rect = getBoundingPageRect(tokenRef);
 
         rightDetails = {
           x: 0.5 * (rect.left + rect.right),
@@ -312,4 +312,22 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       </div>
     </div>;
   }
+}
+
+type Rect = {
+  left: number,
+  right: number,
+  top: number,
+  bottom: number,
+}
+
+function getBoundingPageRect(element: HTMLElement): Rect {
+  const clientRect = element.getBoundingClientRect();
+
+  return {
+    left: window.scrollX + clientRect.left,
+    right: window.scrollX + clientRect.right,
+    top: window.scrollY + clientRect.top,
+    bottom: window.scrollY + clientRect.bottom,
+  };
 }
