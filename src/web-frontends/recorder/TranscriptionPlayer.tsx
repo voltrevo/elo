@@ -1,6 +1,7 @@
 import * as preact from 'preact';
 
 import type { Analysis, AnalysisToken } from '../../analyze';
+import { Settings } from './App';
 import audio from './audio';
 
 type Props = {
@@ -8,10 +9,7 @@ type Props = {
     recording: audio.Recording,
     analysis: Analysis,
   },
-  maximumGap: number,
-  cursorCorrection: number,
-  monospace: boolean,
-  showIncorrectTokens: boolean,
+  settings: Settings,
 };
 
 type State = {
@@ -121,7 +119,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
   findCursorPos(): CursorPos | null {
     const tokens = this.getTokens();
 
-    const cursorTime = this.state.time + this.props.cursorCorrection;
+    const cursorTime = this.state.time + this.props.settings.cursorCorrection;
 
     let leftDetails: { x: number, t: number, top: number, bottom: number } | null = null;
     let rightDetails: { x: number, t: number, top: number, bottom: number } | null = null;
@@ -230,9 +228,9 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       } else {
         let gap = token.start_time - (prevToken?.start_time ?? 0);
 
-        while (gap > this.props.maximumGap) {
+        while (gap > this.props.settings.maximumGap) {
           expandedTokens.push(null);
-          gap -= this.props.maximumGap;
+          gap -= this.props.settings.maximumGap;
         }
 
         expandedTokens.push(token);
@@ -245,9 +243,9 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     if (lastToken) {
       let gap = (this.props.data.recording.duration / 1000) - lastToken.start_time;
 
-      while (gap > this.props.maximumGap) {
+      while (gap > this.props.settings.maximumGap) {
         expandedTokens.push(null);
-        gap -= this.props.maximumGap;
+        gap -= this.props.settings.maximumGap;
       }
     }
 
@@ -265,8 +263,22 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       }
 
       if (token !== null && token.type !== undefined) {
-        if (token.type === 'spoken-incorrect' && this.props.showIncorrectTokens === false) {
+        if (
+          token.type === 'spoken-incorrect' &&
+          this.props.settings.tokenDisplay === 'correct'
+        ) {
           return null;
+        }
+
+        if (
+          token.type === 'missed' &&
+          this.props.settings.tokenDisplay === 'incorrect'
+        ) {
+          return null;
+        }
+
+        if (token.type === 'spoken-incorrect' && this.props.settings.tokenDisplay === 'both') {
+          classes.push('raise');
         }
 
         classes.push(token.type);
@@ -279,7 +291,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
           class={['token', ...classes].join(' ')}
           onClick={() => {
             this.setState({
-              time: startTime - this.props.cursorCorrection,
+              time: startTime - this.props.settings.cursorCorrection,
             });
           }}
           ref={r => {
@@ -346,7 +358,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
     const textClasses = ['transcription-text'];
 
-    if (this.props.monospace) {
+    if (this.props.settings.monospace) {
       textClasses.push('monospace');
     }
 

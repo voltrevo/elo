@@ -12,7 +12,7 @@ export type Settings = {
   maximumGap: number,
   monospace: boolean,
   cursorCorrection: number,
-  showIncorrectTokens: boolean,
+  tokenDisplay: 'both' | 'correct' | 'incorrect',
 };
 
 export type RecordingState = (
@@ -54,7 +54,7 @@ const initialState: State = {
     maximumGap: 0.15,
     monospace: false,
     cursorCorrection: 0.31,
-    showIncorrectTokens: true,
+    tokenDisplay: 'both',
   },
   transcriptions: [],
 };
@@ -171,10 +171,7 @@ export default class App extends preact.Component<{}, State> {
       {this.state.transcriptions.slice().reverse().map(data => (
         <TranscriptionPlayer
           data={data}
-          cursorCorrection={this.state.settings.cursorCorrection}
-          maximumGap={this.state.settings.maximumGap}
-          monospace={this.state.settings.monospace}
-          showIncorrectTokens={this.state.settings.showIncorrectTokens}
+          settings={this.state.settings}
         />
       ))}
     </div>;

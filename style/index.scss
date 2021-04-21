@@ -68,10 +68,13 @@ body {
         line-height: 3em;
         white-space: pre-wrap;
 
-        .spoken-incorrect {
-          color: $spoken-incorrect-color;
+        .raise {
           position: relative;
           top: -1em;
+        }
+
+        .spoken-incorrect {
+          color: $spoken-incorrect-color;
         }
 
         .missed {

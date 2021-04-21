@@ -72,20 +72,38 @@ export default class SettingsPanel extends preact.Component<Props> {
             }}
           />
         </div>
-        <div style={{ marginLeft: '2em' }}>
-          Show incorrect tokens:
-          <input
-            type="checkbox"
-            checked={this.props.settings.showIncorrectTokens}
-            onInput={e => {
-              const value = (e.target as HTMLInputElement).checked;
-
-              this.props.onChange({
+        <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '2em' }}>
+          <div>Token Display</div>
+          <div>
+            <input
+              type="radio"
+              checked={this.props.settings.tokenDisplay === 'both'}
+              onInput={() => this.props.onChange({
                 ...this.props.settings,
-                showIncorrectTokens: value,
-              });
-            }}
-          />
+                tokenDisplay: 'both',
+              })}
+            /> Both
+          </div>
+          <div>
+            <input
+              type="radio"
+              checked={this.props.settings.tokenDisplay === 'correct'}
+              onInput={() => this.props.onChange({
+                ...this.props.settings,
+                tokenDisplay: 'correct',
+              })}
+            /> Correct
+          </div>
+          <div>
+            <input
+              type="radio"
+              checked={this.props.settings.tokenDisplay === 'incorrect'}
+              onInput={() => this.props.onChange({
+                ...this.props.settings,
+                tokenDisplay: 'incorrect',
+              })}
+            /> Incorrect
+          </div>
         </div>
       </div>
     </div>;
