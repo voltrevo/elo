@@ -76,6 +76,11 @@ body {
           color: $missed-color;
           position: absolute;
           top: -2em;
+          z-index: -1;
+        }
+
+        .token {
+          cursor: pointer;
         }
       }
 

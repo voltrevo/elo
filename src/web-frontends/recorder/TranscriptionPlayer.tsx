@@ -189,7 +189,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       return null;
     }
 
-    const progress = Math.min(1, (
+    const progress = leftDetails.t === rightDetails.t ? 0.5 : Math.min(1, (
       (cursorTime - leftDetails.t) /
       (rightDetails.t - leftDetails.t)
     ));
@@ -267,9 +267,16 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         classes.push(token.type);
       }
 
-      if (token !== null && 'start_time' in token) {
+      if (token !== null && token.start_time !== undefined) {
+        const startTime = token.start_time;
+
         return <span
           class={['token', ...classes].join(' ')}
+          onClick={() => {
+            this.setState({
+              time: startTime - this.props.cursorCorrection,
+            });
+          }}
           ref={r => {
             this.tokenRefs[tokens.indexOf(token)] = r;
 
