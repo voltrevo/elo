@@ -1,6 +1,8 @@
 $bgcolor: #222;
 $fgcolor: #fff;
 
+$default-font: sans-serif;
+
 $record-color: rgba(255, 0, 0, 1);
 $record-color-dull: rgba(255, 0, 0, .5);
 
@@ -16,7 +18,7 @@ $missed-color: rgba(255, 0, 0, .5);
 body {
   background-color: $bgcolor;
   color: $fgcolor;
-  font-family: sans-serif;
+  font-family: $default-font;
   margin: 0;
 }
 
@@ -115,17 +117,16 @@ body {
     }
   }
 
-  input {
-    &[type='text'] {
-      background-color: $subtle-brighten;
-      border: 0;
-      color: $fgcolor;
-      padding: .5em;
+  .target-transcript {
+    background-color: $subtle-brighten;
+    border: 0;
+    color: $fgcolor;
+    font-family: $default-font;
+    padding: .5em;
 
-      &:focus {
-        outline-color: $subtle-brighten-2;
-        outline-style: solid;
-      }
+    &:focus {
+      outline-color: $subtle-brighten-2;
+      outline-style: solid;
     }
   }
 }

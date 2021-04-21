@@ -1,6 +1,7 @@
 import * as preact from 'preact';
 
 import { Analysis } from '../../analyze';
+import base58 from '../../helpers/base58';
 import never from '../../helpers/never';
 import audio from './audio';
 import RecorderPanel from './RecorderPanel';
@@ -58,7 +59,7 @@ const initialState: State = {
 
 export default class App extends preact.Component<{}, State> {
   state = initialState;
-  targetTranscriptRef: HTMLInputElement | undefined;
+  targetTranscriptRef: HTMLTextAreaElement | undefined;
 
   async updateLoop() {
     await new Promise(resolve => setTimeout(resolve, 110));
@@ -111,7 +112,9 @@ export default class App extends preact.Component<{}, State> {
         const targetTranscript = this.targetTranscriptRef?.value || undefined;
 
         if (targetTranscript !== undefined) {
-          headers['x-target-transcript'] = targetTranscript;
+          headers['x-target-transcript'] = base58.encode(
+            new TextEncoder().encode(targetTranscript),
+          );
         }
 
         const response = await fetch('/analyze', {

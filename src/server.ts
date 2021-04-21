@@ -9,6 +9,7 @@ import serveStaticCache from 'koa-static-cache';
 import dirs from './dirs';
 import launch from './helpers/launch';
 import analyze from './analyze';
+import base58 from './helpers/base58';
 
 function sanitizeHeader(headerValue: string | string[] | undefined): string | null {
   if (Array.isArray(headerValue)) {
@@ -28,7 +29,13 @@ launch(async (emit) => {
   }));
 
   app.use(route.post('/analyze', async ctx => {
-    const targetTranscript = sanitizeHeader(ctx.headers['x-target-transcript']);
+    const targetTranscriptEncoded = sanitizeHeader(ctx.headers['x-target-transcript']);
+    let targetTranscript: string | null = null;
+
+    if (targetTranscriptEncoded !== null) {
+      targetTranscript = new TextDecoder().decode(base58.decode(targetTranscriptEncoded));
+    }
+
     ctx.body = JSON.stringify(await analyze(ctx.req, targetTranscript));
   }));
 
