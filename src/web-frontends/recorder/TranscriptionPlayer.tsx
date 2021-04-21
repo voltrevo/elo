@@ -11,6 +11,7 @@ type Props = {
   maximumGap: number,
   cursorCorrection: number,
   monospace: boolean,
+  showIncorrectTokens: boolean,
 };
 
 type State = {
@@ -264,6 +265,10 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       }
 
       if (token !== null && token.type !== undefined) {
+        if (token.type === 'spoken-incorrect' && this.props.showIncorrectTokens === false) {
+          return null;
+        }
+
         classes.push(token.type);
       }
 

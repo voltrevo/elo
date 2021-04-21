@@ -72,6 +72,21 @@ export default class SettingsPanel extends preact.Component<Props> {
             }}
           />
         </div>
+        <div style={{ marginLeft: '2em' }}>
+          Show incorrect tokens:
+          <input
+            type="checkbox"
+            checked={this.props.settings.showIncorrectTokens}
+            onInput={e => {
+              const value = (e.target as HTMLInputElement).checked;
+
+              this.props.onChange({
+                ...this.props.settings,
+                showIncorrectTokens: value,
+              });
+            }}
+          />
+        </div>
       </div>
     </div>;
   }

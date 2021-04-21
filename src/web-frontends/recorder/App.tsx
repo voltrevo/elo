@@ -12,6 +12,7 @@ export type Settings = {
   maximumGap: number,
   monospace: boolean,
   cursorCorrection: number,
+  showIncorrectTokens: boolean,
 };
 
 export type RecordingState = (
@@ -53,6 +54,7 @@ const initialState: State = {
     maximumGap: 0.15,
     monospace: false,
     cursorCorrection: 0.31,
+    showIncorrectTokens: true,
   },
   transcriptions: [],
 };
@@ -172,6 +174,7 @@ export default class App extends preact.Component<{}, State> {
           cursorCorrection={this.state.settings.cursorCorrection}
           maximumGap={this.state.settings.maximumGap}
           monospace={this.state.settings.monospace}
+          showIncorrectTokens={this.state.settings.showIncorrectTokens}
         />
       ))}
     </div>;

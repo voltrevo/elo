@@ -12,8 +12,8 @@ $subtle-mark-color: rgba(255, 255, 255, .2);
 $subtle-brighten: rgba(255, 255, 255, 5%);
 $subtle-brighten-2: rgba(255, 255, 255, 10%);
 
-$spoken-incorrect-color: hsl(338deg 100% 72%);
-$missed-color: rgba(255, 0, 0, .5);
+$spoken-incorrect-color: hsl(338deg, 100%, 72%);
+$missed-color: rgba(255, 137, 137, 1);
 
 body {
   background-color: $bgcolor;
@@ -70,12 +70,12 @@ body {
 
         .spoken-incorrect {
           color: $spoken-incorrect-color;
+          position: relative;
+          top: -1em;
         }
 
         .missed {
           color: $missed-color;
-          position: absolute;
-          top: -2em;
           z-index: -1;
         }
 
