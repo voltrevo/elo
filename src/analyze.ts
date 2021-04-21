@@ -32,7 +32,7 @@ export type Analysis = {
   target?: TargetAnalysis,
 };
 
-export type AnalysisToken = deepspeech.TokenMetadata & { correct?: boolean };
+export type AnalysisToken = Partial<deepspeech.TokenMetadata & { correct: boolean }>;
 
 export default async function analyze(
   webmStream: ReadableStream,
@@ -62,10 +62,27 @@ function analyzeTargetTranscript(
   const tokens: AnalysisToken[] = [];
   let tokenPos = 0;
   let rawTargetTranscriptWithCasePos = 0;
+  let targetTranscriptPos = 0;
+
+  function syncPunctuation() {
+    while (
+      targetTranscriptPos < targetTranscript.length &&
+      targetTranscript[targetTranscriptPos] !==
+      rawTargetTranscriptWithCase[rawTargetTranscriptWithCasePos]
+    ) {
+      tokens.push({
+        text: targetTranscript[targetTranscriptPos],
+      });
+
+      targetTranscriptPos++;
+    }
+  }
 
   for (const hunk of hunks) {
     for (const _c of hunk.value) {
       if (!hunk.removed) {
+        syncPunctuation();
+
         tokens.push({
           ...deepspeechAnalysis.transcripts[0].tokens[tokenPos],
           text: hunk.added
@@ -79,9 +96,12 @@ function analyzeTargetTranscript(
 
       if (!hunk.added) {
         rawTargetTranscriptWithCasePos++;
+        targetTranscriptPos++;
       }
     }
   }
+
+  syncPunctuation();
 
   assert(tokenPos === deepspeechTranscript.length);
 

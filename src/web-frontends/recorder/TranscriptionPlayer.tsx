@@ -149,23 +149,29 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
       const i = Number(iStr);
 
-      if (tokens[i].start_time <= cursorTime) {
+      const token = tokens[i];
+
+      if (token.start_time === undefined) {
+        continue;
+      }
+
+      if (token.start_time <= cursorTime) {
         const rect = tokenRef.getBoundingClientRect();
 
         leftDetails = {
           x: 0.5 * (rect.left + rect.right),
-          t: tokens[i].start_time,
+          t: token.start_time,
           top: rect.top,
           bottom: rect.bottom,
         };
       }
 
-      if (tokens[i].start_time >= cursorTime) {
+      if (token.start_time >= cursorTime) {
         const rect = tokenRef.getBoundingClientRect();
 
         rightDetails = {
           x: 0.5 * (rect.left + rect.right),
-          t: tokens[i].start_time,
+          t: token.start_time,
         };
 
         break;
@@ -208,21 +214,25 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     type ExpandedToken = AnalysisToken | null;
 
     const expandedTokens: ExpandedToken[] = [];
-    let prevToken: TokenMetadata | null = null;
+    let prevToken: (AnalysisToken & { start_time: number }) | null = null;
 
     for (const token of tokens) {
-      let gap = token.start_time - (prevToken?.start_time ?? 0);
+      if (token.start_time === undefined) {
+        expandedTokens.push(token);
+      } else {
+        let gap = token.start_time - (prevToken?.start_time ?? 0);
 
-      while (gap > this.props.maximumGap) {
-        expandedTokens.push(null);
-        gap -= this.props.maximumGap;
+        while (gap > this.props.maximumGap) {
+          expandedTokens.push(null);
+          gap -= this.props.maximumGap;
+        }
+
+        expandedTokens.push(token);
+        prevToken = { ...token, start_time: token.start_time };
       }
-
-      expandedTokens.push(token);
-      prevToken = token;
     }
 
-    const lastToken = tokens[tokens.length - 1];
+    const lastToken = prevToken;
 
     if (lastToken) {
       let gap = (this.props.data.recording.duration / 1000) - lastToken.start_time;
@@ -269,8 +279,10 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         </span>;
       }
 
+      const text = token?.text ?? ' ';
+
       if (i !== 0 && i !== expandedTokens.length - 1) {
-        return ' ';
+        return text;
       }
 
       return <span
@@ -285,7 +297,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
           }
         }}
       >
-        &nbsp;
+        {text}
       </span>;
     };
 
