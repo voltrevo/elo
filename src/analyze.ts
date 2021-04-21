@@ -54,7 +54,11 @@ function analyzeTargetTranscript(
   deepspeechAnalysis: Analysis['deepspeech'],
   targetTranscript: string,
 ): TargetAnalysis {
-  const deepspeechTranscript = deepspeechAnalysis.transcripts[0].tokens.map(t => t.text).join('');
+  const originalDeepspeechTokens = deepspeechAnalysis.transcripts[0].tokens;
+  const originalDeepspeechTranscript = originalDeepspeechTokens.map(t => t.text).join('');
+
+  const deepspeechTokens = originalDeepspeechTokens.filter(t => t.text !== '\'');
+  const deepspeechTranscript = deepspeechTokens.map(t => t.text).join('');
 
   const rawTargetTranscriptWithCase = targetTranscript.replace(/[^a-zA-Z ]/g, '');
   const rawTargetTranscript = rawTargetTranscriptWithCase.toLowerCase();
@@ -115,7 +119,7 @@ function analyzeTargetTranscript(
 
   return {
     targetTranscript,
-    speechTranscript: deepspeechTranscript,
+    speechTranscript: originalDeepspeechTranscript,
     tokens,
   };
 }
