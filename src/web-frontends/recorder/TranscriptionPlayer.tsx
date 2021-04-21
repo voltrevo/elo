@@ -1,4 +1,3 @@
-import type { TokenMetadata } from 'deepspeech';
 import * as preact from 'preact';
 
 import type { Analysis, AnalysisToken } from '../../analyze';
@@ -293,10 +292,17 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
           let k = i + 1;
 
-          while (expandedTokens[k]?.type === 'missed') {
+          while (
+            expandedTokens[k]?.type === 'missed' &&
+            /^[a-zA-Z]$/.test(expandedTokens[k]?.text ?? '')
+          ) {
             text += expandedTokens[k]?.text;
             k++;
           }
+
+          return <span style={{ position: 'relative' }}>
+            <span class={classes.join(' ')}>{text}</span>
+          </span>;
         }
 
         return <span class={classes.join(' ')}>{text}</span>;

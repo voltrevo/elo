@@ -59,8 +59,8 @@ body {
 
     .transcription-box {
       .transcription-text {
-        line-height: 2em;
-        position: relative;
+        font-family: consolas, monospace;
+        line-height: 3em;
         white-space: pre-wrap;
 
         .spoken-incorrect {
@@ -70,7 +70,7 @@ body {
         .missed {
           color: $missed-color;
           position: absolute;
-          top: -1em;
+          top: -2em;
         }
       }
 
