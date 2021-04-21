@@ -1,8 +1,8 @@
 namespace audio {
   export type Recording = {
     type: 'audio.Recording',
-    duration: number,
-    blob: Blob,
+    duration: number | null,
+    data: Blob | File,
   };
 
   export type Recorder = {
@@ -29,7 +29,7 @@ namespace audio {
         resolve({
           type: 'audio.Recording',
           duration: Date.now() - startTime,
-          blob: new Blob(recordedBlobs, { type: 'audio/webm' }),
+          data: new Blob(recordedBlobs, { type: 'audio/webm' }),
         });
       };
     });
@@ -55,7 +55,7 @@ namespace audio {
   export async function play(recording: Recording): Promise<void> {
     const audioElement = document.createElement('audio');
     audioElement.setAttribute('controls', '');
-    const url = URL.createObjectURL(recording.blob);
+    const url = URL.createObjectURL(recording.data);
     audioElement.src = url;
 
     document.body.append(audioElement);

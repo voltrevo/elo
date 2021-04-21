@@ -57,7 +57,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
     if (this.audioElement === null) {
       this.audioElement = document.createElement('audio');
-      const url = URL.createObjectURL(this.props.data.recording.blob);
+      const url = URL.createObjectURL(this.props.data.recording.data);
       this.audioElement.src = url;
       document.body.append(this.audioElement);
     }
@@ -135,7 +135,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       };
     }
 
-    if (this.cursorEndRef) {
+    if (this.cursorEndRef && this.props.data.recording.duration !== null) {
       const rect = getBoundingPageRect(this.cursorEndRef);
 
       rightDetails = {
@@ -240,7 +240,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
     const lastToken = prevToken;
 
-    if (lastToken) {
+    if (lastToken && this.props.data.recording.duration !== null) {
       let gap = (this.props.data.recording.duration / 1000) - lastToken.start_time;
 
       while (gap > this.props.settings.maximumGap) {

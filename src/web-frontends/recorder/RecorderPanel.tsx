@@ -8,6 +8,7 @@ type Props = {
   recordingState: RecordingState,
   onRecordToggle: () => void,
   onTargetTranscriptRef: (ref: HTMLTextAreaElement) => void,
+  onFile: (file: File) => void,
 };
 
 export default class RecorderPanel extends preact.Component<Props> {
@@ -23,7 +24,7 @@ export default class RecorderPanel extends preact.Component<Props> {
 
       case 'recorded':
         return <p>
-          Recorded {(recordingState.duration / 1000).toFixed(1)}s, transcribing...
+          Recorded {((recordingState.recording.duration ?? 0) / 1000).toFixed(1)}s, transcribing...
         </p>;
 
       case 'transcribed':
@@ -31,9 +32,14 @@ export default class RecorderPanel extends preact.Component<Props> {
 
         const recordingDuration = recordingState.transcription.recording.duration;
         const transcriptionTime = recordingState.transcription.transcriptionTime;
-        const speedStr = `${(100 * recordingDuration / transcriptionTime).toFixed(0)}%`;
 
-        return <p>Transcribed in {timeStr} (speed: {speedStr})</p>;
+        let speedStr = '';
+
+        if (recordingDuration !== null) {
+          speedStr = ` (speed: ${(100 * recordingDuration / transcriptionTime).toFixed(0)}%)`;
+        }
+
+        return <p>Transcribed in {timeStr}{speedStr}</p>;
 
       default:
         never(recordingState);
@@ -45,6 +51,7 @@ export default class RecorderPanel extends preact.Component<Props> {
       <RecordButton
         active={this.props.recordingState.name === 'recording'}
         onClick={this.props.onRecordToggle}
+        onFile={this.props.onFile}
       />
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
         <div>{this.renderText()}</div>

@@ -25,7 +25,6 @@ export type RecordingState = (
   } |
   {
     name: 'recorded',
-    duration: number,
     recording: audio.Recording,
   } |
   {
@@ -78,6 +77,26 @@ export default class App extends preact.Component<{}, State> {
     }
   }
 
+  async onFile(file: File) {
+    // TODO: Why is this necessary??
+    const state = this.state ?? initialState;
+
+    switch (state.recorder.name) {
+      case 'init':
+      case 'transcribed':
+        await this.transcribe({ type: 'audio.Recording', duration: null, data: file });
+        break;
+
+      case 'recorded':
+      case 'recording':
+        console.error(`Refusing to process file in state ${state.recorder.name}`);
+        break;
+
+      default:
+        never(state.recorder);
+    }
+  }
+
   async onRecordToggle() {
     switch (this.state.recorder.name) {
       case 'init':
@@ -103,7 +122,6 @@ export default class App extends preact.Component<{}, State> {
         this.setState({
           recorder: {
             name: 'recorded',
-            duration: Date.now() - this.state.recorder.startTime,
             recording,
           },
         });
@@ -122,7 +140,7 @@ export default class App extends preact.Component<{}, State> {
         const response = await fetch('/analyze', {
           method: 'POST',
           headers,
-          body: recording.blob,
+          body: recording.data,
         });
 
         const analysis: Analysis = await response.json();
@@ -157,12 +175,60 @@ export default class App extends preact.Component<{}, State> {
     }
   }
 
+  async transcribe(recording: audio.Recording) {
+    this.setState({
+      recorder: {
+        name: 'recorded',
+        recording,
+      },
+    });
+
+    const startTranscriptionTime = Date.now();
+
+    const headers: Record<string, string> = {};
+    const targetTranscript = this.targetTranscriptRef?.value || undefined;
+
+    if (targetTranscript !== undefined) {
+      headers['x-target-transcript'] = base58.encode(
+        new TextEncoder().encode(targetTranscript),
+      );
+    }
+
+    const response = await fetch('/analyze', {
+      method: 'POST',
+      headers,
+      body: recording instanceof File ? recording : recording.data,
+    });
+
+    const analysis: Analysis = await response.json();
+
+    console.log({ analysis });
+
+    const transcription = {
+      recording,
+      analysis,
+      transcriptionTime: Date.now() - startTranscriptionTime,
+    };
+
+    this.setState({
+      recorder: {
+        name: 'transcribed',
+        transcription,
+      },
+      transcriptions: [
+        ...this.state.transcriptions,
+        transcription,
+      ],
+    });
+  }
+
   render() {
     return <div class="recorder-app">
       <RecorderPanel
         recordingState={this.state.recorder}
         onRecordToggle={() => this.onRecordToggle()}
         onTargetTranscriptRef={r => { this.targetTranscriptRef = r; }}
+        onFile={this.onFile}
       />
       <SettingsPanel
         settings={this.state.settings}
