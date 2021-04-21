@@ -54,25 +54,32 @@ function analyzeTargetTranscript(
 ): TargetAnalysis {
   const deepspeechTranscript = deepspeechAnalysis.transcripts[0].tokens.map(t => t.text).join('');
 
-  const rawTargetTranscript = targetTranscript.toLowerCase().replace(/[^a-z ]/g, '');
+  const rawTargetTranscriptWithCase = targetTranscript.replace(/[^a-zA-Z ]/g, '');
+  const rawTargetTranscript = rawTargetTranscriptWithCase.toLowerCase();
 
   const hunks = diff.diffChars(rawTargetTranscript, deepspeechTranscript);
 
   const tokens: AnalysisToken[] = [];
   let tokenPos = 0;
+  let rawTargetTranscriptWithCasePos = 0;
 
   for (const hunk of hunks) {
     for (const _c of hunk.value) {
-      if (hunk.removed) {
-        continue;
+      if (!hunk.removed) {
+        tokens.push({
+          ...deepspeechAnalysis.transcripts[0].tokens[tokenPos],
+          text: hunk.added
+            ? deepspeechAnalysis.transcripts[0].tokens[tokenPos].text
+            : rawTargetTranscriptWithCase[rawTargetTranscriptWithCasePos],
+          correct: !hunk.added,
+        });
+
+        tokenPos++;
       }
 
-      tokens.push({
-        ...deepspeechAnalysis.transcripts[0].tokens[tokenPos],
-        correct: !hunk.added,
-      });
-
-      tokenPos++;
+      if (!hunk.added) {
+        rawTargetTranscriptWithCasePos++;
+      }
     }
   }
 
