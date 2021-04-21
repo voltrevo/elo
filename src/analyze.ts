@@ -32,7 +32,9 @@ export type Analysis = {
   target?: TargetAnalysis,
 };
 
-export type AnalysisToken = Partial<deepspeech.TokenMetadata & { correct: boolean }>;
+export type AnalysisToken = Partial<deepspeech.TokenMetadata & {
+  type: 'correct' | 'spoken-incorrect' | 'missed',
+}>;
 
 export default async function analyze(
   webmStream: ReadableStream,
@@ -79,19 +81,25 @@ function analyzeTargetTranscript(
   }
 
   for (const hunk of hunks) {
-    for (const _c of hunk.value) {
-      if (!hunk.removed) {
-        syncPunctuation();
+    for (const c of hunk.value) {
+      syncPunctuation();
+      const correct = !hunk.added && !hunk.removed;
 
+      if (!hunk.removed) {
         tokens.push({
           ...deepspeechAnalysis.transcripts[0].tokens[tokenPos],
           text: hunk.added
             ? deepspeechAnalysis.transcripts[0].tokens[tokenPos].text
             : rawTargetTranscriptWithCase[rawTargetTranscriptWithCasePos],
-          correct: !hunk.added,
+          type: correct ? 'correct' : 'spoken-incorrect',
         });
 
         tokenPos++;
+      } else {
+        tokens.push({
+          text: c,
+          type: 'missed',
+        });
       }
 
       if (!hunk.added) {

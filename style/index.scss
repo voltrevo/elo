@@ -4,13 +4,14 @@ $fgcolor: #fff;
 $record-color: rgba(255, 0, 0, 1);
 $record-color-dull: rgba(255, 0, 0, .5);
 
-$incorrect-color: rgba(255, 0, 0, 1);
-
 $highlight-color: rgba(255, 255, 0, 1);
 
 $subtle-mark-color: rgba(255, 255, 255, .2);
 $subtle-brighten: rgba(255, 255, 255, 5%);
 $subtle-brighten-2: rgba(255, 255, 255, 10%);
+
+$spoken-incorrect-color: hsl(338deg 100% 72%);
+$missed-color: rgba(255, 0, 0, .5);
 
 body {
   background-color: $bgcolor;
@@ -59,10 +60,17 @@ body {
     .transcription-box {
       .transcription-text {
         line-height: 2em;
+        position: relative;
         white-space: pre-wrap;
 
-        .incorrect {
-          color: $incorrect-color;
+        .spoken-incorrect {
+          color: $spoken-incorrect-color;
+        }
+
+        .missed {
+          color: $missed-color;
+          position: absolute;
+          top: -1em;
         }
       }
 

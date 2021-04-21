@@ -256,11 +256,11 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         classes.push('text-end');
       }
 
-      if (token !== null && 'start_time' in token) {
-        if (token.correct === false) {
-          classes.push('incorrect');
-        }
+      if (token !== null && token.type !== undefined) {
+        classes.push(token.type);
+      }
 
+      if (token !== null && 'start_time' in token) {
         return <span
           class={['token', ...classes].join(' ')}
           ref={r => {
@@ -279,10 +279,27 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         </span>;
       }
 
-      const text = token?.text ?? ' ';
+      let text = token?.text ?? ' ';
 
       if (i !== 0 && i !== expandedTokens.length - 1) {
-        return text;
+        if (token === null) {
+          return text;
+        }
+
+        if (token.type === 'missed') {
+          if (expandedTokens[i - 1]?.type === 'missed') {
+            return null;
+          }
+
+          let k = i + 1;
+
+          while (expandedTokens[k]?.type === 'missed') {
+            text += expandedTokens[k]?.text;
+            k++;
+          }
+        }
+
+        return <span class={classes.join(' ')}>{text}</span>;
       }
 
       return <span
