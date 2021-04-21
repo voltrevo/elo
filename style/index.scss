@@ -99,12 +99,12 @@ body {
         background-color: $record-color;
         border-radius: 100%;
         display: inline-block;
-        height: calc(3em - 9px);
+        height: calc(3em - 12px);
         left: 50%;
         position: absolute;
         top: 50%;
         transform: translate(-50%, -50%);
-        width: calc(3em - 9px);
+        width: calc(3em - 12px);
       }
     }
 
