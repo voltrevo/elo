@@ -136,12 +136,16 @@ body {
 }
 
 .transcription-cursor {
-  animation: fade-out 200ms;
   background-color: $highlight-color;
   border-radius: 100%;
   height: 5px;
-  opacity: 0;
+  opacity: 1;
   position: absolute;
   transform: translateX(-50%);
   width: 5px;
+
+  &.fade-out {
+    animation: fade-out 200ms;
+    opacity: 0;
+  }
 }

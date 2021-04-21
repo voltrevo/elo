@@ -14,10 +14,8 @@ type Props = {
 };
 
 type State = {
-  playback: (
-    { playing: false } |
-    { playing: true, time: number }
-  ),
+  time: number,
+  playing: boolean,
   loadedTotalTime?: number,
 };
 
@@ -29,37 +27,49 @@ type CursorPos = {
 
 export default class TranscriptionPlayer extends preact.Component<Props, State> {
   state: State = {
-    playback: {
-      playing: false,
-    },
+    playing: false,
+    time: 0,
   };
+
+  // TODO: Store these on app?
+  audioElement: HTMLAudioElement | null = null;
 
   tokenRefs: (HTMLSpanElement | null)[] = [];
 
   cursorStartRef: HTMLSpanElement | null = null;
   cursorEndRef: HTMLSpanElement | null = null;
 
-  async play() {
-    if (this.state.playback.playing) {
+  async playPause() {
+    if (this.state.playing) {
+      this.setState({
+        playing: false,
+      });
+
+      if (this.audioElement) {
+        this.audioElement.pause();
+      }
+
       return;
     }
 
     this.setState({
-      playback: {
-        playing: true,
-        time: 0,
-      },
+      playing: true,
     });
 
-    const audioElement = document.createElement('audio');
-    const url = URL.createObjectURL(this.props.data.recording.blob);
-    audioElement.src = url;
+    if (this.audioElement === null) {
+      this.audioElement = document.createElement('audio');
+      const url = URL.createObjectURL(this.props.data.recording.blob);
+      this.audioElement.src = url;
+      document.body.append(this.audioElement);
+    }
 
-    document.body.append(audioElement);
+    const audioElement = this.audioElement;
+
+    audioElement.currentTime = this.state.time;
 
     await audioElement.play();
 
-    let startTime = Date.now();
+    let startTime = Date.now() - this.state.time * 1000;
 
     audioElement.ontimeupdate = () => {
       const predictedTime = (Date.now() - startTime) / 1000;
@@ -68,15 +78,12 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     };
 
     const updateTimeLoop = () => {
-      if (this.state.playback.playing === false) {
+      if (this.state.playing === false) {
         return;
       }
 
       this.setState({
-        playback: {
-          playing: true,
-          time: (Date.now() - startTime) / 1000,
-        },
+        time: (Date.now() - startTime) / 1000,
         loadedTotalTime: Number.isFinite(audioElement.duration)
           ? audioElement.duration
           : this.state.loadedTotalTime,
@@ -89,16 +96,16 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
     await new Promise<void>(resolve => {
       audioElement.onended = () => {
-        URL.revokeObjectURL(url);
+        URL.revokeObjectURL(audioElement.src);
         audioElement.remove();
+        this.audioElement = null;
         resolve();
       };
     });
 
     this.setState({
-      playback: {
-        playing: false,
-      },
+      playing: false,
+      time: 0,
     });
   }
 
@@ -111,13 +118,9 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
   }
 
   findCursorPos(): CursorPos | null {
-    if (!this.state.playback.playing) {
-      return null;
-    }
-
     const tokens = this.getTokens();
 
-    const cursorTime = this.state.playback.time + this.props.cursorCorrection;
+    const cursorTime = this.state.time + this.props.cursorCorrection;
 
     let leftDetails: { x: number, t: number, top: number, bottom: number } | null = null;
     let rightDetails: { x: number, t: number, top: number, bottom: number } | null = null;
@@ -204,7 +207,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
     if (cursorPos) {
       const cursorEl = document.createElement('div');
-      cursorEl.classList.add('transcription-cursor');
+      cursorEl.classList.add('transcription-cursor', 'fade-out');
       document.body.appendChild(cursorEl);
 
       cursorEl.style.left = `${cursorPos.x}px`;
@@ -336,11 +339,18 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     }
 
     return <div class="transcription-player panel">
-      <div class="play-btn" onClick={() => this.play()}>
-        <div class="play-btn-text">{this.state.playback.playing ? '| |' : '▶'}</div>
+      <div class="play-btn" onClick={() => this.playPause()}>
+        <div class="play-btn-text">{this.state.playing ? '| |' : '▶'}</div>
       </div>
       <div class="transcription-box">
         <div class={textClasses.join(' ')}>
+          {cursorPos && <div
+            class="transcription-cursor"
+            style={{
+              left: `${cursorPos.x}px`,
+              top: `${cursorPos.bottom + 2}px`,
+            }}
+          />}
           {expandedTokens.map((t, i) => renderExpandedToken(i))}
         </div>
       </div>
