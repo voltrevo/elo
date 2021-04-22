@@ -376,21 +376,12 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       textClasses.push('monospace');
     }
 
-    return <div class="transcription-player panel">
+    const panel = <div class="transcription-player panel">
       <div class="play-btn" onClick={() => this.playPause()}>
         <div class="play-btn-text">{this.state.playing ? '| |' : '▶'}</div>
       </div>
       <div class="transcription-box">
-        <div class={textClasses.join(' ')}>
-          {cursorPos && <div
-            class="transcription-cursor"
-            style={{
-              left: `${cursorPos.x}px`,
-              top: `${cursorPos.bottom + 2}px`,
-            }}
-          />}
-          {this.renderTokens()}
-        </div>
+        <div class={textClasses.join(' ')}>{this.renderTokens()}</div>
         <div
           style={{
             position: 'absolute',
@@ -417,6 +408,17 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         </div>
       </div>
     </div>;
+
+    return <>
+      {panel}
+      {cursorPos && <div
+        class="transcription-cursor"
+        style={{
+          left: `${cursorPos.x}px`,
+          top: `${cursorPos.bottom + 2}px`,
+        }}
+      />}
+    </>;
   }
 }
 
