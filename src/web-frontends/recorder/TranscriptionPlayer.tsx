@@ -25,6 +25,8 @@ type CursorPos = {
   bottom: number,
 };
 
+type ExpandedToken = AnalysisToken | null;
+
 export default class TranscriptionPlayer extends preact.Component<Props, State> {
   state: State = {
     playing: false,
@@ -201,25 +203,8 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     };
   }
 
-  render() {
+  getExpandedTokens(): ExpandedToken[] {
     const tokens = this.getTokens();
-    const cursorPos = this.findCursorPos();
-
-    if (cursorPos) {
-      const cursorEl = document.createElement('div');
-      cursorEl.classList.add('transcription-cursor', 'fade-out');
-      document.body.appendChild(cursorEl);
-
-      cursorEl.style.left = `${cursorPos.x}px`;
-      cursorEl.style.top = `${cursorPos.bottom + 2}px`;
-
-      setTimeout(() => {
-        cursorEl.remove();
-      }, 250);
-    }
-
-    type ExpandedToken = AnalysisToken | null;
-
     const expandedTokens: ExpandedToken[] = [];
     let prevToken: (AnalysisToken & { start_time: number }) | null = null;
 
@@ -249,6 +234,13 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         gap -= this.props.settings.maximumGap;
       }
     }
+
+    return expandedTokens;
+  }
+
+  renderTokens(): preact.JSX.Element {
+    const tokens = this.getTokens();
+    const expandedTokens = this.getExpandedTokens();
 
     const renderExpandedToken = (i: number) => {
       const token = expandedTokens[i];
@@ -357,6 +349,27 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       </span>;
     };
 
+    return <>
+      {expandedTokens.map((_t, i) => renderExpandedToken(i))}
+    </>;
+  }
+
+  render() {
+    const cursorPos = this.findCursorPos();
+
+    if (cursorPos) {
+      const cursorEl = document.createElement('div');
+      cursorEl.classList.add('transcription-cursor', 'fade-out');
+      document.body.appendChild(cursorEl);
+
+      cursorEl.style.left = `${cursorPos.x}px`;
+      cursorEl.style.top = `${cursorPos.bottom + 2}px`;
+
+      setTimeout(() => {
+        cursorEl.remove();
+      }, 250);
+    }
+
     const textClasses = ['transcription-text'];
 
     if (this.props.settings.monospace) {
@@ -376,7 +389,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
               top: `${cursorPos.bottom + 2}px`,
             }}
           />}
-          {expandedTokens.map((t, i) => renderExpandedToken(i))}
+          {this.renderTokens()}
         </div>
         <div
           style={{
