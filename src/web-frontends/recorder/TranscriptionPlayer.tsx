@@ -377,6 +377,30 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
           />}
           {expandedTokens.map((t, i) => renderExpandedToken(i))}
         </div>
+        <div
+          style={{
+            position: 'absolute',
+            right: '0.2em',
+            bottom: '0.2em',
+          }}
+          onClick={() => {
+            const url = URL.createObjectURL(this.props.data.recording.data);
+            download('recording.webm', url);
+            URL.revokeObjectURL(url);
+          }}
+        >
+          ⬇️
+        </div>
+        <div
+          style={{
+            position: 'absolute',
+            right: '0.2em',
+            top: '0.2em',
+          }}
+          // onClick={this.props.onDelete}
+        >
+          ❌
+        </div>
       </div>
     </div>;
   }
@@ -398,4 +422,17 @@ function getBoundingPageRect(element: HTMLElement): Rect {
     top: window.scrollY + clientRect.top,
     bottom: window.scrollY + clientRect.bottom,
   };
+}
+
+function download(filename: string, url: string) {
+  var element = document.createElement('a');
+  element.setAttribute('href', url);
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
 }
