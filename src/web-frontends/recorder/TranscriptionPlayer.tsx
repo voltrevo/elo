@@ -1,6 +1,7 @@
 import * as preact from 'preact';
 
 import type { Analysis, AnalysisToken } from '../../analyze';
+import never from '../../helpers/never';
 import { Settings } from './App';
 import audio from './audio';
 
@@ -26,6 +27,19 @@ type CursorPos = {
 };
 
 type ExpandedToken = AnalysisToken | null;
+
+type Segment = {
+  type: 'correct' | 'spoken-incorrect' | 'missed' | 'combined',
+  raisedTokens: ExpandedToken[],
+  tokens: ExpandedToken[],
+};
+
+type Word = {
+  tokens: ExpandedToken[],
+  target: string,
+  spoken: string,
+  segments: Segment[],
+}
 
 export default class TranscriptionPlayer extends preact.Component<Props, State> {
   state: State = {
@@ -238,9 +252,111 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     return expandedTokens;
   }
 
+  static assembleWords(expandedTokens: ExpandedToken[]): Word[] {
+    const flatWords: ExpandedToken[][] = [];
+    let currentWord: ExpandedToken[] = [];
+
+    for (const token of expandedTokens) {
+      if (token?.text === ' ' && token.type !== 'spoken-incorrect') {
+        if (currentWord.length !== 0) {
+          flatWords.push(currentWord);
+          currentWord = [];
+        }
+      } else {
+        currentWord.push(token);
+      }
+    }
+
+    if (currentWord.length !== 0) {
+      flatWords.push(currentWord);
+      currentWord = [];
+    }
+
+    const words: Word[] = [];
+
+    for (const flatWord of flatWords) {
+      const segments: Segment[] = [];
+
+      let partialSegment: Omit<Segment, 'type'> & { type?: Segment['type'] } = {
+        raisedTokens: [],
+        tokens: [],
+      };
+
+      function addSegment(type: Segment['type']) {
+        segments.push({
+          ...partialSegment,
+          type,
+        });
+
+        partialSegment = {
+          raisedTokens: [],
+          tokens: [],
+        };
+      }
+
+      for (const token of flatWord) {
+        if (token === null) {
+          partialSegment.raisedTokens.push(null);
+          partialSegment.tokens.push(null);
+        } else {
+          if (partialSegment.type !== token.type && token.type !== undefined) {
+            if (partialSegment.type === undefined) {
+              partialSegment.type = token.type;
+            } else if (token.type === 'correct') {
+              addSegment(partialSegment.type);
+              partialSegment.type = token.type;
+            } else if (token.type === 'missed') {
+              if (partialSegment.type === 'spoken-incorrect') {
+                partialSegment.type = 'combined';
+              } else if (partialSegment.type !== 'combined') {
+                addSegment(partialSegment.type);
+                partialSegment.type = token.type;
+              }
+            } else if (token.type === 'spoken-incorrect') {
+              if (partialSegment.type === 'missed') {
+                partialSegment.type = 'combined';
+              } else if (partialSegment.type !== 'combined') {
+                addSegment(partialSegment.type);
+                partialSegment.type = token.type;
+              }
+            } else {
+              never(token.type);
+            }
+          }
+
+          const positionalTokens = token.type === 'spoken-incorrect'
+            ? partialSegment.raisedTokens
+            : partialSegment.tokens;
+          
+          positionalTokens.push(token);
+        }
+      }
+
+      if (partialSegment.tokens.length + partialSegment.raisedTokens.length > 0) {
+        addSegment(partialSegment.type ?? 'correct');
+      }
+
+      words.push({
+        tokens: flatWord,
+        target: flatWord
+          .filter(t => t?.type !== 'spoken-incorrect')
+          .map(t => t?.text ?? '')
+          .join(''),
+        spoken: flatWord
+          .filter(t => t?.type !== 'missed')
+          .map(t => t?.text ?? '')
+          .join(''),
+        segments,
+      });
+    }
+
+    return words;
+  }
+
   renderTokens(): preact.JSX.Element {
     const tokens = this.getTokens();
     const expandedTokens = this.getExpandedTokens();
+    (window as any).words = TranscriptionPlayer.assembleWords(expandedTokens);
 
     const renderExpandedToken = (i: number) => {
       const token = expandedTokens[i];
