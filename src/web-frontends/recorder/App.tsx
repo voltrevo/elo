@@ -235,6 +235,11 @@ export default class App extends preact.Component<{}, State> {
         <TranscriptionPlayer
           data={data}
           settings={this.state.settings}
+          onDelete={() => {
+            this.setState({
+              transcriptions: this.state.transcriptions.filter(tr => tr !== data),
+            });
+          }}
         />
       ))}
     </div>;

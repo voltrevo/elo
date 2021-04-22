@@ -10,6 +10,7 @@ type Props = {
     analysis: Analysis,
   },
   settings: Settings,
+  onDelete: () => void,
 };
 
 type State = {
@@ -397,7 +398,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
             right: '0.2em',
             top: '0.2em',
           }}
-          // onClick={this.props.onDelete}
+          onClick={this.props.onDelete}
         >
           ❌
         </div>
