@@ -78,10 +78,7 @@ export default class App extends preact.Component<{}, State> {
   }
 
   async onFile(file: File) {
-    // TODO: Why is this necessary??
-    const state = this.state ?? initialState;
-
-    switch (state.recorder.name) {
+    switch (this.state.recorder.name) {
       case 'init':
       case 'transcribed':
         await this.transcribe({ type: 'audio.Recording', duration: null, data: file });
@@ -89,11 +86,11 @@ export default class App extends preact.Component<{}, State> {
 
       case 'recorded':
       case 'recording':
-        console.error(`Refusing to process file in state ${state.recorder.name}`);
+        console.error(`Refusing to process file in state ${this.state.recorder.name}`);
         break;
 
       default:
-        never(state.recorder);
+        never(this.state.recorder);
     }
   }
 
@@ -228,7 +225,7 @@ export default class App extends preact.Component<{}, State> {
         recordingState={this.state.recorder}
         onRecordToggle={() => this.onRecordToggle()}
         onTargetTranscriptRef={r => { this.targetTranscriptRef = r; }}
-        onFile={this.onFile}
+        onFile={file => this.onFile(file)}
       />
       <SettingsPanel
         settings={this.state.settings}
