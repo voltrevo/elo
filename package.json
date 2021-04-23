@@ -17,7 +17,6 @@
   "author": "Andrew Morris",
   "private": true,
   "dependencies": {
-    "@discordjs/opus": "^0.5.0",
     "@jorgeferrero/stream-to-buffer": "^2.0.6",
     "@msgpack/msgpack": "^2.4.1",
     "@types/diff": "^5.0.0",
