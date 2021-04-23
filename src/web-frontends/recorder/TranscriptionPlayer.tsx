@@ -160,15 +160,10 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     }
 
     for (const [iStr, tokenRef] of Object.entries(this.tokenRefs)) {
-      if (!tokenRef) {
-        continue;
-      }
-
       const i = Number(iStr);
-
       const token = tokens[i];
 
-      if (token.start_time === undefined) {
+      if (!tokenRef || token?.start_time === undefined) {
         continue;
       }
 
@@ -253,6 +248,11 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     let currentTokenLine: ExpandedToken[] = [];
 
     for (const token of expandedTokens) {
+      // Skip null tokens at the beginning of each line, except the first line.
+      if (token === null && tokenLines.length > 0 && currentTokenLine.length === 0) {
+        continue;
+      }
+
       if (token?.text === '\n') {
         tokenLines.push(currentTokenLine)
         currentTokenLine = [];
