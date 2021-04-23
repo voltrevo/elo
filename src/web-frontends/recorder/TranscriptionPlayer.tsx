@@ -377,7 +377,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       }
     }
 
-    const raised = <div style={{ textAlign: 'center', minWidth: '1ex' }}>
+    const raised = <div style={{ textAlign: 'center' }}>
       {raisedTokens.map(t => t === null ? <span> </span> : <span
         class="token spoken-incorrect"
         ref={r => {
@@ -388,7 +388,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       </span>)}
     </div>;
 
-    const regular = <div style={{ textAlign: 'center', minWidth: '1ex' }}>
+    const regular = <div style={{ textAlign: 'center' }}>
       {loweredTokens.filter(t => t !== null).map(t => <span class="missed">{t?.text ?? ' '}</span>)}
     </div>;
 
