@@ -354,6 +354,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
   }
 
   renderWords(): preact.JSX.Element {
+    const tokens = this.getTokens();
     const words = TranscriptionPlayer.assembleWords(this.getExpandedTokens());
     (window as any).words = words;
 
@@ -369,25 +370,39 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
           if (segment.type === 'correct') {
             return <div>
-              {segment.tokens.map(t => <span class="token">{t?.text ?? ' '}</span>)}
+              {segment.tokens.map(t => t === null ? <span> </span> : <span
+                class="token"
+                ref={r => {
+                  this.tokenRefs[tokens.indexOf(t)] = r;
+                }}
+              >
+                {t?.text ?? ' '}
+              </span>)}
             </div>;
           }
 
           const raisedTokens = segment.raisedTokens.slice();
-          const tokens = segment.tokens.slice();
+          const loweredTokens = segment.tokens.slice();
 
-          for (const ts of [raisedTokens, tokens]) {
+          for (const ts of [raisedTokens, loweredTokens]) {
             if (ts.length === 0) {
               ts.push({ text: ' ' });
             }
           }
 
           const raised = <div style={{ textAlign: 'center', minWidth: '1ex' }}>
-            {raisedTokens.map(t => <span class="token spoken-incorrect">{t?.text ?? ' '}</span>)}
+            {raisedTokens.map(t => t === null ? <span> </span> : <span
+              class="token spoken-incorrect"
+              ref={r => {
+                this.tokenRefs[tokens.indexOf(t)] = r;
+              }}
+            >
+              {t?.text ?? ' '}
+            </span>)}
           </div>;
 
           const regular = <div style={{ textAlign: 'center', minWidth: '1ex' }}>
-            {tokens.filter(t => t !== null).map(t => <span class="missed">{t?.text ?? ' '}</span>)}
+            {loweredTokens.filter(t => t !== null).map(t => <span class="missed">{t?.text ?? ' '}</span>)}
           </div>;
 
           return <div style={{ display: 'flex', flexDirection: 'column' }}>
