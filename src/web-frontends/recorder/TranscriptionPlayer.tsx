@@ -41,6 +41,8 @@ type Word = {
   segments: Segment[],
 }
 
+type Line = Word[];
+
 export default class TranscriptionPlayer extends preact.Component<Props, State> {
   state: State = {
     playing: false,
@@ -246,6 +248,26 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     return expandedTokens;
   }
 
+  static Lines(expandedTokens: ExpandedToken[]): Line[] {
+    const tokenLines: ExpandedToken[][] = [];
+    let currentTokenLine: ExpandedToken[] = [];
+
+    for (const token of expandedTokens) {
+      if (token?.text === '\n') {
+        tokenLines.push(currentTokenLine)
+        currentTokenLine = [];
+      } else {
+        currentTokenLine.push(token);
+      }
+    }
+
+    if (currentTokenLine.length > 0) {
+      tokenLines.push(currentTokenLine);
+    }
+
+    return tokenLines.map(tl => TranscriptionPlayer.assembleWords(tl));
+  }
+
   static assembleWords(expandedTokens: ExpandedToken[]): Word[] {
     const flatWords: ExpandedToken[][] = [];
     let currentWord: ExpandedToken[] = [];
@@ -398,21 +420,21 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     </div>;
   }
 
-  renderWords(): preact.JSX.Element {
+  renderWords(words: Word[], first: boolean, last: boolean): preact.JSX.Element {
     const tokens = this.getTokens();
-    const words = TranscriptionPlayer.assembleWords(this.getExpandedTokens());
-    (window as any).words = words;
 
-    return <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' }}>
+    return <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', minHeight: '3em' }}>
       {words.map((word, i) => {
         const space = i !== words.length - 1 ? <span> </span> : null;
         let onRef: ((r: HTMLDivElement | null) => void) | undefined = undefined;
         const classes: string[] = [];
 
-        if (i === 0) {
+        if (first && i === 0) {
           onRef = r => { this.cursorStartRef = r };
           classes.push('text-start');
-        } else if (i === words.length - 1) {
+        }
+        
+        if (last && i === words.length - 1) {
           onRef = r => { this.cursorEndRef = r };
           classes.push('text-end');
         }
@@ -427,6 +449,14 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         </div>;
       })}
     </div>;
+  }
+
+  renderLines(): preact.JSX.Element {
+    const lines = TranscriptionPlayer.Lines(this.getExpandedTokens());
+
+    return <div style={{ display: 'flex', flexDirection: 'column' }}>
+      {lines.map((words, i) => this.renderWords(words, i === 0, i === lines.length - 1))}
+    </div>
   }
 
   renderTokens(): preact.JSX.Element {
@@ -572,7 +602,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         <div class="play-btn-text">{this.state.playing ? '| |' : '▶'}</div>
       </div>
       <div class="transcription-box">
-        <div class={textClasses.join(' ')}>{this.renderWords()}</div>
+        <div class={textClasses.join(' ')}>{this.renderLines()}</div>
         <div
           style={{
             position: 'absolute',
