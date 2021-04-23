@@ -353,10 +353,55 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     return words;
   }
 
+  renderWords(): preact.JSX.Element {
+    const words = TranscriptionPlayer.assembleWords(this.getExpandedTokens());
+    (window as any).words = words;
+
+    return <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+      {words.map(word => <div style={{ display: 'flex', flexDirection: 'row', marginLeft: '1ex', alignItems: 'center' }}>
+        {word.segments.map(segment => {
+          if (
+            (segment.type === 'missed' && this.props.settings.tokenDisplay === 'spoken') ||
+            (segment.type === 'spoken-incorrect' && this.props.settings.tokenDisplay === 'target')
+          ) {
+            return null;
+          }
+
+          if (segment.type === 'correct') {
+            return <div>
+              {segment.tokens.map(t => <span class="token">{t?.text ?? ' '}</span>)}
+            </div>;
+          }
+
+          const raisedTokens = segment.raisedTokens.slice();
+          const tokens = segment.tokens.slice();
+
+          for (const ts of [raisedTokens, tokens]) {
+            if (ts.length === 0) {
+              ts.push({ text: ' ' });
+            }
+          }
+
+          const raised = <div style={{ textAlign: 'center', minWidth: '1ex' }}>
+            {raisedTokens.map(t => <span class="token spoken-incorrect">{t?.text ?? ' '}</span>)}
+          </div>;
+
+          const regular = <div style={{ textAlign: 'center', minWidth: '1ex' }}>
+            {tokens.filter(t => t !== null).map(t => <span class="missed">{t?.text ?? ' '}</span>)}
+          </div>;
+
+          return <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {(this.props.settings.tokenDisplay !== 'target' && raised) ?? null}
+            {(this.props.settings.tokenDisplay !== 'spoken' && regular) ?? null}
+          </div>;
+        })}
+      </div>)}
+    </div>;
+  }
+
   renderTokens(): preact.JSX.Element {
     const tokens = this.getTokens();
     const expandedTokens = this.getExpandedTokens();
-    (window as any).words = TranscriptionPlayer.assembleWords(expandedTokens);
 
     const renderExpandedToken = (i: number) => {
       const token = expandedTokens[i];
@@ -497,7 +542,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         <div class="play-btn-text">{this.state.playing ? '| |' : '▶'}</div>
       </div>
       <div class="transcription-box">
-        <div class={textClasses.join(' ')}>{this.renderTokens()}</div>
+        <div class={textClasses.join(' ')}>{this.renderWords()}</div>
         <div
           style={{
             position: 'absolute',
