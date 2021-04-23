@@ -420,7 +420,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         return <div
           class={classes.join(' ')}
           ref={onRef}
-          style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
+          style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', minHeight: '3em' }}
         >
           {word.segments.map(segment => this.renderSegment(tokens, segment))}
           {space}
