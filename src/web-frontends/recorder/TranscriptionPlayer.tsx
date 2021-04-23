@@ -17,7 +17,7 @@ type Props = {
 type State = {
   time: number,
   playing: boolean,
-  loadedTotalTime?: number,
+  duration?: number,
 };
 
 type CursorPos = {
@@ -98,13 +98,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         return;
       }
 
-      this.setState({
-        time: (Date.now() - startTime) / 1000,
-        loadedTotalTime: Number.isFinite(audioElement.duration)
-          ? audioElement.duration
-          : this.state.loadedTotalTime,
-      });
-
+      this.setState({ time: (Date.now() - startTime) / 1000 });
       window.requestAnimationFrame(updateTimeLoop);
     };
 
@@ -152,12 +146,12 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       };
     }
 
-    if (this.cursorEndRef && this.props.data.recording.duration !== null) {
+    if (this.cursorEndRef) {
       const rect = getBoundingPageRect(this.cursorEndRef);
 
       rightDetails = {
         x: rect.right,
-        t: this.props.data.recording.duration / 1000,
+        t: this.props.data.analysis.duration,
         top: rect.top,
         bottom: rect.bottom,
       };
@@ -240,8 +234,8 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
     const lastToken = prevToken;
 
-    if (lastToken && this.props.data.recording.duration !== null) {
-      let gap = (this.props.data.recording.duration / 1000) - lastToken.start_time;
+    if (lastToken) {
+      let gap = this.props.data.analysis.duration - lastToken.start_time;
 
       while (gap > this.props.settings.maximumGap) {
         expandedTokens.push(null);
@@ -410,10 +404,28 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     (window as any).words = words;
 
     return <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-      {words.map(word => <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-        {word.segments.map(segment => this.renderSegment(tokens, segment))}
-        <span> </span>
-      </div>)}
+      {words.map((word, i) => {
+        const space = i !== words.length - 1 ? <span> </span> : null;
+        let onRef: ((r: HTMLDivElement | null) => void) | undefined = undefined;
+        const classes: string[] = [];
+
+        if (i === 0) {
+          onRef = r => { this.cursorStartRef = r };
+          classes.push('text-start');
+        } else if (i === words.length - 1) {
+          onRef = r => { this.cursorEndRef = r };
+          classes.push('text-end');
+        }
+
+        return <div
+          class={classes.join(' ')}
+          ref={onRef}
+          style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
+        >
+          {word.segments.map(segment => this.renderSegment(tokens, segment))}
+          {space}
+        </div>;
+      })}
     </div>;
   }
 

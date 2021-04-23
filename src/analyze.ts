@@ -5,9 +5,11 @@ import * as diff from 'diff';
 import * as deepspeech from 'deepspeech';
 import ffmpeg from 'ffmpeg';
 import { streamToBuffer } from '@jorgeferrero/stream-to-buffer';
+import * as musicMetadata from 'music-metadata';
 
 import dirs from './dirs';
 import assert from './helpers/assert';
+import assertExists from './helpers/assertExists';
 
 function totalTime(hrtimeValue: number[]): string {
   return (hrtimeValue[0] + hrtimeValue[1] / 1000000000).toPrecision(4);
@@ -30,6 +32,7 @@ type TargetAnalysis = {
 export type Analysis = {
   deepspeech: deepspeech.Metadata,
   target?: TargetAnalysis,
+  duration: number,
 };
 
 export type AnalysisToken = Partial<deepspeech.TokenMetadata & {
@@ -40,8 +43,16 @@ export default async function analyze(
   webmStream: ReadableStream,
   targetTranscript: string | null,
 ): Promise<Analysis> {
-  const deepspeechAnalysis = await analyzeDeepspeech(webmStream);
-  const analysis: Analysis = { deepspeech: deepspeechAnalysis };
+  const wavFile = await getWavFile(webmStream);
+
+  const metadata = await musicMetadata.parseFile(wavFile, { duration: true });
+
+  const deepspeechAnalysis = await analyzeDeepspeech(wavFile);
+
+  const analysis: Analysis = {
+    deepspeech: deepspeechAnalysis,
+    duration: assertExists(metadata.format.duration),
+  };
 
   if (targetTranscript) {
     analysis.target = analyzeTargetTranscript(deepspeechAnalysis, targetTranscript);
@@ -124,7 +135,7 @@ function analyzeTargetTranscript(
   };
 }
 
-async function analyzeDeepspeech(webmStream: ReadableStream): Promise<Analysis['deepspeech']> {
+async function getWavFile(webmStream: ReadableStream) {
   const webmFile = `${dirs.data}/recordings/${Date.now()}.webm`;
   const wavFile = webmFile.replace(/\.webm$/, '.wav');
 
@@ -136,6 +147,10 @@ async function analyzeDeepspeech(webmStream: ReadableStream): Promise<Analysis['
   ffmpegCtx.setAudioFrequency(16000);
   await ffmpegCtx.save(wavFile);
 
+  return wavFile;
+}
+
+async function analyzeDeepspeech(wavFile: string): Promise<Analysis['deepspeech']> {
   const output = model.sttWithMetadata(
     await fs.promises.readFile(wavFile),
   );
