@@ -61,7 +61,7 @@ export default async function analyze(
   return analysis;
 }
 
-function analyzeTargetTranscript(
+export function analyzeTargetTranscript(
   deepspeechAnalysis: Analysis['deepspeech'],
   targetTranscript: string,
 ): TargetAnalysis {
