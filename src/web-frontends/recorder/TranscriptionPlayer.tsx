@@ -403,7 +403,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     const words = TranscriptionPlayer.assembleWords(this.getExpandedTokens());
     (window as any).words = words;
 
-    return <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+    return <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' }}>
       {words.map((word, i) => {
         const space = i !== words.length - 1 ? <span> </span> : null;
         let onRef: ((r: HTMLDivElement | null) => void) | undefined = undefined;
