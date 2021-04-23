@@ -353,6 +353,57 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     return words;
   }
 
+  renderSegment(tokens: AnalysisToken[], segment: Segment): preact.JSX.Element | null {
+    if (
+      (segment.type === 'missed' && this.props.settings.tokenDisplay === 'spoken') ||
+      (segment.type === 'spoken-incorrect' && this.props.settings.tokenDisplay === 'target')
+    ) {
+      return null;
+    }
+
+    if (segment.type === 'correct') {
+      return <div>
+        {segment.tokens.map(t => t === null ? <span> </span> : <span
+          class="token"
+          ref={r => {
+            this.tokenRefs[tokens.indexOf(t)] = r;
+          }}
+        >
+          {t?.text ?? ' '}
+        </span>)}
+      </div>;
+    }
+
+    const raisedTokens = segment.raisedTokens.slice();
+    const loweredTokens = segment.tokens.slice();
+
+    for (const ts of [raisedTokens, loweredTokens]) {
+      if (ts.length === 0) {
+        ts.push({ text: ' ' });
+      }
+    }
+
+    const raised = <div style={{ textAlign: 'center', minWidth: '1ex' }}>
+      {raisedTokens.map(t => t === null ? <span> </span> : <span
+        class="token spoken-incorrect"
+        ref={r => {
+          this.tokenRefs[tokens.indexOf(t)] = r;
+        }}
+      >
+        {t?.text ?? ' '}
+      </span>)}
+    </div>;
+
+    const regular = <div style={{ textAlign: 'center', minWidth: '1ex' }}>
+      {loweredTokens.filter(t => t !== null).map(t => <span class="missed">{t?.text ?? ' '}</span>)}
+    </div>;
+
+    return <div style={{ display: 'flex', flexDirection: 'column' }}>
+      {(this.props.settings.tokenDisplay !== 'target' && raised) ?? null}
+      {(this.props.settings.tokenDisplay !== 'spoken' && regular) ?? null}
+    </div>;
+  }
+
   renderWords(): preact.JSX.Element {
     const tokens = this.getTokens();
     const words = TranscriptionPlayer.assembleWords(this.getExpandedTokens());
@@ -360,56 +411,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
     return <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
       {words.map(word => <div style={{ display: 'flex', flexDirection: 'row', marginLeft: '1ex', alignItems: 'center' }}>
-        {word.segments.map(segment => {
-          if (
-            (segment.type === 'missed' && this.props.settings.tokenDisplay === 'spoken') ||
-            (segment.type === 'spoken-incorrect' && this.props.settings.tokenDisplay === 'target')
-          ) {
-            return null;
-          }
-
-          if (segment.type === 'correct') {
-            return <div>
-              {segment.tokens.map(t => t === null ? <span> </span> : <span
-                class="token"
-                ref={r => {
-                  this.tokenRefs[tokens.indexOf(t)] = r;
-                }}
-              >
-                {t?.text ?? ' '}
-              </span>)}
-            </div>;
-          }
-
-          const raisedTokens = segment.raisedTokens.slice();
-          const loweredTokens = segment.tokens.slice();
-
-          for (const ts of [raisedTokens, loweredTokens]) {
-            if (ts.length === 0) {
-              ts.push({ text: ' ' });
-            }
-          }
-
-          const raised = <div style={{ textAlign: 'center', minWidth: '1ex' }}>
-            {raisedTokens.map(t => t === null ? <span> </span> : <span
-              class="token spoken-incorrect"
-              ref={r => {
-                this.tokenRefs[tokens.indexOf(t)] = r;
-              }}
-            >
-              {t?.text ?? ' '}
-            </span>)}
-          </div>;
-
-          const regular = <div style={{ textAlign: 'center', minWidth: '1ex' }}>
-            {loweredTokens.filter(t => t !== null).map(t => <span class="missed">{t?.text ?? ' '}</span>)}
-          </div>;
-
-          return <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {(this.props.settings.tokenDisplay !== 'target' && raised) ?? null}
-            {(this.props.settings.tokenDisplay !== 'spoken' && regular) ?? null}
-          </div>;
-        })}
+        {word.segments.map(segment => this.renderSegment(tokens, segment))}
       </div>)}
     </div>;
   }
