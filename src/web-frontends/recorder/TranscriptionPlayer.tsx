@@ -410,8 +410,9 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     (window as any).words = words;
 
     return <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-      {words.map(word => <div style={{ display: 'flex', flexDirection: 'row', marginLeft: '1ex', alignItems: 'center' }}>
+      {words.map(word => <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
         {word.segments.map(segment => this.renderSegment(tokens, segment))}
+        <span> </span>
       </div>)}
     </div>;
   }
