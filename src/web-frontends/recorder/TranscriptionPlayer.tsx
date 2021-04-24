@@ -163,7 +163,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       const i = Number(iStr);
       const token = tokens[i];
 
-      if (!tokenRef || token?.start_time === undefined) {
+      if (!tokenRef || token?.start_time === undefined || tokenRef.parentElement === null) {
         continue;
       }
 
