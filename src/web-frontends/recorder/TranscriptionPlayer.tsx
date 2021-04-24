@@ -379,14 +379,27 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
     if (segment.type === 'correct') {
       return <div>
-        {segment.tokens.map(t => t === null ? <span> </span> : <span
-          class="token"
-          ref={r => {
-            this.tokenRefs[tokens.indexOf(t)] = r;
-          }}
-        >
-          {t?.text ?? ' '}
-        </span>)}
+        {segment.tokens.map(t => {
+          if (t === null) {
+            return <span> </span>;
+          }
+
+          const startTime = t.start_time;
+
+          return <span
+            class="token"
+            ref={r => {
+              this.tokenRefs[tokens.indexOf(t)] = r;
+            }}
+            onClick={startTime === undefined ? undefined : (() => {
+              this.setState({
+                time: startTime - this.props.settings.cursorCorrection,
+              });
+            })}
+          >
+            {t.text ?? ' '}
+          </span>;
+        })}
       </div>;
     }
 
@@ -400,14 +413,27 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     }
 
     const raised = <div style={{ textAlign: 'center' }}>
-      {raisedTokens.map(t => t === null ? <span> </span> : <span
-        class="token spoken-incorrect"
-        ref={r => {
-          this.tokenRefs[tokens.indexOf(t)] = r;
-        }}
-      >
-        {t?.text ?? ' '}
-      </span>)}
+      {raisedTokens.map(t => {
+        if (t === null) {
+          return <span> </span>;
+        }
+
+        const startTime = t.start_time;
+
+        return <span
+          class="token spoken-incorrect"
+          ref={r => {
+            this.tokenRefs[tokens.indexOf(t)] = r;
+          }}
+          onClick={startTime === undefined ? undefined : (() => {
+            this.setState({
+              time: startTime - this.props.settings.cursorCorrection,
+            });
+          })}
+        >
+          {t?.text ?? ' '}
+        </span>
+      })}
     </div>;
 
     const regular = <div style={{ textAlign: 'center' }}>
