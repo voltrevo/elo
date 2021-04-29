@@ -1,4 +1,4 @@
-import type * as deepspeech from 'deepspeech';
+import type * as deepspeech from 'deepspeech-gpu';
 import analyzeTargetTranscript from '../src/analyzeTargetTranscript';
 
 const deepspeechAnalysis: deepspeech.Metadata = {

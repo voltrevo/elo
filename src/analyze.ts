@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { Readable as ReadableStream } from 'stream';
 
-import * as deepspeech from 'deepspeech';
+import * as deepspeech from 'deepspeech-gpu';
 import ffmpeg from 'ffmpeg';
 import { streamToBuffer } from '@jorgeferrero/stream-to-buffer';
 import * as musicMetadata from 'music-metadata';
@@ -21,6 +21,9 @@ const modelLoadStart = process.hrtime();
 const model = new deepspeech.Model(modelPath);
 const modelLoadEnd = process.hrtime(modelLoadStart);
 console.error('Loaded model in %ds.', totalTime(modelLoadEnd));
+
+// model.enableExternalScorer(`${dirs.data}/10pct-ums-20pct.scorer`);
+// model.enableExternalScorer(`${dirs.data}/deepspeech-0.9.3-models.scorer`);
 
 export type Analysis = {
   deepspeech: deepspeech.Metadata,

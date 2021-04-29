@@ -32,6 +32,7 @@
     "concurrently": "^6.0.0",
     "copy-webpack-plugin": "^8.1.0",
     "deepspeech": "^0.9.3",
+    "deepspeech-gpu": "^0.9.3",
     "diff": "^5.0.0",
     "ffmpeg": "0.0.4",
     "koa": "^2.13.1",

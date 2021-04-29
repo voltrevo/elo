@@ -1,4 +1,4 @@
-import type * as deepspeech from 'deepspeech';
+import type * as deepspeech from 'deepspeech-gpu';
 import * as diff from 'diff';
 
 import assert from './helpers/assert';

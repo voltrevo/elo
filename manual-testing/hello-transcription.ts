@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 
-import * as deepspeech from 'deepspeech';
+import * as deepspeech from 'deepspeech-gpu';
 
 function totalTime(hrtimeValue: number[]): string {
   return (hrtimeValue[0] + hrtimeValue[1] / 1000000000).toPrecision(4);
