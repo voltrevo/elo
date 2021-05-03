@@ -11,7 +11,7 @@ ds = deepspeech.Model(f"{os.getenv('HOME')}/data/deepspeech-exp/deepspeech-0.9.3
 
 def analyze(bytes: bytes, target_transcript: Optional[str] = None) -> Analysis:
   numpyBuffer = numpy.frombuffer(bytes, numpy.int16)
-  dsAnalysis = ds.sttWithMetadata(numpyBuffer, 1), # type: ignore
+  dsAnalysis = ds.sttWithMetadata(numpyBuffer, 1) # type: ignore
 
   return Analysis(
     deepspeech=dsAnalysis,

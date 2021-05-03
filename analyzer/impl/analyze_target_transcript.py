@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import re
 from typing import Any, List
 
@@ -19,22 +20,30 @@ def analyze_target_transcript(
   raw_target_transcript = raw_target_transcript_with_case.lower()
 
   tokens: List[AnalysisToken] = []
-  token_pos = 0
-  raw_target_transcript_with_case_pos = 0
-  target_transcript_pos = 0
+
+  @dataclass
+  class Pos:
+    token = 0
+    raw_target_transcript_with_case = 0
+    target_transcript = 0
+  
+  pos = Pos()
 
   diff_result = diff.diff(raw_target_transcript, deepspeech_transcript)
 
   def sync_punctuation() -> None:
     while (
-      target_transcript_pos < len(target_transcript) and
-      target_transcript[target_transcript_pos] != raw_target_transcript_with_case[raw_target_transcript_with_case_pos]
+      pos.target_transcript < len(target_transcript) and
+      pos.raw_target_transcript_with_case < len(raw_target_transcript_with_case) and
+      target_transcript[pos.target_transcript] != raw_target_transcript_with_case[pos.raw_target_transcript_with_case]
     ):
       tokens.append(AnalysisToken(
-        text=target_transcript[target_transcript_pos],
+        text=target_transcript[pos.target_transcript],
         start_time=None,
         type=None,
       ))
+
+      pos.target_transcript += 1
 
   for action in diff_result:
     sync_punctuation()
@@ -44,14 +53,14 @@ def analyze_target_transcript(
     if not isinstance(action, diff.Remove):
       tokens.append(AnalysisToken(
         text=(
-          deepspeech_tokens[token_pos].text if isinstance(action, diff.Insert)
-          else raw_target_transcript_with_case[raw_target_transcript_with_case_pos]
+          deepspeech_tokens[pos.token].text if isinstance(action, diff.Insert)
+          else raw_target_transcript_with_case[pos.raw_target_transcript_with_case]
         ),
-        start_time=deepspeech_tokens[token_pos].start_time,
+        start_time=deepspeech_tokens[pos.token].start_time,
         type='correct' if correct else 'spoken-incorrect'
       ))
 
-      token_pos += 1
+      pos.token += 1
     else:
       tokens.append(AnalysisToken(
         text=action.text,
@@ -60,12 +69,12 @@ def analyze_target_transcript(
       ))
     
     if not isinstance(action, diff.Insert):
-      raw_target_transcript_with_case_pos += 1
-      target_transcript_pos += 1
+      pos.raw_target_transcript_with_case += 1
+      pos.target_transcript += 1
   
   sync_punctuation()
 
-  assert token_pos == len(deepspeech_transcript)
+  assert pos.token == len(deepspeech_transcript)
 
   return TargetAnalysis(
     target_transcript=target_transcript,
