@@ -49,3 +49,6 @@ class Model:
   def sttWithMetadata(self, audio_buffer: bytes, max_results: int) -> Metadata:
     ds_metadata = self.ds.sttWithMetadata(audio_buffer, max_results) # type: ignore
     return parse(ds_metadata)
+  
+  def enableExternalScorer(self, scorer_path: str):
+    self.ds.enableExternalScorer(scorer_path) # type: ignore
