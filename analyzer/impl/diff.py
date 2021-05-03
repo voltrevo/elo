@@ -1,3 +1,4 @@
+from .helpers.unexpected import Unexpected
 from dataclasses import dataclass
 from typing import List, Union
 
@@ -16,7 +17,7 @@ class Insert:
 class Remove:
   text: str
 
-Action = Union[Keep, Insert, Remove]
+Action = Union[Keep, Insert, Remove, Unexpected]
 
 @dataclass
 class Frontier:
