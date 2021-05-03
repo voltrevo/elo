@@ -1,3 +1,4 @@
+import * as child_process from 'child_process';
 import * as fs from 'fs';
 import { Readable as ReadableStream } from 'stream';
 
@@ -9,6 +10,7 @@ import * as musicMetadata from 'music-metadata';
 import dirs from './dirs';
 import assertExists from './helpers/assertExists';
 import analyzeTargetTranscript, { TargetAnalysis } from './analyzeTargetTranscript';
+import pythonAnalyze from './pythonAnalyze';
 
 function totalTime(hrtimeValue: number[]): string {
   return (hrtimeValue[0] + hrtimeValue[1] / 1000000000).toPrecision(4);
@@ -37,21 +39,24 @@ export default async function analyze(
   targetTranscript: string | null,
 ): Promise<Analysis> {
   const wavFile = await getWavFile(webmStream);
+  const buffer = await fs.promises.readFile(wavFile);
 
-  const metadata = await musicMetadata.parseFile(wavFile, { duration: true });
+  return await pythonAnalyze(buffer, targetTranscript);
 
-  const deepspeechAnalysis = await analyzeDeepspeech(wavFile);
+  // const metadata = await musicMetadata.parseFile(wavFile, { duration: true });
 
-  const analysis: Analysis = {
-    deepspeech: deepspeechAnalysis,
-    duration: assertExists(metadata.format.duration),
-  };
+  // const deepspeechAnalysis = await analyzeDeepspeech(wavFile);
 
-  if (targetTranscript) {
-    analysis.target = analyzeTargetTranscript(deepspeechAnalysis, targetTranscript);
-  }
+  // const analysis: Analysis = {
+  //   deepspeech: deepspeechAnalysis,
+  //   duration: assertExists(metadata.format.duration),
+  // };
 
-  return analysis;
+  // if (targetTranscript) {
+  //   analysis.target = analyzeTargetTranscript(deepspeechAnalysis, targetTranscript);
+  // }
+
+  // return analysis;
 }
 
 async function getWavFile(webmStream: ReadableStream) {

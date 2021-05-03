@@ -10,11 +10,11 @@ function getEnv(varName: string): string {
   return value;
 }
 
-
 namespace dirs {
   export const projectRoot = path.join(__dirname, '..', '..', '..');
   export const build = path.join(projectRoot, 'build');
   export const data = path.join(getEnv('HOME'), 'data', 'deepspeech-exp');
+  export const pythonAnalyzer = path.join(projectRoot, 'analyzer');
 }
 
 export default dirs;
