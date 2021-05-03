@@ -1,3 +1,6 @@
+# Based on https://gist.github.com/adamnew123456/37923cf53f51d6b9af32a539cdfa7cc4
+# (The source above is public domain)
+
 from .helpers.unexpected import Unexpected
 from dataclasses import dataclass
 from typing import List, Union

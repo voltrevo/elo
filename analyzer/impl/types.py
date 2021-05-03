@@ -2,10 +2,11 @@ from .helpers.unexpected import Unexpected
 from dataclasses import dataclass
 from typing import Any, List, Optional, Union
 from typing_extensions import Literal
+from . import deepspeech
 
 @dataclass
 class Analysis:
-  deepspeech: Any
+  deepspeech: deepspeech.Metadata
   target: Any
   duration: float
 

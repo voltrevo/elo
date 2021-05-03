@@ -1,9 +1,9 @@
 import os
 from typing import Optional
 
-import deepspeech # type: ignore
 import numpy
 
+from . import deepspeech
 from .types import Analysis
 from .analyze_target_transcript import analyze_target_transcript
 

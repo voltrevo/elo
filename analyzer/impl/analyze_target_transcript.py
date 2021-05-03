@@ -1,13 +1,14 @@
 from dataclasses import dataclass
 import re
-from typing import Any, List
+from typing import List
 
 from .types import AnalysisToken, TargetAnalysis
+from . import deepspeech
 from . import diff
 
 
 def analyze_target_transcript(
-  deepspeech_analysis: Any,
+  deepspeech_analysis: deepspeech.Metadata,
   target_transcript: str,
 ) -> TargetAnalysis:
   original_deepspeech_tokens = deepspeech_analysis.transcripts[0].tokens
