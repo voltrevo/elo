@@ -31,19 +31,31 @@ def augment_disfluents(analysis: Analysis) -> Analysis:
 
         new_tokens[-1] = AnalysisToken(
           text=' ',
-          start_time=None,
+          start_time=last_start_time + 0.025,
           type=new_tokens[-1].type,
         )
 
         new_tokens.append(AnalysisToken(
-          text='<pause>',
+          text='<',
+          start_time=last_start_time + 0.05,
+          type='spoken-incorrect',
+        ))
+
+        new_tokens.append(AnalysisToken(
+          text='pause',
           start_time=None,
           type='spoken-incorrect',
         ))
 
         new_tokens.append(AnalysisToken(
+          text='>',
+          start_time=token.start_time - 0.05,
+          type='spoken-incorrect',
+        ))
+
+        new_tokens.append(AnalysisToken(
           text=' ',
-          start_time=None,
+          start_time=token.start_time - 0.025,
           type='spoken-incorrect',
         ))
 
