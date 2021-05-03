@@ -1,33 +1,23 @@
-import * as child_process from 'child_process';
 import * as fs from 'fs';
 import { Readable as ReadableStream } from 'stream';
 
 import * as deepspeech from 'deepspeech';
 import ffmpeg from 'ffmpeg';
 import { streamToBuffer } from '@jorgeferrero/stream-to-buffer';
-import * as musicMetadata from 'music-metadata';
 
 import dirs from './dirs';
-import assertExists from './helpers/assertExists';
-import analyzeTargetTranscript, { TargetAnalysis } from './analyzeTargetTranscript';
 import pythonAnalyze from './pythonAnalyze';
-
-function totalTime(hrtimeValue: number[]): string {
-  return (hrtimeValue[0] + hrtimeValue[1] / 1000000000).toPrecision(4);
-}
-
-const modelPath = `${dirs.data}/deepspeech-0.9.3-models.pbmm`;
-
-console.error('Loading model from file %s', modelPath);
-const modelLoadStart = process.hrtime();
-const model = new deepspeech.Model(modelPath);
-const modelLoadEnd = process.hrtime(modelLoadStart);
-console.error('Loaded model in %ds.', totalTime(modelLoadEnd));
 
 export type Analysis = {
   deepspeech: deepspeech.Metadata,
   target?: TargetAnalysis,
   duration: number,
+};
+
+export type TargetAnalysis = {
+  targetTranscript: string,
+  speechTranscript: string,
+  tokens: AnalysisToken[],
 };
 
 export type AnalysisToken = Partial<deepspeech.TokenMetadata & {
@@ -42,21 +32,6 @@ export default async function analyze(
   const buffer = await fs.promises.readFile(wavFile);
 
   return await pythonAnalyze(buffer, targetTranscript);
-
-  // const metadata = await musicMetadata.parseFile(wavFile, { duration: true });
-
-  // const deepspeechAnalysis = await analyzeDeepspeech(wavFile);
-
-  // const analysis: Analysis = {
-  //   deepspeech: deepspeechAnalysis,
-  //   duration: assertExists(metadata.format.duration),
-  // };
-
-  // if (targetTranscript) {
-  //   analysis.target = analyzeTargetTranscript(deepspeechAnalysis, targetTranscript);
-  // }
-
-  // return analysis;
 }
 
 async function getWavFile(webmStream: ReadableStream) {
@@ -72,12 +47,4 @@ async function getWavFile(webmStream: ReadableStream) {
   await ffmpegCtx.save(wavFile);
 
   return wavFile;
-}
-
-async function analyzeDeepspeech(wavFile: string): Promise<Analysis['deepspeech']> {
-  const output = model.sttWithMetadata(
-    await fs.promises.readFile(wavFile),
-  );
-
-  return output;
 }
