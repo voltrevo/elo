@@ -163,7 +163,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       const i = Number(iStr);
       const token = tokens[i];
 
-      if (!tokenRef || token?.start_time === undefined || tokenRef.parentElement === null) {
+      if (!tokenRef || typeof token?.start_time !== 'number' || tokenRef.parentElement === null) {
         continue;
       }
 
@@ -214,7 +214,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     let prevToken: (AnalysisToken & { start_time: number }) | null = null;
 
     for (const token of tokens) {
-      if (token.start_time === undefined) {
+      if (typeof token.start_time !== 'number') {
         expandedTokens.push(token);
       } else {
         let gap = token.start_time - (prevToken?.start_time ?? 0);

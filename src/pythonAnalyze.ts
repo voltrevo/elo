@@ -20,9 +20,15 @@ export default async function pythonAnalyze(
 
   const stdout = await streamToString(proc.stdout);
 
+  const stdoutStart = stdout.indexOf('{');
+
+  if (stdoutStart !== 0) {
+    console.log(stdout.slice(0, stdoutStart));
+  }
+
   try {
     // TODO: Type checking
-    return JSON.parse(stdout);
+    return JSON.parse(stdout.slice(stdoutStart));
   } catch (error) {
     throw new Error(await streamToString(proc.stderr));
   }
