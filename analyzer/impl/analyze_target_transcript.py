@@ -35,8 +35,10 @@ def analyze_target_transcript(
   def sync_punctuation() -> None:
     while (
       pos.target_transcript < len(target_transcript) and
-      pos.raw_target_transcript_with_case < len(raw_target_transcript_with_case) and
-      target_transcript[pos.target_transcript] != raw_target_transcript_with_case[pos.raw_target_transcript_with_case]
+      (
+        pos.raw_target_transcript_with_case >= len(raw_target_transcript_with_case) or
+        target_transcript[pos.target_transcript] != raw_target_transcript_with_case[pos.raw_target_transcript_with_case]
+      )
     ):
       tokens.append(AnalysisToken(
         text=target_transcript[pos.target_transcript],
