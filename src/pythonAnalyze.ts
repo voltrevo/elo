@@ -19,12 +19,13 @@ export default async function pythonAnalyze(
   stream.Readable.from(bytes).pipe(proc.stdin);
 
   const stdout = await streamToString(proc.stdout);
-  const stderr = await streamToString(proc.stderr);
 
-  console.log({ stdout, stderr });
-
-  // TODO: Type checking
-  return JSON.parse(stdout);
+  try {
+    // TODO: Type checking
+    return JSON.parse(stdout);
+  } catch (error) {
+    throw new Error(await streamToString(proc.stderr));
+  }
 }
 
 function streamToString(stream: stream.Stream): Promise<string> {
