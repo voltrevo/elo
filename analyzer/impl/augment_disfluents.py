@@ -1,16 +1,17 @@
+# import math
 from dataclasses import dataclass
 from typing import List, Optional
 from .types import Analysis, AnalysisToken, TargetAnalysis
 
 pause_threshold = 0.8
 
-def augment_disfluents(analysis: Analysis) -> Analysis:
+def augment_disfluents(bytes: bytes, analysis: Analysis) -> Analysis:
   if analysis.target is None:
     return analysis
 
   words = get_words(analysis.target.tokens)
   words = annotate_disfluents(words)
-  words = add_pauses(words)
+  words = add_pauses(bytes, words)
 
   tokens: List[AnalysisToken] = []
 
@@ -45,44 +46,59 @@ def get_words(tokens: List[AnalysisToken]) -> List[Word]:
   partial_word: List[AnalysisToken] = []
   space_before: Optional[AnalysisToken] = None
 
-  def append_word():
-    if len(partial_word) != 0:
-      start_time = None
-      end_time = None
+  def append_word(next_space: Optional[AnalysisToken]):
+    start_time = None
+    end_time = None
 
-      for t in partial_word:
-        if t.start_time is None:
-          continue
+    tokens = [t for t in partial_word]
 
-        if start_time is None:
-          start_time = t.start_time
-        
-        end_time = t.start_time
+    if len(tokens) == 0:
+      tokens = [
+        AnalysisToken(
+          text='<?',
+          start_time=None if space_before is None else space_before.start_time,
+          type='spoken-incorrect',
+        ),
+        AnalysisToken(
+          text='>',
+          start_time=None if next_space is None else next_space.start_time,
+          type='spoken-incorrect',
+        ),
+      ]
 
-      words.append(Word(
-        text=''.join(['' if t.text is None else t.text for t in partial_word]),
-        start_time=start_time,
-        end_time=end_time,
-        space_before=space_before,
-        tokens=[t for t in partial_word],
-        errors=len([t for t in partial_word if t.type in {'spoken-incorrect', 'missed'}]),
-      ))
+    for t in tokens:
+      if t.start_time is None:
+        continue
 
-      partial_word.clear()
+      if start_time is None:
+        start_time = t.start_time
+      
+      end_time = t.start_time
+
+    words.append(Word(
+      text=''.join(['' if t.text is None else t.text for t in partial_word]),
+      start_time=start_time,
+      end_time=end_time,
+      space_before=space_before,
+      tokens=tokens,
+      errors=len([t for t in partial_word if t.type in {'spoken-incorrect', 'missed'}]),
+    ))
+
+    partial_word.clear()
 
   for token in tokens:
     if token.text == ' ':
-      append_word()
+      append_word(token)
       space_before = token
     else:
       partial_word.append(token)
 
-  append_word()
+  append_word(None)
 
   return words
 
 def annotate_disfluents(words: List[Word]) -> List[Word]:
-  whitelist = {'um', 'uh', 'a', 'ho', 'ah', 'an', 'am', 'm', 'ar'}
+  whitelist = {'um', 'uh', 'a', 'ho', 'ah', 'an', 'am', 'm', 'ar', 'ham'}
 
   new_words: List[Word] = []
 
@@ -127,7 +143,7 @@ def annotate_disfluents(words: List[Word]) -> List[Word]:
   
   return new_words
 
-def add_pauses(words: List[Word]) -> List[Word]:
+def add_pauses(bytes: bytes, words: List[Word]) -> List[Word]:
   new_words: List[Word] = []
   last_end_time: Optional[float] = None
 
@@ -136,8 +152,15 @@ def add_pauses(words: List[Word]) -> List[Word]:
       gap = word.start_time - last_end_time
 
       if gap >= pause_threshold:
+        # gapBytes = bytes[
+        #   2 * math.floor(last_end_time * 16000):
+        #   2 * math.floor(word.start_time * 16000)
+        # ]
+
+        # gapVolume = avg_volume(gapBytes)
+
         new_words.append(Word(
-          text='<pause>',
+          text=f'<pause>',
           start_time=last_end_time + 0.05,
           end_time=word.start_time - 0.05,
           space_before=AnalysisToken(
@@ -152,7 +175,7 @@ def add_pauses(words: List[Word]) -> List[Word]:
               type='spoken-incorrect',
             ),
             AnalysisToken(
-              text='pause',
+              text=f'pause',
               start_time=None,
               type='spoken-incorrect',
             ),
@@ -162,10 +185,30 @@ def add_pauses(words: List[Word]) -> List[Word]:
               type='spoken-incorrect',
             ),
           ],
-          errors=len('<pause>'),
+          errors=len(f'<pause>'),
         ))
 
     new_words.append(word)
     last_end_time = word.end_time
 
   return new_words
+
+# def avg_volume(bytes: bytes) -> float:
+#   sqSum = 0
+#   samples = len(bytes) // 2
+
+#   if samples == 0:
+#     print("Bailing - no samples")
+#     return 0
+
+#   print([(((bytes[2 * i] + 256 * bytes[2 * i + 1] + 32768) % 65536) - 32768) / 32768 for i in range(20)])
+
+#   for i in range(samples):
+#     level = (((bytes[2 * i] + 256 * bytes[2 * i + 1] + 32768) % 65536) - 32768) / 32768
+#     # level = ((bytes[2 * i] + 256 * bytes[2 * i + 1] + 32768) % 65536) / 32768
+#     # level = -1 + (bytes[2 * i] + 256 * bytes[2 * i + 1]) / 32768
+#     sqSum += level * level
+  
+#   print(f"Averged {samples} samples to produce sqSum: {sqSum}, volume: {sqSum / samples}")
+
+#   return math.sqrt(sqSum / samples)

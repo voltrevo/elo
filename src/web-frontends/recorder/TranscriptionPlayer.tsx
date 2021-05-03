@@ -126,7 +126,10 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       return this.props.data.analysis.target.tokens;
     }
 
-    return this.props.data.analysis.deepspeech.transcripts[0].tokens;
+    return this.props.data.analysis.deepspeech.transcripts[0].tokens.map(t => ({
+      ...t,
+      type: null,
+    }));
   }
 
   findCursorPos(): CursorPos | null {
@@ -295,9 +298,10 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     for (const flatWord of flatWords) {
       const segments: Segment[] = [];
 
-      let partialSegment: Omit<Segment, 'type'> & { type?: Segment['type'] } = {
+      let partialSegment: Omit<Segment, 'type'> & { type: Segment['type'] | null } = {
         raisedTokens: [],
         tokens: [],
+        type: null,
       };
 
       function addSegment(type: Segment['type']) {
@@ -309,6 +313,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         partialSegment = {
           raisedTokens: [],
           tokens: [],
+          type: null,
         };
       }
 
@@ -317,8 +322,8 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
           partialSegment.raisedTokens.push(null);
           partialSegment.tokens.push(null);
         } else {
-          if (partialSegment.type !== token.type && token.type !== undefined) {
-            if (partialSegment.type === undefined) {
+          if (partialSegment.type !== token.type && token.type !== null) {
+            if (partialSegment.type === null) {
               partialSegment.type = token.type;
             } else if (token.type === 'correct') {
               addSegment(partialSegment.type);
@@ -393,7 +398,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
             ref={r => {
               this.tokenRefs[tokens.indexOf(t)] = r;
             }}
-            onClick={startTime === undefined ? undefined : (() => {
+            onClick={startTime === null ? undefined : (() => {
               this.setState({
                 time: startTime - this.props.settings.cursorCorrection,
               });
@@ -410,7 +415,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
     for (const ts of [raisedTokens, loweredTokens]) {
       if (ts.length === 0) {
-        ts.push({ text: ' ' });
+        ts.push({ text: ' ', start_time: null, timestep: null, type: null });
       }
     }
 
@@ -427,7 +432,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
           ref={r => {
             this.tokenRefs[tokens.indexOf(t)] = r;
           }}
-          onClick={startTime === undefined ? undefined : (() => {
+          onClick={startTime === null ? undefined : (() => {
             this.setState({
               time: startTime - this.props.settings.cursorCorrection,
             });

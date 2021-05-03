@@ -20,4 +20,4 @@ def analyze(bytes: bytes, target_transcript: Optional[str] = None) -> Analysis:
     duration=len(bytes) / 32000,
   )
 
-  return augment_disfluents(analysis)
+  return augment_disfluents(bytes, analysis)

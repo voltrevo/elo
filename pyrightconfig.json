@@ -1,1 +1,8 @@
-{}
+{
+  "reportUnusedImport": "warning",
+  "reportUnusedCallResult": "warning",
+  "reportUnusedClass": "warning",
+  "reportUnusedCoroutine": "warning",
+  "reportUnusedFunction": "warning",
+  "reportUnusedVariable": "warning"
+}

@@ -10,7 +10,7 @@ import pythonAnalyze from './pythonAnalyze';
 
 export type Analysis = {
   deepspeech: deepspeech.Metadata,
-  target?: TargetAnalysis,
+  target: TargetAnalysis | null,
   duration: number,
 };
 
@@ -20,9 +20,12 @@ export type TargetAnalysis = {
   tokens: AnalysisToken[],
 };
 
-export type AnalysisToken = Partial<deepspeech.TokenMetadata & {
-  type: 'correct' | 'spoken-incorrect' | 'missed',
-}>;
+export type AnalysisToken = {
+  text: string | null,
+  timestep: number | null,
+  start_time: number | null,
+  type: 'correct' | 'spoken-incorrect' | 'missed' | null,
+};
 
 export default async function analyze(
   webmStream: ReadableStream,
