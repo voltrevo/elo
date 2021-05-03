@@ -219,9 +219,11 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       } else {
         let gap = token.start_time - (prevToken?.start_time ?? 0);
 
-        while (gap > this.props.settings.maximumGap) {
-          expandedTokens.push(null);
-          gap -= this.props.settings.maximumGap;
+        if (this.props.settings.maximumGap !== null) {
+          while (gap > this.props.settings.maximumGap) {
+            expandedTokens.push(null);
+            gap -= this.props.settings.maximumGap;
+          }
         }
 
         expandedTokens.push(token);
@@ -231,7 +233,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
     const lastToken = prevToken;
 
-    if (lastToken) {
+    if (this.props.settings.maximumGap !== null && lastToken) {
       let gap = this.props.data.analysis.duration - lastToken.start_time;
 
       while (gap > this.props.settings.maximumGap) {

@@ -9,7 +9,7 @@ import SettingsPanel from './SettingsPanel';
 import TranscriptionPlayer from './TranscriptionPlayer';
 
 export type Settings = {
-  maximumGap: number,
+  maximumGap: number | null,
   monospace: boolean,
   cursorCorrection: number,
   tokenDisplay: 'both' | 'target' | 'spoken',
@@ -50,7 +50,7 @@ const initialState: State = {
     name: 'init',
   },
   settings: {
-    maximumGap: 0.15,
+    maximumGap: null,
     monospace: false,
     cursorCorrection: 0.31,
     tokenDisplay: 'both',

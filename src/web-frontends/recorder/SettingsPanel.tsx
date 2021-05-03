@@ -11,23 +11,29 @@ export default class SettingsPanel extends preact.Component<Props> {
   render() {
     const { maximumGap, cursorCorrection } = this.props.settings;
 
-    const maximumGapStr = maximumGap.toFixed(3);
+    let maximumGapStr = maximumGap?.toFixed(3) ?? '(None)';
+
+    if (maximumGapStr !== '(None)') {
+      maximumGapStr += 's';
+    }
+
     const cursorCorrectionStr = (cursorCorrection >= 0 ? '+' : '') + cursorCorrection.toFixed(3);
 
     return <div class="panel">
       <div>Settings</div>
       <div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ textAlign: 'center' }}>Space Size: {maximumGapStr}s</div>
+          <div style={{ textAlign: 'center' }}>Space Size: {maximumGapStr}</div>
           <div>
             <input
               type="range"
-              value={Math.log(maximumGap)}
+              value={Math.log(maximumGap ?? 1)}
               min="-5"
               max="0"
               step="0.01"
               onInput={e => {
-                const value = Math.exp(Number((e.target as HTMLInputElement).value));
+                const domValue = (e.target as HTMLInputElement).value;
+                const value = domValue === '0' ? null : Math.exp(Number(domValue));
 
                 this.props.onChange({
                   ...this.props.settings,
