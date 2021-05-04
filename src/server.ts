@@ -39,8 +39,11 @@ launch(async (emit) => {
     ctx.body = JSON.stringify(await analyze(ctx.req, targetTranscript));
   }));
 
-  await new Promise(resolve => app.listen(36582, '127.0.0.1', () => { resolve(null); }));
-  emit('HTTP: Listening on 127.0.0.1:36582');
+  const host = process.env.HOST ?? '127.0.0.1';
+  const port = Number(process.env.PORT ?? 36582);
+
+  await new Promise(resolve => app.listen(port, host, () => { resolve(null); }));
+  emit(`HTTP: Listening on ${host}:${port}`);
 
   await new Promise(() => {});
 });

@@ -8,7 +8,14 @@ from .types import Analysis
 from .analyze_target_transcript import analyze_target_transcript
 from .augment_disfluents import augment_disfluents
 
-ds = deepspeech.Model(f"{os.getenv('HOME')}/data/deepspeech-exp/deepspeech-0.9.3-models.pbmm")
+home = os.getenv('HOME')
+
+if home == "/root":
+  data_dir = "/data"
+else:
+  data_dir = f"{home}/data/deepspeech-exp"
+
+ds = deepspeech.Model(f"{data_dir}/models.pbmm")
 
 def analyze(bytes: bytes, target_transcript: Optional[str] = None) -> Analysis:
   numpyBuffer = numpy.frombuffer(bytes, numpy.int16)
