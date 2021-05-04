@@ -13,4 +13,6 @@ RUN mkdir -p /data && \
 
 RUN tar xf /data/audio.tar.gz -C /data
 
+RUN apt install libcudnn7
+
 CMD [ "deepspeech", "--model", "/data/models.pbmm", "--audio", "/data/audio/2830-3980-0043.wav" ]
