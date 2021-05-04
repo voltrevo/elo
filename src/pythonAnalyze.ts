@@ -1,10 +1,81 @@
+import * as http from 'http';
 import * as stream from 'stream';
 import * as child_process from 'child_process';
 
 import type { Analysis } from "./analyze";
 import dirs from './dirs';
 
+const runServer = (() => {
+  let proc: child_process.ChildProcess | null = null;
+
+  return () => {
+    if (proc !== null) {
+      return;
+    }
+
+    proc = child_process.spawn(
+      `${dirs.pythonAnalyzer}/venv/bin/python`,
+      [`${dirs.pythonAnalyzer}/server.py`],
+      { stdio: 'inherit' }
+    );
+
+    proc.on('error', (error) => {
+      console.error(error);
+    });
+
+    proc.on('exit', () => {
+      proc = null;
+    });
+  };
+})();
+
+runServer();
+
 export default async function pythonAnalyze(
+  bytes: Buffer,
+  targetTranscript: string | null,
+): Promise<Analysis> {
+  runServer();
+
+  const { req, res } = await new Promise<{ req: http.ClientRequest, res: http.IncomingMessage }>((resolve) => {
+    const req = http.request(
+      {
+        hostname: '127.0.0.1',
+        port: 28329,
+        path: '/',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': bytes.length,
+          ...(targetTranscript === null ? {} : {
+            'x-target-transcript': targetTranscript,
+          })
+        }
+      },
+      (res) => {
+        resolve({ req, res });
+      },
+    );
+
+    req.write(bytes);
+    req.end();
+  
+    req.on('error', error => {
+      console.error(error)
+    });
+  });
+
+  const responseString = await streamToString(res);
+
+  try {
+    // TODO: Type checking
+    return JSON.parse(responseString);
+  } catch (error) {
+    throw new Error(`Failed to parse: ${responseString}`);
+  }
+}
+
+export async function pythonAnalyzeCLI(
   bytes: Buffer,
   targetTranscript: string | null,
 ): Promise<Analysis> {
