@@ -39,8 +39,8 @@ launch(async (emit) => {
     ctx.body = JSON.stringify(await analyze(ctx.req, targetTranscript));
   }));
 
-  await new Promise(resolve => app.listen(8080, '127.0.0.1', () => { resolve(null); }));
-  emit('HTTP: Listening on 127.0.0.1:8080');
+  await new Promise(resolve => app.listen(36582, '127.0.0.1', () => { resolve(null); }));
+  emit('HTTP: Listening on 127.0.0.1:36582');
 
   await new Promise(() => {});
 });

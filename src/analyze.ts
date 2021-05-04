@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { Readable as ReadableStream } from 'stream';
 
-import * as deepspeech from 'deepspeech';
+import type * as deepspeech from 'deepspeech';
 import ffmpeg from 'ffmpeg';
 import { streamToBuffer } from '@jorgeferrero/stream-to-buffer';
 
