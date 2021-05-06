@@ -33,3 +33,17 @@ like to use it, you need to add the `--gpus all` flag to to the docker command a
 - The frontend has been included, which isn't actually necessary. I'm not sure it makes much
 difference though, so it's included. All the analysis is done in python which has a CLI at
 `analyzer/cli/py` if you'd like to abstract this out.
+
+## Future Work Ideas
+
+- Implement streaming
+- Clean separation of API and frontend
+- Minimize resulting docker image size (currently 3.16GB), especially if frontend and/or gpu aren't
+needed
+- Experiment with tensorflow-lite builds for increasing performance / concurrency limits
+- Improve disfluent detection by updating the actual underlying model using fine-tuning
+- Use fine-tuning (or from-scratch) to retrain deepspeech to recognize phonemes
+- Figure out why the GPU doesn't help very much, possibly unblock GPU acceleration
+- Research CPU and GPU options
+- Make the embedded python server use a separate thread for each request (if it isn't already)
+- Increase threshold for `<pause>` based on surrounding punctuation
