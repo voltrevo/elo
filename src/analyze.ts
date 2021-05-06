@@ -5,7 +5,6 @@ import type * as deepspeech from 'deepspeech';
 import ffmpeg from 'ffmpeg';
 import { streamToBuffer } from '@jorgeferrero/stream-to-buffer';
 
-import dirs from './dirs';
 import pythonAnalyze from './pythonAnalyze';
 
 export type Analysis = {
@@ -36,15 +35,19 @@ export default async function analyze(
   webmStream: ReadableStream,
   targetTranscript: string | null,
 ): Promise<Analysis> {
-  const wavFile = await getWavFile(webmStream);
-  const buffer = await fs.promises.readFile(wavFile);
+  const buffer = await getWavBuffer(webmStream);
 
   return await pythonAnalyze(buffer, targetTranscript);
 }
 
-async function getWavFile(webmStream: ReadableStream) {
-  const webmFile = `${dirs.data}/recordings/${Date.now()}.webm`;
-  const wavFile = webmFile.replace(/\.webm$/, '.wav');
+function tempFilename() {
+  return `${Date.now()}-${Math.random().toString().slice(2)}`;
+}
+
+async function getWavBuffer(webmStream: ReadableStream) {
+  const pathBase = `/tmp/${tempFilename()}`;
+  const webmFile = `${pathBase}.webm`;
+  const wavFile = `${pathBase}.wav`;
 
   const buffer = await streamToBuffer(webmStream);
   await fs.promises.writeFile(webmFile, buffer);
@@ -54,5 +57,10 @@ async function getWavFile(webmStream: ReadableStream) {
   ffmpegCtx.setAudioFrequency(16000);
   await ffmpegCtx.save(wavFile);
 
-  return wavFile;
+  const wavBuffer = await fs.promises.readFile(wavFile);
+
+  await fs.promises.unlink(webmFile);
+  await fs.promises.unlink(wavFile);
+
+  return wavBuffer;
 }
