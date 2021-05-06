@@ -1,17 +1,19 @@
 # import math
 from dataclasses import dataclass
 from typing import List, Optional
-from .types import Analysis, AnalysisToken, TargetAnalysis
+from .types import Analysis, AnalysisToken, Disfluent, TargetAnalysis
 
 pause_threshold = 0.8
 
 def augment_disfluents(bytes: bytes, analysis: Analysis) -> Analysis:
   if analysis.target is None:
     return analysis
+  
+  disfluents: List[Disfluent] = []
 
-  words = get_words(analysis.target.tokens)
-  words = annotate_disfluents(words)
-  words = add_pauses(bytes, words)
+  words = get_words(analysis.target.tokens, disfluents)
+  words = annotate_disfluents(words, disfluents)
+  words = add_pauses(bytes, words, disfluents)
 
   tokens: List[AnalysisToken] = []
 
@@ -29,6 +31,7 @@ def augment_disfluents(bytes: bytes, analysis: Analysis) -> Analysis:
       speech_transcript=analysis.target.speech_transcript,
       tokens=tokens,
     ),
+    disfluents=disfluents,
     duration=analysis.duration,
   )
 
@@ -41,7 +44,7 @@ class Word:
   tokens: List[AnalysisToken]
   errors: int
 
-def get_words(tokens: List[AnalysisToken]) -> List[Word]:
+def get_words(tokens: List[AnalysisToken], disfluents: List[Disfluent]) -> List[Word]:
   words: List[Word] = []
   partial_word: List[AnalysisToken] = []
   space_before: Optional[AnalysisToken] = None
@@ -53,18 +56,27 @@ def get_words(tokens: List[AnalysisToken]) -> List[Word]:
     tokens = [t for t in partial_word]
 
     if len(tokens) == 0:
+      start_time = None if space_before is None else space_before.start_time
+      end_time = None if next_space is None else next_space.start_time
+
       tokens = [
         AnalysisToken(
           text='<?',
-          start_time=None if space_before is None else space_before.start_time,
+          start_time=start_time,
           type='spoken-incorrect',
         ),
         AnalysisToken(
           text='>',
-          start_time=None if next_space is None else next_space.start_time,
+          start_time=end_time,
           type='spoken-incorrect',
         ),
       ]
+
+      disfluents.append(Disfluent(
+        start_time=start_time,
+        end_time=end_time,
+        text='?',
+      ))
 
     for t in tokens:
       if t.start_time is None:
@@ -97,7 +109,7 @@ def get_words(tokens: List[AnalysisToken]) -> List[Word]:
 
   return words
 
-def annotate_disfluents(words: List[Word]) -> List[Word]:
+def annotate_disfluents(words: List[Word], disfluents: List[Disfluent]) -> List[Word]:
   whitelist = {'um', 'uh', 'a', 'ho', 'ah', 'an', 'am', 'm', 'ar', 'ham'}
 
   new_words: List[Word] = []
@@ -114,7 +126,7 @@ def annotate_disfluents(words: List[Word]) -> List[Word]:
     if not is_disfluent:
       new_words.append(word)
       continue
-      
+
     new_word = Word(
       text=f"<{word.text}>",
       start_time=word.start_time,
@@ -123,6 +135,12 @@ def annotate_disfluents(words: List[Word]) -> List[Word]:
       tokens=[],
       errors=word.errors,
     )
+
+    disfluents.append(Disfluent(
+      start_time=word.start_time,
+      end_time=word.end_time,
+      text=word.text,
+    ))
 
     new_word.tokens.append(AnalysisToken(
       text='<',
@@ -143,7 +161,7 @@ def annotate_disfluents(words: List[Word]) -> List[Word]:
   
   return new_words
 
-def add_pauses(bytes: bytes, words: List[Word]) -> List[Word]:
+def add_pauses(bytes: bytes, words: List[Word], disfluents: List[Disfluent]) -> List[Word]:
   new_words: List[Word] = []
   last_end_time: Optional[float] = None
 
@@ -159,10 +177,13 @@ def add_pauses(bytes: bytes, words: List[Word]) -> List[Word]:
 
         # gapVolume = avg_volume(gapBytes)
 
+        start_time = last_end_time + 0.05
+        end_time = word.start_time - 0.05
+
         new_words.append(Word(
           text=f'<pause>',
-          start_time=last_end_time + 0.05,
-          end_time=word.start_time - 0.05,
+          start_time=start_time,
+          end_time=end_time,
           space_before=AnalysisToken(
             text=' ',
             start_time=word.start_time - 0.025,
@@ -171,7 +192,7 @@ def add_pauses(bytes: bytes, words: List[Word]) -> List[Word]:
           tokens=[
             AnalysisToken(
               text='<',
-              start_time=last_end_time + 0.05,
+              start_time=start_time,
               type='spoken-incorrect',
             ),
             AnalysisToken(
@@ -181,11 +202,17 @@ def add_pauses(bytes: bytes, words: List[Word]) -> List[Word]:
             ),
             AnalysisToken(
               text='>',
-              start_time=word.start_time - 0.05,
+              start_time=end_time,
               type='spoken-incorrect',
             ),
           ],
           errors=len(f'<pause>'),
+        ))
+
+        disfluents.append(Disfluent(
+          start_time=start_time,
+          end_time=end_time,
+          text='pause'
         ))
 
     new_words.append(word)

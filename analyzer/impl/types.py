@@ -8,7 +8,14 @@ from . import deepspeech
 class Analysis:
   deepspeech: deepspeech.Metadata
   target: Optional['TargetAnalysis']
+  disfluents: List['Disfluent']
   duration: float
+
+@dataclass
+class Disfluent:
+  start_time: Optional[float]
+  end_time: Optional[float]
+  text: str
 
 @dataclass
 class TargetAnalysis:

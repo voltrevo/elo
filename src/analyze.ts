@@ -11,6 +11,11 @@ import pythonAnalyze from './pythonAnalyze';
 export type Analysis = {
   deepspeech: deepspeech.Metadata,
   target: TargetAnalysis | null,
+  disfluents: {
+    start_time: number | null,
+    end_time: number | null,
+    text: string,
+  }[]
   duration: number,
 };
 

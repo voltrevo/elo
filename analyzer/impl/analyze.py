@@ -24,6 +24,7 @@ def analyze(bytes: bytes, target_transcript: Optional[str] = None) -> Analysis:
   analysis = Analysis(
     deepspeech=dsAnalysis,
     target=None if target_transcript is None else analyze_target_transcript(dsAnalysis, target_transcript),
+    disfluents=[],
     duration=len(bytes) / 32000,
   )
 

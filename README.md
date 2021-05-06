@@ -47,3 +47,5 @@ needed
 - Research CPU and GPU options
 - Make the embedded python server use a separate thread for each request (if it isn't already)
 - Increase threshold for `<pause>` based on surrounding punctuation
+- This repo could use some more general tidying if it becomes long lived and actively developed
+  - E.g. having local python venv installed breaks the docker build
