@@ -110,7 +110,7 @@ def get_words(tokens: List[AnalysisToken], disfluents: List[Disfluent]) -> List[
   return words
 
 def annotate_disfluents(words: List[Word], disfluents: List[Disfluent]) -> List[Word]:
-  whitelist = {'um', 'uh', 'a', 'ho', 'ah', 'an', 'am', 'm', 'ar', 'ham'}
+  whitelist = {'um', 'uh', 'un', 'a', 'ho', 'ah', 'an', 'am', 'm', 'ar', 'ham', 'rn'}
 
   new_words: List[Word] = []
 
