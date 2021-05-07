@@ -551,20 +551,29 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
             right: '2em',
             top: '0.5em',
           }}
-          onClick={() => {
-            const modal = new tingle.modal({});
-            modal.setContent(`
-              <pre
-                style="color: black"
-              >${JSON.stringify(this.props.data.analysis.disfluents, null, 2)}</pre>
-            `);
-            modal.open();
-          }}
         >
           <i>
             {this.props.data.analysis.target === null
               ? <>(Target transcript required for disfluent analysis)</>
-              : <>{this.props.data.analysis.disfluents.length} disfluent(s) (click me)</>
+              : <>
+                {this.props.data.analysis.disfluents.length} disfluent(s)
+                (<a
+                  style={{
+                    color: '#407bff',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => {
+                    const modal = new tingle.modal({});
+                    modal.setContent(`
+                      <pre
+                        style="color: black"
+                      >${JSON.stringify(this.props.data.analysis.disfluents, null, 2)}</pre>
+                    `);
+                    modal.open();
+                  }}
+                >api output</a>)
+              </>
             }
           </i>
         </div>
