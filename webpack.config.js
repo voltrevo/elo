@@ -37,6 +37,7 @@ const config = {
         patterns: [
           'static',
           { from: 'build/css', to: 'css' },
+          { from: `${path.dirname(require.resolve('tingle.js'))}/tingle.css`, to: 'css/.' },
         ],
       }),
     ],

@@ -1,4 +1,5 @@
 import * as preact from 'preact';
+import * as tingle from 'tingle.js';
 
 import type { Analysis, AnalysisToken } from '../../analyze';
 import never from '../../helpers/never';
@@ -550,7 +551,15 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
             right: '2em',
             top: '0.5em',
           }}
-          onClick={() => alert(JSON.stringify(this.props.data.analysis.disfluents))}
+          onClick={() => {
+            const modal = new tingle.modal({});
+            modal.setContent(`
+              <pre
+                style="color: black"
+              >${JSON.stringify(this.props.data.analysis.disfluents, null, 2)}</pre>
+            `);
+            modal.open();
+          }}
         >
           <i>
             {this.props.data.analysis.target === null
