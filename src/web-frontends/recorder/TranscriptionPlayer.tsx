@@ -544,6 +544,21 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         >
           ❌
         </div>
+        <div
+          style={{
+            position: 'absolute',
+            right: '2em',
+            top: '0.5em',
+          }}
+          onClick={() => alert(JSON.stringify(this.props.data.analysis.disfluents))}
+        >
+          <i>
+            {this.props.data.analysis.target === null
+              ? <>(Target transcript required for disfluent analysis)</>
+              : <>{this.props.data.analysis.disfluents.length} disfluent(s) (click me)</>
+            }
+          </i>
+        </div>
       </div>
     </div>;
 
