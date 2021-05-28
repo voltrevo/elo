@@ -18,6 +18,12 @@ else:
 ds = deepspeech.Model(f"{data_dir}/models.pbmm")
 
 def analyze(bytes: bytes, target_transcript: Optional[str] = None) -> Analysis:
+  """analyze audio from bytes
+
+  This basically just ties the different analysis together, which comes from
+  analyze_target_transcript applies diffing, and augment_disfluents for disfluent detection.
+  """
+
   numpyBuffer = numpy.frombuffer(bytes, numpy.int16)
   dsAnalysis = ds.sttWithMetadata(numpyBuffer, 1) # type: ignore
 

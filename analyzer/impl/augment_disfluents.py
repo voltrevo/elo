@@ -11,12 +11,20 @@ def augment_disfluents(bytes: bytes, analysis: Analysis) -> Analysis:
   
   disfluents: List[Disfluent] = []
 
+  # Split into words, interpreting empty words as <?> disfluents.
   words = get_words(analysis.target.tokens, disfluents)
+
+  # Then find words considered additional by the diff which match a special list and flag them as
+  # disfluents.
   words = annotate_disfluents(words, disfluents)
+
+  # Finally just look at the time gap between words and add <pause> disfluents when they're big.
   words = add_pauses(bytes, words, disfluents)
 
   tokens: List[AnalysisToken] = []
 
+  # Convert words back into tokens so that TargetAnalysis can be enhanced with disfluent information
+  # for visualization purposes. Disfluents have also been pulled out separately.
   for word in words:
     if word.space_before is not None:
       tokens.append(word.space_before)
