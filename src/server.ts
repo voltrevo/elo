@@ -61,7 +61,7 @@ launch(async (emit) => {
           ));
         }
       }
-    })
+    });
   }));
 
   const host = process.env.HOST ?? '127.0.0.1';
@@ -77,11 +77,11 @@ function wsDataToUint8Array(data: WebSocket.Data): Uint8Array {
   if (typeof data === 'string') {
     return new TextEncoder().encode(data);
   }
-  
+
   if (data instanceof ArrayBuffer) {
     return new Uint8Array(data);
   }
-  
+
   if (Array.isArray(data)) {
     const len = data.map(b => b.length).reduce((a, b) => a + b);
     const buf = new Uint8Array(len);
@@ -94,7 +94,7 @@ function wsDataToUint8Array(data: WebSocket.Data): Uint8Array {
 
     return buf;
   }
-  
+
   if (data instanceof Buffer) {
     return data;
   }
