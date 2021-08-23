@@ -6,7 +6,7 @@ namespace audio {
   };
 
   export type Recorder = {
-    stop: () => void,
+    stop: () => Promise<Recording>,
   };
 
   export async function recordStream(): Promise<{ stream: ReadableStream, stop: () => void }> {
