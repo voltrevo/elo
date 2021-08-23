@@ -5,10 +5,10 @@ from .types import Analysis, AnalysisToken, Disfluent, TargetAnalysis
 
 pause_threshold = 0.8
 
-def augment_disfluents(bytes: bytes, analysis: Analysis) -> Analysis:
+def augment_disfluents(bytes: bytes, analysis: Analysis, target_supplied: bool) -> Analysis:
   if analysis.target is None:
     return analysis
-  
+
   disfluents: List[Disfluent] = []
 
   # Split into words, interpreting empty words as <?> disfluents.
@@ -16,7 +16,7 @@ def augment_disfluents(bytes: bytes, analysis: Analysis) -> Analysis:
 
   # Then find words considered additional by the diff which match a special list and flag them as
   # disfluents.
-  words = annotate_disfluents(words, disfluents)
+  words = annotate_disfluents(words, disfluents, target_supplied)
 
   # Finally just look at the time gap between words and add <pause> disfluents when they're big.
   words = add_pauses(bytes, words, disfluents)
@@ -117,7 +117,11 @@ def get_words(tokens: List[AnalysisToken], disfluents: List[Disfluent]) -> List[
 
   return words
 
-def annotate_disfluents(words: List[Word], disfluents: List[Disfluent]) -> List[Word]:
+def annotate_disfluents(
+  words: List[Word],
+  disfluents: List[Disfluent],
+  target_supplied: bool
+) -> List[Word]:
   whitelist = {'um', 'uh', 'un', 'a', 'ho', 'ah', 'an', 'am', 'm', 'ar', 'ham', 'rn'}
 
   new_words: List[Word] = []
@@ -127,7 +131,7 @@ def annotate_disfluents(words: List[Word], disfluents: List[Disfluent]) -> List[
 
     is_disfluent = (
       word.text in whitelist and
-      word.errors == len(word.text)
+      (not target_supplied or word.errors == len(word.text))
       # TODO: Check neighbouring words are ok?
     )
 
