@@ -6,8 +6,46 @@ namespace audio {
   };
 
   export type Recorder = {
-    stop: () => Promise<Recording>,
+    stop: () => void,
   };
+
+  export async function recordStream(): Promise<{ stream: ReadableStream, stop: () => void }> {
+    const mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'audio/webm;codecs=opus' });
+    const blobQueue: Blob[] = [];
+
+    const stream = new ReadableStream({
+      async start(_controller) {
+        mediaRecorder.onstop = (event) => {
+          console.log('Recorder stopped: ', event);
+          // console.log('Recorded Blobs: ', recordedBlobs);
+          mediaStream.getTracks().forEach(tr => tr.stop());
+        };
+
+        mediaRecorder.ondataavailable = (event) => {
+          console.log('handleDataAvailable', event);
+          if (event.data && event.data.size > 0) {
+            blobQueue.push(event.data);
+          }
+        };
+
+        mediaRecorder.start(100);
+      },
+      pull(controller) {
+        if (blobQueue.length > 0) {
+          controller.enqueue(blobQueue.shift());
+        }
+      },
+      cancel() {
+        mediaRecorder.stop();
+      }
+    });
+
+    return {
+      stream,
+      stop: () => { mediaRecorder.stop(); },
+    };
+  }
 
   export async function record(): Promise<Recorder> {
     const startTime = Date.now();
@@ -41,7 +79,7 @@ namespace audio {
       }
     };
 
-    mediaRecorder.start(100);
+    mediaRecorder.start();
     console.log('MediaRecorder started', mediaRecorder);
 
     return {
