@@ -41,7 +41,7 @@ namespace audio {
       }
     };
 
-    mediaRecorder.start();
+    mediaRecorder.start(100);
     console.log('MediaRecorder started', mediaRecorder);
 
     return {
