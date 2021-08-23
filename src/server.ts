@@ -47,13 +47,10 @@ launch(async (emit) => {
     let pos = 0;
 
     ctx.websocket.on('message', async data => {
-      const dataBuf = wsDataToUint8Array(data);
-      console.log(dataBuf.length);
-
       if (targetTranscript.length === 0) {
         targetTranscript.push(JSON.parse(data.toString()));
       } else {
-        // const dataBuf = wsDataToUint8Array(data);
+        const dataBuf = wsDataToUint8Array(data);
 
         if (dataBuf.length !== 0) {
           buf.set(dataBuf, pos);
