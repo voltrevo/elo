@@ -21,7 +21,8 @@ export type RecordingState = (
     name: 'recording',
     startTime: number,
     previewDuration: number,
-    recorder: audio.Recorder,
+    recorder: audio.StreamingRecorder,
+    responsePromise: Promise<Response>,
   } |
   {
     name: 'recorded',
@@ -97,8 +98,23 @@ export default class App extends preact.Component<{}, State> {
   async onRecordToggle() {
     switch (this.state.recorder.name) {
       case 'init':
-      case 'transcribed':
-        const recorder = await audio.record();
+      case 'transcribed': {
+        const recorder = await audio.recordStream();
+
+        const headers: Record<string, string> = {};
+        const targetTranscript = this.targetTranscriptRef?.value || undefined;
+
+        if (targetTranscript !== undefined) {
+          headers['x-target-transcript'] = base58.encode(
+            new TextEncoder().encode(targetTranscript),
+          );
+        }
+
+        const responsePromise = fetch('/analyze', {
+          method: 'POST',
+          headers,
+          body: recorder.stream,
+        });
 
         this.setState({
           recorder: {
@@ -106,14 +122,16 @@ export default class App extends preact.Component<{}, State> {
             startTime: Date.now(),
             previewDuration: 0,
             recorder,
+            responsePromise,
           },
         });
 
         this.updateLoop();
 
         break;
+      }
 
-      case 'recording':
+      case 'recording': {
         const recording = await this.state.recorder.recorder.stop();
 
         this.setState({
@@ -125,20 +143,7 @@ export default class App extends preact.Component<{}, State> {
 
         const startTranscriptionTime = Date.now();
 
-        const headers: Record<string, string> = {};
-        const targetTranscript = this.targetTranscriptRef?.value || undefined;
-
-        if (targetTranscript !== undefined) {
-          headers['x-target-transcript'] = base58.encode(
-            new TextEncoder().encode(targetTranscript),
-          );
-        }
-
-        const response = await fetch('/analyze', {
-          method: 'POST',
-          headers,
-          body: recording.data,
-        });
+        const response = await this.state.recorder.responsePromise;
 
         const analysis: Analysis = await response.json();
 
@@ -162,13 +167,16 @@ export default class App extends preact.Component<{}, State> {
         });
 
         break;
+      }
 
-      case 'recorded':
+      case 'recorded': {
         console.log('Not implemented: starting a new recording while transcription is in progress');
         break;
+      }
 
-      default:
+      default: {
         never(this.state.recorder);
+      }
     }
   }
 

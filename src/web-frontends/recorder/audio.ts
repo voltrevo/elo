@@ -10,7 +10,7 @@ namespace audio {
   };
 
   export type StreamingRecorder = {
-    stream: ReadableStream,
+    stream: ReadableStream<Uint8Array>,
     stop: () => Promise<Recording>,
   };
 
@@ -35,7 +35,7 @@ namespace audio {
       };
     });
 
-    const stream = new ReadableStream({
+    const stream = new ReadableStream<Uint8Array>({
       async start(_controller) {
         mediaRecorder.ondataavailable = (event) => {
           console.log('handleDataAvailable', event);
@@ -47,9 +47,11 @@ namespace audio {
 
         mediaRecorder.start(100);
       },
-      pull(controller) {
-        if (blobQueue.length > 0) {
-          controller.enqueue(blobQueue.shift());
+      async pull(controller) {
+        const blob = blobQueue.shift();
+
+        if (blob) {
+          controller.enqueue(new Uint8Array(await blob.arrayBuffer()));
         }
       },
       cancel() {
