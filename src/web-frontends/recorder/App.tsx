@@ -21,8 +21,8 @@ export type RecordingState = (
     name: 'recording',
     startTime: number,
     previewDuration: number,
-    recorder: audio.StreamingRecorder,
-    responsePromise: Promise<Response>,
+    recorder: audio.Recorder,
+    webSocket: WebSocket,
   } |
   {
     name: 'recorded',
@@ -99,21 +99,16 @@ export default class App extends preact.Component<{}, State> {
     switch (this.state.recorder.name) {
       case 'init':
       case 'transcribed': {
-        const recorder = await audio.recordStream();
+        const webSocket = new WebSocket("ws://localhost:36582/analyze");
 
-        const headers: Record<string, string> = {};
-        const targetTranscript = this.targetTranscriptRef?.value || undefined;
+        await new Promise(resolve => {
+          webSocket.addEventListener("open", resolve);
+        });
 
-        if (targetTranscript !== undefined) {
-          headers['x-target-transcript'] = base58.encode(
-            new TextEncoder().encode(targetTranscript),
-          );
-        }
+        webSocket.send(JSON.stringify(this.targetTranscriptRef?.value || null));
 
-        const responsePromise = fetch('/analyze', {
-          method: 'POST',
-          headers,
-          body: recorder.stream,
+        const recorder = await audio.record(blob => {
+          webSocket.send(blob);
         });
 
         this.setState({
@@ -122,7 +117,7 @@ export default class App extends preact.Component<{}, State> {
             startTime: Date.now(),
             previewDuration: 0,
             recorder,
-            responsePromise,
+            webSocket,
           },
         });
 
@@ -143,9 +138,15 @@ export default class App extends preact.Component<{}, State> {
 
         const startTranscriptionTime = Date.now();
 
-        const response = await this.state.recorder.responsePromise;
+        const webSocket = this.state.recorder.webSocket;
 
-        const analysis: Analysis = await response.json();
+        webSocket.send(Uint8Array.from([]));
+
+        const analysis: Analysis = await new Promise(resolve => {
+          webSocket.addEventListener("message", evt => {
+            resolve(JSON.parse(evt.data));
+          });
+        });
 
         console.log({ analysis });
 
