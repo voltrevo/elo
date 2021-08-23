@@ -32,10 +32,10 @@ export type AnalysisToken = {
 };
 
 export default async function analyze(
-  webmStream: ReadableStream,
+  webmData: ReadableStream | Uint8Array,
   targetTranscript: string | null,
 ): Promise<Analysis> {
-  const buffer = await getWavBuffer(webmStream);
+  const buffer = await getWavBuffer(webmData);
 
   return await pythonAnalyze(buffer, targetTranscript);
 }
@@ -44,12 +44,12 @@ function tempFilename() {
   return `${Date.now()}-${Math.random().toString().slice(2)}`;
 }
 
-async function getWavBuffer(webmStream: ReadableStream) {
+async function getWavBuffer(webmData: ReadableStream | Uint8Array) {
   const pathBase = `/tmp/${tempFilename()}`;
   const webmFile = `${pathBase}.webm`;
   const wavFile = `${pathBase}.wav`;
 
-  const buffer = await streamToBuffer(webmStream);
+  const buffer = webmData instanceof Uint8Array ? webmData : await streamToBuffer(webmData);
   await fs.promises.writeFile(webmFile, buffer);
 
   const ffmpegCtx = (await (new ffmpeg(webmFile)));
