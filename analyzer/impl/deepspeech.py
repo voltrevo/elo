@@ -3,6 +3,7 @@ from typing import Any, List
 
 import deepspeech # type: ignore
 
+from .types import AnalysisToken
 
 @dataclass
 class Metadata:
@@ -57,11 +58,32 @@ class Model:
     return ModelStream(self.ds.createStream())
 
 class ModelStream:
+  last_token_start: float = -1
+
   def __init__(self, stream: deepspeech.Stream):
     self.stream = stream
 
   def feedAudioContent(self, audio_buffer: bytes) -> None:
     self.stream.feedAudioContent(audio_buffer) # type: ignore
-  
-  def finishStreamWithMetadata(self, max_results: int) -> Metadata:
-    return parse(self.stream.finishStreamWithMetadata(max_results)) # type: ignore
+
+  def get_more_tokens(self) -> List[AnalysisToken]:
+    metadata: Any = self.stream.intermediateDecodeWithMetadata(1) # type: ignore
+
+    new_tokens: List[AnalysisToken] = []
+
+    for token in metadata.transcripts[0].tokens:
+      if token.start_time <= self.last_token_start:
+        continue
+
+      self.last_token_start = token.start_time
+
+      new_tokens.append(AnalysisToken(
+        text=token.text,
+        start_time=token.start_time,
+        timestep=token.timestep,
+      ))
+
+    return new_tokens
+
+  def finishStreamWithMetadata(self) -> Metadata:
+    return parse(self.stream.finishStreamWithMetadata(1)) # type: ignore

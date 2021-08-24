@@ -1,32 +1,31 @@
 import { spawn } from 'child_process';
 import { Readable as ReadableStream } from 'stream';
 
-import type * as deepspeech from 'deepspeech';
-
 import pythonAnalyze from './pythonAnalyze';
 
+export type AnalysisFragment = (
+  | { type: 'token', value: AnalysisToken }
+  | { type: 'word', value: AnalysisWord }
+  | { type: 'end', value: { duration: number } }
+);
+
 export type Analysis = {
-  deepspeech: deepspeech.Metadata,
-  target: TargetAnalysis | null,
-  disfluents: {
-    start_time: number | null,
-    end_time: number | null,
-    text: string,
-  }[]
+  tokens: AnalysisToken[],
+  words: AnalysisWord[],
   duration: number,
 };
 
-export type TargetAnalysis = {
-  targetTranscript: string,
-  speechTranscript: string,
-  tokens: AnalysisToken[],
+export type AnalysisWord = {
+  start_time: number | null,
+  end_time: number | null,
+  disfluent: boolean,
+  text: string,
 };
 
 export type AnalysisToken = {
   text: string | null,
   timestep: number | null,
   start_time: number | null,
-  type: 'correct' | 'spoken-incorrect' | 'missed' | null,
 };
 
 export default async function analyze(

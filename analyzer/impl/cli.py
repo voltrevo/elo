@@ -1,4 +1,4 @@
-import argparse
+from .types import AnalysisFragment
 import dataclasses
 import json
 import sys
@@ -6,12 +6,7 @@ import sys
 from .analyze import analyze
 
 def run():
-  parser = argparse.ArgumentParser(description='Fluency CLI')
+  def on_fragment(fragment: AnalysisFragment):
+    print(json.dumps(dataclasses.asdict(fragment)))
 
-  parser.add_argument('--target_transcript')
-
-  args = parser.parse_args()
-
-  result = analyze(sys.stdin.buffer, args.target_transcript)
-
-  print(json.dumps(dataclasses.asdict(result)))
+  analyze(sys.stdin.buffer, on_fragment)

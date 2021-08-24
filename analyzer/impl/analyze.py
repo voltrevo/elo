@@ -1,12 +1,10 @@
 import os
-from typing import BinaryIO, Optional
+from typing import BinaryIO, Callable
 
 import numpy
 
 from . import deepspeech
-from .types import Analysis
-from .analyze_target_transcript import analyze_target_transcript
-from .augment_disfluents import augment_disfluents
+from .types import AnalysisFragment, AnalysisTokenFragment
 
 home = os.getenv('HOME')
 
@@ -17,7 +15,10 @@ else:
 
 ds = deepspeech.Model(f"{data_dir}/models.pbmm")
 
-def analyze(input_stream: BinaryIO, supplied_target_transcript: Optional[str] = None) -> Analysis:
+def analyze(
+  input_stream: BinaryIO,
+  on_fragment: Callable[[AnalysisFragment], None],
+) -> None:
   """analyze audio from bytes
 
   This basically just ties the different analysis together, which comes from
@@ -38,19 +39,25 @@ def analyze(input_stream: BinaryIO, supplied_target_transcript: Optional[str] = 
     numpyBuffer = numpy.frombuffer(input_bytes, numpy.int16)
     ds_stream.feedAudioContent(numpyBuffer)
 
-  dsAnalysis = ds_stream.finishStreamWithMetadata(1)
+    for token in ds_stream.get_more_tokens():
+      on_fragment(AnalysisTokenFragment(
+        type="token",
+        value=token,
+      ))
 
-  target_transcript = supplied_target_transcript
+  # dsAnalysis = ds_stream.finishStreamWithMetadata(1)
 
-  if target_transcript is None:
-    original_deepspeech_tokens = dsAnalysis.transcripts[0].tokens
-    target_transcript = ''.join([token.text for token in original_deepspeech_tokens])
+  # target_transcript = supplied_target_transcript
 
-  analysis = Analysis(
-    deepspeech=dsAnalysis,
-    target=analyze_target_transcript(dsAnalysis, target_transcript),
-    disfluents=[],
-    duration=byte_len / 32000,
-  )
+  # if target_transcript is None:
+  #   original_deepspeech_tokens = dsAnalysis.transcripts[0].tokens
+  #   target_transcript = ''.join([token.text for token in original_deepspeech_tokens])
 
-  return augment_disfluents(analysis, supplied_target_transcript is not None)
+  # analysis = Analysis(
+  #   deepspeech=dsAnalysis,
+  #   target=analyze_target_transcript(dsAnalysis, target_transcript),
+  #   disfluents=[],
+  #   duration=byte_len / 32000,
+  # )
+
+  # return augment_disfluents(analysis, supplied_target_transcript is not None)

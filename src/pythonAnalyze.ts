@@ -14,7 +14,9 @@ export default async function pythonAnalyze(
     args.push('--target_transcript', targetTranscript);
   }
 
-  const proc = child_process.spawn(`${dirs.pythonAnalyzer}/venv/bin/python`, args);
+  const proc = child_process.spawn(`${dirs.pythonAnalyzer}/venv/bin/python`, args, {
+    stdio: ['pipe', 'pipe', 'inherit'],
+  });
 
   wavStream.pipe(proc.stdin);
 

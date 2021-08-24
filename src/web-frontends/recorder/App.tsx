@@ -99,10 +99,10 @@ export default class App extends preact.Component<{}, State> {
     switch (this.state.recorder.name) {
       case 'init':
       case 'transcribed': {
-        const webSocket = new WebSocket("ws://localhost:36582/analyze");
+        const webSocket = new WebSocket('ws://localhost:36582/analyze');
 
         await new Promise(resolve => {
-          webSocket.addEventListener("open", resolve);
+          webSocket.addEventListener('open', resolve);
         });
 
         webSocket.send(JSON.stringify(this.targetTranscriptRef?.value || null));
@@ -143,7 +143,7 @@ export default class App extends preact.Component<{}, State> {
         webSocket.send(Uint8Array.from([]));
 
         const analysis: Analysis = await new Promise(resolve => {
-          webSocket.addEventListener("message", evt => {
+          webSocket.addEventListener('message', evt => {
             resolve(JSON.parse(evt.data));
           });
         });
