@@ -52,7 +52,7 @@ launch(async (emit) => {
     const webmStream = new Readable({
       read(size) {
         readBytesWaiting = Math.max(readBytesWaiting, size);
-        console.log('read', size, { readBytesWaiting });
+        // console.log('read', size, { readBytesWaiting });
 
         while (readBytesWaiting > 0) {
           const chunk = chunks.shift();
@@ -62,7 +62,7 @@ launch(async (emit) => {
           }
 
           readBytesWaiting -= chunk?.length ?? 0;
-          console.log(`Pushing ${chunk?.length ?? 0} bytes`, { readBytesWaiting });
+          // console.log(`Pushing ${chunk?.length ?? 0} bytes`, { readBytesWaiting });
           webmStream.push(chunk);
         }
       },
@@ -72,7 +72,7 @@ launch(async (emit) => {
       if (readBytesWaiting > 0) {
         const bytesProvided = chunk?.length ?? 0;
         readBytesWaiting = Math.max(0, readBytesWaiting - bytesProvided);
-        console.log(`Pushing ${chunk?.length ?? 0} bytes`, { readBytesWaiting });
+        // console.log(`Pushing ${chunk?.length ?? 0} bytes`, { readBytesWaiting });
         webmStream.push(chunk);
       } else {
         chunks.push(chunk);
@@ -90,7 +90,7 @@ launch(async (emit) => {
           });
       } else {
         const chunk = wsDataToUint8Array(data);
-        console.log(`Received ${chunk.length} bytes`);
+        // console.log(`Received ${chunk.length} bytes`);
 
         if (chunk.length !== 0) {
           write(chunk);

@@ -42,7 +42,7 @@ function transcodeWav(webmStream: ReadableStream): ReadableStream {
   const ffmpegProc = spawn(
     'ffmpeg',
     ['-i', 'pipe:', '-vn', '-ar', '16000', 'pipe:1.wav'],
-    { stdio: ['pipe', 'pipe', 'inherit'] },
+    { stdio: 'pipe' },
   );
 
   webmStream.pipe(ffmpegProc.stdin);
