@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 
 import path from 'path';
+import { Readable } from 'stream';
 
 import Koa from 'koa';
 import websockify from 'koa-websocket';
@@ -43,22 +44,53 @@ launch(async (emit) => {
 
   app.ws.use(route.all('/analyze', async ctx => {
     const targetTranscript: (string | null)[] = [];
-    const buf = new Uint8Array(10 * 1024 * 1024); // 10mb
-    let pos = 0;
+
+    // TODO: Limit buffered chunks
+    const chunks: Uint8Array[] = [];
+    let readWaiting = true;
+
+    const webmStream = new Readable({
+      read() {
+        const chunk = chunks.shift();
+
+        if (chunk) {
+          console.log(`Pushing ${chunk.length} bytes`);
+          webmStream.push(chunk);
+        } else {
+          readWaiting = true;
+        }
+      },
+    });
+
+    function write(chunk: Uint8Array | null) {
+      if (readWaiting) {
+        readWaiting = false;
+        console.log(`Pushing ${chunk?.length ?? 0} bytes`);
+        webmStream.push(chunk);
+      } else if (chunk === null) {
+        webmStream.push(null);
+      } else {
+        chunks.push(chunk);
+      }
+    }
 
     ctx.websocket.on('message', async data => {
       if (targetTranscript.length === 0) {
         targetTranscript.push(JSON.parse(data.toString()));
       } else {
-        const dataBuf = wsDataToUint8Array(data);
+        const chunk = wsDataToUint8Array(data);
+        console.log(`Received ${chunk.length} bytes`);
 
-        if (dataBuf.length !== 0) {
-          buf.set(dataBuf, pos);
-          pos += dataBuf.length;
+        if (chunk.length !== 0) {
+          write(chunk);
         } else {
+          write(null);
+
           ctx.websocket.send(JSON.stringify(
-            await analyze(buf.subarray(0, pos), targetTranscript[0]),
+            await analyze(webmStream, targetTranscript[0]),
           ));
+
+          // TODO: Close?
         }
       }
     });

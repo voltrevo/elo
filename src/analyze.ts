@@ -1,9 +1,8 @@
+import { spawn } from 'child_process';
 import * as fs from 'fs';
 import { Readable as ReadableStream } from 'stream';
 
 import type * as deepspeech from 'deepspeech';
-import ffmpeg from 'ffmpeg';
-import { streamToBuffer } from '@jorgeferrero/stream-to-buffer';
 
 import pythonAnalyze from './pythonAnalyze';
 
@@ -32,10 +31,10 @@ export type AnalysisToken = {
 };
 
 export default async function analyze(
-  webmData: ReadableStream | Uint8Array,
+  webmStream: ReadableStream,
   targetTranscript: string | null,
 ): Promise<Analysis> {
-  const buffer = await getWavBuffer(webmData);
+  const buffer = await getWavBuffer(webmStream);
 
   return await pythonAnalyze(buffer, targetTranscript);
 }
@@ -44,18 +43,21 @@ function tempFilename() {
   return `${Date.now()}-${Math.random().toString().slice(2)}`;
 }
 
-async function getWavBuffer(webmData: ReadableStream | Uint8Array) {
+async function getWavBuffer(webmStream: ReadableStream) {
   const pathBase = `/tmp/${tempFilename()}`;
   const webmFile = `${pathBase}.webm`;
   const wavFile = `${pathBase}.wav`;
 
-  const buffer = webmData instanceof Uint8Array ? webmData : await streamToBuffer(webmData);
-  await fs.promises.writeFile(webmFile, buffer);
+  webmStream.pipe(fs.createWriteStream(webmFile));
+  await new Promise(resolve => webmStream.on('end', resolve));
 
-  const ffmpegCtx = (await (new ffmpeg(webmFile)));
-  ffmpegCtx.setDisableVideo();
-  ffmpegCtx.setAudioFrequency(16000);
-  await ffmpegCtx.save(wavFile);
+  const ffmpegProc = spawn(
+    'ffmpeg',
+    ['-i', webmFile, '-vn', '-ar', '16000', wavFile],
+    { stdio: 'inherit' },
+  );
+
+  await new Promise(resolve => ffmpegProc.on('exit', resolve));
 
   const wavBuffer = await fs.promises.readFile(wavFile);
 
