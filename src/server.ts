@@ -46,29 +46,33 @@ launch(async (emit) => {
     const targetTranscript: (string | null)[] = [];
 
     // TODO: Limit buffered chunks
-    const chunks: Uint8Array[] = [];
-    let readWaiting = true;
+    const chunks: (Uint8Array | null)[] = [];
+    let readBytesWaiting = 1;
 
     const webmStream = new Readable({
-      read() {
-        const chunk = chunks.shift();
+      read(size) {
+        readBytesWaiting += size;
+        console.log('read', size, { readBytesWaiting });
 
-        if (chunk) {
-          console.log(`Pushing ${chunk.length} bytes`);
+        while (readBytesWaiting > 0) {
+          const chunk = chunks.shift();
+
+          if (chunk === undefined) {
+            break;
+          }
+
+          readBytesWaiting -= chunk?.length ?? 0;
           webmStream.push(chunk);
-        } else {
-          readWaiting = true;
         }
       },
     });
 
     function write(chunk: Uint8Array | null) {
-      if (readWaiting) {
-        readWaiting = false;
+      if (readBytesWaiting > 0) {
+        const bytesProvided = chunk?.length ?? 0;
+        readBytesWaiting = Math.max(0, readBytesWaiting - bytesProvided);
         console.log(`Pushing ${chunk?.length ?? 0} bytes`);
         webmStream.push(chunk);
-      } else if (chunk === null) {
-        webmStream.push(null);
       } else {
         chunks.push(chunk);
       }
