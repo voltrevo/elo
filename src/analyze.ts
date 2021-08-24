@@ -27,13 +27,16 @@ export type AnalysisToken = {
   start_time: number | null,
 };
 
-export default async function analyze(
+export default function analyze(
   webmStream: ReadableStream,
-  targetTranscript: string | null,
-): Promise<Analysis> {
-  const wavStream = transcodeWav(webmStream);
-
-  return await pythonAnalyze(wavStream, targetTranscript);
+  onFragment: (fragment: AnalysisFragment) => void,
+  onError: (error: Error) => void,
+) {
+  return pythonAnalyze(
+    transcodeWav(webmStream),
+    onFragment,
+    onError,
+  );
 }
 
 function transcodeWav(webmStream: ReadableStream): ReadableStream {
