@@ -43,7 +43,7 @@ launch(async (emit) => {
   }));
 
   app.ws.use(route.all('/analyze', async ctx => {
-    const targetTranscript: (string | null)[] = [];
+    let readTargetTranscript = false;
 
     // TODO: Limit buffered chunks
     const chunks: (Uint8Array | null)[] = [];
@@ -51,7 +51,7 @@ launch(async (emit) => {
 
     const webmStream = new Readable({
       read(size) {
-        readBytesWaiting += size;
+        readBytesWaiting = Math.max(readBytesWaiting, size);
         console.log('read', size, { readBytesWaiting });
 
         while (readBytesWaiting > 0) {
@@ -80,8 +80,14 @@ launch(async (emit) => {
     }
 
     ctx.websocket.on('message', async data => {
-      if (targetTranscript.length === 0) {
-        targetTranscript.push(JSON.parse(data.toString()));
+      if (!readTargetTranscript) {
+        readTargetTranscript = true;
+
+        analyze(webmStream, JSON.parse(data.toString()))
+          .then(analysis => {
+            ctx.websocket.send(JSON.stringify(analysis));
+            ctx.websocket.close();
+          });
       } else {
         const chunk = wsDataToUint8Array(data);
         console.log(`Received ${chunk.length} bytes`);
@@ -90,12 +96,6 @@ launch(async (emit) => {
           write(chunk);
         } else {
           write(null);
-
-          ctx.websocket.send(JSON.stringify(
-            await analyze(webmStream, targetTranscript[0]),
-          ));
-
-          // TODO: Close?
         }
       }
     });
