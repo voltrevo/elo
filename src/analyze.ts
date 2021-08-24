@@ -45,23 +45,21 @@ function tempFilename() {
 
 async function getWavBuffer(webmStream: ReadableStream) {
   const pathBase = `/tmp/${tempFilename()}`;
-  const webmFile = `${pathBase}.webm`;
   const wavFile = `${pathBase}.wav`;
-
-  webmStream.pipe(fs.createWriteStream(webmFile));
-  await new Promise(resolve => webmStream.on('end', resolve));
 
   const ffmpegProc = spawn(
     'ffmpeg',
-    ['-i', webmFile, '-vn', '-ar', '16000', wavFile],
-    { stdio: 'inherit' },
+    ['-i', 'pipe:', '-vn', '-ar', '16000', wavFile],
+    { stdio: ['pipe', 'inherit', 'inherit'] },
   );
+
+  webmStream.pipe(ffmpegProc.stdin);
 
   await new Promise(resolve => ffmpegProc.on('exit', resolve));
 
   const wavBuffer = await fs.promises.readFile(wavFile);
 
-  await fs.promises.unlink(webmFile);
+  // await fs.promises.unlink(webmFile);
   await fs.promises.unlink(wavFile);
 
   return wavBuffer;
