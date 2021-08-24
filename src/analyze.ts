@@ -49,18 +49,16 @@ async function getWavBuffer(webmStream: ReadableStream) {
 
   const ffmpegProc = spawn(
     'ffmpeg',
-    ['-i', 'pipe:', '-vn', '-ar', '16000', wavFile],
-    { stdio: ['pipe', 'inherit', 'inherit'] },
+    ['-i', 'pipe:', '-vn', '-ar', '16000', 'pipe:1.wav'],
+    { stdio: ['pipe', 'pipe', 'inherit'] },
   );
 
   webmStream.pipe(ffmpegProc.stdin);
+  ffmpegProc.stdout.pipe(fs.createWriteStream(wavFile));
 
   await new Promise(resolve => ffmpegProc.on('exit', resolve));
 
   const wavBuffer = await fs.promises.readFile(wavFile);
-
-  // await fs.promises.unlink(webmFile);
-  await fs.promises.unlink(wavFile);
 
   return wavBuffer;
 }
