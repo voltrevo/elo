@@ -59,6 +59,7 @@ class Model:
 
 class ModelStream:
   last_token_start: float = -1
+  last_metadata: Any = None
 
   def __init__(self, stream: deepspeech.Stream):
     self.stream = stream
@@ -67,7 +68,12 @@ class ModelStream:
     self.stream.feedAudioContent(audio_buffer) # type: ignore
 
   def get_more_tokens(self) -> List[AnalysisToken]:
-    metadata: Any = self.stream.intermediateDecodeWithMetadata(1) # type: ignore
+    metadata: Any = None
+    
+    if self.last_metadata is not None:
+      metadata = self.last_metadata
+    else:
+      metadata = self.stream.intermediateDecodeWithMetadata(1) # type: ignore
 
     new_tokens: List[AnalysisToken] = []
 
@@ -84,5 +90,5 @@ class ModelStream:
 
     return new_tokens
 
-  def finishStreamWithMetadata(self) -> Metadata:
-    return parse(self.stream.finishStreamWithMetadata(1)) # type: ignore
+  def finish(self) -> None:
+    self.last_metadata = self.stream.finishStreamWithMetadata(1) # type: ignore

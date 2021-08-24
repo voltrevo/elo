@@ -36,17 +36,18 @@ def analyze(
     ))
 
   word_extractor = WordExtractor(on_word)
+  finished = False
 
-  while True:
+  while not finished:
     input_bytes = input_stream.read(2048)
-
-    if len(input_bytes) == 0:
-      break
-
     byte_len += len(input_bytes)
 
-    numpyBuffer = numpy.frombuffer(input_bytes, numpy.int16)
-    ds_stream.feedAudioContent(numpyBuffer)
+    if len(input_bytes) == 0:
+      ds_stream.finish()
+      finished = True
+    else:
+      numpyBuffer = numpy.frombuffer(input_bytes, numpy.int16)
+      ds_stream.feedAudioContent(numpyBuffer)
 
     for token in ds_stream.get_more_tokens():
       on_fragment(AnalysisTokenFragment(
@@ -55,9 +56,9 @@ def analyze(
       ))
 
       word_extractor.process_token(token)
-  
+
   word_extractor.end()
-  
+
   on_fragment(AnalysisEndFragment(
     type="end",
     value=AnalysisEndFragment.Value(

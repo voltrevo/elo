@@ -3,6 +3,14 @@ from typing import Callable, List, Optional
 from .types import AnalysisToken, AnalysisWord
 
 
+empty_disfluent = '<?>'
+
+disfluents = {
+  empty_disfluent,
+  'um', 'uh', 'un', 'ho', 'ah', 'm', 'ar', 'rn',
+  # 'a', 'an', 'am', 'ham',
+}
+
 pause_threshold = 0.8
 
 class WordExtractor:
@@ -28,13 +36,10 @@ class WordExtractor:
     end_time = None
 
     tokens = [t for t in self.partial_word]
-    is_disfluent = False
 
     if len(tokens) == 0:
       start_time = None if self.space_before is None else self.space_before.start_time
       end_time = None if next_space is None else next_space.start_time
-
-      is_disfluent = True
 
     for t in tokens:
       if t.start_time is None:
@@ -60,12 +65,12 @@ class WordExtractor:
     text = ''.join(['' if t.text is None else t.text for t in self.partial_word])
 
     if text == '':
-      text = '<?>'
+      text = empty_disfluent
 
     self.on_word(AnalysisWord(
       start_time=start_time,
       end_time=end_time,
-      disfluent=is_disfluent,
+      disfluent=text in disfluents,
       text=text,
     ))
 
