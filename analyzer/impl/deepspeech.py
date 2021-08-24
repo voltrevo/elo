@@ -80,7 +80,6 @@ class ModelStream:
       new_tokens.append(AnalysisToken(
         text=token.text,
         start_time=token.start_time,
-        timestep=token.timestep,
       ))
 
     return new_tokens

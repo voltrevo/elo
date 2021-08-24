@@ -24,7 +24,6 @@ export type AnalysisWord = {
 
 export type AnalysisToken = {
   text: string | null,
-  timestep: number | null,
   start_time: number | null,
 };
 

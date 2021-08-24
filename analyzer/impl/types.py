@@ -47,4 +47,3 @@ class AnalysisWord:
 class AnalysisToken:
   text: Optional[str]
   start_time: Optional[float]
-  timestep: Optional[int]

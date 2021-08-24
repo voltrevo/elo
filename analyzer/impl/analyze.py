@@ -4,7 +4,8 @@ from typing import BinaryIO, Callable
 import numpy
 
 from . import deepspeech
-from .types import AnalysisFragment, AnalysisTokenFragment
+from .word_extractor import WordExtractor
+from .types import AnalysisEndFragment, AnalysisFragment, AnalysisTokenFragment, AnalysisWord, AnalysisWordFragment
 
 home = os.getenv('HOME')
 
@@ -28,6 +29,14 @@ def analyze(
   ds_stream = ds.createStream()
   byte_len = 0
 
+  def on_word(word: AnalysisWord):
+    on_fragment(AnalysisWordFragment(
+      type="word",
+      value=word,
+    ))
+
+  word_extractor = WordExtractor(on_word)
+
   while True:
     input_bytes = input_stream.read(2048)
 
@@ -45,19 +54,13 @@ def analyze(
         value=token,
       ))
 
-  # dsAnalysis = ds_stream.finishStreamWithMetadata(1)
-
-  # target_transcript = supplied_target_transcript
-
-  # if target_transcript is None:
-  #   original_deepspeech_tokens = dsAnalysis.transcripts[0].tokens
-  #   target_transcript = ''.join([token.text for token in original_deepspeech_tokens])
-
-  # analysis = Analysis(
-  #   deepspeech=dsAnalysis,
-  #   target=analyze_target_transcript(dsAnalysis, target_transcript),
-  #   disfluents=[],
-  #   duration=byte_len / 32000,
-  # )
-
-  # return augment_disfluents(analysis, supplied_target_transcript is not None)
+      word_extractor.process_token(token)
+  
+  word_extractor.end()
+  
+  on_fragment(AnalysisEndFragment(
+    type="end",
+    value=AnalysisEndFragment.Value(
+      duration=byte_len / 32000,
+    ),
+  ))
