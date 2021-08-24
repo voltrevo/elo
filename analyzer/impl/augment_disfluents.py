@@ -5,7 +5,7 @@ from .types import Analysis, AnalysisToken, Disfluent, TargetAnalysis
 
 pause_threshold = 0.8
 
-def augment_disfluents(bytes: bytes, analysis: Analysis, target_supplied: bool) -> Analysis:
+def augment_disfluents(analysis: Analysis, target_supplied: bool) -> Analysis:
   if analysis.target is None:
     return analysis
 
@@ -19,7 +19,7 @@ def augment_disfluents(bytes: bytes, analysis: Analysis, target_supplied: bool) 
   words = annotate_disfluents(words, disfluents, target_supplied)
 
   # Finally just look at the time gap between words and add <pause> disfluents when they're big.
-  words = add_pauses(bytes, words, disfluents)
+  words = add_pauses(words, disfluents)
 
   tokens: List[AnalysisToken] = []
 
@@ -173,7 +173,7 @@ def annotate_disfluents(
   
   return new_words
 
-def add_pauses(bytes: bytes, words: List[Word], disfluents: List[Disfluent]) -> List[Word]:
+def add_pauses(words: List[Word], disfluents: List[Disfluent]) -> List[Word]:
   new_words: List[Word] = []
   last_end_time: Optional[float] = None
 
@@ -182,13 +182,6 @@ def add_pauses(bytes: bytes, words: List[Word], disfluents: List[Disfluent]) -> 
       gap = word.start_time - last_end_time
 
       if gap >= pause_threshold:
-        # gapBytes = bytes[
-        #   2 * math.floor(last_end_time * 16000):
-        #   2 * math.floor(word.start_time * 16000)
-        # ]
-
-        # gapVolume = avg_volume(gapBytes)
-
         start_time = last_end_time + 0.05
         end_time = word.start_time - 0.05
 
@@ -231,23 +224,3 @@ def add_pauses(bytes: bytes, words: List[Word], disfluents: List[Disfluent]) -> 
     last_end_time = word.end_time
 
   return new_words
-
-# def avg_volume(bytes: bytes) -> float:
-#   sqSum = 0
-#   samples = len(bytes) // 2
-
-#   if samples == 0:
-#     print("Bailing - no samples")
-#     return 0
-
-#   print([(((bytes[2 * i] + 256 * bytes[2 * i + 1] + 32768) % 65536) - 32768) / 32768 for i in range(20)])
-
-#   for i in range(samples):
-#     level = (((bytes[2 * i] + 256 * bytes[2 * i + 1] + 32768) % 65536) - 32768) / 32768
-#     # level = ((bytes[2 * i] + 256 * bytes[2 * i + 1] + 32768) % 65536) / 32768
-#     # level = -1 + (bytes[2 * i] + 256 * bytes[2 * i + 1]) / 32768
-#     sqSum += level * level
-  
-#   print(f"Averged {samples} samples to produce sqSum: {sqSum}, volume: {sqSum / samples}")
-
-#   return math.sqrt(sqSum / samples)

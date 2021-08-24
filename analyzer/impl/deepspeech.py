@@ -45,10 +45,23 @@ def parse(ds_metadata: Any) -> Metadata:
 class Model:
   def __init__(self, model_path: str):
     self.ds = deepspeech.Model(model_path)
-  
+
   def sttWithMetadata(self, audio_buffer: bytes, max_results: int) -> Metadata:
     ds_metadata = self.ds.sttWithMetadata(audio_buffer, max_results) # type: ignore
     return parse(ds_metadata)
-  
+
   def enableExternalScorer(self, scorer_path: str):
     self.ds.enableExternalScorer(scorer_path) # type: ignore
+
+  def createStream(self):
+    return ModelStream(self.ds.createStream())
+
+class ModelStream:
+  def __init__(self, stream: deepspeech.Stream):
+    self.stream = stream
+
+  def feedAudioContent(self, audio_buffer: bytes) -> None:
+    self.stream.feedAudioContent(audio_buffer) # type: ignore
+  
+  def finishStreamWithMetadata(self, max_results: int) -> Metadata:
+    return parse(self.stream.finishStreamWithMetadata(max_results)) # type: ignore

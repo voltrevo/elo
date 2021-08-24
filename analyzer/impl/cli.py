@@ -12,7 +12,6 @@ def run():
 
   args = parser.parse_args()
 
-  bytes = sys.stdin.buffer.read(50000000)
-  result = analyze(bytes, args.target_transcript)
+  result = analyze(sys.stdin.buffer, args.target_transcript)
 
   print(json.dumps(dataclasses.asdict(result)))
