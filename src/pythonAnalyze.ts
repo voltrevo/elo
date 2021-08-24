@@ -2,7 +2,7 @@ import * as http from 'http';
 import * as stream from 'stream';
 import * as child_process from 'child_process';
 
-import type { Analysis } from "./analyze";
+import type { Analysis } from './analyze';
 import dirs from './dirs';
 
 const runServer = (() => {
@@ -16,7 +16,7 @@ const runServer = (() => {
     proc = child_process.spawn(
       `${dirs.pythonAnalyzer}/venv/bin/python`,
       [`${dirs.pythonAnalyzer}/server.py`],
-      { stdio: 'inherit' }
+      { stdio: 'inherit' },
     );
 
     proc.on('error', (error) => {
@@ -32,7 +32,7 @@ const runServer = (() => {
 runServer();
 
 export default async function pythonAnalyze(
-  bytes: Buffer,
+  wavStream: stream.Readable,
   targetTranscript: string | null,
 ): Promise<Analysis> {
   runServer();
@@ -46,22 +46,20 @@ export default async function pythonAnalyze(
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Content-Length': bytes.length,
           ...(targetTranscript === null ? {} : {
             'x-target-transcript': targetTranscript,
-          })
-        }
+          }),
+        },
       },
       (res) => {
         resolve({ req, res });
       },
     );
 
-    req.write(bytes);
-    req.end();
-  
+    wavStream.pipe(req);
+
     req.on('error', error => {
-      console.error(error)
+      console.error(error);
     });
   });
 
@@ -111,5 +109,5 @@ function streamToString(stream: stream.Stream): Promise<string> {
     stream.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
     stream.on('error', (err) => reject(err));
     stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
-  })
+  });
 }

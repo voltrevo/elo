@@ -1,5 +1,4 @@
 import { spawn } from 'child_process';
-import * as fs from 'fs';
 import { Readable as ReadableStream } from 'stream';
 
 import type * as deepspeech from 'deepspeech';
@@ -34,19 +33,12 @@ export default async function analyze(
   webmStream: ReadableStream,
   targetTranscript: string | null,
 ): Promise<Analysis> {
-  const buffer = await getWavBuffer(webmStream);
+  const wavStream = transcodeWav(webmStream);
 
-  return await pythonAnalyze(buffer, targetTranscript);
+  return await pythonAnalyze(wavStream, targetTranscript);
 }
 
-function tempFilename() {
-  return `${Date.now()}-${Math.random().toString().slice(2)}`;
-}
-
-async function getWavBuffer(webmStream: ReadableStream) {
-  const pathBase = `/tmp/${tempFilename()}`;
-  const wavFile = `${pathBase}.wav`;
-
+function transcodeWav(webmStream: ReadableStream): ReadableStream {
   const ffmpegProc = spawn(
     'ffmpeg',
     ['-i', 'pipe:', '-vn', '-ar', '16000', 'pipe:1.wav'],
@@ -54,11 +46,6 @@ async function getWavBuffer(webmStream: ReadableStream) {
   );
 
   webmStream.pipe(ffmpegProc.stdin);
-  ffmpegProc.stdout.pipe(fs.createWriteStream(wavFile));
 
-  await new Promise(resolve => ffmpegProc.on('exit', resolve));
-
-  const wavBuffer = await fs.promises.readFile(wavFile);
-
-  return wavBuffer;
+  return ffmpegProc.stdout;
 }
