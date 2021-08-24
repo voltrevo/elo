@@ -62,6 +62,7 @@ launch(async (emit) => {
           }
 
           readBytesWaiting -= chunk?.length ?? 0;
+          console.log(`Pushing ${chunk?.length ?? 0} bytes`, { readBytesWaiting });
           webmStream.push(chunk);
         }
       },
@@ -71,7 +72,7 @@ launch(async (emit) => {
       if (readBytesWaiting > 0) {
         const bytesProvided = chunk?.length ?? 0;
         readBytesWaiting = Math.max(0, readBytesWaiting - bytesProvided);
-        console.log(`Pushing ${chunk?.length ?? 0} bytes`);
+        console.log(`Pushing ${chunk?.length ?? 0} bytes`, { readBytesWaiting });
         webmStream.push(chunk);
       } else {
         chunks.push(chunk);
