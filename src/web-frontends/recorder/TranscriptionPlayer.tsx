@@ -233,6 +233,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
   }
 
   renderTranscript(): preact.JSX.Element {
+    const tokens = this.getTokens();
     const expandedTokens = this.getExpandedTokens();
 
     return <div>
@@ -246,7 +247,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         return <span
           class="token"
           ref={r => {
-            this.tokenRefs[expandedTokens.indexOf(t)] = r;
+            this.tokenRefs[tokens.indexOf(t)] = r;
           }}
           onClick={startTime === null ? undefined : (() => {
             this.setState({
