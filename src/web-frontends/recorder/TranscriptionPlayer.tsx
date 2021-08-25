@@ -304,7 +304,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         const startTime = t.start_time;
 
         return <span
-          class="token"
+          class={!t.disfluent ? 'token' : 'token spoken-incorrect'}
           ref={r => {
             this.tokenRefs[tokens.findIndex(tr => tr.start_time === startTime)] = r;
           }}
