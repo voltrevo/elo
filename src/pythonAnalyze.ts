@@ -10,16 +10,8 @@ export default function pythonAnalyze(
   onFragment: (fragment: AnalysisFragment) => void,
   onError: (error: Error) => void,
 ) {
-  const proc = child_process.spawn(
-    `${dirs.pythonAnalyzer}/venv/bin/python`,
-    [`${dirs.pythonAnalyzer}/cli.py`],
-    { stdio: ['pipe', 'pipe', 'inherit'] },
-  );
-
-  wavStream.pipe(proc.stdin);
-
   const lines = readline.createInterface({
-    input: proc.stdout,
+    input: pythonAnalyzeRaw(wavStream),
     crlfDelay: Infinity,
   });
 
@@ -28,4 +20,16 @@ export default function pythonAnalyze(
       onFragment(JSON.parse(line));
     }
   })().catch(onError);
+}
+
+export function pythonAnalyzeRaw(wavStream: stream.Readable): stream.Readable {
+  const proc = child_process.spawn(
+    `${dirs.pythonAnalyzer}/venv/bin/python`,
+    [`${dirs.pythonAnalyzer}/cli.py`],
+    { stdio: ['pipe', 'pipe', 'inherit'] },
+  );
+
+  wavStream.pipe(proc.stdin);
+
+  return proc.stdout;
 }

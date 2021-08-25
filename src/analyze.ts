@@ -1,11 +1,12 @@
 import { spawn } from 'child_process';
 import { Readable as ReadableStream } from 'stream';
 
-import pythonAnalyze from './pythonAnalyze';
+import pythonAnalyze, { pythonAnalyzeRaw } from './pythonAnalyze';
 
 export type AnalysisFragment = (
   | { type: 'token', value: AnalysisToken }
   | { type: 'word', value: AnalysisWord }
+  | { type: 'error', value: { message: string } }
   | { type: 'end', value: { duration: number } }
 );
 
@@ -37,6 +38,12 @@ export default function analyze(
     onFragment,
     onError,
   );
+}
+
+export function analyzeRaw(
+  webmStream: ReadableStream,
+): ReadableStream {
+  return pythonAnalyzeRaw(transcodeWav(webmStream));
 }
 
 function transcodeWav(webmStream: ReadableStream): ReadableStream {

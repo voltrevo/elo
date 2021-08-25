@@ -8,19 +8,11 @@ import websockify from 'koa-websocket';
 import route from 'koa-route';
 import serveStaticCache from 'koa-static-cache';
 import type WebSocket from 'ws';
+import uuid from 'uuid';
 
 import dirs from './dirs';
 import launch from './helpers/launch';
-import analyze from './analyze';
-import base58 from './helpers/base58';
-
-function sanitizeHeader(headerValue: string | string[] | undefined): string | null {
-  if (Array.isArray(headerValue)) {
-    return headerValue[headerValue.length - 1] ?? null;
-  }
-
-  return headerValue ?? null;
-}
+import analyze, { AnalysisFragment, analyzeRaw } from './analyze';
 
 launch(async (emit) => {
   const app = websockify(new Koa());
@@ -32,19 +24,13 @@ launch(async (emit) => {
   }));
 
   app.use(route.post('/analyze', async ctx => {
-    const targetTranscriptEncoded = sanitizeHeader(ctx.headers['x-target-transcript']);
-    let targetTranscript: string | null = null;
+    const analysisStream = analyzeRaw(ctx.req);
+    analysisStream.pipe(ctx.res);
 
-    if (targetTranscriptEncoded !== null) {
-      targetTranscript = new TextDecoder().decode(base58.decode(targetTranscriptEncoded));
-    }
-
-    ctx.body = JSON.stringify(await analyze(ctx.req, targetTranscript));
+    await new Promise(resolve => analysisStream.on('end', resolve));
   }));
 
   app.ws.use(route.all('/analyze', async ctx => {
-    let readTargetTranscript = false;
-
     // TODO: Limit buffered chunks
     const chunks: (Uint8Array | null)[] = [];
     let readBytesWaiting = 1;
@@ -79,24 +65,36 @@ launch(async (emit) => {
       }
     }
 
-    ctx.websocket.on('message', async data => {
-      if (!readTargetTranscript) {
-        readTargetTranscript = true;
+    analyze(
+      webmStream,
+      fragment => {
+        ctx.websocket.send(JSON.stringify(fragment));
 
-        analyze(webmStream, JSON.parse(data.toString()))
-          .then(analysis => {
-            ctx.websocket.send(JSON.stringify(analysis));
-            ctx.websocket.close();
-          });
-      } else {
-        const chunk = wsDataToUint8Array(data);
-        // console.log(`Received ${chunk.length} bytes`);
-
-        if (chunk.length !== 0) {
-          write(chunk);
-        } else {
-          write(null);
+        if (fragment.type === 'end') {
+          ctx.websocket.close();
         }
+      },
+      error => {
+        const id = uuid.v4();
+        console.error(id, error);
+
+        const errorFragment: AnalysisFragment = {
+          type: 'error',
+          value: { message: id },
+        };
+
+        ctx.websocket.send(JSON.stringify(errorFragment));
+      },
+    );
+
+    ctx.websocket.on('message', async data => {
+      const chunk = wsDataToUint8Array(data);
+      // console.log(`Received ${chunk.length} bytes`);
+
+      if (chunk.length !== 0) {
+        write(chunk);
+      } else {
+        write(null);
       }
     });
   }));
