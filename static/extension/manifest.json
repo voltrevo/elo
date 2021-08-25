@@ -1,0 +1,21 @@
+{
+  "manifest_version": 2,
+
+  "name": "Language Confidence",
+  "description": "Automated ai-driven speech feedback",
+  "version": "0.0.0",
+
+  "icons": {
+    "50": "assets/icons/logo-symbol-50x50.png"
+  },
+
+  "web_accessible_resources": [],
+
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "50": "assets/icons/logo-symbol-50x50.png"
+    },
+    "default_title": "Language Confidence"
+  }
+}

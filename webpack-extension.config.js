@@ -5,7 +5,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const config = {
   common: {
     entry: {
-      index: './build/js/src/web-frontends/demo/index.js',
+      index: './build/js/src/web-frontends/extension/index.js',
     },
     module: {
       rules: [
@@ -26,18 +26,18 @@ const config = {
     },
     output: {
       filename: '[name].bundle.js',
-      path: path.join(__dirname, 'build', 'demo'),
+      path: path.join(__dirname, 'build', 'extension'),
       publicPath: '/',
     },
     devServer: {
-      contentBase: path.join(__dirname, 'build', 'demo'),
+      contentBase: path.join(__dirname, 'build', 'extension'),
     },
     plugins: [
       new CopyPlugin({
         patterns: [
-          'static/demo',
-          { from: 'build/css/demo.css', to: 'css/demo.css' },
-          { from: 'build/css/demo.css.map', to: 'css/demo.css.map' },
+          'static/extension',
+          { from: 'build/css/extension.css', to: 'css/extension.css' },
+          { from: 'build/css/extension.css.map', to: 'css/extension.css.map' },
         ],
       }),
     ],

@@ -17,7 +17,7 @@ import analyze, { AnalysisFragment, analyzeRaw } from './analyze';
 launch(async (emit) => {
   const app = websockify(new Koa());
 
-  app.use(serveStaticCache(path.join(dirs.build, 'web'), {
+  app.use(serveStaticCache(path.join(dirs.build, 'demo'), {
     alias: {
       '/': '/index.html',
     },
