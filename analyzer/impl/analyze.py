@@ -21,9 +21,6 @@ def analyze(
   on_fragment: Callable[[AnalysisFragment], None],
 ) -> None:
   """analyze audio from bytes
-
-  This basically just ties the different analysis together, which comes from
-  analyze_target_transcript applies diffing, and augment_disfluents for disfluent detection.
   """
 
   ds_stream = ds.createStream()

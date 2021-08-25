@@ -21,17 +21,40 @@ Visit `localhost:36582` to view the frontend.
 
 ## Using the API Directly
 
-POST your audio file to `http://localhost:36582/analyze`, optionally including the target transcript
-using header `x-target-transcript` (encoded as base58 to allow punctuation which isn't allowed
-directly in headers).
+POST your audio file to `http://localhost:36582/analyze`.
 
 E.g.:
 ```
 $ curl -LO https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/audio-0.9.3.tar.gz
 $ tar xf audio-0.9.3.tar.gz
-$ pip install base58
-$ curl -X POST --data-binary @audio/2830-3980-0043.wav -H "x-target-transcript: $(echo -n 'proves this' | base58)" http://localhost:36582/analyze
-{"deepspeech":{"transcripts":[{"confidence":-2.6299123764038086,"tokens":[{"text":"e","timestep":34,"start_time":0.6800000071525574},{"text":"x","timestep":36,"start_time":0.7199999690055847},{"text":"p","timestep":40,"start_time":0.7999999523162842},{"text":"e","timestep":41,"start_time":0.8199999928474426},{"text":"r","timestep":43,"start_time":0.85999995470047},{"text":"i","timestep":45,"start_time":0.8999999761581421},{"text":"e","timestep":47,"start_time":0.9399999976158142},{"text":"n","timestep":49,"start_time":0.9799999594688416},{"text":"c","timestep":50,"start_time":1},{"text":"e","timestep":52,"start_time":1.0399999618530273},{"text":" ","timestep":56,"start_time":1.1200000047683716},{"text":"p","timestep":61,"start_time":1.2200000286102295},{"text":"r","timestep":63,"start_time":1.2599999904632568},{"text":"o","timestep":64,"start_time":1.2799999713897705},{"text":"v","timestep":66,"start_time":1.3199999332427979},{"text":"e","timestep":67,"start_time":1.3399999141693115},{"text":"s","timestep":69,"start_time":1.3799999952316284},{"text":" ","timestep":72,"start_time":1.4399999380111694},{"text":"t","timestep":75,"start_time":1.5},{"text":"h","timestep":76,"start_time":1.5199999809265137},{"text":"i","timestep":77,"start_time":1.5399999618530273},{"text":"s","timestep":79,"start_time":1.5799999237060547},{"text":"s","timestep":85,"start_time":1.6999999284744263}]}]},"target":{"target_transcript":"proves this","speech_transcript":"experience proves thiss","tokens":[{"text":"e","start_time":0.6800000071525574,"type":"spoken-incorrect"},{"text":"x","start_time":0.7199999690055847,"type":"spoken-incorrect"},{"text":"p","start_time":0.7999999523162842,"type":"correct"},{"text":"e","start_time":0.8199999928474426,"type":"spoken-incorrect"},{"text":"r","start_time":0.85999995470047,"type":"correct"},{"text":"i","start_time":0.8999999761581421,"type":"spoken-incorrect"},{"text":"e","start_time":0.9399999976158142,"type":"spoken-incorrect"},{"text":"n","start_time":0.9799999594688416,"type":"spoken-incorrect"},{"text":"c","start_time":1,"type":"spoken-incorrect"},{"text":"e","start_time":1.0399999618530273,"type":"spoken-incorrect"},{"text":" ","start_time":1.1200000047683716,"type":"spoken-incorrect"},{"text":"p","start_time":1.2200000286102295,"type":"spoken-incorrect"},{"text":"r","start_time":1.2599999904632568,"type":"spoken-incorrect"},{"text":"o","start_time":1.2799999713897705,"type":"correct"},{"text":"v","start_time":1.3199999332427979,"type":"correct"},{"text":"e","start_time":1.3399999141693115,"type":"correct"},{"text":"s","start_time":1.3799999952316284,"type":"correct"},{"text":" ","start_time":1.4399999380111694,"type":"correct"},{"text":"t","start_time":1.5,"type":"correct"},{"text":"h","start_time":1.5199999809265137,"type":"correct"},{"text":"i","start_time":1.5399999618530273,"type":"correct"},{"text":"s","start_time":1.5799999237060547,"type":"correct"},{"text":"s","start_time":1.6999999284744263,"type":"spoken-incorrect"}]},"disfluents":[],"duration":1.9774375}
+$ curl -X POST --data-binary @audio/2830-3980-0043.wav http://localhost:36582/analyze
+{"type": "token", "value": {"text": "e", "start_time": 0.6800000071525574}}
+{"type": "token", "value": {"text": "x", "start_time": 0.7199999690055847}}
+{"type": "token", "value": {"text": "p", "start_time": 0.7999999523162842}}
+{"type": "token", "value": {"text": "e", "start_time": 0.8199999928474426}}
+{"type": "token", "value": {"text": "r", "start_time": 0.85999995470047}}
+{"type": "token", "value": {"text": "i", "start_time": 0.8999999761581421}}
+{"type": "token", "value": {"text": "e", "start_time": 0.9399999976158142}}
+{"type": "token", "value": {"text": "n", "start_time": 0.9799999594688416}}
+{"type": "token", "value": {"text": "c", "start_time": 1.0}}
+{"type": "token", "value": {"text": "e", "start_time": 1.0399999618530273}}
+{"type": "token", "value": {"text": " ", "start_time": 1.1200000047683716}}
+{"type": "word", "value": {"start_time": 0.6800000071525574, "end_time": 1.0399999618530273, "disfluent": false, "text": "experience"}}
+{"type": "token", "value": {"text": "p", "start_time": 1.2200000286102295}}
+{"type": "token", "value": {"text": "r", "start_time": 1.2599999904632568}}
+{"type": "token", "value": {"text": "o", "start_time": 1.2799999713897705}}
+{"type": "token", "value": {"text": "v", "start_time": 1.3199999332427979}}
+{"type": "token", "value": {"text": "e", "start_time": 1.3399999141693115}}
+{"type": "token", "value": {"text": "s", "start_time": 1.3799999952316284}}
+{"type": "token", "value": {"text": " ", "start_time": 1.4399999380111694}}
+{"type": "word", "value": {"start_time": 1.2200000286102295, "end_time": 1.3799999952316284, "disfluent": false, "text": "proves"}}
+{"type": "token", "value": {"text": "t", "start_time": 1.5}}
+{"type": "token", "value": {"text": "h", "start_time": 1.5199999809265137}}
+{"type": "token", "value": {"text": "i", "start_time": 1.5399999618530273}}
+{"type": "token", "value": {"text": "s", "start_time": 1.5799999237060547}}
+{"type": "token", "value": {"text": "s", "start_time": 1.6999999284744263}}
+{"type": "word", "value": {"start_time": 1.5, "end_time": 1.6999999284744263, "disfluent": false, "text": "thiss"}}
+{"type": "end", "value": {"duration": 1.9774375}}
 ```
 
 ## Using the Python CLI
@@ -47,7 +70,33 @@ $ python cli.py "proves this" <audio/2830-3980-0043.wav
 
 (a bunch of stderr output from deepspeech, e.g. describing missing gpu)
 
-{"deepspeech": {"transcripts": [{"confidence": -2.738819122314453, "tokens": [{"text": "e", "timestep": 34, "start_time": 0.6800000071525574}, {"text": "x", "timestep": 36, "start_time": 0.7199999690055847}, {"text": "p", "timestep": 40, "start_time": 0.7999999523162842}, {"text": "e", "timestep": 41, "start_time": 0.8199999928474426}, {"text": "r", "timestep": 43, "start_time": 0.85999995470047}, {"text": "i", "timestep": 45, "start_time": 0.8999999761581421}, {"text": "e", "timestep": 47, "start_time": 0.9399999976158142}, {"text": "n", "timestep": 49, "start_time": 0.9799999594688416}, {"text": "c", "timestep": 50, "start_time": 1.0}, {"text": "e", "timestep": 52, "start_time": 1.0399999618530273}, {"text": " ", "timestep": 56, "start_time": 1.1200000047683716}, {"text": "p", "timestep": 61, "start_time": 1.2200000286102295}, {"text": "r", "timestep": 62, "start_time": 1.2400000095367432}, {"text": "o", "timestep": 64, "start_time": 1.2799999713897705}, {"text": "o", "timestep": 66, "start_time": 1.3199999332427979}, {"text": "e", "timestep": 67, "start_time": 1.3399999141693115}, {"text": "s", "timestep": 69, "start_time": 1.3799999952316284}, {"text": " ", "timestep": 72, "start_time": 1.4399999380111694}, {"text": "t", "timestep": 75, "start_time": 1.5}, {"text": "h", "timestep": 76, "start_time": 1.5199999809265137}, {"text": "i", "timestep": 77, "start_time": 1.5399999618530273}, {"text": "s", "timestep": 80, "start_time": 1.5999999046325684}, {"text": "s", "timestep": 85, "start_time": 1.6999999284744263}]}]}, "target": {"target_transcript": "proves this", "speech_transcript": "experience prooes thiss", "tokens": [{"text": "e", "start_time": 0.6800000071525574, "type": "spoken-incorrect"}, {"text": "x", "start_time": 0.7199999690055847, "type": "spoken-incorrect"}, {"text": "p", "start_time": 0.7999999523162842, "type": "correct"}, {"text": "e", "start_time": 0.8199999928474426, "type": "spoken-incorrect"}, {"text": "r", "start_time": 0.85999995470047, "type": "correct"}, {"text": "i", "start_time": 0.8999999761581421, "type": "spoken-incorrect"}, {"text": "e", "start_time": 0.9399999976158142, "type": "spoken-incorrect"}, {"text": "n", "start_time": 0.9799999594688416, "type": "spoken-incorrect"}, {"text": "c", "start_time": 1.0, "type": "spoken-incorrect"}, {"text": "e", "start_time": 1.0399999618530273, "type": "spoken-incorrect"}, {"text": " ", "start_time": 1.1200000047683716, "type": "spoken-incorrect"}, {"text": "p", "start_time": 1.2200000286102295, "type": "spoken-incorrect"}, {"text": "r", "start_time": 1.2400000095367432, "type": "spoken-incorrect"}, {"text": "o", "start_time": 1.2799999713897705, "type": "correct"}, {"text": "v", "start_time": null, "type": "missed"}, {"text": "o", "start_time": 1.3199999332427979, "type": "spoken-incorrect"}, {"text": "e", "start_time": 1.3399999141693115, "type": "correct"}, {"text": "s", "start_time": 1.3799999952316284, "type": "correct"}, {"text": " ", "start_time": 1.4399999380111694, "type": "correct"}, {"text": "t", "start_time": 1.5, "type": "correct"}, {"text": "h", "start_time": 1.5199999809265137, "type": "correct"}, {"text": "i", "start_time": 1.5399999618530273, "type": "correct"}, {"text": "s", "start_time": 1.5999999046325684, "type": "correct"}, {"text": "s", "start_time": 1.6999999284744263, "type": "spoken-incorrect"}]}, "disfluents": [], "duration": 1.976375}
+{"type": "token", "value": {"text": "e", "start_time": 0.6800000071525574}}
+{"type": "token", "value": {"text": "x", "start_time": 0.7199999690055847}}
+{"type": "token", "value": {"text": "p", "start_time": 0.7999999523162842}}
+{"type": "token", "value": {"text": "e", "start_time": 0.8199999928474426}}
+{"type": "token", "value": {"text": "r", "start_time": 0.85999995470047}}
+{"type": "token", "value": {"text": "i", "start_time": 0.8999999761581421}}
+{"type": "token", "value": {"text": "e", "start_time": 0.9399999976158142}}
+{"type": "token", "value": {"text": "n", "start_time": 0.9799999594688416}}
+{"type": "token", "value": {"text": "c", "start_time": 1.0}}
+{"type": "token", "value": {"text": "e", "start_time": 1.0399999618530273}}
+{"type": "token", "value": {"text": " ", "start_time": 1.1200000047683716}}
+{"type": "word", "value": {"start_time": 0.6800000071525574, "end_time": 1.0399999618530273, "disfluent": false, "text": "experience"}}
+{"type": "token", "value": {"text": "p", "start_time": 1.2200000286102295}}
+{"type": "token", "value": {"text": "r", "start_time": 1.2400000095367432}}
+{"type": "token", "value": {"text": "o", "start_time": 1.2799999713897705}}
+{"type": "token", "value": {"text": "o", "start_time": 1.3199999332427979}}
+{"type": "token", "value": {"text": "e", "start_time": 1.3399999141693115}}
+{"type": "token", "value": {"text": "s", "start_time": 1.3799999952316284}}
+{"type": "token", "value": {"text": " ", "start_time": 1.4399999380111694}}
+{"type": "word", "value": {"start_time": 1.2200000286102295, "end_time": 1.3799999952316284, "disfluent": false, "text": "prooes"}}
+{"type": "token", "value": {"text": "t", "start_time": 1.5}}
+{"type": "token", "value": {"text": "h", "start_time": 1.5199999809265137}}
+{"type": "token", "value": {"text": "i", "start_time": 1.5399999618530273}}
+{"type": "token", "value": {"text": "s", "start_time": 1.5999999046325684}}
+{"type": "token", "value": {"text": "s", "start_time": 1.6999999284744263}}
+{"type": "word", "value": {"start_time": 1.5, "end_time": 1.6999999284744263, "disfluent": false, "text": "thiss"}}
+{"type": "end", "value": {"duration": 1.976375}}
 ```
 
 ## Notes

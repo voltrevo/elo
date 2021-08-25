@@ -147,19 +147,6 @@ body {
     }
   }
 
-  .target-transcript {
-    background-color: $subtle-brighten;
-    border: 0;
-    color: $fgcolor;
-    font-family: $default-font;
-    padding: .5em;
-
-    &:focus {
-      outline-color: $subtle-brighten-2;
-      outline-style: solid;
-    }
-  }
-
   .drop-me {
     background: repeating-linear-gradient(
       -45deg,
