@@ -35,7 +35,7 @@ namespace audio {
     });
 
     mediaRecorder.ondataavailable = (event) => {
-      console.log('handleDataAvailable', event);
+      // console.log('handleDataAvailable', event);
       if (event.data && event.data.size > 0) {
         recordedBlobs.push(event.data);
         onBlob(event.data);
