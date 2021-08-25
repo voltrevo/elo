@@ -306,7 +306,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         return <span
           class="token"
           ref={r => {
-            this.tokenRefs[tokens.indexOf(t)] = r;
+            this.tokenRefs[tokens.findIndex(tr => tr.start_time === startTime)] = r;
           }}
           onClick={startTime === null ? undefined : (() => {
             this.setState({
