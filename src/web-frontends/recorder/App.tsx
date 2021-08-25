@@ -1,6 +1,6 @@
 import * as preact from 'preact';
 
-import { Analysis } from '../../analyze';
+import { Analysis, AnalysisFragment } from '../../analyze';
 import base58 from '../../helpers/base58';
 import never from '../../helpers/never';
 import audio from './audio';
@@ -23,6 +23,7 @@ export type RecordingState = (
     previewDuration: number,
     recorder: audio.Recorder,
     webSocket: WebSocket,
+    transcriptionIndex: number,
   } |
   {
     name: 'recorded',
@@ -35,9 +36,8 @@ export type RecordingState = (
 );
 
 export type Transcription = {
-  recording: audio.Recording,
+  recording?: audio.Recording,
   analysis: Analysis,
-  transcriptionTime: number,
 };
 
 type State = {
@@ -82,7 +82,8 @@ export default class App extends preact.Component<{}, State> {
     switch (this.state.recorder.name) {
       case 'init':
       case 'transcribed':
-        await this.transcribe({ type: 'audio.Recording', duration: null, data: file });
+        console.error('Not implemented: Upload file (since streaming update)');
+        // await this.transcribe({ type: 'audio.Recording', duration: null, data: file });
         break;
 
       case 'recorded':
@@ -99,13 +100,86 @@ export default class App extends preact.Component<{}, State> {
     switch (this.state.recorder.name) {
       case 'init':
       case 'transcribed': {
-        const webSocket = new WebSocket('ws://localhost:36582/analyze');
+        const loc = window.location;
+        const wsProto = loc.protocol === 'https' ? 'wss' : 'ws';
+        const portSuffix = loc.port === '' ? '' : `:${loc.port}`;
+        const webSocket = new WebSocket(`${wsProto}://${loc.hostname}${portSuffix}/analyze`);
 
         await new Promise(resolve => {
           webSocket.addEventListener('open', resolve);
         });
 
-        webSocket.send(JSON.stringify(this.targetTranscriptRef?.value || null));
+        const transcriptionIndex = this.state.transcriptions.length;
+
+        let analysis: Analysis = {
+          tokens: [],
+          words: [],
+          duration: 0,
+        };
+
+        const setTranscription = () => {
+          this.setState({
+            transcriptions: [
+              ...this.state.transcriptions.slice(0, transcriptionIndex),
+              {
+                ...this.state.transcriptions[transcriptionIndex],
+                analysis,
+              },
+              ...this.state.transcriptions.slice(transcriptionIndex + 1),
+            ],
+          });
+        };
+
+        setTranscription();
+
+        webSocket.addEventListener('message', evt => {
+          const fragment: AnalysisFragment = JSON.parse(evt.data);
+
+          switch (fragment.type) {
+            case 'token': {
+              analysis = {
+                ...analysis,
+                tokens: [...analysis.tokens, fragment.value],
+                duration: fragment.value.start_time ?? analysis.duration,
+              };
+
+              break;
+            }
+
+            case 'word': {
+              analysis = {
+                ...analysis,
+                words: [...analysis.words, fragment.value],
+                duration: fragment.value.start_time ?? analysis.duration,
+              };
+
+              break;
+            }
+
+            case 'error': {
+              console.error('Transcription error', fragment.value.message);
+
+              break;
+            }
+
+            case 'end': {
+              analysis = {
+                ...analysis,
+                duration: fragment.value.duration,
+              };
+
+              console.log({ analysis });
+
+              break;
+            }
+
+            default: {
+              never(fragment);
+            }
+          }
+
+          setTranscription();
+        });
 
         const recorder = await audio.record(blob => {
           webSocket.send(blob);
@@ -118,6 +192,7 @@ export default class App extends preact.Component<{}, State> {
             previewDuration: 0,
             recorder,
             webSocket,
+            transcriptionIndex,
           },
         });
 
@@ -136,35 +211,15 @@ export default class App extends preact.Component<{}, State> {
           },
         });
 
-        const startTranscriptionTime = Date.now();
-
         const webSocket = this.state.recorder.webSocket;
 
         webSocket.send(Uint8Array.from([]));
 
-        const analysis: Analysis = await new Promise(resolve => {
-          webSocket.addEventListener('message', evt => {
-            resolve(JSON.parse(evt.data));
-          });
-        });
-
-        console.log({ analysis });
-
-        const transcription = {
-          recording,
-          analysis,
-          transcriptionTime: Date.now() - startTranscriptionTime,
-        };
-
         this.setState({
           recorder: {
             name: 'transcribed',
-            transcription,
+            transcription: this.state.transcriptions[this.state.recorder.transcriptionIndex],
           },
-          transcriptions: [
-            ...this.state.transcriptions,
-            transcription,
-          ],
         });
 
         break;
