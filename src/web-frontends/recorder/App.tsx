@@ -12,7 +12,6 @@ export type Settings = {
   maximumGap: number | null,
   monospace: boolean,
   cursorCorrection: number,
-  tokenDisplay: 'both' | 'target' | 'spoken',
 };
 
 export type RecordingState = (
@@ -54,7 +53,6 @@ const initialState: State = {
     maximumGap: null,
     monospace: false,
     cursorCorrection: 0.31,
-    tokenDisplay: 'both',
   },
   transcriptions: [],
 };

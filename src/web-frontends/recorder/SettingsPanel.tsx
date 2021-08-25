@@ -78,39 +78,6 @@ export default class SettingsPanel extends preact.Component<Props> {
             }}
           />
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '2em' }}>
-          <div>Token Display</div>
-          <div>
-            <input
-              type="radio"
-              checked={this.props.settings.tokenDisplay === 'both'}
-              onInput={() => this.props.onChange({
-                ...this.props.settings,
-                tokenDisplay: 'both',
-              })}
-            /> Both
-          </div>
-          <div>
-            <input
-              type="radio"
-              checked={this.props.settings.tokenDisplay === 'target'}
-              onInput={() => this.props.onChange({
-                ...this.props.settings,
-                tokenDisplay: 'target',
-              })}
-            /> Target
-          </div>
-          <div>
-            <input
-              type="radio"
-              checked={this.props.settings.tokenDisplay === 'spoken'}
-              onInput={() => this.props.onChange({
-                ...this.props.settings,
-                tokenDisplay: 'spoken',
-              })}
-            /> Spoken
-          </div>
-        </div>
       </div>
     </div>;
   }
