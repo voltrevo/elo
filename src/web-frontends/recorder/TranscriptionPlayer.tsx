@@ -4,6 +4,8 @@ import type { Analysis, AnalysisToken } from '../../analyze';
 import { Settings } from './App';
 import audio from './audio';
 
+/* eslint-disable camelcase */
+
 type Props = {
   data: {
     recording?: audio.Recording,
@@ -25,7 +27,7 @@ type CursorPos = {
   bottom: number,
 };
 
-type ExpandedToken = AnalysisToken | null;
+type ExpandedToken = (AnalysisToken & { disfluent: boolean }) | null;
 
 export default class TranscriptionPlayer extends preact.Component<Props, State> {
   state: State = {
@@ -198,27 +200,84 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
   getExpandedTokens(): ExpandedToken[] {
     const tokens = this.getTokens();
     const expandedTokens: ExpandedToken[] = [];
-    let prevToken: (AnalysisToken & { start_time: number }) | null = null;
+    type PrevToken = (AnalysisToken & { start_time: number }) | null;
+    let prevToken: PrevToken = null;
 
-    for (const token of tokens) {
-      if (typeof token.start_time !== 'number') {
-        expandedTokens.push(token);
-      } else {
-        let gap = token.start_time - (prevToken?.start_time ?? 0);
+    let firstWord = true;
 
-        if (this.props.settings.maximumGap !== null) {
-          while (gap > this.props.settings.maximumGap) {
-            expandedTokens.push(null);
-            gap -= this.props.settings.maximumGap;
+    const addChunk = (chunk: AnalysisToken[], disfluent: boolean) => {
+      for (const token of chunk) {
+        if (typeof token.start_time !== 'number') {
+          expandedTokens.push({ ...token, disfluent });
+        } else {
+          let gap = token.start_time - (prevToken?.start_time ?? 0);
+
+          if (this.props.settings.maximumGap !== null) {
+            while (gap > this.props.settings.maximumGap) {
+              expandedTokens.push(null);
+              gap -= this.props.settings.maximumGap;
+            }
           }
+
+          expandedTokens.push({ ...token, disfluent });
+          prevToken = { ...token, start_time: token.start_time };
+        }
+      }
+    };
+
+    for (const word of this.props.data.analysis.words) {
+      if (!firstWord) {
+        expandedTokens.push(null);
+      } else {
+        firstWord = false;
+      }
+
+      const { start_time, end_time } = word;
+
+      if (start_time === null || end_time === null) {
+        console.error('Missing start/end time');
+        continue;
+      }
+
+      let wordTokens = tokens.filter(t => (
+        t.start_time !== null &&
+        t.start_time >= start_time &&
+        t.start_time <= end_time
+      ));
+
+      if (wordTokens.map(t => t.text).join('').trim() === '') {
+        let wordPlainText = word.text[0] === '<'
+          ? word.text.slice(1, word.text.length - 1)
+          : word.text;
+
+        if (wordPlainText === '') {
+          wordPlainText = '?';
         }
 
-        expandedTokens.push(token);
-        prevToken = { ...token, start_time: token.start_time };
+        wordTokens = Array.from(wordPlainText).map(c => ({
+          start_time: word.start_time,
+          text: c,
+        }));
       }
+
+      if (word.disfluent) {
+        wordTokens = [
+          { start_time: word.start_time, text: '<' },
+          ...wordTokens,
+          { start_time: word.end_time, text: '>' },
+        ];
+      }
+
+      addChunk(wordTokens, word.disfluent);
     }
 
-    const lastToken = prevToken;
+    const lastWord = this.props.data.analysis.words.slice(-1)[0];
+    const lastWordEndTime = lastWord?.end_time ?? -Infinity;
+
+    const trailingTokens = tokens.filter(t => t.start_time && t.start_time > lastWordEndTime);
+    addChunk(trailingTokens, false);
+
+    const lastToken = prevToken as PrevToken;
 
     if (this.props.settings.maximumGap !== null && lastToken) {
       let gap = this.props.data.analysis.duration - lastToken.start_time;
