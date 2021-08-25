@@ -28,18 +28,11 @@ export default class RecorderPanel extends preact.Component<Props> {
         </p>;
 
       case 'transcribed':
-        const timeStr = `${(recordingState.transcription.transcriptionTime / 1000).toFixed(1)}s`;
-
-        const recordingDuration = recordingState.transcription.recording.duration;
-        const transcriptionTime = recordingState.transcription.transcriptionTime;
-
-        let speedStr = '';
-
-        if (recordingDuration !== null) {
-          speedStr = ` (speed: ${(100 * recordingDuration / transcriptionTime).toFixed(0)}%)`;
-        }
-
-        return <p>Transcribed in {timeStr}{speedStr}</p>;
+        return <p>
+          Transcribed&nbsp;
+          {((recordingState.transcription.analysis.duration ?? 0) / 1000).toFixed(1)}s
+          of audio
+        </p>;
 
       default:
         never(recordingState);

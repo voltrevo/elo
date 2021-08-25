@@ -215,11 +215,21 @@ export default class App extends preact.Component<{}, State> {
 
         webSocket.send(Uint8Array.from([]));
 
+        const ti = this.state.recorder.transcriptionIndex;
+
         this.setState({
           recorder: {
             name: 'transcribed',
             transcription: this.state.transcriptions[this.state.recorder.transcriptionIndex],
           },
+          transcriptions: [
+            ...this.state.transcriptions.slice(0, ti),
+            {
+              ...this.state.transcriptions[ti],
+              recording,
+            },
+            ...this.state.transcriptions.slice(ti + 1),
+          ],
         });
 
         break;

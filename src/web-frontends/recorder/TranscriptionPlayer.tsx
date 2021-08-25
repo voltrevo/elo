@@ -1,14 +1,12 @@
 import * as preact from 'preact';
-import * as tingle from 'tingle.js';
 
 import type { Analysis, AnalysisToken } from '../../analyze';
-import never from '../../helpers/never';
 import { Settings } from './App';
 import audio from './audio';
 
 type Props = {
   data: {
-    recording: audio.Recording,
+    recording?: audio.Recording,
     analysis: Analysis,
   },
   settings: Settings,
@@ -29,21 +27,6 @@ type CursorPos = {
 
 type ExpandedToken = AnalysisToken | null;
 
-type Segment = {
-  type: 'correct' | 'spoken-incorrect' | 'missed' | 'combined',
-  raisedTokens: ExpandedToken[],
-  tokens: ExpandedToken[],
-};
-
-type Word = {
-  tokens: ExpandedToken[],
-  target: string,
-  spoken: string,
-  segments: Segment[],
-}
-
-type Line = Word[];
-
 export default class TranscriptionPlayer extends preact.Component<Props, State> {
   state: State = {
     playing: false,
@@ -59,6 +42,13 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
   cursorEndRef: HTMLSpanElement | null = null;
 
   async playPause() {
+    const recording = this.props.data.recording;
+
+    if (recording === undefined) {
+      console.log("Can't play without recording");
+      return;
+    }
+
     if (this.state.playing) {
       this.setState({
         playing: false,
@@ -77,7 +67,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
 
     if (this.audioElement === null) {
       this.audioElement = document.createElement('audio');
-      const url = URL.createObjectURL(this.props.data.recording.data);
+      const url = URL.createObjectURL(recording.data);
       this.audioElement.src = url;
       document.body.append(this.audioElement);
     }
@@ -123,14 +113,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
   }
 
   getTokens(): AnalysisToken[] {
-    if (this.props.data.analysis.target) {
-      return this.props.data.analysis.target.tokens;
-    }
-
-    return this.props.data.analysis.deepspeech.transcripts[0].tokens.map(t => ({
-      ...t,
-      type: null,
-    }));
+    return this.props.data.analysis.tokens;
   }
 
   findCursorPos(): CursorPos | null {
@@ -249,179 +232,11 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     return expandedTokens;
   }
 
-  static Lines(expandedTokens: ExpandedToken[]): Line[] {
-    const tokenLines: ExpandedToken[][] = [];
-    let currentTokenLine: ExpandedToken[] = [];
+  renderTranscript(): preact.JSX.Element {
+    const expandedTokens = this.getExpandedTokens();
 
-    for (const token of expandedTokens) {
-      // Skip null tokens at the beginning of each line, except the first line.
-      if (token === null && tokenLines.length > 0 && currentTokenLine.length === 0) {
-        continue;
-      }
-
-      if (token?.text === '\n') {
-        tokenLines.push(currentTokenLine)
-        currentTokenLine = [];
-      } else {
-        currentTokenLine.push(token);
-      }
-    }
-
-    if (currentTokenLine.length > 0) {
-      tokenLines.push(currentTokenLine);
-    }
-
-    return tokenLines.map(tl => TranscriptionPlayer.assembleWords(tl));
-  }
-
-  static assembleWords(expandedTokens: ExpandedToken[]): Word[] {
-    const flatWords: ExpandedToken[][] = [];
-    let currentWord: ExpandedToken[] = [];
-
-    for (const token of expandedTokens) {
-      if (token?.text === ' ' && token.type !== 'spoken-incorrect') {
-        if (currentWord.length !== 0) {
-          flatWords.push(currentWord);
-          currentWord = [];
-        }
-      } else {
-        currentWord.push(token);
-      }
-    }
-
-    if (currentWord.length !== 0) {
-      flatWords.push(currentWord);
-      currentWord = [];
-    }
-
-    const words: Word[] = [];
-
-    for (const flatWord of flatWords) {
-      const segments: Segment[] = [];
-
-      let partialSegment: Omit<Segment, 'type'> & { type: Segment['type'] | null } = {
-        raisedTokens: [],
-        tokens: [],
-        type: null,
-      };
-
-      function addSegment(type: Segment['type']) {
-        segments.push({
-          ...partialSegment,
-          type,
-        });
-
-        partialSegment = {
-          raisedTokens: [],
-          tokens: [],
-          type: null,
-        };
-      }
-
-      for (const token of flatWord) {
-        if (token === null) {
-          partialSegment.raisedTokens.push(null);
-          partialSegment.tokens.push(null);
-        } else {
-          if (partialSegment.type !== token.type && token.type !== null) {
-            if (partialSegment.type === null) {
-              partialSegment.type = token.type;
-            } else if (token.type === 'correct') {
-              addSegment(partialSegment.type);
-              partialSegment.type = token.type;
-            } else if (token.type === 'missed') {
-              if (partialSegment.type === 'spoken-incorrect') {
-                partialSegment.type = 'combined';
-              } else if (partialSegment.type !== 'combined') {
-                addSegment(partialSegment.type);
-                partialSegment.type = token.type;
-              }
-            } else if (token.type === 'spoken-incorrect') {
-              if (partialSegment.type === 'missed') {
-                partialSegment.type = 'combined';
-              } else if (partialSegment.type !== 'combined') {
-                addSegment(partialSegment.type);
-                partialSegment.type = token.type;
-              }
-            } else {
-              never(token.type);
-            }
-          }
-
-          const positionalTokens = token.type === 'spoken-incorrect'
-            ? partialSegment.raisedTokens
-            : partialSegment.tokens;
-          
-          positionalTokens.push(token);
-        }
-      }
-
-      if (partialSegment.tokens.length + partialSegment.raisedTokens.length > 0) {
-        addSegment(partialSegment.type ?? 'correct');
-      }
-
-      words.push({
-        tokens: flatWord,
-        target: flatWord
-          .filter(t => t?.type !== 'spoken-incorrect')
-          .map(t => t?.text ?? '')
-          .join(''),
-        spoken: flatWord
-          .filter(t => t?.type !== 'missed')
-          .map(t => t?.text ?? '')
-          .join(''),
-        segments,
-      });
-    }
-
-    return words;
-  }
-
-  renderSegment(tokens: AnalysisToken[], segment: Segment): preact.JSX.Element | null {
-    if (
-      (segment.type === 'missed' && this.props.settings.tokenDisplay === 'spoken') ||
-      (segment.type === 'spoken-incorrect' && this.props.settings.tokenDisplay === 'target')
-    ) {
-      return null;
-    }
-
-    if (segment.type === 'correct') {
-      return <div>
-        {segment.tokens.map(t => {
-          if (t === null) {
-            return <span> </span>;
-          }
-
-          const startTime = t.start_time;
-
-          return <span
-            class="token"
-            ref={r => {
-              this.tokenRefs[tokens.indexOf(t)] = r;
-            }}
-            onClick={startTime === null ? undefined : (() => {
-              this.setState({
-                time: startTime - this.props.settings.cursorCorrection,
-              });
-            })}
-          >
-            {t.text ?? ' '}
-          </span>;
-        })}
-      </div>;
-    }
-
-    const raisedTokens = segment.raisedTokens.slice();
-    const loweredTokens = segment.tokens.slice();
-
-    for (const ts of [raisedTokens, loweredTokens]) {
-      if (ts.length === 0) {
-        ts.push({ text: ' ', start_time: null, timestep: null, type: null });
-      }
-    }
-
-    const raised = <div style={{ textAlign: 'center' }}>
-      {raisedTokens.map(t => {
+    return <div>
+      {expandedTokens.map(t => {
         if (t === null) {
           return <span> </span>;
         }
@@ -429,9 +244,9 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         const startTime = t.start_time;
 
         return <span
-          class="token spoken-incorrect"
+          class="token"
           ref={r => {
-            this.tokenRefs[tokens.indexOf(t)] = r;
+            this.tokenRefs[expandedTokens.indexOf(t)] = r;
           }}
           onClick={startTime === null ? undefined : (() => {
             this.setState({
@@ -439,58 +254,10 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
             });
           })}
         >
-          {t?.text ?? ' '}
-        </span>
+          {t.text ?? ' '}
+        </span>;
       })}
     </div>;
-
-    const regular = <div style={{ textAlign: 'center' }}>
-      {loweredTokens.filter(t => t !== null).map(t => <span class="missed">{t?.text ?? ' '}</span>)}
-    </div>;
-
-    return <div style={{ display: 'flex', flexDirection: 'column' }}>
-      {(this.props.settings.tokenDisplay !== 'target' && raised) ?? null}
-      {(this.props.settings.tokenDisplay !== 'spoken' && regular) ?? null}
-    </div>;
-  }
-
-  renderWords(words: Word[], first: boolean, last: boolean): preact.JSX.Element {
-    const tokens = this.getTokens();
-
-    return <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', minHeight: '3em' }}>
-      {words.map((word, i) => {
-        const space = i !== words.length - 1 ? <span> </span> : null;
-        let onRef: ((r: HTMLDivElement | null) => void) | undefined = undefined;
-        const classes: string[] = [];
-
-        if (first && i === 0) {
-          onRef = r => { this.cursorStartRef = r };
-          classes.push('text-start');
-        }
-        
-        if (last && i === words.length - 1) {
-          onRef = r => { this.cursorEndRef = r };
-          classes.push('text-end');
-        }
-
-        return <div
-          class={classes.join(' ')}
-          ref={onRef}
-          style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', minHeight: '3em' }}
-        >
-          {word.segments.map(segment => this.renderSegment(tokens, segment))}
-          {space}
-        </div>;
-      })}
-    </div>;
-  }
-
-  renderLines(): preact.JSX.Element {
-    const lines = TranscriptionPlayer.Lines(this.getExpandedTokens());
-
-    return <div style={{ display: 'flex', flexDirection: 'column' }}>
-      {lines.map((words, i) => this.renderWords(words, i === 0, i === lines.length - 1))}
-    </div>
   }
 
   render() {
@@ -520,21 +287,29 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         <div class="play-btn-text">{this.state.playing ? '| |' : '▶'}</div>
       </div>
       <div class="transcription-box">
-        <div class={textClasses.join(' ')}>{this.renderLines()}</div>
-        <div
-          style={{
-            position: 'absolute',
-            right: '0.2em',
-            bottom: '0.2em',
-          }}
-          onClick={() => {
-            const url = URL.createObjectURL(this.props.data.recording.data);
-            download('recording.webm', url);
-            URL.revokeObjectURL(url);
-          }}
-        >
-          ⬇️
-        </div>
+        <div class={textClasses.join(' ')}>{this.renderTranscript()}</div>
+        {(() => {
+          const recording = this.props.data.recording;
+
+          if (recording === undefined) {
+            return null;
+          }
+
+          return <div
+            style={{
+              position: 'absolute',
+              right: '0.2em',
+              bottom: '0.2em',
+            }}
+            onClick={() => {
+              const url = URL.createObjectURL(recording.data);
+              download('recording.webm', url);
+              URL.revokeObjectURL(url);
+            }}
+          >
+            ⬇️
+          </div>;
+        })()}
         <div
           style={{
             position: 'absolute',
@@ -553,28 +328,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
           }}
         >
           <i>
-            {this.props.data.analysis.target === null
-              ? <>(Target transcript required for disfluent analysis)</>
-              : <>
-                {this.props.data.analysis.disfluents.length} disfluent(s)
-                (<a
-                  style={{
-                    color: '#407bff',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => {
-                    const modal = new tingle.modal({});
-                    modal.setContent(`
-                      <pre
-                        style="color: black"
-                      >${JSON.stringify(this.props.data.analysis.disfluents, null, 2)}</pre>
-                    `);
-                    modal.open();
-                  }}
-                >api output</a>)
-              </>
-            }
+            {this.props.data.analysis.words.filter(w => w.disfluent).length} disfluent(s)
           </i>
         </div>
       </div>
@@ -612,7 +366,7 @@ function getBoundingPageRect(element: HTMLElement): Rect {
 }
 
 function download(filename: string, url: string) {
-  var element = document.createElement('a');
+  const element = document.createElement('a');
   element.setAttribute('href', url);
   element.setAttribute('download', filename);
 
