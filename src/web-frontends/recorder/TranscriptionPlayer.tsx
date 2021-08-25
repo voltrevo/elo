@@ -317,6 +317,9 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
           {t.text ?? ' '}
         </span>;
       })}
+      {this.props.data.analysis.complete ? null : <div class="spinner">
+        <div class="spinner-content"></div>
+      </div>}
     </div>;
   }
 

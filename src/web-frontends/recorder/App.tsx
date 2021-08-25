@@ -113,6 +113,7 @@ export default class App extends preact.Component<{}, State> {
           tokens: [],
           words: [],
           duration: 0,
+          complete: false,
         };
 
         const setTranscription = () => {
@@ -164,6 +165,7 @@ export default class App extends preact.Component<{}, State> {
               analysis = {
                 ...analysis,
                 duration: fragment.value.duration,
+                complete: true,
               };
 
               console.log({ analysis });

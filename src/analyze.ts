@@ -14,6 +14,7 @@ export type Analysis = {
   tokens: AnalysisToken[],
   words: AnalysisWord[],
   duration: number,
+  complete: boolean,
 };
 
 export type AnalysisWord = {

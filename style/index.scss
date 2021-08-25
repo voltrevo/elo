@@ -96,6 +96,26 @@ body {
       .text-end {
         border-right: 1px solid $subtle-mark-color;
       }
+
+      .spinner {
+        display: inline-block;
+        width: 0.2em;
+        height: 1em;
+        background-color: $fgcolor;
+        position: relative;
+        top: 0.15em;
+        margin-left: 1em;
+        animation: rotating 1s linear infinite;
+      }
+
+      @keyframes rotating {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
     }
   }
 
