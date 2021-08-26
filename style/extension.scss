@@ -1,0 +1,12 @@
+#language-confidence-extension {
+  .app {
+    border: 1px solid black;
+    z-index: 1000;
+    position: absolute;
+    left: 1em;
+    top: 1em;
+    width: 100px;
+    height: 100px;
+    background-color: orange;
+  }
+}
