@@ -7,7 +7,7 @@ empty_disfluent = '<?>'
 
 disfluents = {
   empty_disfluent,
-  'um', 'uh', 'un', 'ho', 'ah', 'm', 'ar', 'rn', 'like',
+  'um', 'uh', 'un', 'ho', 'ah', 'm', 'ar', 'rn', 'like', 'er',
   # 'a', 'an', 'am', 'ham',
 }
 

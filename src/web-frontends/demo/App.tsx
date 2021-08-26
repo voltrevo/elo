@@ -30,7 +30,7 @@ export type RecordingState = (
   } |
   {
     name: 'transcribed',
-    transcription: Transcription,
+    duration: number,
   }
 );
 
@@ -219,7 +219,7 @@ export default class App extends preact.Component<{}, State> {
         this.setState({
           recorder: {
             name: 'transcribed',
-            transcription: this.state.transcriptions[this.state.recorder.transcriptionIndex],
+            duration: this.state.recorder.previewDuration,
           },
           transcriptions: [
             ...this.state.transcriptions.slice(0, ti),
@@ -276,7 +276,7 @@ export default class App extends preact.Component<{}, State> {
     this.setState({
       recorder: {
         name: 'transcribed',
-        transcription,
+        duration: transcription.analysis.duration,
       },
       transcriptions: [
         ...this.state.transcriptions,

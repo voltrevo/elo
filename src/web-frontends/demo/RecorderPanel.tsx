@@ -29,7 +29,7 @@ export default class RecorderPanel extends preact.Component<Props> {
       case 'transcribed':
         return <p>
           Transcribed&nbsp;
-          {((recordingState.transcription.analysis.duration ?? 0) / 1000).toFixed(1)}s
+          {((recordingState.duration ?? 0) / 1000).toFixed(1)}s
           of audio
         </p>;
 

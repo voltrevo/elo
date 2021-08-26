@@ -17,5 +17,10 @@
       "50": "assets/icons/logo-symbol-50x50.png"
     },
     "default_title": "Language Confidence"
-  }
+  },
+
+  "content_scripts": [{
+    "matches": ["<all_urls>"],
+    "js": ["contentScript.bundle.js"]
+  }]
 }

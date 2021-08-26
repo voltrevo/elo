@@ -5,7 +5,8 @@ const CopyPlugin = require('copy-webpack-plugin');
 const config = {
   common: {
     entry: {
-      index: './build/js/src/web-frontends/extension/index.js',
+      popup: './build/js/src/web-frontends/extension/popup.js',
+      contentScript: './build/js/src/web-frontends/extension/contentScript.js',
     },
     module: {
       rules: [
