@@ -1,8 +1,16 @@
 #language-confidence-extension {
   .app {
+    opacity: 0;
+
+    &.active {
+      opacity: initial;
+    }
+
+    transition: opacity 0.2s;
+
     font-family: sans-serif;
 
-    z-index: 1000;
+    z-index: 100;
     position: fixed;
     left: 1em;
     top: 1em;
@@ -20,9 +28,20 @@
     }
 
     .body {
+      border-radius: 0 0 0.5em 0.5em;
       min-width: 10em;
       min-height: 5em;
       display: inline-grid;
+
+      color: transparent;
+
+      &.highlight {
+        background-color: rgb(0, 255, 255);
+        color: black;
+      }
+
+      transition: all 200ms ease;
+      transition-property: background-color, color;
 
       .word {
         display: flex;

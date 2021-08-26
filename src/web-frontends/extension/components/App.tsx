@@ -1,11 +1,19 @@
 import * as preact from 'preact';
 
+import never from '../../../helpers/never';
+import Callbacks from '../Callbacks';
+
+type Props = {
+  callbacks: Callbacks,
+};
+
 type State = {
+  active: boolean;
   left?: string;
   top?: string;
 };
 
-export default class App extends preact.Component<{}, State> {
+export default class App extends preact.Component<Props, State> {
   dragData: null | {
     mouseDownPos: { x: number, y: number },
     appPosAtMouseDown: { x: number, y: number },
@@ -13,6 +21,36 @@ export default class App extends preact.Component<{}, State> {
 
   appRef: HTMLDivElement | null = null;
   headRef: HTMLDivElement | null = null;
+
+  constructor() {
+    super();
+
+    const initialState: State = {
+      active: false,
+    };
+
+    this.setState(initialState);
+  }
+
+  componentWillMount() {
+    this.props.callbacks.onMessage = (msg) => {
+      switch (msg.type) {
+        case 'getUserMedia-called': {
+          setTimeout(() => {
+            this.setState({
+              active: true,
+            });
+          });
+
+          break;
+        }
+
+        default: {
+          never(msg.type);
+        }
+      }
+    };
+  }
 
   trySetupDragging() {
     if (this.appRef === null || this.headRef === null) {
@@ -61,7 +99,7 @@ export default class App extends preact.Component<{}, State> {
 
   render(): preact.ComponentChild {
     return <div
-      class="app"
+      class={this.state.active ? 'app active' : 'app'}
       ref={r => {
         this.appRef = r;
         this.trySetupDragging();
