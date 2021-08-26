@@ -46,7 +46,7 @@ const config = {
   },
   dev: {
     mode: 'development',
-    devtool: 'eval-source-map',
+    devtool: 'source-map',
   },
   prod: {
     mode: 'production',
