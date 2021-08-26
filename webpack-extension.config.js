@@ -2,6 +2,9 @@ const path = require('path');
 
 const CopyPlugin = require('copy-webpack-plugin');
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+const webpack = require('webpack');
+
 const config = {
   common: {
     entry: {
@@ -41,6 +44,11 @@ const config = {
           { from: 'build/css/extension.css', to: 'css/extension.css' },
           { from: 'build/css/extension.css.map', to: 'css/extension.css.map' },
         ],
+      }),
+      new webpack.DefinePlugin({
+        'process.env.API_HOST_AND_PORT': JSON.stringify(
+          process.env.API_HOST_AND_PORT ?? 'localhost:36582',
+        ),
       }),
     ],
   },
