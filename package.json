@@ -21,6 +21,7 @@
   "dependencies": {
     "@jorgeferrero/stream-to-buffer": "^2.0.6",
     "@msgpack/msgpack": "^2.4.1",
+    "@types/chrome": "^0.0.154",
     "@types/diff": "^5.0.0",
     "@types/dom-mediacapture-record": "^1.0.7",
     "@types/ffmpeg": "^1.0.4",

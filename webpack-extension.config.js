@@ -7,6 +7,7 @@ const config = {
     entry: {
       popup: './build/js/src/web-frontends/extension/popup.js',
       contentScript: './build/js/src/web-frontends/extension/contentScript.js',
+      pageContentScript: './build/js/src/web-frontends/extension/pageContentScript.js',
     },
     module: {
       rules: [
