@@ -13,7 +13,7 @@ disfluents = {
 }
 
 pause_min = 0.8
-pause_max = 3
+pause_max = 2
 
 class WordExtractor:
   partial_word: List[AnalysisToken] = []
@@ -67,7 +67,7 @@ class WordExtractor:
         start_time = t.start_time
 
       end_time = t.start_time
-
+    
     if (
       self.last_end_time is not None and
       start_time is not None and
