@@ -17,16 +17,30 @@ class WordExtractor:
   partial_word: List[AnalysisToken] = []
   space_before: Optional[AnalysisToken] = None
   last_end_time: Optional[float] = None
+  chunks_since_token = 0
+  phantom_space_mode = False
 
   def __init__(self, on_word: Callable[[AnalysisWord], None]):
     self.on_word = on_word
 
   def process_token(self, token: AnalysisToken):
+    self.chunks_since_token = 0
+
     if token.text == ' ':
-      self.append_word(token)
+      if not self.phantom_space_mode:
+        self.append_word(token)
       self.space_before = token
     else:
       self.partial_word.append(token)
+
+    self.phantom_space_mode = False
+
+  def process_chunk_end(self):
+    if self.chunks_since_token >= 5 and len(self.partial_word) > 0:
+      self.append_word(None)
+      self.phantom_space_mode
+
+    self.chunks_since_token += 1
 
   def end(self):
     self.append_word(None)

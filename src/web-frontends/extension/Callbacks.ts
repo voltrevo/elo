@@ -1,6 +1,8 @@
+import { AnalysisWord } from '../../analyze';
+
 export type AppMessage = (
   | { type: 'getUserMedia-called', value: null }
-  | { type: 'disfluent', value: string }
+  | { type: 'word', value: AnalysisWord }
 );
 
 export type Callbacks = {

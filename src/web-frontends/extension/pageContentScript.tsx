@@ -31,9 +31,9 @@ interceptGetUserMedia(({ constraints, streamPromise }) => {
     const audioStream = new MediaStream(stream.getAudioTracks());
     analyzeStream(
       audioStream,
-      disfluent => callbacks.onMessage({
-        type: 'disfluent',
-        value: disfluent,
+      word => callbacks.onMessage({
+        type: 'word',
+        value: word,
       }),
     );
   });

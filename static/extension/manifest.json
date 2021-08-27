@@ -1,12 +1,12 @@
 {
   "manifest_version": 2,
 
-  "name": "Language Confidence",
-  "description": "Automated ai-driven speech feedback",
+  "name": "Fluency (TODO: title)",
+  "description": "TODO: description",
   "version": "0.0.0",
 
   "icons": {
-    "50": "assets/icons/logo-symbol-50x50.png"
+    "48": "assets/icons/icon.png"
   },
 
   "content_security_policy": "script-src 'self'; object-src 'self'",
@@ -19,9 +19,9 @@
   "browser_action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "50": "assets/icons/logo-symbol-50x50.png"
+      "48": "assets/icons/icon.png"
     },
-    "default_title": "Language Confidence"
+    "default_title": "Fluency (TODO: title)"
   },
 
   "content_scripts": [{

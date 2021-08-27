@@ -9,7 +9,7 @@ type Props = {
 
 type State = {
   active: boolean;
-  highlight: boolean;
+  highlightWord?: string;
   word?: string;
   highlightClearTimerId?: number;
   left?: string;
@@ -30,7 +30,6 @@ export default class App extends preact.Component<Props, State> {
 
     const initialState: State = {
       active: false,
-      highlight: false,
     };
 
     this.setState(initialState);
@@ -49,16 +48,22 @@ export default class App extends preact.Component<Props, State> {
           break;
         }
 
-        case 'disfluent': {
-          clearTimeout(this.state.highlightClearTimerId);
+        case 'word': {
+          if (msg.value.disfluent) {
+            clearTimeout(this.state.highlightClearTimerId);
 
-          this.setState({
-            highlight: true,
-            word: msg.value,
-            highlightClearTimerId: window.setTimeout(() => {
-              this.setState({ highlight: false });
-            }, 3000),
-          });
+            this.setState({
+              highlightWord: msg.value.text,
+              highlightClearTimerId: window.setTimeout(() => {
+                this.setState({ highlightWord: undefined });
+              }, 3000),
+              word: undefined,
+            });
+          } else {
+            this.setState({
+              word: msg.value.text,
+            });
+          }
 
           break;
         }
@@ -136,9 +141,9 @@ export default class App extends preact.Component<Props, State> {
       >
         Fluency Extension
       </div>
-      <div class={this.state.highlight ? 'body highlight' : 'body'}>
+      <div class={this.state.highlightWord !== undefined ? 'body highlight' : 'body'}>
         <div class="word">
-          {this.state.word}
+          {this.state.highlightWord ?? this.state.word}
         </div>
       </div>
     </div>;

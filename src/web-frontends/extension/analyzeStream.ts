@@ -1,9 +1,9 @@
-import { AnalysisFragment } from '../../analyze';
+import { AnalysisFragment, AnalysisWord } from '../../analyze';
 import never from '../../helpers/never';
 
 export default async function analyzeStream(
   stream: MediaStream,
-  onDisfluent: (disfluent: string) => void,
+  onWord: (word: AnalysisWord) => void,
 ) {
   const wsProto = window.location.protocol === 'https' ? 'wss' : 'ws';
   const webSocket = new WebSocket(`${wsProto}://${process.env.API_HOST_AND_PORT}/analyze`);
@@ -48,9 +48,7 @@ export default async function analyzeStream(
       }
 
       case 'word': {
-        if (fragment.value.disfluent) {
-          onDisfluent(fragment.value.text);
-        }
+        onWord(fragment.value);
 
         break;
       }
