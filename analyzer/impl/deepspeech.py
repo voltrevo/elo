@@ -2,8 +2,10 @@ from dataclasses import dataclass
 from typing import Any, List
 
 import deepspeech # type: ignore
+import numpy
 
 from .types import AnalysisToken
+
 
 @dataclass
 class Metadata:
@@ -55,25 +57,45 @@ class Model:
     self.ds.enableExternalScorer(scorer_path) # type: ignore
 
   def createStream(self):
-    return ModelStream(self.ds.createStream())
+    return ModelStream(self.ds)
+
+
+# About every 10 seconds we just nuke the stream and make it start again fresh
+# Enhancements:
+# - rewind on reset to avoid mistakes
+# - reset at intelligent points like when deepspeech emits a space
+chunks_per_reset = 150
+
 
 class ModelStream:
   last_token_start: float = -1
   last_metadata: Any = None
+  chunks_since_reset = 0
+  chunk_time = 0
+  time_offset = 0
 
-  def __init__(self, stream: deepspeech.Stream):
-    self.stream = stream
+  def __init__(self, ds: deepspeech.Model):
+    self.ds = ds
+    self.stream = ds.createStream()
 
   def feedAudioContent(self, audio_buffer: bytes) -> None:
-    self.stream.feedAudioContent(audio_buffer) # type: ignore
+    numpyBuffer = numpy.frombuffer(audio_buffer, numpy.int16)
+    self.stream.feedAudioContent(numpyBuffer) # type: ignore
+    self.chunks_since_reset += 1
+    self.chunk_time += len(audio_buffer) / 32000
 
   def get_more_tokens(self) -> List[AnalysisToken]:
     metadata: Any = None
-    
+    do_reset = False
+
     if self.last_metadata is not None:
       metadata = self.last_metadata
     else:
-      metadata = self.stream.intermediateDecodeWithMetadata(1) # type: ignore
+      if self.chunks_since_reset < chunks_per_reset:
+        metadata = self.stream.intermediateDecodeWithMetadata(1) # type: ignore
+      else:
+        do_reset = True
+        metadata = self.stream.finishStreamWithMetadata(1) # type: ignore
 
     new_tokens: List[AnalysisToken] = []
 
@@ -85,10 +107,23 @@ class ModelStream:
 
       new_tokens.append(AnalysisToken(
         text=token.text,
-        start_time=token.start_time,
+        start_time=self.time_offset + token.start_time,
       ))
 
+    if do_reset:
+      self.reset()
+
     return new_tokens
+  
+  def reset(self):
+    self.chunks_since_reset = 0
+    self.time_offset += self.chunk_time
+    self.chunk_time = 0
+
+    self.last_token_start = -1
+    self.last_metadata = None
+
+    self.stream = self.ds.createStream()
 
   def finish(self) -> None:
     self.last_metadata = self.stream.finishStreamWithMetadata(1) # type: ignore

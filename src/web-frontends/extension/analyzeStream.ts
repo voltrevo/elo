@@ -8,7 +8,12 @@ export default async function analyzeStream(
   const wsProto = window.location.protocol === 'https' ? 'wss' : 'ws';
   const webSocket = new WebSocket(`${wsProto}://${process.env.API_HOST_AND_PORT}/analyze`);
 
+  webSocket.onerror = (error) => {
+    console.error('webSocket error', error);
+  };
+
   await new Promise(resolve => webSocket.addEventListener('open', resolve));
+  console.log('webSocket opened');
 
   const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
 
@@ -19,7 +24,7 @@ export default async function analyzeStream(
     if (event.data && event.data.size > 0) {
       webSocket.send(event.data);
       bytesSent += event.data.size;
-      console.log({ bytesSent, buffered: webSocket.bufferedAmount });
+      // console.log({ bytesSent, buffered: webSocket.bufferedAmount });
     } else if (event.data && event.data.size === 0) {
       console.log('Got empty blob from mediaRecorder');
     }
@@ -47,6 +52,11 @@ export default async function analyzeStream(
           onDisfluent(fragment.value.text);
         }
 
+        break;
+      }
+
+      case 'progress': {
+        // Enhancement: Latency monitoring
         break;
       }
 

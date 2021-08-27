@@ -20,6 +20,20 @@ class AnalysisWordFragment:
   value: 'AnalysisWord'
 
 @dataclass
+class AnalysisProgressFragment:
+  type: Literal['progress']
+
+  @dataclass
+  class Value:
+    duration: float
+    audio_time: float
+    stream_processing_time: float
+    token_processing_time: float
+    other_processing_time: float
+
+  value: Value
+
+@dataclass
 class AnalysisEndFragment:
   type: Literal['end']
   
@@ -32,6 +46,7 @@ class AnalysisEndFragment:
 AnalysisFragment = Union[
   AnalysisTokenFragment,
   AnalysisWordFragment,
+  AnalysisProgressFragment,
   AnalysisEndFragment,
   Unexpected,
 ]

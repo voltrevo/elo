@@ -153,6 +153,11 @@ export default class App extends preact.Component<{}, State> {
               break;
             }
 
+            case 'progress': {
+              // Enhancement: Latency monitoring
+              break;
+            }
+
             case 'error': {
               console.error('Transcription error', fragment.value.message);
 

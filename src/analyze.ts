@@ -7,6 +7,13 @@ export type AnalysisFragment = (
   | { type: 'token', value: AnalysisToken }
   | { type: 'word', value: AnalysisWord }
   | { type: 'error', value: { message: string } }
+  | { type: 'progress', value: {
+    duration: number,
+    audio_time: number,
+    stream_processing_time: number,
+    token_processing_time: number,
+    other_processing_time: number,
+  } }
   | { type: 'end', value: { duration: number } }
 );
 

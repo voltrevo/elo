@@ -1,11 +1,10 @@
 import os
+import time
 from typing import BinaryIO, Callable
-
-import numpy
 
 from . import deepspeech
 from .word_extractor import WordExtractor
-from .types import AnalysisEndFragment, AnalysisFragment, AnalysisTokenFragment, AnalysisWord, AnalysisWordFragment
+from .types import AnalysisEndFragment, AnalysisFragment, AnalysisProgressFragment, AnalysisTokenFragment, AnalysisWord, AnalysisWordFragment
 
 home = os.getenv('HOME')
 
@@ -35,24 +34,59 @@ def analyze(
   word_extractor = WordExtractor(on_word)
   finished = False
 
+  audio_time = 0
+  stream_processing_time = 0
+  token_processing_time = 0
+  other_start = time.perf_counter()
+
   while not finished:
     input_bytes = input_stream.read(2048)
     byte_len += len(input_bytes)
+    audio_time += len(input_bytes) / 32000
 
     if len(input_bytes) == 0:
+      start = time.perf_counter()
       ds_stream.finish()
+      stream_processing_time += time.perf_counter() - start
       finished = True
     else:
-      numpyBuffer = numpy.frombuffer(input_bytes, numpy.int16)
-      ds_stream.feedAudioContent(numpyBuffer)
+      start = time.perf_counter()
+      ds_stream.feedAudioContent(input_bytes)
+      stream_processing_time += time.perf_counter() - start
 
-    for token in ds_stream.get_more_tokens():
+    start = time.perf_counter()
+    tokens = ds_stream.get_more_tokens()
+    token_processing_time += time.perf_counter() - start
+
+    for token in tokens:
       on_fragment(AnalysisTokenFragment(
         type="token",
         value=token,
       ))
 
       word_extractor.process_token(token)
+    
+    if audio_time >= 1:
+      other_processing_time = time.perf_counter() - other_start
+      other_start = time.perf_counter()
+
+      other_processing_time -= stream_processing_time
+      other_processing_time -= token_processing_time
+
+      on_fragment(AnalysisProgressFragment(
+        type="progress",
+        value=AnalysisProgressFragment.Value(
+          duration=byte_len / 32000,
+          audio_time=audio_time,
+          stream_processing_time=stream_processing_time,
+          token_processing_time=token_processing_time,
+          other_processing_time=other_processing_time,
+        ),
+      ))
+
+      audio_time = 0
+      stream_processing_time = 0
+      token_processing_time = 0
 
   word_extractor.end()
 
