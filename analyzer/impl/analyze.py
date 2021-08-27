@@ -66,6 +66,8 @@ def analyze(
 
       word_extractor.process_token(token)
     
+    word_extractor.process_chunk_end()
+    
     if audio_time >= 1:
       other_processing_time = time.perf_counter() - other_start
       other_start = time.perf_counter()

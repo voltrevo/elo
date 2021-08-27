@@ -7,11 +7,13 @@ empty_disfluent = '<?>'
 
 disfluents = {
   empty_disfluent,
-  'um', 'uh', 'un', 'ho', 'ah', 'm', 'ar', 'rn', 'like', 'er',
+  'um', 'uh', 'un', 'ho', 'ah', 'm', 'ar', 'rn', 'er', 'earh', 'eh',
+  'like',
   # 'a', 'an', 'am', 'ham',
 }
 
-pause_threshold = 0.8
+pause_min = 0.8
+pause_max = 3
 
 class WordExtractor:
   partial_word: List[AnalysisToken] = []
@@ -37,13 +39,15 @@ class WordExtractor:
 
   def process_chunk_end(self):
     if self.chunks_since_token >= 5 and len(self.partial_word) > 0:
+      self.chunks_since_token = 0
       self.append_word(None)
-      self.phantom_space_mode
+      self.phantom_space_mode = True
 
     self.chunks_since_token += 1
 
   def end(self):
-    self.append_word(None)
+    if not self.phantom_space_mode:
+      self.append_word(None)
 
   def append_word(self, next_space: Optional[AnalysisToken]):
     start_time = None
@@ -67,7 +71,8 @@ class WordExtractor:
     if (
       self.last_end_time is not None and
       start_time is not None and
-      start_time - self.last_end_time >= pause_threshold
+      start_time - self.last_end_time >= pause_min and
+      start_time - self.last_end_time <= pause_max
     ):
       self.on_word(AnalysisWord(
         start_time=self.last_end_time + 0.05,
