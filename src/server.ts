@@ -24,7 +24,10 @@ launch(async (emit) => {
   }));
 
   app.use(route.post('/analyze', async ctx => {
-    const analysisStream = analyzeRaw(ctx.req);
+    const analysisStream = analyzeRaw(ctx.req, error => {
+      ctx.res.end();
+    });
+
     analysisStream.pipe(ctx.res);
 
     await new Promise(resolve => analysisStream.on('end', resolve));
@@ -58,7 +61,7 @@ launch(async (emit) => {
       if (readBytesWaiting > 0) {
         const bytesProvided = chunk?.length ?? 0;
         readBytesWaiting = Math.max(0, readBytesWaiting - bytesProvided);
-        // console.log(`Pushing ${chunk?.length ?? 0} bytes`, { readBytesWaiting });
+        console.log(`Pushing ${chunk?.length ?? 0} bytes`, { readBytesWaiting });
         webmStream.push(chunk);
       } else {
         chunks.push(chunk);
@@ -84,6 +87,7 @@ launch(async (emit) => {
         };
 
         ctx.websocket.send(JSON.stringify(errorFragment));
+        ctx.websocket.close();
       },
     );
 

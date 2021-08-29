@@ -11,7 +11,7 @@ export default function pythonAnalyze(
   onError: (error: Error) => void,
 ) {
   const lines = readline.createInterface({
-    input: pythonAnalyzeRaw(wavStream),
+    input: pythonAnalyzeRaw(wavStream, onError),
     crlfDelay: Infinity,
   });
 
@@ -22,14 +22,29 @@ export default function pythonAnalyze(
   })().catch(onError);
 }
 
-export function pythonAnalyzeRaw(wavStream: stream.Readable): stream.Readable {
+export function pythonAnalyzeRaw(
+  wavStream: stream.Readable,
+  onError: (error: Error) => void,
+): stream.Readable {
   const proc = child_process.spawn(
     `${dirs.pythonAnalyzer}/venv/bin/python`,
     [`${dirs.pythonAnalyzer}/cli.py`],
     { stdio: ['pipe', 'pipe', 'inherit'] },
   );
 
+  proc.on('error', onError);
+
+  proc.on('exit', code => {
+    if (code !== 0) {
+      onError(new Error(`Non-zero exit code from analyzer/cli.py (${code})`));
+    }
+  });
+
   wavStream.pipe(proc.stdin);
+
+  wavStream.on('data', chunk => {
+    console.log(chunk.length, 'bytes of wav data');
+  });
 
   return proc.stdout;
 }

@@ -24,7 +24,10 @@ namespace audio {
       mediaRecorder.onstop = (event) => {
         console.log('Recorder stopped: ', event);
         console.log('Recorded Blobs: ', recordedBlobs);
-        stream.getTracks().forEach(tr => tr.stop());
+        stream.getTracks().forEach(tr => {
+          // console.log('Stopping track', tr);
+          tr.stop();
+        });
 
         resolve({
           type: 'audio.Recording',

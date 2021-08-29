@@ -22,19 +22,31 @@ interceptGetUserMedia(({ constraints, streamPromise }) => {
     return; // Ignore intercepts without audio
   }
 
-  console.log('audio constraints', constraints.audio);
+  // console.log('audio constraints', constraints.audio);
 
   container.style.display = '';
   callbacks.onMessage({ type: 'getUserMedia-called', value: null });
 
-  streamPromise.then(stream => {
+  streamPromise.then(async stream => {
     const audioStream = new MediaStream(stream.getAudioTracks());
-    analyzeStream(
-      audioStream,
-      word => callbacks.onMessage({
-        type: 'word',
-        value: word,
-      }),
-    );
+
+    while (true) {
+      await analyzeStream(
+        audioStream,
+        word => callbacks.onMessage({
+          type: 'word',
+          value: word,
+        }),
+      );
+
+      const streamAlive = audioStream.getTracks().some(t => t.readyState !== 'ended');
+
+      if (!streamAlive) {
+        break;
+      }
+
+      console.log('Fluency terminated even though the stream is still going. Restarting in 3s.');
+      await new Promise(resolve => setTimeout(resolve, 3000));
+    }
   });
 });
