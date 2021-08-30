@@ -31,16 +31,20 @@ interceptGetUserMedia(({ constraints, streamPromise }) => {
     while (true) {
       callbacks.onMessage({ type: 'connecting', value: null });
 
-      await analyzeStream(
-        audioStream,
-        {
-          onConnected: () => callbacks.onMessage({ type: 'connected', value: null }),
-          onWord: word => callbacks.onMessage({
-            type: 'word',
-            value: word,
-          }),
-        },
-      );
+      try {
+        await analyzeStream(
+          audioStream,
+          {
+            onConnected: () => callbacks.onMessage({ type: 'connected', value: null }),
+            onWord: word => callbacks.onMessage({
+              type: 'word',
+              value: word,
+            }),
+          },
+        );
+      } catch (error) {
+        console.error('fluency', error);
+      }
 
       const streamAlive = audioStream.getTracks().some(t => t.readyState !== 'ended');
 

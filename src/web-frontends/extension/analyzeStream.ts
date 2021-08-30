@@ -1,6 +1,8 @@
 import { AnalysisFragment, AnalysisWord } from '../../analyze';
 import never from '../../helpers/never';
 
+const maxLatency = 2; // seconds
+
 export default async function analyzeStream(
   stream: MediaStream,
   callbacks: {
@@ -43,6 +45,7 @@ export default async function analyzeStream(
     mediaRecorder.ondataavailable = null;
 
     clearInterval(tracksEndedPollingId);
+    clearTimeout(latencyTimeoutId);
 
     finishedResolver!();
   }
@@ -67,14 +70,25 @@ export default async function analyzeStream(
 
   const startTime = Date.now();
 
-  webSocket.onmessage = evt => {
-    const fragment: AnalysisFragment = JSON.parse(evt.data);
+  let latencyTimeoutId = -1;
 
-    if ('duration' in fragment.value) {
-      const duration = (Date.now() - startTime) / 1000;
-      const latency = duration - fragment.value.duration;
-      // console.log({ duration, latency });
-    }
+  const resetLatencyTimeout = () => {
+    clearTimeout(latencyTimeoutId);
+
+    latencyTimeoutId = window.setTimeout(() => {
+      console.debug('fluency', 'Latency timeout');
+      cleanup();
+    }, (maxLatency + 1) * 1000);
+
+    // Adding 1 second above because progress messages only come once per second, so the first
+    // second of delay is expected
+  };
+
+  resetLatencyTimeout();
+
+  webSocket.onmessage = evt => {
+    resetLatencyTimeout();
+    const fragment: AnalysisFragment = JSON.parse(evt.data);
 
     switch (fragment.type) {
       case 'token': {
@@ -89,12 +103,19 @@ export default async function analyzeStream(
       }
 
       case 'progress': {
-        // Enhancement: Latency monitoring
+        const duration = (Date.now() - startTime) / 1000;
+        const latency = duration - fragment.value.duration;
+
+        if (latency > maxLatency) {
+          console.error('fluency', 'reached max latency, resetting connection');
+          cleanup();
+        }
+
         break;
       }
 
       case 'error': {
-        console.error('Transcription error', fragment.value.message);
+        console.error('fluency', 'Transcription error', fragment.value.message);
         cleanup();
         break;
       }
