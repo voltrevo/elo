@@ -12,6 +12,9 @@ on your preferred distro without too much trouble.
 - NodeJS (Install [nvm](https://github.com/nvm-sh/nvm), `nvm i 16`)
 
 **Steps**
+
+For production, add `API_HOST_AND_PORT=example.com ` to the start of `npm run build` below.
+
 1. `npm install`
 2. `npm run build`
 3. `sudo docker build . -t fluency` (~4min)
