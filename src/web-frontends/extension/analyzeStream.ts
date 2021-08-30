@@ -3,14 +3,16 @@ import never from '../../helpers/never';
 
 export default async function analyzeStream(
   stream: MediaStream,
-  onWord: (word: AnalysisWord) => void,
+  callbacks: {
+    onConnected: () => void,
+    onWord: (word: AnalysisWord) => void,
+  },
 ) {
   const wsProto = window.location.protocol === 'https' ? 'wss' : 'ws';
   const webSocket = new WebSocket(`${wsProto}://${process.env.API_HOST_AND_PORT}/analyze`);
-  // console.log('opening websocket');
 
   await new Promise(resolve => { webSocket.onopen = resolve; });
-  // console.log('websocket opened');
+  callbacks.onConnected();
 
   const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
 
@@ -81,7 +83,7 @@ export default async function analyzeStream(
       }
 
       case 'word': {
-        onWord(fragment.value);
+        callbacks.onWord(fragment.value);
 
         break;
       }

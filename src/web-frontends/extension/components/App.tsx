@@ -9,6 +9,7 @@ type Props = {
 
 type State = {
   active: boolean;
+  loading: boolean;
   highlightWord?: string;
   word?: string;
   highlightClearTimerId?: number;
@@ -30,6 +31,7 @@ export default class App extends preact.Component<Props, State> {
 
     const initialState: State = {
       active: false,
+      loading: false,
     };
 
     this.setState(initialState);
@@ -37,6 +39,8 @@ export default class App extends preact.Component<Props, State> {
 
   componentWillMount() {
     this.props.callbacks.onMessage = (msg) => {
+      console.debug('fluency message', msg);
+
       switch (msg.type) {
         case 'getUserMedia-called': {
           setTimeout(() => {
@@ -64,6 +68,23 @@ export default class App extends preact.Component<Props, State> {
               word: msg.value.text,
             });
           }
+
+          break;
+        }
+
+        case 'connecting':
+        case 'reconnecting': {
+          this.setState({
+            loading: true,
+          });
+
+          break;
+        }
+
+        case 'connected': {
+          this.setState({
+            loading: false,
+          });
 
           break;
         }
@@ -142,9 +163,15 @@ export default class App extends preact.Component<Props, State> {
         Fluency Extension
       </div>
       <div class={this.state.highlightWord !== undefined ? 'body highlight' : 'body'}>
-        <div class="word">
-          {this.state.highlightWord ?? this.state.word}
-        </div>
+        {(() => {
+          if (this.state.loading) {
+            return <div class="meta">{'<loading>'}</div>;
+          }
+
+          return <div class="word">
+            {this.state.highlightWord ?? null}
+          </div>;
+        })()}
       </div>
     </div>;
   }
