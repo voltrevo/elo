@@ -17,7 +17,11 @@ on your preferred distro without too much trouble.
 3. `sudo docker build . -t fluency` (~4min)
 4. `sudo docker run --rm -it -p36582:36582 fluency:latest`
 
-Visit `localhost:36582` to view the frontend.
+Visit `localhost:36582` to view the demo frontend.
+
+The extension is located at `build/extension`. (See
+[here](https://developer.chrome.com/docs/extensions/mv3/getstarted/) for loading locally and
+[here](https://developer.chrome.com/docs/webstore/publish/) for advice on publishing.)
 
 ## Using the API Directly
 
@@ -112,11 +116,10 @@ possible the GPU would enable a much higher capacity per node. If your machine h
 like to use it, you need to add the `--gpus all` flag to to the docker command above.
 - The frontend has been included, which isn't actually necessary. I'm not sure it makes much
 difference though, so it's included. All the analysis is done in python which has a CLI at
-`analyzer/cli/py` if you'd like to abstract this out.
+`analyzer/cli.py` if you'd like to abstract this out.
 
 ## Future Work Ideas
 
-- Implement streaming
 - Clean separation of API and frontend
 - Minimize resulting docker image size (currently 3.16GB), especially if frontend and/or gpu aren't
 needed
@@ -125,8 +128,6 @@ needed
 - Use fine-tuning (or from-scratch) to retrain deepspeech to recognize phonemes
 - Figure out why the GPU doesn't help very much, possibly unblock GPU acceleration
 - Research CPU and GPU options
-- Make the embedded python server use a separate thread for each request (if it isn't already)
-- Increase threshold for `<pause>` based on surrounding punctuation
 - This repo could use some more general tidying if it becomes long lived and actively developed
   - E.g. having local python venv installed breaks the docker build
 
@@ -188,3 +189,6 @@ word, and outputs another space. Therefore, double spaces are disfluents.
 17. Got docker version working with GPUs and tried it out on GCP. GPUs are a pain and unfortunately
 I wasn't rewarded very much. It was a little better though, and I still think it's possible GPUs
 will allow much more concurrent requests.
+
+(Work has since been added to implement streaming and add a browser extension which is not described
+above.)
