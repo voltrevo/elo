@@ -43,7 +43,7 @@ export function pythonAnalyzeRaw(
   wavStream.pipe(proc.stdin);
 
   wavStream.on('data', chunk => {
-    console.log(chunk.length, 'bytes of wav data');
+    // console.log(chunk.length, 'bytes of wav data');
   });
 
   return proc.stdout;
