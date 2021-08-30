@@ -7,14 +7,22 @@ type Props = {
   callbacks: Callbacks,
 };
 
+type WordBox = {
+  word: string;
+  count: number;
+  highlight: boolean;
+  highlightTimerId?: number;
+};
+
 type State = {
   active: boolean;
   loading: boolean;
-  highlightWord?: string;
   word?: string;
-  highlightClearTimerId?: number;
   left?: string;
   top?: string;
+
+  fillerBox: WordBox;
+  otherDisfluentBox: WordBox;
 };
 
 export default class App extends preact.Component<Props, State> {
@@ -32,6 +40,16 @@ export default class App extends preact.Component<Props, State> {
     const initialState: State = {
       active: false,
       loading: false,
+      fillerBox: {
+        word: '',
+        count: 0,
+        highlight: false,
+      },
+      otherDisfluentBox: {
+        word: '',
+        count: 0,
+        highlight: false,
+      },
     };
 
     this.setState(initialState);
@@ -58,14 +76,26 @@ export default class App extends preact.Component<Props, State> {
         }
 
         case 'disfluent': {
-          clearTimeout(this.state.highlightClearTimerId);
+          const key = msg.value.category === 'filler'
+            ? 'fillerBox' as const
+            : 'otherDisfluentBox' as const;
+
+          clearTimeout(this.state[key].highlightTimerId);
 
           this.setState({
-            highlightWord: msg.value.text,
-            highlightClearTimerId: window.setTimeout(() => {
-              this.setState({ highlightWord: undefined });
-            }, 3000),
-            word: undefined,
+            [key]: {
+              word: msg.value.text,
+              count: this.state[key].count + 1,
+              highlight: true,
+              highlightTimerId: window.setTimeout(() => {
+                this.setState({
+                  [key]: {
+                    ...this.state[key],
+                    highlight: false,
+                  },
+                });
+              }, 3000),
+            },
           });
 
           break;
@@ -157,11 +187,19 @@ export default class App extends preact.Component<Props, State> {
         <div class="left spacer">
           <div class="spacer common-centering"></div>
           <div class="word-box-container">
-            <div class="common-centering word-box">
-              Uhm
+            <div
+              class={[
+                'common-centering',
+                'word-box',
+                ...(this.state.fillerBox.highlight ? ['highlight'] : []),
+              ].join(' ')}
+            >
+              {this.state.fillerBox.word}
             </div>
           </div>
-          <div class="common-centering counter">25</div>
+          <div class="common-centering counter">
+            {this.state.fillerBox.count}
+          </div>
         </div>
         <div class="center common-centering">
           <div class="content common-centering">
@@ -169,10 +207,18 @@ export default class App extends preact.Component<Props, State> {
           </div>
         </div>
         <div class="right spacer">
-          <div class="common-centering counter">11</div>
+          <div class="common-centering counter">
+            {this.state.otherDisfluentBox.count}
+          </div>
           <div class="word-box-container">
-            <div class="common-centering word-box">
-              Literally
+            <div
+              class={[
+                'common-centering',
+                'word-box',
+                ...(this.state.otherDisfluentBox.highlight ? ['highlight'] : []),
+              ].join(' ')}
+            >
+              {this.state.otherDisfluentBox.word}
             </div>
           </div>
           <div class="spacer common-centering"></div>
