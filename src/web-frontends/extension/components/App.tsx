@@ -24,7 +24,7 @@ export default class App extends preact.Component<Props, State> {
   } = null;
 
   appRef: HTMLDivElement | null = null;
-  headRef: HTMLDivElement | null = null;
+  dragRef: HTMLDivElement | null = null;
 
   constructor() {
     super();
@@ -96,12 +96,12 @@ export default class App extends preact.Component<Props, State> {
   }
 
   trySetupDragging() {
-    if (this.appRef === null || this.headRef === null) {
+    if (this.appRef === null || this.dragRef === null) {
       return;
     }
 
-    this.headRef.addEventListener('mousedown', (evt) => {
-      if (this.dragData !== null || this.appRef === null || this.headRef === null) {
+    this.dragRef.addEventListener('mousedown', (evt) => {
+      if (this.dragData !== null || this.appRef === null || this.dragRef === null) {
         return;
       }
 
@@ -145,6 +145,7 @@ export default class App extends preact.Component<Props, State> {
       class={this.state.active ? 'app active' : 'app'}
       ref={r => {
         this.appRef = r;
+        this.dragRef = r;
         this.trySetupDragging();
       }}
       style={{
@@ -152,25 +153,30 @@ export default class App extends preact.Component<Props, State> {
         top: this.state.top ?? '',
       }}
     >
-      <div
-        class="head"
-        ref={r => {
-          this.headRef = r;
-          this.trySetupDragging();
-        }}
-      >
-        Fluency Extension
-      </div>
-      <div class={this.state.highlightWord !== undefined ? 'body highlight' : 'body'}>
-        {(() => {
-          if (this.state.loading) {
-            return <div class="meta">{'<loading>'}</div>;
-          }
-
-          return <div class="word">
-            {this.state.highlightWord ?? null}
-          </div>;
-        })()}
+      <div class="body">
+        <div class="left spacer">
+          <div class="spacer common-centering"></div>
+          <div class="word-box-container">
+            <div class="common-centering word-box">
+              Uhm
+            </div>
+          </div>
+          <div class="common-centering counter">25</div>
+        </div>
+        <div class="center common-centering">
+          <div class="content common-centering">
+            {this.state.loading ? <div class="spinner"></div> : null}
+          </div>
+        </div>
+        <div class="right spacer">
+          <div class="common-centering counter">11</div>
+          <div class="word-box-container">
+            <div class="common-centering word-box">
+              Literally
+            </div>
+          </div>
+          <div class="spacer common-centering"></div>
+        </div>
       </div>
     </div>;
   }
