@@ -50,14 +50,9 @@ export default async function analyzeStream(
     finishedResolver!();
   }
 
-  // let bytesSent = 0;
-
   mediaRecorder.ondataavailable = (event) => {
-    // console.log('handleDataAvailable', event);
     if (event.data && event.data.size > 0) {
       webSocket.send(event.data);
-      // bytesSent += event.data.size;
-      // console.log({ bytesSent, buffered: webSocket.bufferedAmount });
     }
   };
 
@@ -92,7 +87,6 @@ export default async function analyzeStream(
 
     switch (fragment.type) {
       case 'token': {
-        // console.log(fragment.value);
         break;
       }
 
