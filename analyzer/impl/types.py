@@ -20,6 +20,11 @@ class AnalysisWordFragment:
   value: 'AnalysisWord'
 
 @dataclass
+class AnalysisDisfluentFragment:
+  type: Literal['disfluent']
+  value: 'AnalysisDisfluent'
+
+@dataclass
 class AnalysisProgressFragment:
   type: Literal['progress']
 
@@ -46,6 +51,7 @@ class AnalysisEndFragment:
 AnalysisFragment = Union[
   AnalysisTokenFragment,
   AnalysisWordFragment,
+  AnalysisDisfluentFragment,
   AnalysisProgressFragment,
   AnalysisEndFragment,
   Unexpected,
@@ -56,6 +62,13 @@ class AnalysisWord:
   start_time: Optional[float]
   end_time: Optional[float]
   disfluent: bool
+  text: str
+
+@dataclass
+class AnalysisDisfluent:
+  start_time: Optional[float]
+  end_time: Optional[float]
+  category: str
   text: str
 
 @dataclass

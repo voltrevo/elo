@@ -6,6 +6,7 @@ import pythonAnalyze, { pythonAnalyzeRaw } from './pythonAnalyze';
 export type AnalysisFragment = (
   | { type: 'token', value: AnalysisToken }
   | { type: 'word', value: AnalysisWord }
+  | { type: 'disfluent', value: AnalysisDisfluent }
   | { type: 'error', value: { message: string } }
   | { type: 'progress', value: {
     duration: number,
@@ -28,6 +29,13 @@ export type AnalysisWord = {
   start_time: number | null,
   end_time: number | null,
   disfluent: boolean,
+  text: string,
+};
+
+export type AnalysisDisfluent = {
+  start_time: number | null,
+  end_time: number | null,
+  category: string,
   text: string,
 };
 

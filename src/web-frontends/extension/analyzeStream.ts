@@ -1,4 +1,4 @@
-import { AnalysisFragment, AnalysisWord } from '../../analyze';
+import { AnalysisDisfluent, AnalysisFragment, AnalysisWord } from '../../analyze';
 import never from '../../helpers/never';
 
 const maxLatency = 2; // seconds
@@ -8,6 +8,7 @@ export default async function analyzeStream(
   callbacks: {
     onConnected: () => void,
     onWord: (word: AnalysisWord) => void,
+    onDisfluent: (disfluent: AnalysisDisfluent) => void,
   },
 ) {
   const wsProto = window.location.protocol === 'https' ? 'wss' : 'ws';
@@ -92,7 +93,11 @@ export default async function analyzeStream(
 
       case 'word': {
         callbacks.onWord(fragment.value);
+        break;
+      }
 
+      case 'disfluent': {
+        callbacks.onDisfluent(fragment.value);
         break;
       }
 

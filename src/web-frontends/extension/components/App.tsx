@@ -53,21 +53,20 @@ export default class App extends preact.Component<Props, State> {
         }
 
         case 'word': {
-          if (msg.value.disfluent) {
-            clearTimeout(this.state.highlightClearTimerId);
+          this.setState({ word: msg.value.text });
+          break;
+        }
 
-            this.setState({
-              highlightWord: msg.value.text,
-              highlightClearTimerId: window.setTimeout(() => {
-                this.setState({ highlightWord: undefined });
-              }, 3000),
-              word: undefined,
-            });
-          } else {
-            this.setState({
-              word: msg.value.text,
-            });
-          }
+        case 'disfluent': {
+          clearTimeout(this.state.highlightClearTimerId);
+
+          this.setState({
+            highlightWord: msg.value.text,
+            highlightClearTimerId: window.setTimeout(() => {
+              this.setState({ highlightWord: undefined });
+            }, 3000),
+            word: undefined,
+          });
 
           break;
         }

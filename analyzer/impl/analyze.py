@@ -4,7 +4,7 @@ from typing import BinaryIO, Callable
 
 from . import deepspeech
 from .word_extractor import WordExtractor
-from .types import AnalysisEndFragment, AnalysisFragment, AnalysisProgressFragment, AnalysisTokenFragment, AnalysisWord, AnalysisWordFragment
+from .types import AnalysisDisfluent, AnalysisDisfluentFragment, AnalysisEndFragment, AnalysisFragment, AnalysisProgressFragment, AnalysisTokenFragment, AnalysisWord, AnalysisWordFragment
 
 home = os.getenv('HOME')
 
@@ -30,8 +30,14 @@ def analyze(
       type="word",
       value=word,
     ))
+  
+  def on_disfluent(disfluent: AnalysisDisfluent):
+    on_fragment(AnalysisDisfluentFragment(
+      type="disfluent",
+      value=disfluent,
+    ))
 
-  word_extractor = WordExtractor(on_word)
+  word_extractor = WordExtractor(on_word, on_disfluent)
   finished = False
 
   audio_time = 0

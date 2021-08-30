@@ -40,6 +40,10 @@ interceptGetUserMedia(({ constraints, streamPromise }) => {
               type: 'word',
               value: word,
             }),
+            onDisfluent: disfluent => callbacks.onMessage({
+              type: 'disfluent',
+              value: disfluent,
+            }),
           },
         );
       } catch (error) {

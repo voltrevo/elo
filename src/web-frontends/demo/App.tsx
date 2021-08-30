@@ -153,6 +153,12 @@ export default class App extends preact.Component<{}, State> {
               break;
             }
 
+            case 'disfluent': {
+              // Do nothing (demo app only uses disfluent:true from regular words which doesn't
+              // include disfluents that are formed from multiple words)
+              break;
+            }
+
             case 'progress': {
               // Enhancement: Latency monitoring
               break;
