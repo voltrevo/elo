@@ -1,3 +1,8 @@
+$filler-fgcolor: rgb(0, 200, 255);
+$filler-bgcolor: rgb(0, 200, 255);
+$other-disfluent-fgcolor: rgb(179, 0, 255);
+$other-disfluent-bgcolor: rgb(212, 112, 255);
+
 #language-confidence-extension {
   .app {
     * {
@@ -50,6 +55,8 @@
         width: 7.5em;
         height: 100%;
         padding: 0.5em;
+
+        transition: background-color 0.2s;
       }
 
       > .left {
@@ -57,6 +64,14 @@
 
         .word-box {
           justify-content: flex-end;
+
+          &.highlight {
+            background-color: $filler-bgcolor;
+          }
+        }
+
+        .counter {
+          color: $filler-fgcolor;
         }
       }
 
@@ -76,6 +91,14 @@
 
         .word-box {
           justify-content: flex-start;
+
+          &.highlight {
+            background-color: $other-disfluent-bgcolor;
+          }
+        }
+
+        .counter {
+          color: $other-disfluent-fgcolor;
         }
       }
     }
