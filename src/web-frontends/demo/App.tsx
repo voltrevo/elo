@@ -98,8 +98,8 @@ export default class App extends preact.Component<{}, State> {
       case 'init':
       case 'transcribed': {
         const loc = window.location;
-        const wsProto = loc.protocol === 'https' ? 'wss' : 'ws';
-        const webSocket = new WebSocket(`${wsProto}://${process.env.API_HOST_AND_PORT}/analyze`);
+        const wsProto = loc.protocol === 'https:' ? 'wss:' : 'ws:';
+        const webSocket = new WebSocket(`${wsProto}//${process.env.API_HOST_AND_PORT}/analyze`);
 
         await new Promise(resolve => {
           webSocket.addEventListener('open', resolve);

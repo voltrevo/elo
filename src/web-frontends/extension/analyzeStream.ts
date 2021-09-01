@@ -11,8 +11,8 @@ export default async function analyzeStream(
     onDisfluent: (disfluent: AnalysisDisfluent) => void,
   },
 ) {
-  const wsProto = window.location.protocol === 'https' ? 'wss' : 'ws';
-  const webSocket = new WebSocket(`${wsProto}://${process.env.API_HOST_AND_PORT}/analyze`);
+  const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const webSocket = new WebSocket(`${wsProto}//${process.env.API_HOST_AND_PORT}/analyze`);
 
   await new Promise(resolve => { webSocket.onopen = resolve; });
   callbacks.onConnected();
