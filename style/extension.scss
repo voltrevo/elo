@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Amita&family=Source+Sans+Pro:wght@300&display=swap');
+
 $filler-fgcolor: rgb(0, 200, 255);
 $filler-bgcolor: rgb(0, 200, 255);
 $other-disfluent-fgcolor: rgb(179, 0, 255);
@@ -17,17 +19,19 @@ $other-disfluent-bgcolor: rgb(212, 112, 255);
 
     transition: opacity 0.2s;
 
-    font-family: sans-serif;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 1.1em;
 
     z-index: 100;
     position: fixed;
     left: 1em;
     top: 1em;
     background-color: white;
-    border: 1px solid black;
+    border: 1px solid rgba(0, 0, 0, 0.25);
 
     .spacer {
       flex-grow: 1;
+      flex-basis: 0;
     }
 
     .common-centering {
@@ -39,20 +43,14 @@ $other-disfluent-bgcolor: rgb(212, 112, 255);
     .body {
       display: flex;
       flex-direction: row;
-      width: 30em;
-      height: 4em;
-
-      .counter {
-        padding: 0.5em;
-      }
+      width: 18em;
+      height: 3em;
 
       .word-box-container {
-        padding: 0.8em 0;
+        padding: 0.3em;
       }
 
       .word-box {
-        background-color: #f4f4f4;
-        width: 7.5em;
         height: 100%;
         padding: 0.5em;
 
@@ -79,10 +77,9 @@ $other-disfluent-bgcolor: rgb(212, 112, 255);
         display: flex;
 
         > .content {
-          width: 3.5em;
-          height: 3.5em;
-          border-radius: 100%;
-          border: 1px solid black;
+          width: 2.8em;
+          font-family: 'Amita', cursive;
+          position: relative;
         }
       }
 

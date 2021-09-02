@@ -185,8 +185,7 @@ export default class App extends preact.Component<Props, State> {
     >
       <div class="body">
         <div class="left spacer">
-          <div class="spacer common-centering"></div>
-          <div class="word-box-container">
+          <div class="word-box-container spacer">
             <div
               class={[
                 'common-centering',
@@ -203,14 +202,14 @@ export default class App extends preact.Component<Props, State> {
         </div>
         <div class="center common-centering">
           <div class="content common-centering">
-            {this.state.loading ? <div class="spinner"></div> : null}
+            {this.state.loading ? <div class="spinner"></div> : 'elo'}
           </div>
         </div>
         <div class="right spacer">
           <div class="common-centering counter">
             {this.state.otherDisfluentBox.count}
           </div>
-          <div class="word-box-container">
+          <div class="word-box-container spacer">
             <div
               class={[
                 'common-centering',
@@ -221,7 +220,6 @@ export default class App extends preact.Component<Props, State> {
               {this.state.otherDisfluentBox.word}
             </div>
           </div>
-          <div class="spacer common-centering"></div>
         </div>
       </div>
     </div>;
