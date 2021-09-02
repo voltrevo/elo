@@ -5,11 +5,11 @@ import Callbacks from './Callbacks';
 import App from './components/App';
 import interceptGetUserMedia from './interceptGetUserMedia';
 
-const languageConfidenceExtension = document.querySelector('#language-confidence-extension')!;
+const eloExtension = document.querySelector('#elo-extension')!;
 
 const container = document.createElement('div');
 container.style.display = 'none';
-languageConfidenceExtension.appendChild(container);
+eloExtension.appendChild(container);
 
 const callbacks: Callbacks = {
   onMessage: () => {},
