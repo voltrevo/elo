@@ -1,12 +1,15 @@
 {
   "manifest_version": 2,
 
-  "name": "Fluency (TODO: title)",
-  "description": "TODO: description",
-  "version": "1.0.1",
+  "name": "Elo",
+  "description": "Elo helps you eliminate filler words like “ums, ahs, likes, you know, totally, etc.” so you can speak with authority and conviction.",
+  "version": "1.0.2",
 
   "icons": {
-    "48": "assets/icons/icon.png"
+    "16": "assets/icons/icon16.png",
+    "32": "assets/icons/icon32.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
   },
 
   "content_security_policy": "script-src 'self'; object-src 'self'",
@@ -21,7 +24,7 @@
     "default_icon": {
       "48": "assets/icons/icon.png"
     },
-    "default_title": "Fluency (TODO: title)"
+    "default_title": "Elo"
   },
 
   "content_scripts": [{
