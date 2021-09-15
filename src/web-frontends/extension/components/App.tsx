@@ -202,7 +202,17 @@ export default class App extends preact.Component<Props, State> {
         </div>
         <div class="center common-centering">
           <div class="content common-centering">
-            {this.state.loading ? <div class="spinner"></div> : 'elo'}
+            {this.state.loading
+              ? <div class="spinner"></div>
+              : <div class="logo" style={{
+                backgroundImage: `url("${(
+                  document.querySelector('#elo-extension #icon-template') as HTMLImageElement
+                ).src}")`,
+                backgroundSize: 'contain',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+              }}></div>
+            }
           </div>
         </div>
         <div class="right spacer">

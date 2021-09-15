@@ -77,7 +77,8 @@ $other-disfluent-bgcolor: rgb(212, 112, 255);
         display: flex;
 
         > .content {
-          width: 2.8em;
+          width: 3.5em;
+          height: 100%;
           font-family: 'Amita', cursive;
           position: relative;
         }
@@ -98,6 +99,13 @@ $other-disfluent-bgcolor: rgb(212, 112, 255);
           color: $other-disfluent-fgcolor;
         }
       }
+    }
+
+    .logo {
+      width: 70%;
+      height: 70%;
+      position: relative;
+      top: -4px;
     }
 
     .spinner {
