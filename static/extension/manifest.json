@@ -3,7 +3,7 @@
 
   "name": "Elo",
   "description": "Elo helps you eliminate filler words like “ums, ahs, likes, you know, totally, etc.” so you can speak with authority and conviction.",
-  "version": "1.0.2",
+  "version": "1.0.3",
 
   "icons": {
     "16": "assets/icons/icon16.png",
