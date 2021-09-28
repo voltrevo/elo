@@ -39,6 +39,16 @@ class AnalysisProgressFragment:
   value: Value
 
 @dataclass
+class AnalysisDebugFragment:
+  type: Literal['debug']
+
+  @dataclass
+  class Value:
+    message: str
+  
+  value: Value
+
+@dataclass
 class AnalysisEndFragment:
   type: Literal['end']
   
@@ -53,6 +63,7 @@ AnalysisFragment = Union[
   AnalysisWordFragment,
   AnalysisDisfluentFragment,
   AnalysisProgressFragment,
+  AnalysisDebugFragment,
   AnalysisEndFragment,
   Unexpected,
 ]

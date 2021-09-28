@@ -1,10 +1,12 @@
 import os
 import time
-from typing import BinaryIO, Callable
+from typing import Any, BinaryIO, Callable
+
+import webrtcvad # type: ignore
 
 from . import deepspeech
 from .word_extractor import WordExtractor
-from .types import AnalysisDisfluent, AnalysisDisfluentFragment, AnalysisEndFragment, AnalysisFragment, AnalysisProgressFragment, AnalysisTokenFragment, AnalysisWord, AnalysisWordFragment
+from .types import AnalysisDebugFragment, AnalysisDisfluent, AnalysisDisfluentFragment, AnalysisEndFragment, AnalysisFragment, AnalysisProgressFragment, AnalysisToken, AnalysisTokenFragment, AnalysisWord, AnalysisWordFragment
 
 home = os.getenv('HOME')
 
@@ -14,6 +16,7 @@ else:
   data_dir = f"{home}/data/deepspeech-exp"
 
 ds = deepspeech.Model(f"{data_dir}/models.pbmm")
+vad: Any = webrtcvad.Vad(3)
 
 def analyze(
   input_stream: BinaryIO,
@@ -22,7 +25,23 @@ def analyze(
   """analyze audio from bytes
   """
 
-  ds_stream = ds.createStream()
+  def on_token(token: AnalysisToken):
+    on_fragment(AnalysisTokenFragment(
+      type="token",
+      value=token,
+    ))
+    
+    word_extractor.process_token(token)
+
+  def on_debug(message: str):
+    on_fragment(AnalysisDebugFragment(
+      type="debug",
+      value=AnalysisDebugFragment.Value(
+        message=message,
+      ),
+    ))
+
+  ds_stream = ds.createStream(on_token, on_debug)
   byte_len = 0
 
   def on_word(word: AnalysisWord):
@@ -46,31 +65,20 @@ def analyze(
   other_start = time.perf_counter()
 
   while not finished:
-    input_bytes = input_stream.read(2048)
+    byte_pos = byte_len
+    input_bytes = input_stream.read(960)
     byte_len += len(input_bytes)
     audio_time += len(input_bytes) / 32000
 
     if len(input_bytes) == 0:
       start = time.perf_counter()
-      ds_stream.finish()
+      ds_stream.finalize_current()
       stream_processing_time += time.perf_counter() - start
       finished = True
     else:
       start = time.perf_counter()
-      ds_stream.feedAudioContent(input_bytes)
+      ds_stream.feed_audio_content(byte_pos, input_bytes)
       stream_processing_time += time.perf_counter() - start
-
-    start = time.perf_counter()
-    tokens = ds_stream.get_more_tokens()
-    token_processing_time += time.perf_counter() - start
-
-    for token in tokens:
-      on_fragment(AnalysisTokenFragment(
-        type="token",
-        value=token,
-      ))
-
-      word_extractor.process_token(token)
     
     word_extractor.process_chunk_end()
     
