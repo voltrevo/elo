@@ -15,6 +15,7 @@ export type AnalysisFragment = (
     token_processing_time: number,
     other_processing_time: number,
   } }
+  | { type: 'debug', value: { message: string } }
   | { type: 'end', value: { duration: number } }
 );
 

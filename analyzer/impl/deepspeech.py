@@ -103,7 +103,7 @@ class ModelStream:
     else:
       self.emit_new_tokens(self.stream.intermediateDecodeWithMetadata(1)) # type: ignore
 
-    self.processed_byte_pos += len(audio_buffer)
+    self.processed_byte_pos = byte_pos + len(audio_buffer)
 
   def emit_new_tokens(self, metadata: Any):
     for token in metadata.transcripts[0].tokens:

@@ -1,6 +1,7 @@
+from dataclasses import dataclass
 import os
 import time
-from typing import Any, BinaryIO, Callable
+from typing import Any, BinaryIO, Callable, Optional
 
 import webrtcvad # type: ignore
 
@@ -16,7 +17,12 @@ else:
   data_dir = f"{home}/data/deepspeech-exp"
 
 ds = deepspeech.Model(f"{data_dir}/models.pbmm")
-vad: Any = webrtcvad.Vad(3)
+vad: Any = webrtcvad.Vad(1)
+
+@dataclass
+class AudioChunk:
+  byte_pos: int
+  buffer: bytes
 
 def analyze(
   input_stream: BinaryIO,
@@ -59,6 +65,10 @@ def analyze(
   word_extractor = WordExtractor(on_word, on_disfluent)
   finished = False
 
+  voice_absent_counter = 0
+  voice_absent_threshold = 3
+  buffered_chunk: Optional[AudioChunk] = None
+
   audio_time = 0
   stream_processing_time = 0
   token_processing_time = 0
@@ -75,13 +85,35 @@ def analyze(
       ds_stream.finalize_current()
       stream_processing_time += time.perf_counter() - start
       finished = True
+      word_extractor.process_chunk_end()
     else:
-      start = time.perf_counter()
-      ds_stream.feed_audio_content(byte_pos, input_bytes)
-      stream_processing_time += time.perf_counter() - start
-    
-    word_extractor.process_chunk_end()
-    
+      if vad.is_speech(input_bytes, 16000):
+        on_debug("voice")
+        voice_absent_counter = 0
+      else:
+        on_debug("no voice")
+        voice_absent_counter += 1
+
+        if voice_absent_counter == voice_absent_threshold:
+          on_debug("voice_absent_threshold reached")
+
+      if voice_absent_counter >= voice_absent_threshold:
+        buffered_chunk = AudioChunk(byte_pos=byte_pos, buffer=input_bytes)
+      else:
+        if buffered_chunk is not None:
+          on_debug("voice redetected, processing buffered_chunk")
+
+          start = time.perf_counter()
+          ds_stream.feed_audio_content(buffered_chunk.byte_pos, buffered_chunk.buffer)
+          stream_processing_time += time.perf_counter() - start
+          word_extractor.process_chunk_end()
+          buffered_chunk = None
+        
+        start = time.perf_counter()
+        ds_stream.feed_audio_content(byte_pos, input_bytes)
+        stream_processing_time += time.perf_counter() - start
+        word_extractor.process_chunk_end()
+
     if audio_time >= 1:
       other_processing_time = time.perf_counter() - other_start
       other_start = time.perf_counter()

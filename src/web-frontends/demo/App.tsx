@@ -170,6 +170,11 @@ export default class App extends preact.Component<{}, State> {
               break;
             }
 
+            case 'debug': {
+              console.log('Transcription debug:', fragment.value.message);
+              break;
+            }
+
             case 'end': {
               analysis = {
                 ...analysis,

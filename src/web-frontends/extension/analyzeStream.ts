@@ -119,6 +119,11 @@ export default async function analyzeStream(
         break;
       }
 
+      case 'debug': {
+        console.error('fluency', 'Transcription debug', fragment.value.message);
+        break;
+      }
+
       case 'end': {
         cleanup();
         break;
