@@ -24,6 +24,8 @@ launch(async (emit) => {
   }));
 
   app.use(route.post('/analyze', async ctx => {
+    ctx.res.statusCode = 200;
+
     const analysisStream = analyzeRaw(ctx.req, error => {
       console.error(error);
       ctx.res.end();

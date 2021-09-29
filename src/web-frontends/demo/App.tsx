@@ -1,8 +1,8 @@
 import * as preact from 'preact';
 
 import { Analysis, AnalysisFragment } from '../../analyze';
-import base58 from '../../helpers/base58';
 import never from '../../helpers/never';
+import AnalysisBuilder from './AnalysisBuilder';
 import audio from './audio';
 import RecorderPanel from './RecorderPanel';
 import SettingsPanel from './SettingsPanel';
@@ -79,8 +79,8 @@ export default class App extends preact.Component<{}, State> {
     switch (this.state.recorder.name) {
       case 'init':
       case 'transcribed':
-        console.error('Not implemented: Upload file (since streaming update)');
-        // await this.transcribe({ type: 'audio.Recording', duration: null, data: file });
+        // console.error('Not implemented: Upload file (since streaming update)');
+        await this.transcribe({ type: 'audio.Recording', duration: null, data: file });
         break;
 
       case 'recorded':
@@ -107,12 +107,7 @@ export default class App extends preact.Component<{}, State> {
 
         const transcriptionIndex = this.state.transcriptions.length;
 
-        let analysis: Analysis = {
-          tokens: [],
-          words: [],
-          duration: 0,
-          complete: false,
-        };
+        const analysisBuilder = new AnalysisBuilder();
 
         const setTranscription = () => {
           this.setState({
@@ -120,7 +115,7 @@ export default class App extends preact.Component<{}, State> {
               ...this.state.transcriptions.slice(0, transcriptionIndex),
               {
                 ...this.state.transcriptions[transcriptionIndex],
-                analysis,
+                analysis: analysisBuilder.analysis,
               },
               ...this.state.transcriptions.slice(transcriptionIndex + 1),
             ],
@@ -131,66 +126,7 @@ export default class App extends preact.Component<{}, State> {
 
         webSocket.addEventListener('message', evt => {
           const fragment: AnalysisFragment = JSON.parse(evt.data);
-
-          switch (fragment.type) {
-            case 'token': {
-              analysis = {
-                ...analysis,
-                tokens: [...analysis.tokens, fragment.value],
-                duration: fragment.value.start_time ?? analysis.duration,
-              };
-
-              break;
-            }
-
-            case 'word': {
-              analysis = {
-                ...analysis,
-                words: [...analysis.words, fragment.value],
-                duration: fragment.value.start_time ?? analysis.duration,
-              };
-
-              break;
-            }
-
-            case 'disfluent': {
-              // Do nothing (demo app only uses disfluent:true from regular words which doesn't
-              // include disfluents that are formed from multiple words)
-              break;
-            }
-
-            case 'progress': {
-              // Enhancement: Latency monitoring
-              break;
-            }
-
-            case 'error': {
-              console.error('Transcription error', fragment.value.message);
-
-              break;
-            }
-
-            case 'debug': {
-              console.log('Transcription debug:', fragment.value.message);
-              break;
-            }
-
-            case 'end': {
-              analysis = {
-                ...analysis,
-                duration: fragment.value.duration,
-                complete: true,
-              };
-
-              console.log({ analysis });
-
-              break;
-            }
-
-            default: {
-              never(fragment);
-            }
-          }
+          analysisBuilder.add(fragment);
 
           setTranscription();
         });
@@ -278,13 +214,20 @@ export default class App extends preact.Component<{}, State> {
       body: recording instanceof File ? recording : recording.data,
     });
 
-    const analysis: Analysis = await response.json();
+    const analysisFragments: AnalysisFragment[] = (await response.text())
+      .split('\n')
+      .filter(line => line.trim() !== '')
+      .map(line => JSON.parse(line));
 
-    console.log({ analysis });
+    const analysisBuilder = new AnalysisBuilder();
+
+    for (const fragment of analysisFragments) {
+      analysisBuilder.add(fragment);
+    }
 
     const transcription = {
       recording,
-      analysis,
+      analysis: analysisBuilder.analysis,
       transcriptionTime: Date.now() - startTranscriptionTime,
     };
 
