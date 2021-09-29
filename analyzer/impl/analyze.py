@@ -87,7 +87,9 @@ def analyze(
       finished = True
       word_extractor.process_chunk_end()
     else:
-      if vad.is_speech(input_bytes, 16000):
+      is_speech = True if len(input_bytes) < 960 else vad.is_speech(input_bytes, 16000)
+
+      if is_speech:
         on_debug("voice")
         voice_absent_counter = 0
       else:
