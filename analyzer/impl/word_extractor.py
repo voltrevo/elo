@@ -47,9 +47,11 @@ class WordExtractor:
     self,
     on_word: Callable[[AnalysisWord], None],
     on_disfluent: Callable[[AnalysisDisfluent], None],
+    on_debug: Callable[[str], None],
   ):
     self.on_word = on_word
     self.on_disfluent = on_disfluent
+    self.on_debug = on_debug
 
   def process_token(self, token: AnalysisToken):
     self.chunks_since_token = 0
@@ -62,14 +64,12 @@ class WordExtractor:
       self.partial_word.append(token)
 
     self.phantom_space_mode = False
-
-  def process_chunk_end(self):
-    if self.chunks_since_token >= 5 and len(self.partial_word) > 0:
-      self.chunks_since_token = 0
+  
+  def process_stream_finalize(self):
+    if len(self.partial_word) > 0:
       self.append_word(None)
       self.phantom_space_mode = True
-
-    self.chunks_since_token += 1
+      self.on_debug("chopping word in WordExtractor")
 
   def end(self):
     if not self.phantom_space_mode:

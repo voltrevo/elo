@@ -58,9 +58,10 @@ class Model:
 
   def createStream(self,
     on_token: Callable[[AnalysisToken], None],
-    on_debug: Callable[[str], None]
+    on_debug: Callable[[str], None],
+    on_finalize: Callable[[], None],
   ):
-    return ModelStream(self.ds, on_token, on_debug)
+    return ModelStream(self.ds, on_token, on_debug, on_finalize)
 
 
 # About every 10 seconds we just nuke the stream and make it start again fresh
@@ -81,10 +82,12 @@ class ModelStream:
     ds: deepspeech.Model,
     on_token: Callable[[AnalysisToken], None],
     on_debug: Callable[[str], None],
+    on_finalize: Callable[[], None],
   ):
     self.ds = ds
     self.on_token = on_token
     self.on_debug = on_debug
+    self.on_finalize = on_finalize
     self.stream = ds.createStream()
 
   def feed_audio_content(self, byte_pos: int, audio_buffer: bytes) -> None:
@@ -130,3 +133,4 @@ class ModelStream:
 
   def finalize_current(self) -> None:
     self.emit_new_tokens(self.stream.finishStreamWithMetadata(1)) # type: ignore
+    self.on_finalize()

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import os
 import time
-from typing import Any, BinaryIO, Callable, Optional
+from typing import Any, BinaryIO, Callable, List
 
 import webrtcvad # type: ignore
 
@@ -17,7 +17,7 @@ else:
   data_dir = f"{home}/data/deepspeech-exp"
 
 ds = deepspeech.Model(f"{data_dir}/models.pbmm")
-vad: Any = webrtcvad.Vad(1)
+vad: Any = webrtcvad.Vad(3)
 
 @dataclass
 class AudioChunk:
@@ -47,7 +47,10 @@ def analyze(
       ),
     ))
 
-  ds_stream = ds.createStream(on_token, on_debug)
+  def on_stream_finalize():
+    word_extractor.process_stream_finalize()
+
+  ds_stream = ds.createStream(on_token, on_debug, on_stream_finalize)
   byte_len = 0
 
   def on_word(word: AnalysisWord):
@@ -62,12 +65,12 @@ def analyze(
       value=disfluent,
     ))
 
-  word_extractor = WordExtractor(on_word, on_disfluent)
+  word_extractor = WordExtractor(on_word, on_disfluent, on_debug)
   finished = False
 
   voice_absent_counter = 0
-  voice_absent_threshold = 3
-  buffered_chunk: Optional[AudioChunk] = None
+  voice_absent_threshold = 30
+  buffered_chunks: List[AudioChunk] = []
 
   audio_time = 0
   stream_processing_time = 0
@@ -85,8 +88,8 @@ def analyze(
       ds_stream.finalize_current()
       stream_processing_time += time.perf_counter() - start
       finished = True
-      word_extractor.process_chunk_end()
     else:
+      # is_speech = True
       is_speech = True if len(input_bytes) < 960 else vad.is_speech(input_bytes, 16000)
 
       if is_speech:
@@ -100,21 +103,22 @@ def analyze(
           on_debug("voice_absent_threshold reached")
 
       if voice_absent_counter >= voice_absent_threshold:
-        buffered_chunk = AudioChunk(byte_pos=byte_pos, buffer=input_bytes)
-      else:
-        if buffered_chunk is not None:
-          on_debug("voice redetected, processing buffered_chunk")
+        buffered_chunks.append(AudioChunk(byte_pos=byte_pos, buffer=input_bytes))
 
-          start = time.perf_counter()
-          ds_stream.feed_audio_content(buffered_chunk.byte_pos, buffered_chunk.buffer)
-          stream_processing_time += time.perf_counter() - start
-          word_extractor.process_chunk_end()
-          buffered_chunk = None
-        
+        while len(buffered_chunks) > voice_absent_threshold:
+          buffered_chunks = buffered_chunks[1:]
+      else:
+        if len(buffered_chunks) > 0:
+          on_debug("voice redetected, processing buffered_chunk")
+          for buffered_chunk in buffered_chunks:
+            start = time.perf_counter()
+            ds_stream.feed_audio_content(buffered_chunk.byte_pos, buffered_chunk.buffer)
+            stream_processing_time += time.perf_counter() - start
+            buffered_chunks = []
+
         start = time.perf_counter()
         ds_stream.feed_audio_content(byte_pos, input_bytes)
         stream_processing_time += time.perf_counter() - start
-        word_extractor.process_chunk_end()
 
     if audio_time >= 1:
       other_processing_time = time.perf_counter() - other_start
