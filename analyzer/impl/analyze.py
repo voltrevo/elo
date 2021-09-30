@@ -40,12 +40,13 @@ def analyze(
     word_extractor.process_token(token)
 
   def on_debug(message: str):
-    on_fragment(AnalysisDebugFragment(
-      type="debug",
-      value=AnalysisDebugFragment.Value(
-        message=message,
-      ),
-    ))
+    # on_fragment(AnalysisDebugFragment(
+    #   type="debug",
+    #   value=AnalysisDebugFragment.Value(
+    #     message=message,
+    #   ),
+    # ))
+    pass
 
   def on_stream_finalize():
     word_extractor.process_stream_finalize()
@@ -89,7 +90,6 @@ def analyze(
       stream_processing_time += time.perf_counter() - start
       finished = True
     else:
-      # is_speech = True
       is_speech = True if len(input_bytes) < 960 else vad.is_speech(input_bytes, 16000)
 
       if is_speech:
