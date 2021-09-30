@@ -101,6 +101,7 @@ def analyze(
 
         if voice_absent_counter == voice_absent_threshold:
           on_debug("voice_absent_threshold reached")
+          ds_stream.finalize_current()
 
       if voice_absent_counter >= voice_absent_threshold:
         buffered_chunks.append(AudioChunk(byte_pos=byte_pos, buffer=input_bytes))

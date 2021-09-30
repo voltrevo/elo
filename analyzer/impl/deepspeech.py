@@ -89,9 +89,10 @@ class ModelStream:
     self.on_debug = on_debug
     self.on_finalize = on_finalize
     self.stream = ds.createStream()
+    self.stream_finished = False
 
   def feed_audio_content(self, byte_pos: int, audio_buffer: bytes) -> None:
-    if byte_pos > self.processed_byte_pos:
+    if byte_pos > self.processed_byte_pos or self.stream_finished:
       self.on_debug("resetting on audio gap")
       self.reset(byte_pos / 32000)
 
@@ -121,7 +122,8 @@ class ModelStream:
       ))
 
   def reset(self, new_time_offset: float):
-    self.finalize_current()
+    if not self.stream_finished:
+      self.finalize_current()
     self.chunks_since_reset = 0
     self.time_offset = new_time_offset
     self.chunk_time = 0
@@ -129,8 +131,10 @@ class ModelStream:
     self.last_token_start = -1
 
     self.stream = self.ds.createStream()
+    self.stream_finished = False
     self.on_debug("model reset")
 
   def finalize_current(self) -> None:
     self.emit_new_tokens(self.stream.finishStreamWithMetadata(1)) # type: ignore
+    self.stream_finished = True
     self.on_finalize()
