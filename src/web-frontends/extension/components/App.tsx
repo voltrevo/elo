@@ -26,6 +26,11 @@ type State = {
   otherDisfluentBox: WordBox;
 };
 
+const disfluentRewriteMap: Record<string, string | undefined> = {
+  '<?>': 'uhm',
+  '<pause>': 'ehm',
+};
+
 export default class App extends preact.Component<Props, State> {
   dragData: null | {
     mouseDownPos: { x: number, y: number },
@@ -92,7 +97,7 @@ export default class App extends preact.Component<Props, State> {
 
           this.setState({
             [key]: {
-              word: msg.value.text,
+              word: disfluentRewriteMap[msg.value.text] ?? msg.value.text,
               count: this.state[key].count + 1,
               highlight: true,
               highlightTimerId: window.setTimeout(() => {
