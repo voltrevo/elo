@@ -2,6 +2,7 @@ import * as preact from 'preact';
 
 import never from '../../../helpers/never';
 import Callbacks from '../Callbacks';
+import TaskQueue from '../helpers/TaskQueue';
 
 type Props = {
   callbacks: Callbacks,
@@ -33,6 +34,13 @@ export default class App extends preact.Component<Props, State> {
 
   appRef: HTMLDivElement | null = null;
   dragRef: HTMLDivElement | null = null;
+
+  windowSize = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  };
+
+  cleanupTasks = new TaskQueue();
 
   constructor() {
     super();
@@ -123,6 +131,71 @@ export default class App extends preact.Component<Props, State> {
         }
       }
     };
+
+    const onResize = () => {
+      const lastWindowSize = this.windowSize;
+
+      this.windowSize = {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      };
+
+      if (this.dragData !== null || this.appRef === null) {
+        return;
+      }
+
+      const left = this.appRef.style.left;
+      const top = this.appRef.style.top;
+
+      if (!left.endsWith('px') || !top.endsWith('px')) {
+        return;
+      }
+
+      const padding = 18;
+
+      const elementRect = this.appRef.getBoundingClientRect();
+
+      const lastPosRect = {
+        width: lastWindowSize.width - 2 * padding - elementRect.width,
+        height: lastWindowSize.height - 2 * padding - elementRect.height,
+      };
+
+      const posRect = {
+        width: this.windowSize.width - 2 * padding - elementRect.width,
+        height: this.windowSize.height - 2 * padding - elementRect.height,
+      };
+
+      const oldLeft = parseFloat(left) - padding;
+      const oldTop = parseFloat(top) - padding;
+
+      if (oldLeft < 0) {
+        // Do nothing
+      } else if (oldLeft > lastPosRect.width) {
+        this.appRef.style.left = `${padding + oldLeft - lastPosRect.width + posRect.width}`;
+      } else {
+        const xRatio = (parseFloat(left) - padding) / lastPosRect.width;
+        this.appRef.style.left = `${padding + xRatio * posRect.width}px`;
+      }
+
+      if (oldTop < 0) {
+        // Do nothing
+      } else if (oldTop > lastPosRect.height) {
+        this.appRef.style.top = `${padding + oldTop - lastPosRect.height + posRect.height}`;
+      } else {
+        const yRatio = (parseFloat(top) - padding) / lastPosRect.height;
+        this.appRef.style.top = `${padding + yRatio * posRect.height}px`;
+      }
+    };
+
+    window.addEventListener('resize', onResize);
+
+    this.cleanupTasks.push(() => {
+      window.removeEventListener('resize', onResize);
+    });
+  }
+
+  componentWillUnmount() {
+    this.cleanupTasks.run();
   }
 
   trySetupDragging() {
