@@ -14,7 +14,7 @@ $other-disfluent-bgcolor: rgb(212, 112, 255);
     opacity: 0;
 
     &.active {
-      opacity: initial;
+      opacity: 0.9;
     }
 
     transition: opacity 0.2s;
