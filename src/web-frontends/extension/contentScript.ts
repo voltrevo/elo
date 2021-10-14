@@ -1,3 +1,5 @@
+import browser from 'webextension-polyfill';
+
 const eloExtension = document.createElement('div');
 eloExtension.id = 'elo-extension';
 document.documentElement.appendChild(eloExtension);
@@ -17,3 +19,7 @@ iconTag.setAttribute('id', 'icon-template');
 iconTag.src = chrome.runtime.getURL('assets/icons/icon128.png');
 iconTag.style.display = 'none';
 eloExtension.appendChild(iconTag);
+debugger;
+window.browser = browser;
+
+export {};
