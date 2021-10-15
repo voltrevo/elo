@@ -14,7 +14,7 @@ $other-disfluent-bgcolor: rgb(212, 112, 255);
     opacity: 0;
 
     &.active {
-      opacity: initial;
+      opacity: 0.85;
     }
 
     transition: opacity 0.2s;
@@ -24,8 +24,8 @@ $other-disfluent-bgcolor: rgb(212, 112, 255);
 
     z-index: 100;
     position: fixed;
-    left: 1em;
-    top: 1em;
+    left: calc(50vw - 9em);
+    top: 18px;
     background-color: white;
     border: 1px solid rgba(0, 0, 0, 0.25);
 

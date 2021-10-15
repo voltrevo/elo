@@ -9,6 +9,7 @@ const config = {
   common: {
     entry: {
       popup: './build/js/src/web-frontends/extension/popup.js',
+      'elo-page': './build/js/src/web-frontends/extension/elo-page.js',
       contentScript: './build/js/src/web-frontends/extension/contentScript.js',
       pageContentScript: './build/js/src/web-frontends/extension/pageContentScript.js',
     },
@@ -43,6 +44,8 @@ const config = {
           'static/extension',
           { from: 'build/css/extension.css', to: 'css/extension.css' },
           { from: 'build/css/extension.css.map', to: 'css/extension.css.map' },
+          { from: 'build/css/elo-page.css', to: 'css/elo-page.css' },
+          { from: 'build/css/elo-page.css.map', to: 'css/elo-page.css.map' },
         ],
       }),
       new webpack.DefinePlugin({
