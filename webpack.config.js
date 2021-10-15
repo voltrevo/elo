@@ -8,7 +8,8 @@ const webpack = require('webpack');
 const config = {
   common: {
     entry: {
-      index: './build/js/src/web-frontends/demo/index.js',
+      demo: './build/js/src/web-frontends/demo/index.js',
+      'labelling-tool': './build/js/src/web-frontends/labelling-tool/index.js',
     },
     module: {
       rules: [
@@ -29,18 +30,20 @@ const config = {
     },
     output: {
       filename: '[name].bundle.js',
-      path: path.join(__dirname, 'build', 'demo'),
+      path: path.join(__dirname, 'build'),
       publicPath: '/',
     },
     devServer: {
-      contentBase: path.join(__dirname, 'build', 'demo'),
+      contentBase: path.join(__dirname, 'build'),
     },
     plugins: [
       new CopyPlugin({
         patterns: [
-          'static/demo',
+          'static',
           { from: 'build/css/demo.css', to: 'css/demo.css' },
           { from: 'build/css/demo.css.map', to: 'css/demo.css.map' },
+          { from: 'build/css/labelling-tool.css', to: 'css/labelling-tool.css' },
+          { from: 'build/css/labelling-tool.css.map', to: 'css/labelling-tool.css.map' },
         ],
       }),
       new webpack.DefinePlugin({

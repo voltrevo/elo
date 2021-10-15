@@ -20,7 +20,7 @@ For production, add `API_HOST_AND_PORT=example.com ` to the start of `npm run bu
 3. `sudo docker build . -t fluency` (~4min)
 4. `sudo docker run --rm -it -p36582:36582 fluency:latest`
 
-Visit `localhost:36582` to view the demo frontend.
+Visit `localhost:36582/demo.html` to view the demo frontend.
 
 The extension is located at `build/extension`. (See
 [here](https://developer.chrome.com/docs/extensions/mv3/getstarted/) for loading locally and
