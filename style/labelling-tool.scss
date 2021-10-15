@@ -3,3 +3,15 @@
     border: 10px dashed rgba(70, 70, 70, 0.4);
   }
 }
+
+.file-request {
+  border: 1px solid black;
+  position: relative;
+  padding: 1em;
+  display: inline-block;
+}
+
+a {
+  cursor: pointer;
+  color: blue;
+}

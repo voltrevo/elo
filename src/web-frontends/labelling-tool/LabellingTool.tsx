@@ -1,18 +1,18 @@
 import * as preact from 'preact';
 
-import DropDetector from './DropDetector';
+import FileSet from './FileSet';
+import Setup from './Setup';
 
-export default class LabellingTool extends preact.Component {
+type State = {
+  fileSet?: FileSet,
+};
+
+export default class LabellingTool extends preact.Component<{}, State> {
   render() {
-    this;
+    if (!this.state.fileSet) {
+      return <Setup onFileSet={(fileSet) => this.setState({ fileSet })}/>;
+    }
 
-    return <>
-      Labelling Tool
-
-      <div style={{ position: 'relative', width: '100px', height: '100px' }}>
-        <DropDetector onDrop={(f) => console.log('drop detected', f)}/>
-        Test
-      </div>
-    </>;
+    return <>Ready</>;
   }
 }
