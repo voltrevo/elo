@@ -16,7 +16,7 @@
 
   "web_accessible_resources": [
     "pageContentScript.bundle.js",
-    "css/extension.css",
+    "css/*",
     "assets/icons/icon128.png"
   ],
 

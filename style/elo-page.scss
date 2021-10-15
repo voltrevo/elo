@@ -1,0 +1,25 @@
+.elo-page {
+  font-size: 2em;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+
+  h1 {
+    text-align: center;
+  }
+
+  .highlight-stat-container {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+
+    .highlight-stat {
+      display: flex;
+      flex-direction: column;
+
+      .value {
+        font-size: 3em;
+      }
+    }
+  }
+}

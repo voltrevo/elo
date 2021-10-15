@@ -44,6 +44,8 @@ const config = {
           'static/extension',
           { from: 'build/css/extension.css', to: 'css/extension.css' },
           { from: 'build/css/extension.css.map', to: 'css/extension.css.map' },
+          { from: 'build/css/elo-page.css', to: 'css/elo-page.css' },
+          { from: 'build/css/elo-page.css.map', to: 'css/elo-page.css.map' },
         ],
       }),
       new webpack.DefinePlugin({
