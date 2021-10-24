@@ -2,14 +2,30 @@ import * as preact from 'preact';
 
 import nil from '../../helpers/nil';
 import TaskQueue from '../../helpers/TaskQueue';
+import audioContext from './audioContext';
+
+type Props = {
+  src: File;
+};
 
 type State = {
+  audioBuffer?: AudioBuffer;
   size?: { width: number, height: number };
 };
 
-export default class WaveForm extends preact.Component<{}, State> {
+export default class WaveForm extends preact.Component<Props, State> {
   container?: HTMLDivElement;
   cleanupTasks = new TaskQueue();
+
+  constructor(props: Props) {
+    super(props);
+  }
+
+  async componentWillMount() {
+    this.setState({
+      audioBuffer: await audioContext.decodeAudioData(await this.props.src.arrayBuffer()),
+    });
+  }
 
   componentWillUnmount() {
     this.cleanupTasks.run();
@@ -58,6 +74,19 @@ export default class WaveForm extends preact.Component<{}, State> {
       }}
     >
       {szStr}
+      {renderAudioBufferStr(this.state.audioBuffer)}
     </div>;
   }
+}
+
+function renderAudioBufferStr(buf: AudioBuffer | nil) {
+  if (buf === nil) {
+    return 'loading';
+  }
+
+  return JSON.stringify({
+    length: buf.length,
+    sampleRate: buf.sampleRate,
+    numberOfChannels: buf.numberOfChannels,
+  });
 }

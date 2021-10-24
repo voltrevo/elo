@@ -1,8 +1,7 @@
 import * as preact from 'preact';
 
-// import LabellingTool from './LabellingTool';
-import WaveForm from './WaveForm';
+import LabellingTool from './LabellingTool';
 
 window.addEventListener('load', () => {
-  preact.render(<WaveForm/>, document.body);
+  preact.render(<LabellingTool/>, document.body);
 });
