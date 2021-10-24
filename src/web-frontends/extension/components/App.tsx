@@ -2,7 +2,7 @@ import * as preact from 'preact';
 
 import never from '../../../helpers/never';
 import Callbacks from '../Callbacks';
-import TaskQueue from '../helpers/TaskQueue';
+import TaskQueue from '../../../helpers/TaskQueue';
 
 type Props = {
   callbacks: Callbacks,
