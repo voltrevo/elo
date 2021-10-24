@@ -16,7 +16,9 @@ export default class LabellingTool extends preact.Component<{}, State> {
 
     return <>
       Ready
-      <WaveForm src={this.state.fileSet.analysisAudioFile}/>
+      <div style={{ height: '100px' }}>
+        <WaveForm src={this.state.fileSet.analysisAudioFile}/>
+      </div>
     </>;
   }
 }
