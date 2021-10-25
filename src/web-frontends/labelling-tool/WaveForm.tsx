@@ -2,14 +2,14 @@ import * as preact from 'preact';
 
 import nil from '../../helpers/nil';
 import TaskQueue from '../../helpers/TaskQueue';
-import audioContext from './audioContext';
 
 type Props = {
-  src: File;
+  data: Float32Array,
+  start: number;
+  end: number;
 };
 
 type State = {
-  audioBuffer?: AudioBuffer;
   size?: { width: number, height: number };
 };
 
@@ -22,18 +22,6 @@ export default class WaveForm extends preact.Component<Props, State> {
   canvasRenderPending = false;
   lastRenderTime = 0;
   renderTimer?: number;
-
-  constructor(props: Props) {
-    super(props);
-  }
-
-  async componentWillMount() {
-    const audioBuffer = await audioContext.decodeAudioData(await this.props.src.arrayBuffer());
-
-    this.setState({
-      audioBuffer,
-    });
-  }
 
   componentWillUnmount() {
     this.cleanupTasks.run();
@@ -105,7 +93,6 @@ export default class WaveForm extends preact.Component<Props, State> {
     if (!(
       this.state.size &&
       this.canvas &&
-      this.state.audioBuffer &&
       this.canvasRenderPending
     )) {
       return;
@@ -130,7 +117,7 @@ export default class WaveForm extends preact.Component<Props, State> {
 
     const ctx = this.canvas?.getContext('2d');
 
-    if (!this.canvas || !ctx || !size || !this.state.audioBuffer) {
+    if (!this.canvas || !ctx || !size) {
       return;
     }
 
@@ -147,11 +134,11 @@ export default class WaveForm extends preact.Component<Props, State> {
     ctx.clearRect(0, 0, width, height);
     ctx.beginPath();
 
-    const data = this.state.audioBuffer.getChannelData(0);
-
     function yPos(sample: number) {
       return height * ((-sample + 1) / 2);
     }
+
+    const data = this.props.data;
 
     ctx.moveTo(0, yPos(data[0]));
 

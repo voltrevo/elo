@@ -4,6 +4,7 @@ import FileSet from './FileSet';
 import nil from '../../helpers/nil';
 import WaveForm from './WaveForm';
 import WaveOverlay from './WaveOverlay';
+import audioContext from './audioContext';
 
 type Props = {
   fileSet: FileSet;
@@ -11,6 +12,8 @@ type Props = {
 
 type State = {
   currentTime: number;
+  audioData?: Float32Array;
+  totalTime?: number;
 };
 
 export default class WavePlayer extends preact.Component<Props, State> {
@@ -27,7 +30,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
     };
   }
 
-  componentWillMount() {
+  async componentWillMount() {
     this.analysisAudioUrl = URL.createObjectURL(this.props.fileSet.analysisAudioFile);
     const analysisAudioElement = new Audio(this.analysisAudioUrl);
     this.analysisAudioElement = analysisAudioElement;
@@ -42,6 +45,15 @@ export default class WavePlayer extends preact.Component<Props, State> {
       this.otherAudioUrl = URL.createObjectURL(this.props.fileSet.otherAudioFile);
       this.otherAudioElement = new Audio(this.otherAudioUrl);
     }
+
+    const audioBuffer = await audioContext.decodeAudioData(
+      await this.props.fileSet.analysisAudioFile.arrayBuffer(),
+    );
+
+    this.setState({
+      totalTime: audioBuffer.duration,
+      audioData: audioBuffer.getChannelData(0), // TODO: Mix channels
+    });
   }
 
   componentWillUnmount() {
@@ -71,7 +83,17 @@ export default class WavePlayer extends preact.Component<Props, State> {
     return <div class="wave-player">
       <div style={{ height: '300px', position: 'relative' }}>
         <div style={{ height: '33%' }}>
-          <WaveForm src={this.props.fileSet.analysisAudioFile}/>
+          {(() => {
+            if (!this.state.audioData) {
+              return <>Loading</>;
+            }
+
+            return <WaveForm
+              data={this.state.audioData}
+              start={0}
+              end={this.state.audioData.length}
+            />;
+          })()}
         </div>
         <div style={{
           left: 0,
