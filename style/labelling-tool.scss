@@ -15,3 +15,13 @@ a {
   cursor: pointer;
   color: blue;
 }
+
+.wave-player {
+  .wave-cursor {
+    display: inline-block;
+    position: absolute;
+    width: 1px;
+    height: 100%;
+    background-color: #ffa500;
+  }
+}

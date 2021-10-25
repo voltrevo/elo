@@ -68,7 +68,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
   };
 
   render() {
-    return <div>
+    return <div class="wave-player">
       <div style={{ height: '300px', position: 'relative' }}>
         <div style={{ height: '33%' }}>
           <WaveForm src={this.props.fileSet.analysisAudioFile}/>
