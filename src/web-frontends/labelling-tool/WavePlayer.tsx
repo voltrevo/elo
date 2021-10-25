@@ -8,6 +8,7 @@ import audioContext from './audioContext';
 import TaskQueue from '../../helpers/TaskQueue';
 import clamp from '../../helpers/clamp';
 import renderTimeFromSeconds from './helpers/renderTimeFromSeconds';
+import Label from './Label';
 
 type Props = {
   fileSet: FileSet;
@@ -21,7 +22,7 @@ type State = {
   start: number;
   end?: number;
   hoverTime?: number;
-  labels: number[];
+  labels: Record<string, Label>;
 };
 
 export default class WavePlayer extends preact.Component<Props, State> {
@@ -41,7 +42,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
     this.state = {
       currentTime: 0,
       start: 0,
-      labels: [],
+      labels: {},
     };
   }
 
@@ -88,12 +89,12 @@ export default class WavePlayer extends preact.Component<Props, State> {
       await this.props.fileSet.analysisAudioFile.arrayBuffer(),
     );
 
-    let labels: number[] = [];
+    let labelTimes: number[] = [];
 
     if (this.props.fileSet.labelsFile) {
       const labelStr = new TextDecoder().decode(await this.props.fileSet.labelsFile.arrayBuffer());
       const labelStrs = labelStr.split('\n').filter(line => line.trim() !== '');
-      labels = labelStrs.map(Number);
+      labelTimes = labelStrs.map(Number);
     }
 
     this.setState({
@@ -101,7 +102,10 @@ export default class WavePlayer extends preact.Component<Props, State> {
       end: audioBuffer.length,
       audioBuffer,
       audioData: audioBuffer.getChannelData(0), // TODO: Mix channels
-      labels,
+      labels: Object.fromEntries(labelTimes.map((t, i) => [`r${i}`, {
+        type: 'reference',
+        time: t,
+      }])),
     });
   }
 
@@ -141,28 +145,21 @@ export default class WavePlayer extends preact.Component<Props, State> {
     this.rafId = requestAnimationFrame(() => this.animateCurrentTime(opt));
   }
 
-  calculateMouseTime = (evt: MouseEvent): number | nil => {
+  calculateClientXTime = (clientX: number): number | nil => {
     if (this.timelineElement === nil || this.state.end === nil || this.state.audioBuffer === nil) {
       return nil;
     }
 
     const rect = this.timelineElement.getBoundingClientRect();
 
-    if (!(
-      (rect.left <= evt.clientX && evt.clientX <= rect.right) &&
-      (rect.top <= evt.clientY && evt.clientY <= rect.bottom)
-    )) {
-      return nil;
-    }
-
-    const windowProgress = (evt.clientX - rect.x) / rect.width;
+    const windowProgress = (clientX - rect.x) / rect.width;
     const samplePos = this.state.start + windowProgress * (this.state.end - this.state.start);
 
     return samplePos / this.state.audioBuffer.length * this.state.audioBuffer.duration;
   }
 
   handleTimelineClick = (evt: MouseEvent) => {
-    const newTime = this.calculateMouseTime(evt);
+    const newTime = this.calculateClientXTime(evt.clientX);
 
     if (newTime === nil) {
       return;
@@ -178,9 +175,22 @@ export default class WavePlayer extends preact.Component<Props, State> {
   };
 
   handleMouseMove = (evt: MouseEvent) => {
-    this.setState({
-      hoverTime: this.calculateMouseTime(evt),
-    });
+    const rect = this.timelineElement?.getBoundingClientRect();
+
+    if (!rect) {
+      return;
+    }
+
+    if (!(
+      (rect.left <= evt.clientX && evt.clientX <= rect.right) &&
+      (rect.top <= evt.clientY && evt.clientY <= rect.bottom)
+    )) {
+      this.setState({ hoverTime: nil });
+    } else {
+      this.setState({
+        hoverTime: this.calculateClientXTime(evt.clientX),
+      });
+    }
   };
 
   zoom(factor: number) {
@@ -201,6 +211,21 @@ export default class WavePlayer extends preact.Component<Props, State> {
 
     this.setState(newProps);
   }
+
+  moveLabel = (labelKey: string, clientX: number) => {
+    const time = this.calculateClientXTime(clientX);
+
+    if (time === nil) {
+      return;
+    }
+
+    this.setState({
+      labels: {
+        ...this.state.labels,
+        [labelKey]: { ...this.state.labels[labelKey], time },
+      },
+    });
+  };
 
   render() {
     return <div class="wave-player">
@@ -245,6 +270,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
               hoverTime={this.state.hoverTime}
               totalTime={this.state.totalTime}
               labels={this.state.labels}
+              moveLabel={this.moveLabel}
             />;
           })()}
         </div>

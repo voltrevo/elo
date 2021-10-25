@@ -27,6 +27,7 @@ a {
     width: 1px;
     height: 100%;
     background-color: #ffa500;
+    user-select: none;
 
     &.faded {
       opacity: 0.4;
@@ -38,6 +39,7 @@ a {
     position: absolute;
     bottom: 0;
     padding: 5px;
+    user-select: none;
   }
 
   .label {
@@ -50,5 +52,6 @@ a {
     top: 150px;
     background-color: rgb(0, 193, 142);
     border-radius: 100%;
+    user-select: none;
   }
 }

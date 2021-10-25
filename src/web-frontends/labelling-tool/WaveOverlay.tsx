@@ -2,6 +2,8 @@ import * as preact from 'preact';
 
 import nil from '../../helpers/nil';
 import renderTimeFromSeconds from './helpers/renderTimeFromSeconds';
+import Label from './Label';
+import LabelComponent from './LabelComponent';
 
 type Props = {
   startTime: number;
@@ -9,7 +11,8 @@ type Props = {
   endTime: number;
   hoverTime?: number;
   totalTime?: number;
-  labels: number[];
+  labels: Record<string, Label>;
+  moveLabel: (labelKey: string, clientX: number) => void;
 };
 
 export default class WaveOverlay extends preact.Component<Props> {
@@ -58,10 +61,13 @@ export default class WaveOverlay extends preact.Component<Props> {
           >{renderTimeFromSeconds(hoverTime)}</div>
         </>;
       })()}
-      {(() => this.props.labels.map(labelTime => <div
-        class="label"
-        style={{ left: `${100 * progressOf(labelTime)}%` }}
-      />))()}
+      {(() => Object.entries(this.props.labels).map(([labelKey, label]) => (
+        <LabelComponent
+          label={label}
+          left={`${100 * progressOf(label.time)}%`}
+          move={clientX => this.props.moveLabel(labelKey, clientX)}
+        />
+      )))()}
     </div>;
   }
 }
