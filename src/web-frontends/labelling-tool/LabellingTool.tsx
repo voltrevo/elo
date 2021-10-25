@@ -2,7 +2,7 @@ import * as preact from 'preact';
 
 import FileSet from './FileSet';
 import Setup from './Setup';
-import WaveForm from './WaveForm';
+import WavePlayer from './WavePlayer';
 
 type State = {
   fileSet?: FileSet,
@@ -14,11 +14,6 @@ export default class LabellingTool extends preact.Component<{}, State> {
       return <Setup onFileSet={(fileSet) => this.setState({ fileSet })}/>;
     }
 
-    return <>
-      Ready
-      <div style={{ height: '100px' }}>
-        <WaveForm src={this.state.fileSet.analysisAudioFile}/>
-      </div>
-    </>;
+    return <WavePlayer fileSet={this.state.fileSet}/>;
   }
 }
