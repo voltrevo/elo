@@ -248,6 +248,18 @@ export default class WavePlayer extends preact.Component<Props, State> {
     });
   };
 
+  addLabel = () => {
+    this.setState({
+      labels: {
+        ...this.state.labels,
+        [`r${Math.random()}`]: {
+          type: 'reference',
+          time: this.state.currentTime,
+        },
+      },
+    });
+  };
+
   downloadLabels = () => {
     const str = Object.values(this.state.labels)
       .filter(label => label.type === 'reference')
@@ -325,6 +337,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
         <button onClick={() => this.zoom(1 / 1.3)}>
           Zoom Out
         </button>
+        <button onClick={this.addLabel}>Add label</button>
       </div>
       <div>
         <FileRequest name="analysis audio" onDrop={this.setAnalysisAudio}/>
