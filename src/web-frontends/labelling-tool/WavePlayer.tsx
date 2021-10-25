@@ -29,6 +29,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
   otherAudioElement?: HTMLAudioElement;
   analysisAudioUrl?: string;
   otherAudioUrl?: string;
+  rafId?: number;
 
   timelineElement?: HTMLDivElement;
 
@@ -53,6 +54,23 @@ export default class WavePlayer extends preact.Component<Props, State> {
       this.setState({
         currentTime: analysisAudioElement.currentTime,
       });
+
+      if (this.rafId !== nil) {
+        cancelAnimationFrame(this.rafId);
+      }
+
+      if (!analysisAudioElement.paused) {
+        requestAnimationFrame(() => this.animateCurrentTime({
+          referenceTime: Date.now(),
+          referenceCurrentTime: analysisAudioElement.currentTime,
+        }));
+      }
+    };
+
+    analysisAudioElement.onpause = () => {
+      if (this.rafId !== nil) {
+        cancelAnimationFrame(this.rafId);
+      }
     };
 
     if (this.props.fileSet.otherAudioFile !== null) {
@@ -111,6 +129,17 @@ export default class WavePlayer extends preact.Component<Props, State> {
     this.analysisAudioElement?.pause();
     this.otherAudioElement?.pause();
   };
+
+  animateCurrentTime(opt: {
+    referenceTime: number,
+    referenceCurrentTime: number,
+  }) {
+    this.setState({
+      currentTime: opt.referenceCurrentTime + (Date.now() - opt.referenceTime) / 1000,
+    });
+
+    this.rafId = requestAnimationFrame(() => this.animateCurrentTime(opt));
+  }
 
   calculateMouseTime = (evt: MouseEvent): number | nil => {
     if (this.timelineElement === nil || this.state.end === nil || this.state.audioBuffer === nil) {
