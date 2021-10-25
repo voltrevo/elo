@@ -13,6 +13,7 @@ type State = {
   size?: { width: number, height: number };
 };
 
+const yPosSamples = 50;
 const minRenderDelay = 300;
 
 export default class WaveForm extends preact.Component<Props, State> {
@@ -134,17 +135,38 @@ export default class WaveForm extends preact.Component<Props, State> {
     ctx.clearRect(0, 0, width, height);
     ctx.beginPath();
 
-    function yPos(sample: number) {
-      return height * ((-sample + 1) / 2);
-    }
-
     const { data, start, end } = this.props;
 
-    ctx.moveTo(0, yPos(data[0]));
+    function yPos(a: number, b: number) {
+      let maxY = 0;
+
+      if (b - a <= yPosSamples) {
+        for (let i = a; i < b; i++) {
+          const y = data[i];
+
+          if (Math.abs(y) > Math.abs(maxY)) {
+            maxY = y;
+          }
+        }
+      } else {
+        for (let i = 0; i < 20; i++) {
+          const y = data[Math.round(a + i / 20 * (b - a))];
+
+          if (Math.abs(y) > Math.abs(maxY)) {
+            maxY = y;
+          }
+        }
+      }
+
+      return height * (-maxY + 1) / 2;
+    }
+
+    ctx.moveTo(0, yPos(0, 1));
 
     for (let x = 1; x < width; x++) {
-      const i = Math.round(start + (x / width) * (end - start));
-      ctx.lineTo(x, yPos(data[i]));
+      const a = Math.round(start + ((x - 1) / width) * (end - start));
+      const b = Math.round(start + (x / width) * (end - start));
+      ctx.lineTo(x, yPos(a, b));
     }
 
     ctx.stroke();
