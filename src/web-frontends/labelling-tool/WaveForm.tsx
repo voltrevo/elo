@@ -138,12 +138,12 @@ export default class WaveForm extends preact.Component<Props, State> {
       return height * ((-sample + 1) / 2);
     }
 
-    const data = this.props.data;
+    const { data, start, end } = this.props;
 
     ctx.moveTo(0, yPos(data[0]));
 
     for (let x = 1; x < width; x++) {
-      const i = Math.round((x / width) * data.length);
+      const i = Math.round(start + (x / width) * (end - start));
       ctx.lineTo(x, yPos(data[i]));
     }
 
