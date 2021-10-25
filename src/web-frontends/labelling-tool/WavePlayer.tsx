@@ -6,6 +6,7 @@ import WaveForm from './WaveForm';
 import WaveOverlay from './WaveOverlay';
 import audioContext from './audioContext';
 import TaskQueue from '../../helpers/TaskQueue';
+import clamp from '../../helpers/clamp';
 
 type Props = {
   fileSet: FileSet;
@@ -152,6 +153,25 @@ export default class WavePlayer extends preact.Component<Props, State> {
     });
   };
 
+  zoom(factor: number) {
+    const {
+      start, end, currentTime, totalTime, audioBuffer,
+    } = this.state;
+
+    if (end === nil || totalTime === nil || audioBuffer === nil) {
+      return;
+    }
+
+    const current = currentTime / totalTime * audioBuffer.length;
+
+    const newProps = {
+      start: clamp(0, current + (start - current) / factor, audioBuffer.length),
+      end: clamp(0, current + (end - current) / factor, audioBuffer.length),
+    };
+
+    this.setState(newProps);
+  }
+
   render() {
     return <div class="wave-player">
       <div
@@ -179,12 +199,24 @@ export default class WavePlayer extends preact.Component<Props, State> {
           bottom: 0,
           position: 'absolute',
         }}>
-          <WaveOverlay
-            currentTime={this.state.currentTime}
-            hoverTime={this.state.hoverTime}
-            totalTime={this.state.totalTime}
-            labels={this.state.labels}
-          />
+          {(() => {
+            if (
+              this.state.audioBuffer === nil ||
+              this.state.end === nil ||
+              this.state.totalTime === nil
+            ) {
+              return <>Loading</>;
+            }
+
+            return <WaveOverlay
+              startTime={this.state.totalTime * this.state.start / this.state.audioBuffer.length}
+              currentTime={this.state.currentTime}
+              endTime={this.state.totalTime * this.state.end / this.state.audioBuffer.length}
+              hoverTime={this.state.hoverTime}
+              totalTime={this.state.totalTime}
+              labels={this.state.labels}
+            />;
+          })()}
         </div>
       </div>
       <button onClick={this.play}>
@@ -192,6 +224,12 @@ export default class WavePlayer extends preact.Component<Props, State> {
       </button>
       <button onClick={this.pause}>
         Pause
+      </button>
+      <button onClick={() => this.zoom(1.3)}>
+        Zoom In
+      </button>
+      <button onClick={() => this.zoom(1 / 1.3)}>
+        Zoom Out
       </button>
     </div>;
   }
