@@ -266,6 +266,35 @@ export default class WavePlayer extends preact.Component<Props, State> {
     });
   };
 
+  removeLabel = () => {
+    const newLabels: Record<string, Label> = {};
+    let closestLabelDiff: number | nil = nil;
+    let closestLabelKey: string | nil = nil;
+
+    for (const [labelKey, label] of Object.entries(this.state.labels)) {
+      const labelDiff = Math.abs(label.time - this.state.currentTime);
+
+      if (closestLabelDiff === nil || labelDiff < closestLabelDiff) {
+        closestLabelDiff = labelDiff;
+        closestLabelKey = labelKey;
+      }
+
+      newLabels[labelKey] = label;
+    }
+
+    if (closestLabelDiff === nil || closestLabelDiff > 3) {
+      return; // Ignore if closest label is more than 3 seconds away
+    }
+
+    if (closestLabelKey !== nil) {
+      delete newLabels[closestLabelKey];
+
+      this.setState({
+        labels: newLabels,
+      });
+    }
+  };
+
   downloadLabels = () => {
     const str = Object.values(this.state.labels)
       .filter(label => label.type === 'reference')
@@ -332,27 +361,30 @@ export default class WavePlayer extends preact.Component<Props, State> {
         &nbsp;/&nbsp;
         {renderTimeFromSeconds(this.state.totalTime ?? 0)}
       </div>
-      <div>
+      <div class="tool-row">
         <button onClick={this.play}>
           Play
         </button>
         <button onClick={this.pause}>
           Pause
         </button>
+        &nbsp;
         <button onClick={() => this.zoom(1.3)}>
           Zoom In
         </button>
         <button onClick={() => this.zoom(1 / 1.3)}>
           Zoom Out
         </button>
+        &nbsp;
         <button onClick={this.addLabel}>Add label</button>
+        <button onClick={this.removeLabel}>Remove label</button>
       </div>
-      <div>
+      <div class="tool-row">
         <FileRequest name="analysis audio" onDrop={this.setAnalysisAudio}/>
         <FileRequest name="other audio" onDrop={this.setOtherAudio}/>
         <FileRequest name="labels" onDrop={this.setLabelsFile}/>
       </div>
-      <div>
+      <div class="tool-row">
         <button onClick={this.downloadLabels}>Download labels</button>
       </div>
     </div>;

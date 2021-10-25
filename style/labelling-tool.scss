@@ -69,4 +69,12 @@ a {
       cursor: ew-resize
     }
   }
+
+  .tool-row {
+    margin-top: 5px;
+
+    > *:not(:first-child) {
+      margin-left: 5px;
+    }
+  }
 }
