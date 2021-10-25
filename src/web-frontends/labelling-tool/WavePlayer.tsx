@@ -12,8 +12,11 @@ type Props = {
 
 type State = {
   currentTime: number;
+  audioBuffer?: AudioBuffer;
   audioData?: Float32Array;
   totalTime?: number;
+  start: number;
+  end?: number;
 };
 
 export default class WavePlayer extends preact.Component<Props, State> {
@@ -22,11 +25,14 @@ export default class WavePlayer extends preact.Component<Props, State> {
   analysisAudioUrl?: string;
   otherAudioUrl?: string;
 
+  timelineElement?: HTMLDivElement;
+
   constructor(props: Props) {
     super(props);
 
     this.state = {
       currentTime: 0,
+      start: 0,
     };
   }
 
@@ -52,6 +58,8 @@ export default class WavePlayer extends preact.Component<Props, State> {
 
     this.setState({
       totalTime: audioBuffer.duration,
+      end: audioBuffer.length,
+      audioBuffer,
       audioData: audioBuffer.getChannelData(0), // TODO: Mix channels
     });
   }
@@ -79,19 +87,42 @@ export default class WavePlayer extends preact.Component<Props, State> {
     this.otherAudioElement?.pause();
   };
 
+  handleTimelineClick = (evt: MouseEvent) => {
+    if (this.timelineElement === nil || this.state.end === nil || this.state.audioBuffer === nil) {
+      return;
+    }
+
+    const rect = this.timelineElement.getBoundingClientRect();
+    const windowProgress = (evt.clientX - rect.x) / rect.width;
+    const samplePos = this.state.start + windowProgress * (this.state.end - this.state.start);
+    const newTime = samplePos / this.state.audioBuffer.length * this.state.audioBuffer.duration;
+
+    if (this.analysisAudioElement) {
+      this.analysisAudioElement.currentTime = newTime;
+    }
+
+    if (this.otherAudioElement) {
+      this.otherAudioElement.currentTime = newTime;
+    }
+  };
+
   render() {
     return <div class="wave-player">
-      <div style={{ height: '300px', position: 'relative' }}>
+      <div
+        style={{ height: '300px', position: 'relative' }}
+        onClick={this.handleTimelineClick}
+        ref={r => { this.timelineElement = r ?? nil; }}
+      >
         <div style={{ height: '33%' }}>
           {(() => {
-            if (!this.state.audioData) {
+            if (!this.state.audioData || this.state.end === nil) {
               return <>Loading</>;
             }
 
             return <WaveForm
               data={this.state.audioData}
-              start={0}
-              end={this.state.audioData.length}
+              start={this.state.start}
+              end={this.state.end}
             />;
           })()}
         </div>
