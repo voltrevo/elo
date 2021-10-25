@@ -1,6 +1,5 @@
 import * as preact from 'preact';
 
-import FileSet from './FileSet';
 import nil from '../../helpers/nil';
 import WaveForm from './WaveForm';
 import WaveOverlay from './WaveOverlay';
@@ -9,12 +8,15 @@ import TaskQueue from '../../helpers/TaskQueue';
 import clamp from '../../helpers/clamp';
 import renderTimeFromSeconds from './helpers/renderTimeFromSeconds';
 import Label from './Label';
+import DropDetector from './DropDetector';
 
-type Props = {
-  fileSet: FileSet;
-};
+type Props = {};
 
 type State = {
+  analysisAudioFile?: File,
+  otherAudioFile?: File,
+  labelsFile?: File,
+
   currentTime: number;
   audioBuffer?: AudioBuffer;
   audioData?: Float32Array;
@@ -27,8 +29,8 @@ type State = {
 
 export default class WavePlayer extends preact.Component<Props, State> {
   analysisAudioElement?: HTMLAudioElement;
-  otherAudioElement?: HTMLAudioElement;
   analysisAudioUrl?: string;
+  otherAudioElement?: HTMLAudioElement;
   otherAudioUrl?: string;
   rafId?: number;
 
@@ -36,7 +38,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
 
   cleanupTasks = new TaskQueue();
 
-  constructor(props: Props) {
+  constructor(props: {}) {
     super(props);
 
     this.state = {
@@ -46,9 +48,54 @@ export default class WavePlayer extends preact.Component<Props, State> {
     };
   }
 
+  setAnalysisAudio = async (f: File) => {
+    const audioBuffer = await audioContext.decodeAudioData(await f.arrayBuffer());
+
+    if (this.analysisAudioUrl !== nil) {
+      URL.revokeObjectURL(this.analysisAudioUrl);
+    }
+
+    this.analysisAudioUrl = URL.createObjectURL(f);
+    this.analysisAudioElement!.src = this.analysisAudioUrl;
+
+    this.setState({
+      analysisAudioFile: f,
+      audioBuffer,
+      totalTime: audioBuffer.duration,
+      end: audioBuffer.length,
+      audioData: audioBuffer.getChannelData(0), // TODO: Mix channels
+    });
+  };
+
+  setOtherAudio = async (f: File) => {
+    if (this.otherAudioUrl !== nil) {
+      URL.revokeObjectURL(this.otherAudioUrl);
+    }
+
+    this.otherAudioUrl = URL.createObjectURL(f);
+    this.otherAudioElement!.src = this.otherAudioUrl;
+
+    this.setState({
+      otherAudioFile: f,
+    });
+  };
+
+  setLabelsFile = async (f: File) => {
+    const labelStr = new TextDecoder().decode(await f.arrayBuffer());
+    const labelStrs = labelStr.split('\n').filter(line => line.trim() !== '');
+    const labelTimes = labelStrs.map(Number);
+
+    this.setState({
+      labelsFile: f,
+      labels: Object.fromEntries(labelTimes.map((t, i) => [`r${i}`, {
+        type: 'reference',
+        time: t,
+      }])),
+    });
+  };
+
   async componentWillMount() {
-    this.analysisAudioUrl = URL.createObjectURL(this.props.fileSet.analysisAudioFile);
-    const analysisAudioElement = new Audio(this.analysisAudioUrl);
+    const analysisAudioElement = new Audio();
     this.analysisAudioElement = analysisAudioElement;
 
     analysisAudioElement.ontimeupdate = () => {
@@ -74,46 +121,19 @@ export default class WavePlayer extends preact.Component<Props, State> {
       }
     };
 
-    if (this.props.fileSet.otherAudioFile !== null) {
-      this.otherAudioUrl = URL.createObjectURL(this.props.fileSet.otherAudioFile);
-      this.otherAudioElement = new Audio(this.otherAudioUrl);
-    }
+    this.otherAudioElement = new Audio();
 
     window.addEventListener('mousemove', this.handleMouseMove);
 
     this.cleanupTasks.push(() => {
       window.removeEventListener('mousemove', this.handleMouseMove);
     });
-
-    const audioBuffer = await audioContext.decodeAudioData(
-      await this.props.fileSet.analysisAudioFile.arrayBuffer(),
-    );
-
-    let labelTimes: number[] = [];
-
-    if (this.props.fileSet.labelsFile) {
-      const labelStr = new TextDecoder().decode(await this.props.fileSet.labelsFile.arrayBuffer());
-      const labelStrs = labelStr.split('\n').filter(line => line.trim() !== '');
-      labelTimes = labelStrs.map(Number);
-    }
-
-    this.setState({
-      totalTime: audioBuffer.duration,
-      end: audioBuffer.length,
-      audioBuffer,
-      audioData: audioBuffer.getChannelData(0), // TODO: Mix channels
-      labels: Object.fromEntries(labelTimes.map((t, i) => [`r${i}`, {
-        type: 'reference',
-        time: t,
-      }])),
-    });
   }
 
   componentWillUnmount() {
-    this.analysisAudioElement?.pause();
-    this.otherAudioElement?.pause();
+    this.pause();
 
-    if (this.analysisAudioUrl) {
+    if (this.analysisAudioUrl !== nil) {
       URL.revokeObjectURL(this.analysisAudioUrl);
     }
 
@@ -294,6 +314,18 @@ export default class WavePlayer extends preact.Component<Props, State> {
           Zoom Out
         </button>
       </div>
+      <div>
+          <FileRequest name="analysis audio" onDrop={this.setAnalysisAudio}/>
+          <FileRequest name="other audio" onDrop={this.setOtherAudio}/>
+          <FileRequest name="labels" onDrop={this.setLabelsFile}/>
+      </div>
     </div>;
   }
+}
+
+function FileRequest(props: { name: string, onDrop: (f: File) => void }) {
+  return <div class="file-request">
+    <DropDetector onDrop={props.onDrop}/>
+    Drop {props.name} file here
+  </div>;
 }
