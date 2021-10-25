@@ -19,6 +19,7 @@ type State = {
   start: number;
   end?: number;
   hoverTime?: number;
+  labels: number[];
 };
 
 export default class WavePlayer extends preact.Component<Props, State> {
@@ -37,6 +38,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
     this.state = {
       currentTime: 0,
       start: 0,
+      labels: [],
     };
   }
 
@@ -66,11 +68,20 @@ export default class WavePlayer extends preact.Component<Props, State> {
       await this.props.fileSet.analysisAudioFile.arrayBuffer(),
     );
 
+    let labels: number[] = [];
+
+    if (this.props.fileSet.labelsFile) {
+      const labelStr = new TextDecoder().decode(await this.props.fileSet.labelsFile.arrayBuffer());
+      const labelStrs = labelStr.split('\n').filter(line => line.trim() !== '');
+      labels = labelStrs.map(Number);
+    }
+
     this.setState({
       totalTime: audioBuffer.duration,
       end: audioBuffer.length,
       audioBuffer,
       audioData: audioBuffer.getChannelData(0), // TODO: Mix channels
+      labels,
     });
   }
 
@@ -172,6 +183,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
             currentTime={this.state.currentTime}
             hoverTime={this.state.hoverTime}
             totalTime={this.state.totalTime}
+            labels={this.state.labels}
           />
         </div>
       </div>

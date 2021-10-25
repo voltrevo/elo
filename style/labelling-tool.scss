@@ -28,4 +28,16 @@ a {
       opacity: 0.4;
     }
   }
+
+  .label {
+    display: inline-block;
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    margin-left: -2.5px;
+    margin-top: -2.5px;
+    top: 150px;
+    background-color: green;
+    border-radius: 100%;
+  }
 }

@@ -7,6 +7,7 @@ type Props = {
   currentTime: number;
   hoverTime?: number;
   totalTime?: number;
+  labels: number[];
 };
 
 export default class WaveOverlay extends preact.Component<Props> {
@@ -32,6 +33,10 @@ export default class WaveOverlay extends preact.Component<Props> {
           style={{ left: `${100 * (hoverTime / totalTime)}%` }}
         />;
       })()}
+      {(() => this.props.labels.map(labelTime => <div
+        class="label"
+        style={{ left: `${100 * (labelTime / totalTime)}%` }}
+      />))()}
     </div>;
   }
 }
