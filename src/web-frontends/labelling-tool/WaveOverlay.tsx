@@ -5,12 +5,13 @@ import nil from '../../helpers/nil';
 
 type Props = {
   currentTime: number;
+  hoverTime?: number;
   totalTime?: number;
 };
 
 export default class WaveOverlay extends preact.Component<Props> {
   render() {
-    const { currentTime, totalTime } = this.props;
+    const { currentTime, hoverTime, totalTime } = this.props;
 
     if (totalTime === nil) {
       return <>Loading</>;
@@ -21,6 +22,16 @@ export default class WaveOverlay extends preact.Component<Props> {
         class="wave-cursor"
         style={{ left: `${100 * (currentTime / totalTime)}%` }}
       />
+      {(() => {
+        if (hoverTime === nil) {
+          return <></>;
+        }
+
+        return <div
+          class="wave-cursor faded"
+          style={{ left: `${100 * (hoverTime / totalTime)}%` }}
+        />;
+      })()}
     </div>;
   }
 }

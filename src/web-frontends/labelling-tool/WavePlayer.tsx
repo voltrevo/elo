@@ -5,6 +5,7 @@ import nil from '../../helpers/nil';
 import WaveForm from './WaveForm';
 import WaveOverlay from './WaveOverlay';
 import audioContext from './audioContext';
+import TaskQueue from '../../helpers/TaskQueue';
 
 type Props = {
   fileSet: FileSet;
@@ -17,6 +18,7 @@ type State = {
   totalTime?: number;
   start: number;
   end?: number;
+  hoverTime?: number;
 };
 
 export default class WavePlayer extends preact.Component<Props, State> {
@@ -26,6 +28,8 @@ export default class WavePlayer extends preact.Component<Props, State> {
   otherAudioUrl?: string;
 
   timelineElement?: HTMLDivElement;
+
+  cleanupTasks = new TaskQueue();
 
   constructor(props: Props) {
     super(props);
@@ -52,6 +56,12 @@ export default class WavePlayer extends preact.Component<Props, State> {
       this.otherAudioElement = new Audio(this.otherAudioUrl);
     }
 
+    window.addEventListener('mousemove', this.handleMouseMove);
+
+    this.cleanupTasks.push(() => {
+      window.removeEventListener('mousemove', this.handleMouseMove);
+    });
+
     const audioBuffer = await audioContext.decodeAudioData(
       await this.props.fileSet.analysisAudioFile.arrayBuffer(),
     );
@@ -75,6 +85,8 @@ export default class WavePlayer extends preact.Component<Props, State> {
     if (this.otherAudioUrl !== nil) {
       URL.revokeObjectURL(this.otherAudioUrl);
     }
+
+    this.cleanupTasks.run(); // TODO: Use cleanup tasks only?
   }
 
   play = () => {
@@ -87,15 +99,32 @@ export default class WavePlayer extends preact.Component<Props, State> {
     this.otherAudioElement?.pause();
   };
 
-  handleTimelineClick = (evt: MouseEvent) => {
+  calculateMouseTime = (evt: MouseEvent): number | nil => {
     if (this.timelineElement === nil || this.state.end === nil || this.state.audioBuffer === nil) {
-      return;
+      return nil;
     }
 
     const rect = this.timelineElement.getBoundingClientRect();
+
+    if (!(
+      (rect.left <= evt.clientX && evt.clientX <= rect.right) &&
+      (rect.top <= evt.clientY && evt.clientY <= rect.bottom)
+    )) {
+      return nil;
+    }
+
     const windowProgress = (evt.clientX - rect.x) / rect.width;
     const samplePos = this.state.start + windowProgress * (this.state.end - this.state.start);
-    const newTime = samplePos / this.state.audioBuffer.length * this.state.audioBuffer.duration;
+
+    return samplePos / this.state.audioBuffer.length * this.state.audioBuffer.duration;
+  }
+
+  handleTimelineClick = (evt: MouseEvent) => {
+    const newTime = this.calculateMouseTime(evt);
+
+    if (newTime === nil) {
+      return;
+    }
 
     if (this.analysisAudioElement) {
       this.analysisAudioElement.currentTime = newTime;
@@ -104,6 +133,12 @@ export default class WavePlayer extends preact.Component<Props, State> {
     if (this.otherAudioElement) {
       this.otherAudioElement.currentTime = newTime;
     }
+  };
+
+  handleMouseMove = (evt: MouseEvent) => {
+    this.setState({
+      hoverTime: this.calculateMouseTime(evt),
+    });
   };
 
   render() {
@@ -133,7 +168,11 @@ export default class WavePlayer extends preact.Component<Props, State> {
           bottom: 0,
           position: 'absolute',
         }}>
-          <WaveOverlay currentTime={this.state.currentTime} totalTime={this.state.totalTime}/>
+          <WaveOverlay
+            currentTime={this.state.currentTime}
+            hoverTime={this.state.hoverTime}
+            totalTime={this.state.totalTime}
+          />
         </div>
       </div>
       <button onClick={this.play}>
