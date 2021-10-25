@@ -8,6 +8,8 @@ type Props = {
   label: Label; // TODO: Unused
   left: string;
   move: (clientX: number) => void;
+  onDragStart: () => void;
+  onDragEnd: () => void;
 };
 
 export default class LabelComponent extends preact.Component<Props> {
@@ -39,6 +41,8 @@ export default class LabelComponent extends preact.Component<Props> {
       return;
     }
 
+    this.props.onDragStart();
+
     const self = this;
 
     function onMouseMove(moveEvt: MouseEvent) {
@@ -50,6 +54,7 @@ export default class LabelComponent extends preact.Component<Props> {
     function onMouseUp() {
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
+      setTimeout(self.props.onDragEnd);
     }
 
     window.addEventListener('mousemove', onMouseMove);

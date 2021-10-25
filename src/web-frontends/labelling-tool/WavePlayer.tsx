@@ -37,6 +37,8 @@ export default class WavePlayer extends preact.Component<Props, State> {
 
   timelineElement?: HTMLDivElement;
 
+  blockInteractionsCounter = 0;
+
   cleanupTasks = new TaskQueue();
 
   constructor(props: {}) {
@@ -180,6 +182,10 @@ export default class WavePlayer extends preact.Component<Props, State> {
   }
 
   handleTimelineClick = (evt: MouseEvent) => {
+    if (this.blockInteractionsCounter > 0) {
+      return;
+    }
+
     const newTime = this.calculateClientXTime(evt.clientX);
 
     if (newTime === nil) {
@@ -315,6 +321,8 @@ export default class WavePlayer extends preact.Component<Props, State> {
               totalTime={this.state.totalTime}
               labels={this.state.labels}
               moveLabel={this.moveLabel}
+              blockParentInteractions={() => this.blockInteractionsCounter++}
+              unblockParentInteractions={() => this.blockInteractionsCounter--}
             />;
           })()}
         </div>

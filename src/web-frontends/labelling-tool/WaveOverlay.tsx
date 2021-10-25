@@ -13,6 +13,8 @@ type Props = {
   totalTime?: number;
   labels: Record<string, Label>;
   moveLabel: (labelKey: string, clientX: number) => void;
+  blockParentInteractions: () => void;
+  unblockParentInteractions: () => void;
 };
 
 export default class WaveOverlay extends preact.Component<Props> {
@@ -66,6 +68,8 @@ export default class WaveOverlay extends preact.Component<Props> {
           label={label}
           left={`${100 * progressOf(label.time)}%`}
           move={clientX => this.props.moveLabel(labelKey, clientX)}
+          onDragStart={this.props.blockParentInteractions}
+          onDragEnd={this.props.unblockParentInteractions}
         />
       )))()}
     </div>;
