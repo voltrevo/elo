@@ -45,13 +45,28 @@ a {
   .label {
     display: inline-block;
     position: absolute;
-    width: 5px;
-    height: 5px;
-    margin-left: -2.5px;
-    margin-top: -2.5px;
+    width: 25px;
+    height: 25px;
+    margin-left: -12.5px;
+    margin-top: -12.5px;
     top: 150px;
-    background-color: rgb(0, 193, 142);
+    border: 1px solid transparent;
     border-radius: 100%;
     user-select: none;
+
+    .circle {
+      width: 5px;
+      height: 5px;
+      border-radius: 100%;
+      background-color: rgb(0, 193, 142);
+      display: inline-block;
+      margin-left: 10px;
+      margin-top: 10px;
+    }
+
+    &:hover {
+      border: 1px solid black;
+      cursor: ew-resize
+    }
   }
 }

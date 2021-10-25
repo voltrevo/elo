@@ -39,16 +39,13 @@ export default class LabelComponent extends preact.Component<Props> {
       return;
     }
 
-    const rect = this.ref.getBoundingClientRect();
-    const refX = rect.left + 0.5 * rect.width;
-
-    const offsetX = refX - evt.clientX;
-
     const self = this;
 
     function onMouseMove(moveEvt: MouseEvent) {
-      self.props.move(moveEvt.clientX + offsetX);
+      self.props.move(moveEvt.clientX);
     }
+
+    onMouseMove(evt);
 
     function onMouseUp() {
       window.removeEventListener('mousemove', onMouseMove);
@@ -64,6 +61,8 @@ export default class LabelComponent extends preact.Component<Props> {
       class="label"
       ref={this.setRef}
       style={{ left: this.props.left }}
-    />;
+    >
+      <div class="circle"/>
+    </div>;
   }
 }
