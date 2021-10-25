@@ -1,7 +1,7 @@
 import * as preact from 'preact';
-import nil from '../../helpers/nil';
 
-// import nil from '../../helpers/nil';
+import nil from '../../helpers/nil';
+import renderTimeFromSeconds from './helpers/renderTimeFromSeconds';
 
 type Props = {
   startTime: number;
@@ -42,10 +42,21 @@ export default class WaveOverlay extends preact.Component<Props> {
           return <></>;
         }
 
-        return <div
-          class="wave-cursor faded"
-          style={{ left: `${100 * progressOf(hoverTime)}%` }}
-        />;
+        const textStyle = (progress < 0.8
+          ? { left: `${100 * progressOf(hoverTime)}%` }
+          : { right: `${100 * (1 - progressOf(hoverTime))}%` }
+        );
+
+        return <>
+          <div
+            class="wave-cursor faded"
+            style={{ left: `${100 * progressOf(hoverTime)}%` }}
+          />
+          <div
+            class="wave-cursor-time"
+            style={textStyle}
+          >{renderTimeFromSeconds(hoverTime)}</div>
+        </>;
       })()}
       {(() => this.props.labels.map(labelTime => <div
         class="label"

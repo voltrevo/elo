@@ -7,6 +7,7 @@ import WaveOverlay from './WaveOverlay';
 import audioContext from './audioContext';
 import TaskQueue from '../../helpers/TaskQueue';
 import clamp from '../../helpers/clamp';
+import renderTimeFromSeconds from './helpers/renderTimeFromSeconds';
 
 type Props = {
   fileSet: FileSet;
@@ -219,18 +220,25 @@ export default class WavePlayer extends preact.Component<Props, State> {
           })()}
         </div>
       </div>
-      <button onClick={this.play}>
-        Play
-      </button>
-      <button onClick={this.pause}>
-        Pause
-      </button>
-      <button onClick={() => this.zoom(1.3)}>
-        Zoom In
-      </button>
-      <button onClick={() => this.zoom(1 / 1.3)}>
-        Zoom Out
-      </button>
+      <div>
+        {renderTimeFromSeconds(this.state.currentTime)}
+        &nbsp;/&nbsp;
+        {renderTimeFromSeconds(this.state.totalTime ?? 0)}
+      </div>
+      <div>
+        <button onClick={this.play}>
+          Play
+        </button>
+        <button onClick={this.pause}>
+          Pause
+        </button>
+        <button onClick={() => this.zoom(1.3)}>
+          Zoom In
+        </button>
+        <button onClick={() => this.zoom(1 / 1.3)}>
+          Zoom Out
+        </button>
+      </div>
     </div>;
   }
 }
