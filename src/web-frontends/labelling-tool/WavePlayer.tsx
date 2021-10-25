@@ -9,6 +9,7 @@ import clamp from '../../helpers/clamp';
 import renderTimeFromSeconds from './helpers/renderTimeFromSeconds';
 import Label from './Label';
 import DropDetector from './DropDetector';
+import { download } from '../helpers/download';
 
 type Props = {};
 
@@ -247,6 +248,17 @@ export default class WavePlayer extends preact.Component<Props, State> {
     });
   };
 
+  downloadLabels = () => {
+    const str = Object.values(this.state.labels)
+      .filter(label => label.type === 'reference')
+      .map(label => `${label.time}`)
+      .join('\n');
+
+    const url = URL.createObjectURL(new Blob([str]));
+    download('labels.txt', url);
+    URL.revokeObjectURL(url);
+  };
+
   render() {
     return <div class="wave-player">
       <div
@@ -315,9 +327,12 @@ export default class WavePlayer extends preact.Component<Props, State> {
         </button>
       </div>
       <div>
-          <FileRequest name="analysis audio" onDrop={this.setAnalysisAudio}/>
-          <FileRequest name="other audio" onDrop={this.setOtherAudio}/>
-          <FileRequest name="labels" onDrop={this.setLabelsFile}/>
+        <FileRequest name="analysis audio" onDrop={this.setAnalysisAudio}/>
+        <FileRequest name="other audio" onDrop={this.setOtherAudio}/>
+        <FileRequest name="labels" onDrop={this.setLabelsFile}/>
+      </div>
+      <div>
+        <button onClick={this.downloadLabels}>Download labels</button>
       </div>
     </div>;
   }

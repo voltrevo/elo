@@ -1,6 +1,7 @@
 import * as preact from 'preact';
 
 import type { Analysis, AnalysisToken } from '../../analyze';
+import { download } from '../helpers/download';
 import { Settings } from './App';
 import audio from './audio';
 
@@ -426,17 +427,4 @@ function getBoundingPageRect(element: HTMLElement): Rect {
     top: window.scrollY + clientRect.top,
     bottom: window.scrollY + clientRect.bottom,
   };
-}
-
-function download(filename: string, url: string) {
-  const element = document.createElement('a');
-  element.setAttribute('href', url);
-  element.setAttribute('download', filename);
-
-  element.style.display = 'none';
-  document.body.appendChild(element);
-
-  element.click();
-
-  document.body.removeChild(element);
 }
