@@ -102,7 +102,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
           bottom: 0,
           position: 'absolute',
         }}>
-          <WaveOverlay currentTime={this.state.currentTime} totalTime={100}/>
+          <WaveOverlay currentTime={this.state.currentTime} totalTime={this.state.totalTime}/>
         </div>
       </div>
       <button onClick={this.play}>
