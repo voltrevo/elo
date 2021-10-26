@@ -20,6 +20,7 @@ type State = {
   labelsFile?: File,
 
   currentTime: number;
+  loadingTime?: number;
   audioBuffer?: AudioBuffer;
   audioData?: Float32Array;
   totalTime?: number;
@@ -326,6 +327,18 @@ export default class WavePlayer extends preact.Component<Props, State> {
             },
           });
         }
+
+        if (fragment.type === 'progress') {
+          this.setState({
+            loadingTime: fragment.value.duration,
+          });
+        }
+
+        if (fragment.type === 'end') {
+          this.setState({
+            loadingTime: nil,
+          });
+        }
       },
     );
   };
@@ -382,6 +395,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
               currentTime={this.state.currentTime}
               endTime={this.state.totalTime * this.state.end / this.state.audioBuffer.length}
               hoverTime={this.state.hoverTime}
+              loadingTime={this.state.loadingTime}
               totalTime={this.state.totalTime}
               labels={this.state.labels}
               moveLabel={this.moveLabel}

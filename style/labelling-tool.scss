@@ -32,6 +32,10 @@ a {
     &.faded {
       opacity: 0.4;
     }
+
+    &.loading {
+      background-color: rgb(0, 71, 193);
+    }
   }
 
   .wave-cursor-time {

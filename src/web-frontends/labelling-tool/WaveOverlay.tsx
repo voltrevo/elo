@@ -8,6 +8,7 @@ import LabelComponent from './LabelComponent';
 type Props = {
   startTime: number;
   currentTime: number;
+  loadingTime?: number;
   endTime: number;
   hoverTime?: number;
   totalTime?: number;
@@ -20,7 +21,7 @@ type Props = {
 export default class WaveOverlay extends preact.Component<Props> {
   render() {
     const {
-      startTime, currentTime, endTime, hoverTime, totalTime,
+      startTime, currentTime, loadingTime, endTime, hoverTime, totalTime,
     } = this.props;
 
     if (totalTime === nil) {
@@ -62,6 +63,16 @@ export default class WaveOverlay extends preact.Component<Props> {
             style={textStyle}
           >{renderTimeFromSeconds(hoverTime)}</div>
         </>;
+      })()}
+      {(() => {
+        if (loadingTime === nil) {
+          return <></>;
+        }
+
+        return <div
+          class="wave-cursor loading"
+          style={{ left: `${100 * progressOf(loadingTime)}%` }}
+        />;
       })()}
       {(() => Object.entries(this.props.labels).map(([labelKey, label]) => (
         <LabelComponent
