@@ -120,6 +120,10 @@ export default class WavePlayer extends preact.Component<Props, State> {
     });
   };
 
+  setAnalysisFile = async (f: File) => {
+    console.log('TODO');
+  }
+
   async componentWillMount() {
     const mainAudioElement = new Audio();
     this.mainAudioElement = mainAudioElement;
@@ -506,7 +510,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
         <div style={{ height: '33%' }}>
           {(() => {
             if (!this.state.audioData || this.state.end === nil) {
-              return <>Loading</>;
+              return <>Waiting for audio data</>;
             }
 
             return <WaveForm
@@ -529,7 +533,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
               this.state.end === nil ||
               this.state.totalTime === nil
             ) {
-              return <>Loading</>;
+              return <></>;
             }
 
             return <WaveOverlay
@@ -575,29 +579,69 @@ export default class WavePlayer extends preact.Component<Props, State> {
         &nbsp;
         <button onClick={this.addLabel}>Add label</button>
         <button onClick={this.removeLabel}>Remove label</button>
-        &nbsp;
-        <button
-          disabled={this.state.loadingTime !== nil}
-          onClick={this.generateLabels}
-        >
-          {this.state.loadingTime === nil ? 'Generate labels' : 'Generating...'}
-        </button>
       </div>
-      <div class="tool-row">
-        <FileRequest name="main audio" onDrop={this.setMainAudio}/>
-        <FileRequest name="other audio" onDrop={this.setOtherAudio}/>
-        <FileRequest name="labels" onDrop={this.setLabelsFile}/>
-      </div>
-      <div class="tool-row">
-        <button onClick={this.downloadLabels}>Download labels</button>
-      </div>
+      <table class="files-table">
+        <thead></thead>
+        <tbody>
+          <tr>
+            <td>Main Audio</td>
+            <td>
+              <FileRequest onDrop={this.setMainAudio}>Drop File</FileRequest>
+            </td>
+            <td>
+              {this.state.mainAudioFile && this.state.mainAudioFile.name}
+            </td>
+          </tr>
+          <tr>
+            <td>Other Audio</td>
+            <td>
+              <FileRequest onDrop={this.setOtherAudio}>Drop File</FileRequest>
+            </td>
+            <td>
+              {this.state.otherAudioFile && this.state.otherAudioFile.name}
+            </td>
+          </tr>
+          <tr>
+            <td>Reference Labels</td>
+            <td>
+              <FileRequest onDrop={this.setLabelsFile}>Drop File</FileRequest>
+            </td>
+            <td>
+              {this.state.labelsFile && this.state.labelsFile.name}
+            </td>
+            <td>
+              <button onClick={this.downloadLabels}>Download</button>
+            </td>
+          </tr>
+          <tr>
+            <td>Analysis</td>
+            <td>
+              <FileRequest onDrop={this.setAnalysisFile}>Drop File</FileRequest>
+            </td>
+            <td>
+              {/* TODO: filename */}
+            </td>
+            <td>
+              <button
+                disabled={this.state.loadingTime !== nil}
+                onClick={this.generateLabels}
+              >
+                {this.state.loadingTime === nil ? 'Analyze' : 'Analyzing...'}
+              </button>
+            </td>
+            <td>
+              <button onClick={() => { /* TODO: Download */ }}>Download</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>;
   }
 }
 
-function FileRequest(props: { name: string, onDrop: (f: File) => void }) {
+function FileRequest(props: { onDrop: (f: File) => void, children?: preact.ComponentChildren }) {
   return <div class="file-request">
     <DropDetector onDrop={props.onDrop}/>
-    Drop {props.name} file here
+    {props.children}
   </div>;
 }
