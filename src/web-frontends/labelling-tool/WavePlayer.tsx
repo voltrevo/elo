@@ -372,6 +372,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
               [`g${Math.random()}`]: {
                 type: 'generated',
                 time: fragment.value.end_time,
+                data: fragment.value,
               },
             },
           });

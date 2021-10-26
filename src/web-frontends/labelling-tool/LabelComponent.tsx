@@ -71,7 +71,25 @@ export default class LabelComponent extends preact.Component<Props> {
       ref={this.setRef}
       style={{ left: this.props.left }}
     >
-      <div class="circle"/>
+      <div class="circle">
+        {(() => {
+          const text = looseProp(this.props.label.data, 'text');
+
+          if (typeof text !== 'string') {
+            return <></>;
+          }
+
+          return <div class="text">{text}</div>;
+        })()}
+      </div>
     </div>;
   }
+}
+
+function looseProp(obj: unknown, key: string): unknown {
+  if (obj === null || obj === nil) {
+    return nil;
+  }
+
+  return (obj as Record<string, unknown>)[key];
 }
