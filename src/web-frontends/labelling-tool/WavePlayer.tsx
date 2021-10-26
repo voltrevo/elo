@@ -527,7 +527,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
         {renderTimeFromSeconds(this.state.totalTime ?? 0)}
       </div>
       <div>
-        Accuracy: {Math.round(100 * marks.correct / marks.total)}
+        Accuracy: {Math.round(100 * marks.correct / marks.total)}%
         &nbsp;({marks.correct}/{marks.total})
       </div>
       <div class="tool-row">
