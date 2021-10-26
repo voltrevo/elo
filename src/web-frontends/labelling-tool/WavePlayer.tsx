@@ -184,7 +184,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
   }
 
   handleTimelineClick = (evt: MouseEvent) => {
-    if (this.blockInteractionsCounter > 0) {
+    if (this.blockInteractionsCounter > 0 || evt.shiftKey) {
       return;
     }
 
@@ -201,6 +201,53 @@ export default class WavePlayer extends preact.Component<Props, State> {
     if (this.otherAudioElement) {
       this.otherAudioElement.currentTime = newTime;
     }
+  };
+
+  handleTimelineMouseDown = (evt: MouseEvent) => {
+    if (
+      this.blockInteractionsCounter > 0 ||
+      !evt.shiftKey ||
+      this.state.end === nil ||
+      this.state.audioBuffer === nil
+    ) {
+      return;
+    }
+
+    const audioBuffer = this.state.audioBuffer;
+
+    const refWindow = {
+      start: this.state.start,
+      end: this.state.end,
+    };
+
+    const self = this;
+
+    function onMouseMove(moveEvt: MouseEvent) {
+      const mouseDownTime = self.calculateClientXTime(evt.clientX);
+      const mouseMoveTime = self.calculateClientXTime(moveEvt.clientX);
+
+      if (mouseDownTime === nil || mouseMoveTime === nil) {
+        return;
+      }
+
+      const moveSampleDiff = (
+        (mouseMoveTime - mouseDownTime!) *
+        (audioBuffer.length / audioBuffer.duration)
+      );
+
+      self.setState({
+        start: refWindow.start - moveSampleDiff,
+        end: refWindow.end - moveSampleDiff,
+      });
+    }
+
+    function onMouseUp() {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    }
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
   };
 
   handleMouseMove = (evt: MouseEvent) => {
@@ -361,6 +408,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
       <div
         style={{ height: '300px', position: 'relative' }}
         onClick={this.handleTimelineClick}
+        onMouseDown={this.handleTimelineMouseDown}
         ref={r => { this.timelineElement = r ?? nil; }}
       >
         <div style={{ height: '33%' }}>
