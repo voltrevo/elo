@@ -14,7 +14,7 @@ type State = {
 };
 
 const yPosSamples = 50;
-const minRenderDelay = 300;
+const minRenderDelay = 100;
 
 export default class WaveForm extends preact.Component<Props, State> {
   container?: HTMLDivElement;
@@ -108,7 +108,7 @@ export default class WaveForm extends preact.Component<Props, State> {
       this.renderCanvas();
       this.renderTimer = nil;
       this.lastRenderTime = Date.now();
-    }, Math.max(timeUntilRender, 100));
+    }, Math.max(timeUntilRender, 30));
   }
 
   renderCanvas() {
