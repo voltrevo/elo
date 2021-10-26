@@ -15,7 +15,7 @@ import analyzeViaFetch from '../../analyzeViaFetch';
 type Props = {};
 
 type State = {
-  analysisAudioFile?: File,
+  mainAudioFile?: File,
   otherAudioFile?: File,
   labelsFile?: File,
 
@@ -44,8 +44,8 @@ export default class WavePlayer extends preact.Component<Props, State> {
     words: [],
   };
 
-  analysisAudioElement?: HTMLAudioElement;
-  analysisAudioUrl?: string;
+  mainAudioElement?: HTMLAudioElement;
+  mainAudioUrl?: string;
   otherAudioElement?: HTMLAudioElement;
   otherAudioUrl?: string;
   rafId?: number;
@@ -71,18 +71,18 @@ export default class WavePlayer extends preact.Component<Props, State> {
     super.setState(this.latestState);
   }
 
-  setAnalysisAudio = async (f: File) => {
+  setMainAudio = async (f: File) => {
     const audioBuffer = await audioContext.decodeAudioData(await f.arrayBuffer());
 
-    if (this.analysisAudioUrl !== nil) {
-      URL.revokeObjectURL(this.analysisAudioUrl);
+    if (this.mainAudioUrl !== nil) {
+      URL.revokeObjectURL(this.mainAudioUrl);
     }
 
-    this.analysisAudioUrl = URL.createObjectURL(f);
-    this.analysisAudioElement!.src = this.analysisAudioUrl;
+    this.mainAudioUrl = URL.createObjectURL(f);
+    this.mainAudioElement!.src = this.mainAudioUrl;
 
     this.setState({
-      analysisAudioFile: f,
+      mainAudioFile: f,
       audioBuffer,
       totalTime: audioBuffer.duration,
       end: audioBuffer.length,
@@ -121,27 +121,27 @@ export default class WavePlayer extends preact.Component<Props, State> {
   };
 
   async componentWillMount() {
-    const analysisAudioElement = new Audio();
-    this.analysisAudioElement = analysisAudioElement;
+    const mainAudioElement = new Audio();
+    this.mainAudioElement = mainAudioElement;
 
-    analysisAudioElement.ontimeupdate = () => {
+    mainAudioElement.ontimeupdate = () => {
       this.setState({
-        currentTime: analysisAudioElement.currentTime,
+        currentTime: mainAudioElement.currentTime,
       });
 
       if (this.rafId !== nil) {
         cancelAnimationFrame(this.rafId);
       }
 
-      if (!analysisAudioElement.paused) {
+      if (!mainAudioElement.paused) {
         requestAnimationFrame(() => this.animateCurrentTime({
           referenceTime: Date.now(),
-          referenceCurrentTime: analysisAudioElement.currentTime,
+          referenceCurrentTime: mainAudioElement.currentTime,
         }));
       }
     };
 
-    analysisAudioElement.onpause = () => {
+    mainAudioElement.onpause = () => {
       if (this.rafId !== nil) {
         cancelAnimationFrame(this.rafId);
       }
@@ -159,8 +159,8 @@ export default class WavePlayer extends preact.Component<Props, State> {
   componentWillUnmount() {
     this.pause();
 
-    if (this.analysisAudioUrl !== nil) {
-      URL.revokeObjectURL(this.analysisAudioUrl);
+    if (this.mainAudioUrl !== nil) {
+      URL.revokeObjectURL(this.mainAudioUrl);
     }
 
     if (this.otherAudioUrl !== nil) {
@@ -171,12 +171,12 @@ export default class WavePlayer extends preact.Component<Props, State> {
   }
 
   play = () => {
-    this.analysisAudioElement?.play();
+    this.mainAudioElement?.play();
     this.otherAudioElement?.play();
   };
 
   pause = () => {
-    this.analysisAudioElement?.pause();
+    this.mainAudioElement?.pause();
     this.otherAudioElement?.pause();
   };
 
@@ -215,8 +215,8 @@ export default class WavePlayer extends preact.Component<Props, State> {
       return;
     }
 
-    if (this.analysisAudioElement) {
-      this.analysisAudioElement.currentTime = newTime;
+    if (this.mainAudioElement) {
+      this.mainAudioElement.currentTime = newTime;
     }
 
     if (this.otherAudioElement) {
@@ -368,7 +368,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
   };
 
   generateLabels = () => {
-    if (this.state.analysisAudioFile === nil) {
+    if (this.state.mainAudioFile === nil) {
       return;
     }
 
@@ -379,7 +379,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
 
     analyzeViaFetch(
       '/analyze',
-      this.state.analysisAudioFile,
+      this.state.mainAudioFile,
       fragment => {
         console.log(fragment);
 
@@ -584,7 +584,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
         </button>
       </div>
       <div class="tool-row">
-        <FileRequest name="analysis audio" onDrop={this.setAnalysisAudio}/>
+        <FileRequest name="main audio" onDrop={this.setMainAudio}/>
         <FileRequest name="other audio" onDrop={this.setOtherAudio}/>
         <FileRequest name="labels" onDrop={this.setLabelsFile}/>
       </div>
