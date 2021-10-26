@@ -269,7 +269,6 @@ export default class WavePlayer extends preact.Component<Props, State> {
   };
 
   removeLabel = () => {
-    const newLabels: Record<string, Label> = {};
     let closestLabelDiff: number | nil = nil;
     let closestLabelKey: string | nil = nil;
 
@@ -284,8 +283,6 @@ export default class WavePlayer extends preact.Component<Props, State> {
         closestLabelDiff = labelDiff;
         closestLabelKey = labelKey;
       }
-
-      newLabels[labelKey] = label;
     }
 
     if (closestLabelDiff === nil || closestLabelDiff > 3) {
@@ -293,6 +290,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
     }
 
     if (closestLabelKey !== nil) {
+      const newLabels = { ...this.state.labels };
       delete newLabels[closestLabelKey];
 
       this.setState({
