@@ -18,6 +18,7 @@ type Props = {
   blockParentInteractions: () => void;
   unblockParentInteractions: () => void;
   markers: Marker[];
+  words: { time: number, text: string }[];
 };
 
 export default class WaveOverlay extends preact.Component<Props> {
@@ -88,6 +89,14 @@ export default class WaveOverlay extends preact.Component<Props> {
       {this.props.markers.map(marker => (
         <div class="marker" style={{ left: `${100 * progressOf(marker.time)}%` }}>
           {marker.text}
+        </div>
+      ))}
+      {this.props.words.map(word => (
+        <div
+          class="word"
+          style={{ right: `${100 * (1 - progressOf(word.time))}%` }}
+        >
+          {word.text}
         </div>
       ))}
     </div>;

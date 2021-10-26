@@ -117,6 +117,13 @@ a {
     text-align: center;
   }
 
+  .word {
+    display: inline-block;
+    position: absolute;
+    top: 110px;
+    user-select: none;
+  }
+
   .tool-row {
     margin-top: 5px;
 

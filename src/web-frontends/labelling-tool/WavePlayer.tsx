@@ -28,6 +28,7 @@ type State = {
   end?: number;
   hoverTime?: number;
   labels: Record<string, Label>;
+  words: { time: number, text: string }[];
 };
 
 export type Marker = {
@@ -55,6 +56,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
       currentTime: 0,
       start: 0,
       labels: {},
+      words: [],
     };
   }
 
@@ -361,6 +363,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
 
     this.setState({
       loadingTime: 0,
+      words: [],
     });
 
     analyzeViaFetch(
@@ -383,6 +386,15 @@ export default class WavePlayer extends preact.Component<Props, State> {
                 data: fragment.value,
               },
             },
+          });
+        }
+
+        if (fragment.type === 'word' && fragment.value.end_time !== null) {
+          this.setState({
+            words: [
+              ...this.state.words,
+              { time: fragment.value.end_time, text: fragment.value.text },
+            ],
           });
         }
 
@@ -521,6 +533,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
               blockParentInteractions={() => this.blockInteractionsCounter++}
               unblockParentInteractions={() => this.blockInteractionsCounter--}
               markers={marks.markers}
+              words={this.state.words}
             />;
           })()}
         </div>
