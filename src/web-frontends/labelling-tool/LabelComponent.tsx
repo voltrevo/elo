@@ -33,7 +33,9 @@ export default class LabelComponent extends preact.Component<Props> {
       return;
     }
 
-    this.ref.addEventListener('mousedown', this.dragStart);
+    if (this.props.label.type === 'reference') {
+      this.ref.addEventListener('mousedown', this.dragStart);
+    }
   };
 
   dragStart = (evt: MouseEvent) => {
@@ -62,8 +64,10 @@ export default class LabelComponent extends preact.Component<Props> {
   };
 
   render() {
+    const classes = ['label', this.props.label.type];
+
     return <div
-      class="label"
+      class={classes.join(' ')}
       ref={this.setRef}
       style={{ left: this.props.left }}
     >

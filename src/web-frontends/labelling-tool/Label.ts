@@ -1,5 +1,5 @@
 type Label = {
-  type: 'reference',
+  type: 'reference' | 'generated',
   time: number;
   data?: unknown;
 };

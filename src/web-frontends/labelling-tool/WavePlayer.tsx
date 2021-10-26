@@ -301,7 +301,29 @@ export default class WavePlayer extends preact.Component<Props, State> {
       return;
     }
 
-    analyzeViaFetch('/analyze', this.state.analysisAudioFile, fragment => console.log(fragment));
+    analyzeViaFetch(
+      '/analyze',
+      this.state.analysisAudioFile,
+      fragment => {
+        console.log(fragment);
+
+        if (
+          fragment.type === 'disfluent' &&
+          fragment.value.category === 'filler' &&
+          fragment.value.end_time !== null
+        ) {
+          this.setState({
+            labels: {
+              ...this.state.labels,
+              [`g${Math.random()}`]: {
+                type: 'generated',
+                time: fragment.value.end_time,
+              },
+            },
+          });
+        }
+      },
+    );
   };
 
   copyGeneratedLabels = () => {

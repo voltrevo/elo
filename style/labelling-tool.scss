@@ -58,15 +58,28 @@ a {
       width: 5px;
       height: 5px;
       border-radius: 100%;
-      background-color: rgb(0, 193, 142);
       display: inline-block;
       margin-left: 10px;
       margin-top: 10px;
     }
 
-    &:hover {
-      border: 1px solid black;
-      cursor: ew-resize
+    &.reference {
+      &:hover {
+        border: 1px solid black;
+        cursor: ew-resize
+      }
+
+      .circle {
+        background-color: rgb(0, 193, 142);
+      }
+    }
+
+    &.generated {
+      top: 175px;
+
+      .circle {
+        background-color: rgb(0, 71, 193);
+      }
     }
   }
 
