@@ -410,25 +410,59 @@ export default class WavePlayer extends preact.Component<Props, State> {
   };
 
   calculateMarks() {
-    this;
+    const matches: { reference: Label, generated: Label }[] = [];
+
+    const referenceLabels = Object.fromEntries(
+      Object.entries(this.state.labels).filter(([, label]) => label.type === 'reference'),
+    );
+
+    const generatedLabels = Object.fromEntries(
+      Object.entries(this.state.labels).filter(([, label]) => label.type === 'generated'),
+    );
+
+    for (const [referenceKey, referenceLabel] of Object.entries(referenceLabels)) {
+      let bestMatch: { key: string, timeDiff: number } | nil = nil;
+
+      for (const [generatedKey, generatedLabel] of Object.entries(generatedLabels)) {
+        const timeDiff = generatedLabel.time - referenceLabel.time;
+
+        if (bestMatch === nil || Math.abs(timeDiff) < Math.abs(bestMatch.timeDiff)) {
+          bestMatch = { key: generatedKey, timeDiff };
+        }
+      }
+
+      if (bestMatch !== nil && Math.abs(bestMatch.timeDiff) <= 1) {
+        matches.push({
+          reference: referenceLabel,
+          generated: generatedLabels[bestMatch.key],
+        });
+
+        delete referenceLabels[referenceKey];
+        delete generatedLabels[bestMatch.key];
+      }
+    }
 
     const markers: Marker[] = [
-      {
-        time: 5,
+      ...matches.map(match => ({
+        time: match.generated.time,
         text: '✅',
-      },
-      {
-        time: 15,
+      })),
+      ...Object.values(referenceLabels).map(label => ({
+        time: label.time,
         text: '❌',
-      },
+      })),
+      ...Object.values(generatedLabels).map(label => ({
+        time: label.time,
+        text: '❌',
+      })),
     ];
 
     return {
       markers,
-      correct: 5,
-      total: 7,
-      falsePositives: 1,
-      falseNegatives: 1,
+      correct: matches.length,
+      total: markers.length,
+      falsePositives: Object.keys(generatedLabels).length,
+      falseNegatives: Object.keys(referenceLabels).length,
     };
   }
 
@@ -493,8 +527,8 @@ export default class WavePlayer extends preact.Component<Props, State> {
         {renderTimeFromSeconds(this.state.totalTime ?? 0)}
       </div>
       <div>
-        Marks: {Math.round(100 * marks.correct / marks.total)}% &nbsp;&nbsp;
-        {marks.correct} / {marks.total}
+        Accuracy: {Math.round(100 * marks.correct / marks.total)}
+        &nbsp;({marks.correct}/{marks.total})
       </div>
       <div class="tool-row">
         <button onClick={this.play}>
