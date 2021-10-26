@@ -273,6 +273,10 @@ export default class WavePlayer extends preact.Component<Props, State> {
     let closestLabelKey: string | nil = nil;
 
     for (const [labelKey, label] of Object.entries(this.state.labels)) {
+      if (label.type !== 'reference') {
+        continue;
+      }
+
       const labelDiff = Math.abs(label.time - this.state.currentTime);
 
       if (closestLabelDiff === nil || labelDiff < closestLabelDiff) {
