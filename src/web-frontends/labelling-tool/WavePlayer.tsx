@@ -304,6 +304,10 @@ export default class WavePlayer extends preact.Component<Props, State> {
       return;
     }
 
+    this.setState({
+      loadingTime: 0,
+    });
+
     analyzeViaFetch(
       '/analyze',
       this.state.analysisAudioFile,
@@ -426,7 +430,12 @@ export default class WavePlayer extends preact.Component<Props, State> {
         <button onClick={this.addLabel}>Add label</button>
         <button onClick={this.removeLabel}>Remove label</button>
         &nbsp;
-        <button onClick={this.generateLabels}>Generate labels</button>
+        <button
+          disabled={this.state.loadingTime !== nil}
+          onClick={this.generateLabels}
+        >
+          {this.state.loadingTime === nil ? 'Generate labels' : 'Generating...'}
+        </button>
       </div>
       <div class="tool-row">
         <FileRequest name="analysis audio" onDrop={this.setAnalysisAudio}/>
