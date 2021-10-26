@@ -330,10 +330,6 @@ export default class WavePlayer extends preact.Component<Props, State> {
     );
   };
 
-  copyGeneratedLabels = () => {
-    console.log('TODO');
-  };
-
   downloadLabels = () => {
     const str = Object.values(this.state.labels)
       .filter(label => label.type === 'reference')
@@ -419,7 +415,6 @@ export default class WavePlayer extends preact.Component<Props, State> {
         <button onClick={this.removeLabel}>Remove label</button>
         &nbsp;
         <button onClick={this.generateLabels}>Generate labels</button>
-        <button onClick={this.copyGeneratedLabels}>Copy generated labels</button>
       </div>
       <div class="tool-row">
         <FileRequest name="analysis audio" onDrop={this.setAnalysisAudio}/>
