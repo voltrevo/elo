@@ -4,6 +4,7 @@ import nil from '../../helpers/nil';
 import renderTimeFromSeconds from './helpers/renderTimeFromSeconds';
 import Label from './Label';
 import LabelComponent from './LabelComponent';
+import type { Marker } from './WavePlayer';
 
 type Props = {
   startTime: number;
@@ -16,6 +17,7 @@ type Props = {
   moveLabel: (labelKey: string, clientX: number) => void;
   blockParentInteractions: () => void;
   unblockParentInteractions: () => void;
+  markers: Marker[];
 };
 
 export default class WaveOverlay extends preact.Component<Props> {
@@ -74,7 +76,7 @@ export default class WaveOverlay extends preact.Component<Props> {
           style={{ left: `${100 * progressOf(loadingTime)}%` }}
         />;
       })()}
-      {(() => Object.entries(this.props.labels).map(([labelKey, label]) => (
+      {Object.entries(this.props.labels).map(([labelKey, label]) => (
         <LabelComponent
           label={label}
           left={`${100 * progressOf(label.time)}%`}
@@ -82,7 +84,12 @@ export default class WaveOverlay extends preact.Component<Props> {
           onDragStart={this.props.blockParentInteractions}
           onDragEnd={this.props.unblockParentInteractions}
         />
-      )))()}
+      ))}
+      {this.props.markers.map(marker => (
+        <div class="marker" style={{ left: `${100 * progressOf(marker.time)}%` }}>
+          {marker.text}
+        </div>
+      ))}
     </div>;
   }
 }

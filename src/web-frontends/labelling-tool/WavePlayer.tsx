@@ -30,6 +30,11 @@ type State = {
   labels: Record<string, Label>;
 };
 
+export type Marker = {
+  time: number;
+  text: string;
+};
+
 export default class WavePlayer extends preact.Component<Props, State> {
   analysisAudioElement?: HTMLAudioElement;
   analysisAudioUrl?: string;
@@ -404,7 +409,32 @@ export default class WavePlayer extends preact.Component<Props, State> {
     URL.revokeObjectURL(url);
   };
 
+  calculateMarks() {
+    this;
+
+    const markers: Marker[] = [
+      {
+        time: 5,
+        text: '✅',
+      },
+      {
+        time: 15,
+        text: '❌',
+      },
+    ];
+
+    return {
+      markers,
+      correct: 5,
+      total: 7,
+      falsePositives: 1,
+      falseNegatives: 1,
+    };
+  }
+
   render() {
+    const marks = this.calculateMarks();
+
     return <div class="wave-player">
       <div
         style={{ height: '300px', position: 'relative' }}
@@ -452,6 +482,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
               moveLabel={this.moveLabel}
               blockParentInteractions={() => this.blockInteractionsCounter++}
               unblockParentInteractions={() => this.blockInteractionsCounter--}
+              markers={marks.markers}
             />;
           })()}
         </div>
@@ -460,6 +491,10 @@ export default class WavePlayer extends preact.Component<Props, State> {
         {renderTimeFromSeconds(this.state.currentTime)}
         &nbsp;/&nbsp;
         {renderTimeFromSeconds(this.state.totalTime ?? 0)}
+      </div>
+      <div>
+        Marks: {Math.round(100 * marks.correct / marks.total)}% &nbsp;&nbsp;
+        {marks.correct} / {marks.total}
       </div>
       <div class="tool-row">
         <button onClick={this.play}>
