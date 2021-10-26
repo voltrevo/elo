@@ -97,10 +97,13 @@ export default class WavePlayer extends preact.Component<Props, State> {
 
     this.setState({
       labelsFile: f,
-      labels: Object.fromEntries(labelTimes.map((t, i) => [`r${i}`, {
-        type: 'reference',
-        time: t,
-      }])),
+      labels: {
+        ...Object.fromEntries(labelTimes.map((t, i) => [`r${i}`, {
+          type: 'reference',
+          time: t,
+        }])),
+        ...this.getLabels('generated'),
+      },
     });
   };
 
@@ -409,16 +412,17 @@ export default class WavePlayer extends preact.Component<Props, State> {
     URL.revokeObjectURL(url);
   };
 
+  getLabels(type: Label['type']) {
+    return Object.fromEntries(
+      Object.entries(this.state.labels).filter(([, label]) => label.type === type),
+    );
+  }
+
   calculateMarks() {
     const matches: { reference: Label, generated: Label }[] = [];
 
-    const referenceLabels = Object.fromEntries(
-      Object.entries(this.state.labels).filter(([, label]) => label.type === 'reference'),
-    );
-
-    const generatedLabels = Object.fromEntries(
-      Object.entries(this.state.labels).filter(([, label]) => label.type === 'generated'),
-    );
+    const referenceLabels = this.getLabels('reference');
+    const generatedLabels = this.getLabels('generated');
 
     for (const [referenceKey, referenceLabel] of Object.entries(referenceLabels)) {
       let bestMatch: { key: string, timeDiff: number } | nil = nil;
