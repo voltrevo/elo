@@ -37,6 +37,13 @@ export type Marker = {
 };
 
 export default class WavePlayer extends preact.Component<Props, State> {
+  latestState: State = {
+    currentTime: 0,
+    start: 0,
+    labels: {},
+    words: [],
+  };
+
   analysisAudioElement?: HTMLAudioElement;
   analysisAudioUrl?: string;
   otherAudioElement?: HTMLAudioElement;
@@ -52,12 +59,16 @@ export default class WavePlayer extends preact.Component<Props, State> {
   constructor(props: {}) {
     super(props);
 
-    this.state = {
-      currentTime: 0,
-      start: 0,
-      labels: {},
-      words: [],
+    this.state = this.latestState;
+  }
+
+  setState(updates: Partial<State>) {
+    this.latestState = {
+      ...this.latestState,
+      ...updates,
     };
+
+    super.setState(this.latestState);
   }
 
   setAnalysisAudio = async (f: File) => {
@@ -347,7 +358,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
     }
 
     if (closestLabelKey !== nil) {
-      const newLabels = { ...this.state.labels };
+      const newLabels = { ...this.latestState.labels };
       delete newLabels[closestLabelKey];
 
       this.setState({
@@ -379,7 +390,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
         ) {
           this.setState({
             labels: {
-              ...this.state.labels,
+              ...this.latestState.labels,
               [`g${Math.random()}`]: {
                 type: 'generated',
                 time: fragment.value.end_time,
@@ -392,7 +403,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
         if (fragment.type === 'word' && fragment.value.end_time !== null) {
           this.setState({
             words: [
-              ...this.state.words,
+              ...this.latestState.words,
               { time: fragment.value.end_time, text: fragment.value.text },
             ],
           });
