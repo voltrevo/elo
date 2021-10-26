@@ -11,6 +11,7 @@ import Label from './Label';
 import DropDetector from './DropDetector';
 import { download } from '../helpers/download';
 import analyzeViaFetch from '../../analyzeViaFetch';
+import type { AnalysisFragment } from '../../analyze';
 
 type Props = {};
 
@@ -18,6 +19,8 @@ type State = {
   mainAudioFile?: File,
   otherAudioFile?: File,
   labelsFile?: File,
+  analysisFile?: File,
+  analysis?: AnalysisFragment[],
 
   currentTime: number;
   loadingTime?: number;
@@ -121,7 +124,9 @@ export default class WavePlayer extends preact.Component<Props, State> {
   };
 
   setAnalysisFile = async (f: File) => {
-    console.log('TODO');
+    this.setState({
+      analysisFile: f,
+    });
   }
 
   async componentWillMount() {
@@ -371,62 +376,78 @@ export default class WavePlayer extends preact.Component<Props, State> {
     }
   };
 
-  generateLabels = () => {
+  clearAnalysis() {
+    this.setState({
+      words: [],
+      labels: this.getLabels('reference'),
+      analysisFile: nil,
+      analysis: nil,
+    });
+  }
+
+  analyze = async () => {
     if (this.state.mainAudioFile === nil) {
       return;
     }
 
-    this.setState({
-      loadingTime: 0,
-      words: [],
-    });
+    this.clearAnalysis();
 
-    analyzeViaFetch(
+    this.setState({ loadingTime: 0 });
+
+    const analysis: AnalysisFragment[] = [];
+
+    await analyzeViaFetch(
       '/analyze',
       this.state.mainAudioFile,
       fragment => {
         console.log(fragment);
-
-        if (
-          fragment.type === 'disfluent' &&
-          fragment.value.category === 'filler' &&
-          fragment.value.end_time !== null
-        ) {
-          this.setState({
-            labels: {
-              ...this.latestState.labels,
-              [`g${Math.random()}`]: {
-                type: 'generated',
-                time: fragment.value.end_time,
-                data: fragment.value,
-              },
-            },
-          });
-        }
-
-        if (fragment.type === 'word' && fragment.value.end_time !== null) {
-          this.setState({
-            words: [
-              ...this.latestState.words,
-              { time: fragment.value.end_time, text: fragment.value.text },
-            ],
-          });
-        }
-
-        if (fragment.type === 'progress') {
-          this.setState({
-            loadingTime: fragment.value.duration,
-          });
-        }
-
-        if (fragment.type === 'end') {
-          this.setState({
-            loadingTime: nil,
-          });
-        }
+        analysis.push(fragment);
+        this.addAnalysisFragment(fragment);
       },
     );
+
+    this.setState({ analysis });
   };
+
+  addAnalysisFragment(fragment: AnalysisFragment) {
+    if (
+      fragment.type === 'disfluent' &&
+      fragment.value.category === 'filler' &&
+      fragment.value.end_time !== null
+    ) {
+      this.setState({
+        labels: {
+          ...this.latestState.labels,
+          [`g${Math.random()}`]: {
+            type: 'generated',
+            time: fragment.value.end_time,
+            data: fragment.value,
+          },
+        },
+      });
+    }
+
+    if (fragment.type === 'word' && fragment.value.end_time !== null) {
+      this.setState({
+        words: [
+          ...this.latestState.words,
+          { time: fragment.value.end_time, text: fragment.value.text },
+        ],
+      });
+    }
+
+    if (fragment.type === 'progress') {
+      this.setState({
+        loadingTime: fragment.value.duration,
+      });
+    }
+
+    if (fragment.type === 'end') {
+      this.setState({
+        loadingTime: nil,
+      });
+    }
+  }
 
   downloadLabels = () => {
     const str = Object.values(this.state.labels)
@@ -589,7 +610,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
               <FileRequest onDrop={this.setMainAudio}>Drop File</FileRequest>
             </td>
             <td>
-              {this.state.mainAudioFile && this.state.mainAudioFile.name}
+              {this.state.mainAudioFile?.name}
             </td>
           </tr>
           <tr>
@@ -598,7 +619,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
               <FileRequest onDrop={this.setOtherAudio}>Drop File</FileRequest>
             </td>
             <td>
-              {this.state.otherAudioFile && this.state.otherAudioFile.name}
+              {this.state.otherAudioFile?.name}
             </td>
           </tr>
           <tr>
@@ -607,7 +628,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
               <FileRequest onDrop={this.setLabelsFile}>Drop File</FileRequest>
             </td>
             <td>
-              {this.state.labelsFile && this.state.labelsFile.name}
+              {this.state.labelsFile?.name}
             </td>
             <td>
               <button onClick={this.downloadLabels}>Download</button>
@@ -619,12 +640,12 @@ export default class WavePlayer extends preact.Component<Props, State> {
               <FileRequest onDrop={this.setAnalysisFile}>Drop File</FileRequest>
             </td>
             <td>
-              {/* TODO: filename */}
+              {this.state.analysisFile?.name}
             </td>
             <td>
               <button
                 disabled={this.state.loadingTime !== nil}
-                onClick={this.generateLabels}
+                onClick={this.analyze}
               >
                 {this.state.loadingTime === nil ? 'Analyze' : 'Analyzing...'}
               </button>
