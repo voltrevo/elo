@@ -10,6 +10,7 @@ import renderTimeFromSeconds from './helpers/renderTimeFromSeconds';
 import Label from './Label';
 import DropDetector from './DropDetector';
 import { download } from '../helpers/download';
+import analyzeViaFetch from '../../analyzeViaFetch';
 
 type Props = {};
 
@@ -295,6 +296,18 @@ export default class WavePlayer extends preact.Component<Props, State> {
     }
   };
 
+  generateLabels = () => {
+    if (this.state.analysisAudioFile === nil) {
+      return;
+    }
+
+    analyzeViaFetch('/analyze', this.state.analysisAudioFile, fragment => console.log(fragment));
+  };
+
+  copyGeneratedLabels = () => {
+    console.log('TODO');
+  };
+
   downloadLabels = () => {
     const str = Object.values(this.state.labels)
       .filter(label => label.type === 'reference')
@@ -378,6 +391,9 @@ export default class WavePlayer extends preact.Component<Props, State> {
         &nbsp;
         <button onClick={this.addLabel}>Add label</button>
         <button onClick={this.removeLabel}>Remove label</button>
+        &nbsp;
+        <button onClick={this.generateLabels}>Generate labels</button>
+        <button onClick={this.copyGeneratedLabels}>Copy generated labels</button>
       </div>
       <div class="tool-row">
         <FileRequest name="analysis audio" onDrop={this.setAnalysisAudio}/>
