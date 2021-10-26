@@ -25,7 +25,7 @@ async function readLines(stream: ReadableStream<Uint8Array>, onLine: (line: stri
   const reader = stream.getReader();
 
   const textDecoder = new TextDecoder();
-  const buf = new Uint8Array(65536); // TODO: Handle lines exceeding this length
+  const buf = new Uint8Array(1024 * 1024); // TODO: Handle lines exceeding this length
   let bufPos = 0;
   const lineBreakCode = '\n'.charCodeAt(0);
 
