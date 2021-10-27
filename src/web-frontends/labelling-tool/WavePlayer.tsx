@@ -672,12 +672,19 @@ export default class WavePlayer extends preact.Component<Props, State> {
         &nbsp;({marks.correct}/{marks.total})
       </div>
       <div class="tool-row">
-        <button onClick={this.play}>
-          Play
-        </button>
-        <button onClick={this.pause}>
-          Pause
-        </button>
+        {(() => {
+          const style = { width: '5em' };
+
+          if (this.state.audioBuffer === nil) {
+            return <button disabled style={style}>Play</button>;
+          }
+
+          if (this.mainAudioElement?.paused ?? true) {
+            return <button style={style} onClick={this.play}>Play</button>;
+          }
+
+          return <button style={style} onClick={this.pause}>Pause</button>;
+        })()}
         &nbsp;
         <button onClick={(evt) => {
           if (evt.shiftKey) {
