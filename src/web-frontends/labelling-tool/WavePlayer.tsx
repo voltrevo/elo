@@ -743,6 +743,13 @@ export default class WavePlayer extends preact.Component<Props, State> {
           </tr>
         </tbody>
       </table>
+      <div>
+        <h2>Tips</h2>
+        <ul>
+          <li>Use the shift key while dragging the timeline to adjust the visible window</li>
+          <li>Try using shift with zoom in/out</li>
+        </ul>
+      </div>
     </div>;
   }
 }
