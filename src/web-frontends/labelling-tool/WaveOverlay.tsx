@@ -1,4 +1,5 @@
 import * as preact from 'preact';
+import clamp from '../../helpers/clamp';
 
 import nil from '../../helpers/nil';
 import renderTimeFromSeconds from './helpers/renderTimeFromSeconds';
@@ -77,28 +78,46 @@ export default class WaveOverlay extends preact.Component<Props> {
           style={{ left: `${100 * progressOf(loadingTime)}%` }}
         />;
       })()}
-      {Object.entries(this.props.labels).map(([labelKey, label]) => (
-        <LabelComponent
+      {Object.entries(this.props.labels).map(([labelKey, label]) => {
+        const progress = progressOf(label.time);
+
+        if (progress !== clamp(0, progress, 1)) {
+          return <></>;
+        }
+
+        return <LabelComponent
           label={label}
-          left={`${100 * progressOf(label.time)}%`}
+          left={`${100 * progress}%`}
           move={clientX => this.props.moveLabel(labelKey, clientX)}
           onDragStart={this.props.blockParentInteractions}
           onDragEnd={this.props.unblockParentInteractions}
-        />
-      ))}
-      {this.props.markers.map(marker => (
-        <div class="marker" style={{ left: `${100 * progressOf(marker.time)}%` }}>
+        />;
+      })}
+      {this.props.markers.map(marker => {
+        const progress = progressOf(marker.time);
+
+        if (progress !== clamp(0, progress, 1)) {
+          return <></>;
+        }
+
+        return <div class="marker" style={{ left: `${100 * progress}%` }}>
           {marker.text}
-        </div>
-      ))}
-      {this.props.words.map(word => (
-        <div
+        </div>;
+      })}
+      {this.props.words.map(word => {
+        const progress = progressOf(word.time);
+
+        if (progress !== clamp(0, progress, 1)) {
+          return <></>;
+        }
+
+        return <div
           class="word"
-          style={{ right: `${100 * (1 - progressOf(word.time))}%` }}
+          style={{ right: `${100 * (1 - progress)}%` }}
         >
           {word.text}
-        </div>
-      ))}
+        </div>;
+      })}
     </div>;
   }
 }

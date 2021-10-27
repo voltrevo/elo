@@ -21,6 +21,8 @@ a {
 }
 
 .wave-player {
+  overflow-x: hidden;
+
   .wave-cursor {
     display: inline-block;
     position: absolute;
