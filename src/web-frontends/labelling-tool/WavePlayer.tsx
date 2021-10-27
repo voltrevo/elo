@@ -251,15 +251,17 @@ export default class WavePlayer extends preact.Component<Props, State> {
   }
 
   handleTimelineClick = (evt: MouseEvent) => {
-    if (this.blockInteractionsCounter > 0 || evt.shiftKey) {
+    if (this.blockInteractionsCounter > 0 || evt.shiftKey || !this.state.audioBuffer) {
       return;
     }
 
-    const newTime = this.calculateClientXTime(evt.clientX);
+    let newTime = this.calculateClientXTime(evt.clientX);
 
     if (newTime === nil) {
       return;
     }
+
+    newTime = clamp(0, newTime, this.state.audioBuffer.duration);
 
     if (this.mainAudioElement) {
       this.mainAudioElement.currentTime = newTime;
@@ -353,6 +355,42 @@ export default class WavePlayer extends preact.Component<Props, State> {
     };
 
     this.setState(newProps);
+  }
+
+  zoomInClose() {
+    const targetWidth = 7; // seconds
+
+    const {
+      start, end, currentTime, totalTime, audioBuffer,
+    } = this.state;
+
+    if (end === nil || totalTime === nil || audioBuffer === nil) {
+      return;
+    }
+
+    const targetSampleWidth = targetWidth * audioBuffer.sampleRate;
+    const currentSample = currentTime / totalTime * audioBuffer.length;
+
+    const currentProgress = (currentSample - start) / (end - start);
+
+    const newStart = currentSample - currentProgress * targetSampleWidth;
+    const newEnd = currentSample + (1 - currentProgress) * targetSampleWidth;
+
+    this.setState({
+      start: clamp(0, newStart, audioBuffer.length),
+      end: clamp(0, newEnd, audioBuffer.length),
+    });
+  }
+
+  zoomOutMax() {
+    if (this.state.audioBuffer === nil) {
+      return;
+    }
+
+    this.setState({
+      start: 0,
+      end: this.state.audioBuffer.length,
+    });
   }
 
   moveLabel = (labelKey: string, clientX: number) => {
@@ -628,10 +666,22 @@ export default class WavePlayer extends preact.Component<Props, State> {
           Pause
         </button>
         &nbsp;
-        <button onClick={() => this.zoom(1.3)}>
+        <button onClick={(evt) => {
+          if (evt.shiftKey) {
+            this.zoomInClose();
+          } else {
+            this.zoom(1.3);
+          }
+        }}>
           Zoom In
         </button>
-        <button onClick={() => this.zoom(1 / 1.3)}>
+        <button onClick={(evt) => {
+          if (evt.shiftKey) {
+            this.zoomOutMax();
+          } else {
+            this.zoom(1 / 1.3);
+          }
+        }}>
           Zoom Out
         </button>
         &nbsp;
