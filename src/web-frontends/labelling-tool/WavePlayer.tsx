@@ -485,15 +485,15 @@ export default class WavePlayer extends preact.Component<Props, State> {
       return;
     }
 
-    if (evt.code === 'KeyK') {
+    if (evt.code === 'KeyS') {
       if (this.mainAudioElement.paused) {
         this.play();
       } else {
         this.pause();
       }
-    } else if (evt.code === 'KeyJ') {
+    } else if (evt.code === 'KeyA') {
       this.setCurrentTime(this.latestState.currentTime - 1.5);
-    } else if (evt.code === 'KeyL') {
+    } else if (evt.code === 'KeyD') {
       this.setCurrentTime(this.latestState.currentTime + 1.5);
     }
   };
@@ -945,7 +945,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
         <ul>
           <li>Use the shift key while dragging the timeline to adjust the visible window</li>
           <li>Try using shift with zoom in/out</li>
-          <li>Use j/k/l for time control</li>
+          <li>Use a/s/d for time control</li>
         </ul>
       </div>
     </div>;
