@@ -17,11 +17,12 @@ import readLines from '../../helpers/readLines';
 type Props = {};
 
 type State = {
-  mainAudioFile?: File,
-  otherAudioFile?: File,
-  labelsFile?: File,
-  analysisFile?: File,
-  analysis?: AnalysisFragment[],
+  mainAudioFile?: File;
+  otherAudioFile?: File;
+  otherAudioMuted: boolean;
+  labelsFile?: File;
+  analysisFile?: File;
+  analysis?: AnalysisFragment[];
 
   currentTime: number;
   loadingTime?: number;
@@ -42,6 +43,7 @@ export type Marker = {
 
 export default class WavePlayer extends preact.Component<Props, State> {
   latestState: State = {
+    otherAudioMuted: false,
     currentTime: 0,
     start: 0,
     labels: {},
@@ -103,6 +105,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
 
     this.otherAudioUrl = URL.createObjectURL(f);
     this.otherAudioElement!.src = this.otherAudioUrl;
+    this.otherAudioElement!.volume = this.latestState.otherAudioMuted ? 0 : 1;
 
     if (this.mainAudioElement !== nil) {
       this.otherAudioElement!.currentTime = this.mainAudioElement.currentTime;
@@ -217,6 +220,12 @@ export default class WavePlayer extends preact.Component<Props, State> {
     this.cleanupTasks.push(() => {
       window.removeEventListener('mousemove', this.handleMouseMove);
     });
+
+    window.addEventListener('keydown', this.handleKeyDown);
+
+    this.cleanupTasks.push(() => {
+      window.removeEventListener('keydown', this.handleKeyDown);
+    });
   }
 
   componentWillUnmount() {
@@ -254,6 +263,18 @@ export default class WavePlayer extends preact.Component<Props, State> {
     if (this.rafId !== nil) {
       cancelAnimationFrame(this.rafId);
     }
+  };
+
+  toggleOtherAudioMuted = () => {
+    const newMuteSetting = !this.latestState.otherAudioMuted;
+
+    if (this.otherAudioElement !== nil) {
+      this.otherAudioElement.volume = newMuteSetting ? 0 : 1;
+    }
+
+    this.setState({
+      otherAudioMuted: newMuteSetting,
+    });
   };
 
   animateCurrentTime(opt: {
@@ -415,6 +436,16 @@ export default class WavePlayer extends preact.Component<Props, State> {
       this.setState({
         hoverTime: this.calculateClientXTime(evt.clientX),
       });
+    }
+  };
+
+  handleKeyDown = (evt: KeyboardEvent) => {
+    if (evt.code === 'Space' && this.mainAudioElement !== nil) {
+      if (this.mainAudioElement.paused) {
+        this.play();
+      } else {
+        this.pause();
+      }
     }
   };
 
@@ -807,6 +838,14 @@ export default class WavePlayer extends preact.Component<Props, State> {
             <td>
               {this.state.otherAudioFile?.name}
             </td>
+            <td>
+              Mute
+              <input
+                type="checkbox"
+                checked={this.state.otherAudioMuted}
+                onClick={this.toggleOtherAudioMuted}
+              />
+            </td>
           </tr>
           <tr>
             <td>Reference Labels</td>
@@ -847,6 +886,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
         <ul>
           <li>Use the shift key while dragging the timeline to adjust the visible window</li>
           <li>Try using shift with zoom in/out</li>
+          <li>Play/pause with spacebar</li>
         </ul>
       </div>
     </div>;
