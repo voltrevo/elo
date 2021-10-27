@@ -714,6 +714,13 @@ export default class WavePlayer extends preact.Component<Props, State> {
   }
 
   calculateMarks() {
+    // An early match is more dubious than a late match, because there generally isn't enough
+    // information at that time. A late match is more understandable, especially as an algorithm may
+    // correctly wait for enough context to determine what has happened (though ideally it would
+    // still place the feature back at when it happened).
+    const maxEarlyMatchError = 0.3; // seconds
+    const maxLateMatchError = 0.7; // seconds
+
     const matches: { reference: Label, generated: Label }[] = [];
 
     const referenceLabels = this.getLabels('reference');
@@ -724,6 +731,10 @@ export default class WavePlayer extends preact.Component<Props, State> {
 
       for (const [generatedKey, generatedLabel] of Object.entries(generatedLabels)) {
         const timeDiff = generatedLabel.time - referenceLabel.time;
+
+        if (timeDiff < -maxEarlyMatchError || timeDiff > maxLateMatchError) {
+          continue;
+        }
 
         if (bestMatch === nil || Math.abs(timeDiff) < Math.abs(bestMatch.timeDiff)) {
           bestMatch = { key: generatedKey, timeDiff };
