@@ -86,6 +86,7 @@ export default class WaveOverlay extends preact.Component<Props> {
         }
 
         return <LabelComponent
+          key={labelKey}
           label={label}
           left={`${100 * progress}%`}
           move={clientX => this.props.moveLabel(labelKey, clientX)}
