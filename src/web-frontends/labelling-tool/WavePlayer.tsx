@@ -217,13 +217,26 @@ export default class WavePlayer extends preact.Component<Props, State> {
   }
 
   play = () => {
-    this.mainAudioElement?.play();
+    if (this.mainAudioElement === nil) {
+      return;
+    }
+
+    this.mainAudioElement.play();
     this.otherAudioElement?.play();
+
+    this.animateCurrentTime({
+      referenceTime: Date.now(),
+      referenceCurrentTime: this.mainAudioElement.currentTime,
+    });
   };
 
   pause = () => {
     this.mainAudioElement?.pause();
     this.otherAudioElement?.pause();
+
+    if (this.rafId !== nil) {
+      cancelAnimationFrame(this.rafId);
+    }
   };
 
   animateCurrentTime(opt: {
