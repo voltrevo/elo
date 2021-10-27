@@ -14,14 +14,15 @@ type State = {
 };
 
 const yPosSamples = 50;
-const minRenderDelay = 100;
 
 export default class WaveForm extends preact.Component<Props, State> {
   container?: HTMLDivElement;
   cleanupTasks = new TaskQueue();
   canvas?: HTMLCanvasElement;
   canvasRenderPending = false;
+  canvasRenderQueued = false;
   lastRenderTime = 0;
+  nextRenderMinTime = 0;
   renderTimer?: number;
 
   componentWillUnmount() {
@@ -94,26 +95,29 @@ export default class WaveForm extends preact.Component<Props, State> {
     if (!(
       this.state.size &&
       this.canvas &&
-      this.canvasRenderPending
+      this.canvasRenderPending &&
+      !this.canvasRenderQueued
     )) {
       return;
     }
 
-    const renderTime = Date.now();
-    const timeUntilRender = this.lastRenderTime + minRenderDelay - renderTime;
+    const timeUntilRender = this.nextRenderMinTime - Date.now();
 
     clearTimeout(this.renderTimer);
 
+    this.canvasRenderQueued = true;
+
     this.renderTimer = window.setTimeout(() => {
+      const renderStart = Date.now();
       this.renderCanvas();
       this.renderTimer = nil;
       this.lastRenderTime = Date.now();
-    }, Math.max(timeUntilRender, 30));
+      const renderDuration = Date.now() - renderStart;
+      this.nextRenderMinTime = this.lastRenderTime + 9 * renderDuration;
+    }, Math.max(timeUntilRender, 0));
   }
 
   renderCanvas() {
-    this.canvasRenderPending = false;
-
     const size = this.state.size;
 
     const ctx = this.canvas?.getContext('2d');
@@ -170,5 +174,8 @@ export default class WaveForm extends preact.Component<Props, State> {
     }
 
     ctx.stroke();
+
+    this.canvasRenderPending = false;
+    this.canvasRenderQueued = false;
   }
 }
