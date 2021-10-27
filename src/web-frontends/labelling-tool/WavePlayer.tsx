@@ -25,6 +25,7 @@ type State = {
   analysis?: AnalysisFragment[];
 
   currentTime: number;
+  playbackRate: number;
   loadingTime?: number;
   audioBuffer?: AudioBuffer;
   audioData?: Float32Array;
@@ -41,10 +42,13 @@ export type Marker = {
   text: string;
 };
 
+const maxPlaybackRate = 4;
+
 export default class WavePlayer extends preact.Component<Props, State> {
   latestState: State = {
     otherAudioMuted: false,
     currentTime: 0,
+    playbackRate: 1,
     start: 0,
     labels: {},
     words: [],
@@ -57,8 +61,8 @@ export default class WavePlayer extends preact.Component<Props, State> {
   rafId?: number;
   windowRafId?: number;
   targetWindowStartTime?: number;
-
   timelineElement?: HTMLDivElement;
+  playbackRangeElement?: HTMLInputElement;
 
   blockInteractionsCounter = 0;
 
@@ -106,6 +110,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
     this.otherAudioUrl = URL.createObjectURL(f);
     this.otherAudioElement!.src = this.otherAudioUrl;
     this.otherAudioElement!.volume = this.latestState.otherAudioMuted ? 0 : 1;
+    this.otherAudioElement!.playbackRate = this.latestState.playbackRate;
 
     if (this.mainAudioElement !== nil) {
       this.otherAudioElement!.currentTime = this.mainAudioElement.currentTime;
@@ -265,6 +270,26 @@ export default class WavePlayer extends preact.Component<Props, State> {
     }
   };
 
+  syncPlaybackRate = () => {
+    if (this.playbackRangeElement === nil) {
+      return;
+    }
+
+    const playbackRate = maxPlaybackRate ** Number(this.playbackRangeElement.value);
+
+    if (this.mainAudioElement !== nil) {
+      this.mainAudioElement.playbackRate = playbackRate;
+    }
+
+    if (this.otherAudioElement !== nil) {
+      this.otherAudioElement.playbackRate = playbackRate;
+    }
+
+    this.setState({
+      playbackRate: maxPlaybackRate ** Number(this.playbackRangeElement.value),
+    });
+  };
+
   toggleOtherAudioMuted = () => {
     const newMuteSetting = !this.latestState.otherAudioMuted;
 
@@ -286,8 +311,15 @@ export default class WavePlayer extends preact.Component<Props, State> {
       this.rafId = nil;
     }
 
+    if (this.mainAudioElement?.paused) {
+      return;
+    }
+
     this.setState({
-      currentTime: opt.referenceCurrentTime + (Date.now() - opt.referenceTime) / 1000,
+      currentTime: (
+        opt.referenceCurrentTime +
+        this.state.playbackRate * (Date.now() - opt.referenceTime) / 1000
+      ),
     });
 
     this.rafId = requestAnimationFrame(() => this.animateCurrentTime(opt));
@@ -351,22 +383,31 @@ export default class WavePlayer extends preact.Component<Props, State> {
       return;
     }
 
-    let newTime = this.calculateClientXTime(evt.clientX);
+    const newTime = this.calculateClientXTime(evt.clientX);
 
     if (newTime === nil) {
       return;
     }
 
-    newTime = clamp(0, newTime, this.state.audioBuffer.duration);
+    this.setCurrentTime(newTime);
+  };
+
+  setCurrentTime(time: number) {
+    if (this.state.audioBuffer === nil) {
+      return;
+    }
+
+    // Rely on timeupdate from main audio element to update the state
+    time = clamp(0, time, this.state.audioBuffer.duration);
 
     if (this.mainAudioElement) {
-      this.mainAudioElement.currentTime = newTime;
+      this.mainAudioElement.currentTime = time;
     }
 
     if (this.otherAudioElement) {
-      this.otherAudioElement.currentTime = newTime;
+      this.otherAudioElement.currentTime = time;
     }
-  };
+  }
 
   handleTimelineMouseDown = (evt: MouseEvent) => {
     if (
@@ -440,12 +481,20 @@ export default class WavePlayer extends preact.Component<Props, State> {
   };
 
   handleKeyDown = (evt: KeyboardEvent) => {
-    if (evt.code === 'Space' && this.mainAudioElement !== nil) {
+    if (this.mainAudioElement === nil) {
+      return;
+    }
+
+    if (evt.code === 'KeyK') {
       if (this.mainAudioElement.paused) {
         this.play();
       } else {
         this.pause();
       }
+    } else if (evt.code === 'KeyJ') {
+      this.setCurrentTime(this.latestState.currentTime - 1.5);
+    } else if (evt.code === 'KeyL') {
+      this.setCurrentTime(this.latestState.currentTime + 1.5);
     }
   };
 
@@ -795,6 +844,16 @@ export default class WavePlayer extends preact.Component<Props, State> {
 
           return <button style={style} onClick={this.pause}>Pause</button>;
         })()}
+        <input
+          type="range"
+          value={Math.log(this.state.playbackRate) / Math.log(maxPlaybackRate)}
+          min="-1"
+          max="1"
+          step="0.001"
+          ref={r => { this.playbackRangeElement = r ?? nil; }}
+          onInput={this.syncPlaybackRate}
+        />
+        {this.state.playbackRate.toFixed(2)}x
         &nbsp;
         <button onClick={(evt) => {
           if (evt.shiftKey) {
@@ -886,7 +945,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
         <ul>
           <li>Use the shift key while dragging the timeline to adjust the visible window</li>
           <li>Try using shift with zoom in/out</li>
-          <li>Play/pause with spacebar</li>
+          <li>Use j/k/l for time control</li>
         </ul>
       </div>
     </div>;
