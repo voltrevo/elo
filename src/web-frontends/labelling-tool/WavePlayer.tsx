@@ -53,6 +53,8 @@ export default class WavePlayer extends preact.Component<Props, State> {
   otherAudioElement?: HTMLAudioElement;
   otherAudioUrl?: string;
   rafId?: number;
+  windowRafId?: number;
+  targetWindowStartTime?: number;
 
   timelineElement?: HTMLDivElement;
 
@@ -101,6 +103,10 @@ export default class WavePlayer extends preact.Component<Props, State> {
 
     this.otherAudioUrl = URL.createObjectURL(f);
     this.otherAudioElement!.src = this.otherAudioUrl;
+
+    if (this.mainAudioElement !== nil) {
+      this.otherAudioElement!.currentTime = this.mainAudioElement.currentTime;
+    }
 
     this.setState({
       otherAudioFile: f,
@@ -175,6 +181,17 @@ export default class WavePlayer extends preact.Component<Props, State> {
         currentTime: mainAudioElement.currentTime,
       });
 
+      const windowProgress = this.calculateProgressOf(mainAudioElement.currentTime);
+
+      if (
+        windowProgress !== nil &&
+        clamp(0, windowProgress, 1) !== windowProgress &&
+        this.windowRafId === nil
+      ) {
+        this.targetWindowStartTime = mainAudioElement.currentTime;
+        this.animateWindowShift();
+      }
+
       if (this.rafId !== nil) {
         cancelAnimationFrame(this.rafId);
       }
@@ -243,11 +260,56 @@ export default class WavePlayer extends preact.Component<Props, State> {
     referenceTime: number,
     referenceCurrentTime: number,
   }) {
+    if (this.rafId !== nil) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = nil;
+    }
+
     this.setState({
       currentTime: opt.referenceCurrentTime + (Date.now() - opt.referenceTime) / 1000,
     });
 
     this.rafId = requestAnimationFrame(() => this.animateCurrentTime(opt));
+  }
+
+  animateWindowShift() {
+    const target = this.targetWindowStartTime;
+
+    if (this.windowRafId !== nil) {
+      cancelAnimationFrame(this.windowRafId);
+      this.windowRafId = nil;
+    }
+
+    if (target === nil || this.state.audioBuffer === nil || this.state.end === nil) {
+      return;
+    }
+
+    const startTime = this.state.start / this.state.audioBuffer.sampleRate;
+    const windowTime = (this.state.end - this.state.start) / this.state.audioBuffer.sampleRate;
+
+    const diff = startTime - target;
+    let adjustment = -0.2 * diff;
+
+    if (Math.abs(adjustment) > 0.025 * windowTime) {
+      adjustment = Math.sign(adjustment) * 0.025 * windowTime;
+    }
+
+    let newStartTime = startTime + adjustment;
+
+    if (Math.abs(newStartTime - startTime) < 0.001) {
+      newStartTime = target;
+    }
+
+    const newStart = newStartTime * this.state.audioBuffer.sampleRate;
+
+    this.setState({
+      start: newStart,
+      end: newStart + (this.state.end - this.state.start),
+    });
+
+    if (newStartTime !== target) {
+      this.windowRafId = requestAnimationFrame(() => this.animateWindowShift());
+    }
   }
 
   calculateClientXTime = (clientX: number): number | nil => {
@@ -293,6 +355,11 @@ export default class WavePlayer extends preact.Component<Props, State> {
       this.state.audioBuffer === nil
     ) {
       return;
+    }
+
+    if (this.windowRafId !== nil) {
+      cancelAnimationFrame(this.windowRafId);
+      this.windowRafId = nil;
     }
 
     const audioBuffer = this.state.audioBuffer;
@@ -350,6 +417,18 @@ export default class WavePlayer extends preact.Component<Props, State> {
       });
     }
   };
+
+  calculateProgressOf(time: number): number | nil {
+    const { start, end, audioBuffer } = this.state;
+
+    if (end === nil || audioBuffer === nil) {
+      return nil;
+    }
+
+    const timeSample = time * audioBuffer.sampleRate;
+
+    return (timeSample - start) / (end - start);
+  }
 
   zoom(factor: number) {
     const {
