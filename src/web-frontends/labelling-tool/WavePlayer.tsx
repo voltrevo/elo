@@ -12,6 +12,7 @@ import DropDetector from './DropDetector';
 import { download } from '../helpers/download';
 import analyzeViaFetch from '../../analyzeViaFetch';
 import type { AnalysisFragment } from '../../analyze';
+import readLines from '../../helpers/readLines';
 
 type Props = {};
 
@@ -124,10 +125,46 @@ export default class WavePlayer extends preact.Component<Props, State> {
   };
 
   setAnalysisFile = async (f: File) => {
+    this.clearAnalysis();
+
+    readLines(f.stream(), () => {});
+
+    this.clearAnalysis();
+
     this.setState({
+      loadingTime: 0,
       analysisFile: f,
     });
+
+    const analysis: AnalysisFragment[] = [];
+
+    await readLines(
+      f.stream(),
+      line => {
+        const fragment: AnalysisFragment = JSON.parse(line);
+        console.log(fragment);
+        analysis.push(fragment);
+        this.addAnalysisFragment(fragment);
+      },
+    );
+
+    this.setState({ analysis });
   }
+
+  downloadAnalysis = () => {
+    if (this.state.analysis === nil) {
+      return;
+    }
+
+    const str = (this.state.analysis
+      .map(fragment => JSON.stringify(fragment))
+      .join('\n')
+    );
+
+    const url = URL.createObjectURL(new Blob([str]));
+    download('analysis.jsonl', url);
+    URL.revokeObjectURL(url);
+  };
 
   async componentWillMount() {
     const mainAudioElement = new Audio();
@@ -651,7 +688,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
               </button>
             </td>
             <td>
-              <button onClick={() => { /* TODO: Download */ }}>Download</button>
+              <button onClick={this.downloadAnalysis}>Download</button>
             </td>
           </tr>
         </tbody>
