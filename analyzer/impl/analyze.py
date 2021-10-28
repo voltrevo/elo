@@ -90,7 +90,8 @@ def analyze(
       stream_processing_time += time.perf_counter() - start
       finished = True
     else:
-      is_speech = True if len(input_bytes) < 960 else vad.is_speech(input_bytes, 16000)
+      # is_speech = True if len(input_bytes) < 960 else vad.is_speech(input_bytes, 16000)
+      is_speech = True
 
       if is_speech:
         on_debug("voice")

@@ -718,8 +718,8 @@ export default class WavePlayer extends preact.Component<Props, State> {
     // information at that time. A late match is more understandable, especially as an algorithm may
     // correctly wait for enough context to determine what has happened (though ideally it would
     // still place the feature back at when it happened).
-    const maxEarlyMatchError = 0.3; // seconds
-    const maxLateMatchError = 0.7; // seconds
+    const maxEarlyMatchError = 0.6; // seconds
+    const maxLateMatchError = 0.9; // seconds
 
     const matches: { reference: Label, generated: Label }[] = [];
 
