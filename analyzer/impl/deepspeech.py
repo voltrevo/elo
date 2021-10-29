@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Callable, List
 
-import deepspeech # type: ignore
+import stt # type: ignore
 import numpy
 
 from .types import AnalysisToken
@@ -47,7 +47,7 @@ def parse(ds_metadata: Any) -> Metadata:
 
 class Model:
   def __init__(self, model_path: str):
-    self.ds = deepspeech.Model(model_path)
+    self.ds = stt.Model(model_path) # type: ignore
 
   def sttWithMetadata(self, audio_buffer: bytes, max_results: int) -> Metadata:
     ds_metadata = self.ds.sttWithMetadata(audio_buffer, max_results) # type: ignore
@@ -79,7 +79,7 @@ class ModelStream:
   processed_byte_pos = 0 # includes skipped bytes
 
   def __init__(self,
-    ds: deepspeech.Model,
+    ds, # type: ignore
     on_token: Callable[[AnalysisToken], None],
     on_debug: Callable[[str], None],
     on_finalize: Callable[[], None],
