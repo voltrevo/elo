@@ -25,7 +25,5 @@ RUN python -m pip install -U pip
 RUN python -m pip install wheel
 RUN python -m pip install numpy stt dataclasses typing_extensions webrtcvad
 
-ENV STT_TFLITE_DELEGATE="gpu"
-
 WORKDIR /app
 CMD [ "npm", "start" ]
