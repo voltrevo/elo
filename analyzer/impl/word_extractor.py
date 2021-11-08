@@ -12,7 +12,7 @@ disfluents = {
     # 'a', 'an', 'am', 'ham', 'm',
 
     # Candidates to add
-    # 'im', 'h', 'ahr', 'om', 'ouh', 'u',
+    # 'im', 'ih', 'h', 'ahr', 'om', 'ouh', 'u', 'o', 'hum',
   },
   'undesirable': {
     'you know', 'like',
