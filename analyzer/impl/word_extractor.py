@@ -3,13 +3,16 @@ from typing import Callable, List, Optional, Set
 from .types import AnalysisDisfluent, AnalysisToken, AnalysisWord
 
 
-empty_disfluent = '<?>'
+unknown_marker = '<?>'
 
 disfluents = {
   'filler': {
-    empty_disfluent,
-    'um', 'uh', 'un', 'ho', 'ah', 'm', 'ar', 'rn', 'er', 'earh', 'eh',
-    # 'a', 'an', 'am', 'ham',
+    # unknown_marker,
+    'um', 'uh', 'un', 'ho', 'ah', 'ar', 'rn', 'er', 'earh', 'eh',
+    # 'a', 'an', 'am', 'ham', 'm',
+
+    # Candidates to add
+    # 'im', 'h', 'ahr', 'om', 'ouh', 'u',
   },
   'undesirable': {
     'you know', 'like',
@@ -93,31 +96,11 @@ class WordExtractor:
         start_time = t.start_time
 
       end_time = t.start_time
-    
-    if (
-      self.last_end_time is not None and
-      start_time is not None and
-      start_time - self.last_end_time >= pause_min and
-      start_time - self.last_end_time <= pause_max
-    ):
-      self.on_word(AnalysisWord(
-        start_time=self.last_end_time + 0.05,
-        end_time=start_time - 0.05,
-        disfluent=True,
-        text='<pause>',
-      ))
-
-      self.on_disfluent(AnalysisDisfluent(
-        start_time=self.last_end_time + 0.05,
-        end_time=start_time - 0.05,
-        category='filler',
-        text='<pause>',
-      ))
 
     text = ''.join(['' if t.text is None else t.text for t in self.partial_word])
 
     if text == '':
-      text = empty_disfluent
+      text = unknown_marker
     
     analysis_word = AnalysisWord(
       start_time=start_time,
