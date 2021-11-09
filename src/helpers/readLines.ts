@@ -5,7 +5,7 @@ export default async function readLines(
   const reader = stream.getReader();
 
   const textDecoder = new TextDecoder();
-  const buf = new Uint8Array(1024 * 1024); // TODO: Handle lines exceeding this length
+  const buf = new Uint8Array(4 * 1024 * 1024); // TODO: Handle lines exceeding this length
   let bufPos = 0;
   const lineBreakCode = '\n'.charCodeAt(0);
 
