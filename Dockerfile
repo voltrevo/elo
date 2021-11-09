@@ -1,4 +1,5 @@
-FROM nvcr.io/nvidia/tensorflow:20.06-tf1-py3
+FROM ubuntu:20.04
+# FROM nvcr.io/nvidia/tensorflow:20.06-tf1-py3
 
 RUN apt update -y
 # RUN apt install -y ffmpeg python3 python3-pip curl libcudnn7 python3-venv
