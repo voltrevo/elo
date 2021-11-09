@@ -4,9 +4,8 @@ RUN apt update -y
 # RUN apt install -y ffmpeg python3 python3-pip curl libcudnn7 python3-venv
 RUN apt install -y ffmpeg curl python3-venv
 
-RUN mkdir -p /data && \
-  curl -L https://github.com/coqui-ai/STT-models/releases/download/english/coqui/v0.9.3/model.tflite >/data/models.tflite && \
-  curl -L https://github.com/coqui-ai/STT-models/releases/download/english/coqui/v0.9.3/coqui-stt-0.9.3-models.scorer >/data/models.scorer
+ARG modelPath
+ADD "$modelPath" /data/models.tflite
 
 RUN curl -L https://nodejs.org/dist/v16.0.0/node-v16.0.0-linux-x64.tar.xz >/data/node.tar.gz && \
   tar xf /data/node.tar.gz -C /data && \
