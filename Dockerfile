@@ -15,11 +15,13 @@ ENV PATH="/data/node-v16.0.0-linux-x64/bin:${PATH}"
 
 ENV HOST="0.0.0.0" PORT=36582
 
+RUN apt install -y build-essential python3-dev
+
 ADD . /app
 
 WORKDIR /app/analyzer
 ENV PATH="/app/analyzer/venv/bin:$PATH"
-RUN python -m venv venv
+RUN python3 -m venv venv
 RUN python -m pip install -U pip
 RUN python -m pip install wheel
 RUN python -m pip install numpy stt dataclasses typing_extensions webrtcvad
