@@ -4,8 +4,7 @@ RUN apt update -y
 # RUN apt install -y ffmpeg python3 python3-pip curl libcudnn7 python3-venv
 RUN apt install -y ffmpeg curl python3-venv
 
-ARG modelPath
-ADD "$modelPath" /data/models.tflite
+ADD data/models.tflite /data/models.tflite
 
 RUN curl -L https://nodejs.org/dist/v16.0.0/node-v16.0.0-linux-x64.tar.xz >/data/node.tar.gz && \
   tar xf /data/node.tar.gz -C /data && \
