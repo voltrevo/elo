@@ -13,12 +13,14 @@ on your preferred distro without too much trouble.
 
 **Steps**
 
-For production, add `API_HOST_AND_PORT=example.com ` to the start of `npm run build` below.
-
 1. `npm install`
-2. `npm run build`
-3. `sudo docker build . -t fluency` (~4min)
+2. `npm run build` (Note 1)
+3. `sudo docker build --build-arg modelPath=/tmp/model.tflite . -t fluency` (~4min) (Note 2) 
 4. `sudo docker run --rm -it -p36582:36582 fluency:latest`
+
+**Note 1**: For production, prefix the command with `API_HOST_AND_PORT=example.com `
+
+**Note 2**: Replace `/tmp/model.tflite` with the model you want to use. Coqui has a public [english model](https://github.com/coqui-ai/STT-models/releases/download/english/coqui/v0.9.3/model.tflite) you can use if you don't have one.
 
 Visit `localhost:36582/demo.html` to view the demo frontend.
 
