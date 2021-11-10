@@ -1,8 +1,68 @@
+@import "./variables";
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;600&display=swap');
+
 .elo-page {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight: 300;
   font-size: 2em;
   max-width: 1280px;
   margin-left: auto;
   margin-right: auto;
+
+  .elo-page-container {
+    padding: 25px;
+  }
+
+  .important-value {
+    font-weight: 600;
+  }
+
+  .heading {
+    display: flex;
+    flex-direction: row;
+    margin-top: 3em;
+
+    > * {
+      flex-grow: 1;
+      flex-basis: 0;
+    }
+
+    > *:last-child {
+      text-align: right;
+    }
+
+    .your-weekly-report {
+      font-weight: 600;
+      color: $other-disfluent-fgcolor;
+    }
+
+    .user-label {
+      font-weight: 600;
+      color: $filler-fgcolor;
+    }
+
+    .stats {
+      margin-top: 0.5em;
+
+      td.numeric {
+        text-align: right;
+        padding-left: 0.5em;
+      }
+    }
+  }
+
+  .single-stat-boxes {
+    display: flex;
+    flex-direction: row;
+    margin-top: 1em;
+    gap: 1em;
+
+    > div {
+      flex-grow: 1;
+      flex-basis: 0;
+      border: 1px solid black;
+    }
+  }
 
   h1 {
     text-align: center;
