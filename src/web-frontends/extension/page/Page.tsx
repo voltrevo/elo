@@ -96,25 +96,6 @@ export default class Page extends preact.Component {
             </div>
           </div>
         </div>
-
-        <h1>Elo</h1>
-
-        <div class="highlight-stat-container">
-          <div class="highlight-stat">
-            <div class="value">{(sampleData.totalDuration / 3600000).toFixed(1)}</div>
-            <div class="name">Hours Analyzed</div>
-          </div>
-          <div class="highlight-stat">
-            <div class="value">{sampleData.totalSessions}</div>
-            <div class="name">Sessions</div>
-          </div>
-        </div>
-
-        <div>
-          <h2>Recent Activity</h2>
-
-
-        </div>
       </div>
     </div>;
   }
