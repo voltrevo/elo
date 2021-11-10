@@ -44,6 +44,10 @@ interceptGetUserMedia(({ constraints, streamPromise }) => {
               type: 'disfluent',
               value: disfluent,
             }),
+            onProgress: progress => callbacks.onMessage({
+              type: 'progress',
+              value: progress,
+            }),
           },
         );
       } catch (error) {

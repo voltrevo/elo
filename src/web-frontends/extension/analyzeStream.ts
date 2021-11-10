@@ -1,4 +1,4 @@
-import { AnalysisDisfluent, AnalysisFragment, AnalysisWord } from '../../analyze';
+import { AnalysisDisfluent, AnalysisFragment, AnalysisProgress, AnalysisWord } from '../../analyze';
 import never from '../../helpers/never';
 
 const maxLatency = 2; // seconds
@@ -9,6 +9,7 @@ export default async function analyzeStream(
     onConnected: () => void,
     onWord: (word: AnalysisWord) => void,
     onDisfluent: (disfluent: AnalysisDisfluent) => void,
+    onProgress: (progress: AnalysisProgress) => void,
   },
 ) {
   const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -102,6 +103,8 @@ export default async function analyzeStream(
       }
 
       case 'progress': {
+        callbacks.onProgress(fragment.value);
+
         const duration = (Date.now() - startTime) / 1000;
         const latency = duration - fragment.value.duration;
 

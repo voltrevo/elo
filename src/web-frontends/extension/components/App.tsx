@@ -3,6 +3,7 @@ import * as preact from 'preact';
 import never from '../../../helpers/never';
 import Callbacks from '../Callbacks';
 import TaskQueue from '../../../helpers/TaskQueue';
+import EwmaCalculator from '../../helpers/EwmaCalculator';
 
 type Props = {
   callbacks: Callbacks,
@@ -24,6 +25,9 @@ type State = {
 
   fillerBox: WordBox;
   otherDisfluentBox: WordBox;
+
+  fillerSoundRate: number;
+  fillerWordRate: number;
 
   sessionStats: {
     speakingTime: number;
@@ -56,6 +60,9 @@ export default class App extends preact.Component<Props, State> {
     featureCounts: {},
   };
 
+  fillerSoundEwma = new EwmaCalculator(60, 60);
+  fillerWordEwma = new EwmaCalculator(60, 60);
+
   cleanupTasks = new TaskQueue();
 
   constructor() {
@@ -74,6 +81,8 @@ export default class App extends preact.Component<Props, State> {
         count: 0,
         highlight: false,
       },
+      fillerSoundRate: 0,
+      fillerWordRate: 0,
       sessionStats: this.latestSessionStats,
     };
 
@@ -120,6 +129,18 @@ export default class App extends preact.Component<Props, State> {
             },
           };
 
+          const ewmaKey = (msg.value.category === 'filler'
+            ? 'fillerSoundEwma' as const
+            : 'fillerWordEwma' as const
+          );
+
+          const rateKey = (msg.value.category === 'filler'
+            ? 'fillerSoundRate' as const
+            : 'fillerWordRate' as const
+          );
+
+          this[ewmaKey].observe(1);
+
           this.setState({
             [key]: {
               word: disfluentRewriteMap[msg.value.text] ?? msg.value.text,
@@ -134,6 +155,7 @@ export default class App extends preact.Component<Props, State> {
                 });
               }, 3000),
             },
+            [rateKey]: this[ewmaKey].value,
             sessionStats: this.latestSessionStats,
           });
 
@@ -147,7 +169,14 @@ export default class App extends preact.Component<Props, State> {
             totalTime: this.latestSessionStats.totalTime + msg.value.audio_time,
           };
 
-          this.setState({ sessionStats: this.latestSessionStats });
+          this.fillerSoundEwma.timeDecay(msg.value.speaking_time);
+          this.fillerWordEwma.timeDecay(msg.value.speaking_time);
+
+          this.setState({
+            sessionStats: this.latestSessionStats,
+            fillerSoundRate: this.fillerSoundEwma.value,
+            fillerWordRate: this.fillerWordEwma.value,
+          });
 
           break;
         }
@@ -313,7 +342,7 @@ export default class App extends preact.Component<Props, State> {
             </div>
           </div>
           <div class="common-centering counter">
-            {this.state.fillerBox.count}
+            {this.state.fillerSoundRate.toFixed(1)}
           </div>
         </div>
         <div class="center common-centering">
@@ -333,7 +362,7 @@ export default class App extends preact.Component<Props, State> {
         </div>
         <div class="right spacer">
           <div class="common-centering counter">
-            {this.state.otherDisfluentBox.count}
+            {this.state.fillerWordRate.toFixed(1)}
           </div>
           <div class="word-box-container spacer">
             <div
