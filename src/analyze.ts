@@ -11,6 +11,7 @@ export type AnalysisFragment = (
   | { type: 'progress', value: {
     duration: number,
     audio_time: number,
+    speaking_time: number,
     stream_processing_time: number,
     token_processing_time: number,
     other_processing_time: number,

@@ -7,7 +7,18 @@ import webrtcvad # type: ignore
 
 from . import deepspeech
 from .word_extractor import WordExtractor
-from .types import AnalysisDebugFragment, AnalysisDisfluent, AnalysisDisfluentFragment, AnalysisEndFragment, AnalysisFragment, AnalysisProgressFragment, AnalysisToken, AnalysisTokenFragment, AnalysisWord, AnalysisWordFragment
+
+from .types import (
+  AnalysisDisfluent,
+  AnalysisDisfluentFragment,
+  AnalysisEndFragment,
+  AnalysisFragment,
+  AnalysisProgressFragment,
+  AnalysisToken,
+  AnalysisTokenFragment,
+  AnalysisWord,
+  AnalysisWordFragment,
+)
 
 home = os.getenv('HOME')
 
@@ -75,6 +86,7 @@ def analyze(
   buffered_chunks: List[AudioChunk] = []
 
   audio_time = 0
+  speaking_time = 0
   stream_processing_time = 0
   token_processing_time = 0
   other_start = time.perf_counter()
@@ -117,11 +129,13 @@ def analyze(
             start = time.perf_counter()
             ds_stream.feed_audio_content(buffered_chunk.byte_pos, buffered_chunk.buffer)
             stream_processing_time += time.perf_counter() - start
+            speaking_time += len(buffered_chunk.buffer) / 32000
             buffered_chunks = []
 
         start = time.perf_counter()
         ds_stream.feed_audio_content(byte_pos, input_bytes)
         stream_processing_time += time.perf_counter() - start
+        speaking_time += len(input_bytes) / 32000
 
     if audio_time >= 1:
       other_processing_time = time.perf_counter() - other_start
@@ -135,6 +149,7 @@ def analyze(
         value=AnalysisProgressFragment.Value(
           duration=byte_len / 32000,
           audio_time=audio_time,
+          speaking_time=speaking_time,
           stream_processing_time=stream_processing_time,
           token_processing_time=token_processing_time,
           other_processing_time=other_processing_time,
@@ -142,6 +157,7 @@ def analyze(
       ))
 
       audio_time = 0
+      speaking_time = 0
       stream_processing_time = 0
       token_processing_time = 0
 

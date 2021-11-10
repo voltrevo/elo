@@ -32,6 +32,7 @@ class AnalysisProgressFragment:
   class Value:
     duration: float
     audio_time: float
+    speaking_time: float
     stream_processing_time: float
     token_processing_time: float
     other_processing_time: float
