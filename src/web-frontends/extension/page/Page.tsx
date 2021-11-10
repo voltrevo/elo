@@ -96,6 +96,80 @@ export default class Page extends preact.Component {
             </div>
           </div>
         </div>
+
+        <div class="overview">
+          <div class="bold other-disfluent-fgcolor">Overview</div>
+          <hr class="overview-underline" />
+          <div class="overview-sections">
+            <div>
+              <div>
+                Expressions to Avoid
+                <hr/>
+              </div>
+              <div class="overview-subtext">
+                Tip: You can select which expressions Elo looks out for by clocking on the dropdown
+                in a video conference.
+              </div>
+              <table>
+                <thead></thead>
+                <tbody>
+                  <tr>
+                    <td>like</td><td>40</td>
+                  </tr>
+                  <tr>
+                    <td>so...</td><td>22</td>
+                  </tr>
+                  <tr>
+                    <td>ok, so...</td><td>10</td>
+                  </tr>
+                  <tr>
+                    <td>I mean...</td><td>6</td>
+                  </tr>
+                  <tr>
+                    <td>right?</td><td>5</td>
+                  </tr>
+                  <tr>
+                    <td>ok</td><td>5</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <div>
+                Hedge Words
+                <hr/>
+              </div>
+              <div class="overview-subtext">
+                Hedge Words make your statements less impactful. For example “I think we should do
+                this…” is less impactful than “We should do this”. You can use them intentionally
+                but be mindful if you overuse them.
+              </div>
+              <table>
+                <thead></thead>
+                <tbody>
+                  <tr>
+                    <td>I guess</td><td>32</td>
+                  </tr>
+                  <tr>
+                    <td>I suppose</td><td>11</td>
+                  </tr>
+                  <tr>
+                    <td>kind of</td><td>6</td>
+                  </tr>
+                  <tr>
+                    <td>or something</td><td>5</td>
+                  </tr>
+                  <tr>
+                    <td>I just</td><td>5</td>
+                  </tr>
+                  <tr>
+                    <td>Well...</td><td>5</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
     </div>;
   }

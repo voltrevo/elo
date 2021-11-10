@@ -91,6 +91,56 @@
     }
   }
 
+  .overview {
+    margin-top: 1em;
+
+    .overview-underline {
+      border: none;
+      border-top: 3px solid $other-disfluent-fgcolor;
+    }
+
+    .overview-subtext {
+      font-size: 0.8em;
+      min-height: 4em; // TODO: Better alignment solution - css grid?
+    }
+
+    .overview-sections {
+      display: flex;
+      flex-direction: row;
+      gap: 1em;
+
+      padding: 0 0.5em;
+
+      > div {
+        flex-grow: 1;
+        flex-basis: 0;
+      }
+    }
+
+    table {
+      margin-top: 1em;
+      width: 100%;
+
+      tr {
+        &:nth-child(odd) {
+          background-color: rgba(0, 0, 0, 0.03);
+        }
+
+        &:nth-child(even) {
+          background-color: rgba(0, 0, 0, 0.01);
+        }
+      }
+
+      td {
+        width: 50%;
+
+        &:last-child {
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
   .very-prominent-number {
     font-size: 4em;
     font-weight: 600;
