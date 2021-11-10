@@ -56,9 +56,45 @@ export default class Page extends preact.Component {
         </div>
 
         <div class="single-stat-boxes">
-          <div>Combined</div>
-          <div>ums and uhs</div>
-          <div>Filler and Hedge Words</div>
+          <div>
+            <div class="bold">Combined</div>
+            <div>
+              <span class="very-prominent-number third-accent-fgcolor">4.8</span>
+              <span class="bold">&nbsp;per minute speaking</span>
+            </div>
+            <div>
+              <span class="bold third-accent-fgcolor">That’s pretty good!</span> The optimum frequency is
+              one filler per minute, but the average speaker uses five fillers per minute
+              (<a href="https://hbr.org/2018/08/how-to-stop-saying-um-ah-and-you-know">source</a>).
+              Keep improving with Elo and you’ll get there.
+            </div>
+          </div>
+          <div>
+            <div class="bold">ums and uhs</div>
+            <div>
+              <span class="very-prominent-number filler-fgcolor">2.1</span>
+              <span class="bold">&nbsp;per minute speaking</span>
+            </div>
+            <div>
+              Keep paying attention to your ehms and uhms till you catch yourself about to use them.
+              Then, err on silence instead to develop a smoother, polished delivery.
+            </div>
+          </div>
+          <div>
+            <div class="bold">Filler and Hedge Words</div>
+            <div>
+              <span class="very-prominent-number other-disfluent-fgcolor">2.7</span>
+              <span class="bold">&nbsp;per minute speaking</span>
+            </div>
+            <div>
+              Your most used filler word this week was
+              “<span class="bold other-disfluent-fgcolor">like</span>”.
+              <p>
+                By eliminating fillers and hedgewords you boost your credibility by speaking with
+                authority and conviction.
+              </p>
+            </div>
+          </div>
         </div>
 
         <h1>Elo</h1>
