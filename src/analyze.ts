@@ -8,14 +8,7 @@ export type AnalysisFragment = (
   | { type: 'word', value: AnalysisWord }
   | { type: 'disfluent', value: AnalysisDisfluent }
   | { type: 'error', value: { message: string } }
-  | { type: 'progress', value: {
-    duration: number,
-    audio_time: number,
-    speaking_time: number,
-    stream_processing_time: number,
-    token_processing_time: number,
-    other_processing_time: number,
-  } }
+  | { type: 'progress', value: AnalysisProgress }
   | { type: 'debug', value: { message: string } }
   | { type: 'end', value: { duration: number } }
 );
@@ -39,6 +32,15 @@ export type AnalysisDisfluent = {
   end_time: number | null,
   category: string,
   text: string,
+};
+
+export type AnalysisProgress = {
+  duration: number,
+  audio_time: number,
+  speaking_time: number,
+  stream_processing_time: number,
+  token_processing_time: number,
+  other_processing_time: number,
 };
 
 export type AnalysisToken = {

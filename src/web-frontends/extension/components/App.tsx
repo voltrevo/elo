@@ -24,11 +24,16 @@ type State = {
 
   fillerBox: WordBox;
   otherDisfluentBox: WordBox;
+
+  sessionStats: {
+    speakingTime: number;
+    totalTime: number;
+    featureCounts: Record<string, Record<string, number>>;
+  },
 };
 
 const disfluentRewriteMap: Record<string, string | undefined> = {
-  '<?>': 'uhm',
-  '<pause>': 'ehm',
+  // Currently not rewriting anything
 };
 
 export default class App extends preact.Component<Props, State> {
@@ -43,6 +48,12 @@ export default class App extends preact.Component<Props, State> {
   windowSize = {
     width: window.innerWidth,
     height: window.innerHeight,
+  };
+
+  latestSessionStats: State['sessionStats'] = {
+    speakingTime: 0,
+    totalTime: 0,
+    featureCounts: {},
   };
 
   cleanupTasks = new TaskQueue();
@@ -63,6 +74,7 @@ export default class App extends preact.Component<Props, State> {
         count: 0,
         highlight: false,
       },
+      sessionStats: this.latestSessionStats,
     };
 
     this.setState(initialState);
@@ -95,6 +107,19 @@ export default class App extends preact.Component<Props, State> {
 
           clearTimeout(this.state[key].highlightTimerId);
 
+          this.latestSessionStats = {
+            ...this.latestSessionStats,
+            featureCounts: {
+              ...this.latestSessionStats.featureCounts,
+              [msg.value.category]: {
+                ...this.latestSessionStats.featureCounts[msg.value.category],
+                [msg.value.text]: (
+                  this.latestSessionStats.featureCounts[msg.value.category]?.[msg.value.text] ?? 0
+                ) + 1,
+              },
+            },
+          };
+
           this.setState({
             [key]: {
               word: disfluentRewriteMap[msg.value.text] ?? msg.value.text,
@@ -109,7 +134,20 @@ export default class App extends preact.Component<Props, State> {
                 });
               }, 3000),
             },
+            sessionStats: this.latestSessionStats,
           });
+
+          break;
+        }
+
+        case 'progress': {
+          this.latestSessionStats = {
+            ...this.latestSessionStats,
+            speakingTime: this.latestSessionStats.speakingTime + msg.value.speaking_time,
+            totalTime: this.latestSessionStats.totalTime + msg.value.audio_time,
+          };
+
+          this.setState({ sessionStats: this.latestSessionStats });
 
           break;
         }
