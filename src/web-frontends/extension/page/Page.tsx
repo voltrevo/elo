@@ -1,5 +1,58 @@
 import * as preact from 'preact';
 
+import {
+  Chart,
+  ArcElement,
+  LineElement,
+  BarElement,
+  PointElement,
+  BarController,
+  BubbleController,
+  DoughnutController,
+  LineController,
+  PieController,
+  PolarAreaController,
+  RadarController,
+  ScatterController,
+  CategoryScale,
+  LinearScale,
+  LogarithmicScale,
+  RadialLinearScale,
+  TimeScale,
+  TimeSeriesScale,
+  Decimation,
+  Filler,
+  Legend,
+  Title,
+  Tooltip
+} from 'chart.js';
+
+Chart.register(
+  ArcElement,
+  LineElement,
+  BarElement,
+  PointElement,
+  BarController,
+  BubbleController,
+  DoughnutController,
+  LineController,
+  PieController,
+  PolarAreaController,
+  RadarController,
+  ScatterController,
+  CategoryScale,
+  LinearScale,
+  LogarithmicScale,
+  RadialLinearScale,
+  TimeScale,
+  TimeSeriesScale,
+  Decimation,
+  Filler,
+  Legend,
+  Title,
+  Tooltip
+);
+
 const sampleData = {
   totalSessions: 10,
   totalDuration: 4123000,
@@ -15,8 +68,13 @@ const sampleData = {
 };
 
 export default class Page extends preact.Component {
+  totalChartRef?: HTMLCanvasElement;
+  totalChart?: Chart;
+  byTypeChartRef?: HTMLCanvasElement;
+
   render() {
-    this;
+    setTimeout(() => this.renderCharts());
+
     return <div class="elo-page">
       <div class="elo-page-container">
         <img src="/assets/icons/icon128.png" width="64" height="64" />
@@ -91,7 +149,7 @@ export default class Page extends preact.Component {
                 Your most used filler word this week was
                 “<span class="bold other-disfluent-fgcolor">like</span>”.
                 <p>
-                  By eliminating fillers and hedgewords you boost your credibility by speaking with
+                  By eliminating fillers and hedge words you boost your credibility by speaking with
                   authority and conviction.
                 </p>
               </div>
@@ -99,11 +157,11 @@ export default class Page extends preact.Component {
           </div>
 
           <div class="card">
-            Total chart
+            <canvas ref={this.setTotalChartRef}></canvas>
           </div>
 
           <div class="card">
-            By type chart
+            <canvas ref={this.setByTypeChartRef}></canvas>
           </div>
 
           <div class="overview">
@@ -149,7 +207,7 @@ export default class Page extends preact.Component {
                   <hr/>
                 </div>
                 <div class="overview-subtext">
-                  Hedge Words make your statements less impactful. For example “I think we should do
+                  Hedge words make your statements less impactful. For example “I think we should do
                   this…” is less impactful than “We should do this”. You can use them intentionally
                   but be mindful if you overuse them.
                 </div>
@@ -189,6 +247,65 @@ export default class Page extends preact.Component {
         </div>
       </div>
     </div>;
+  }
+
+  setTotalChartRef = (r: HTMLCanvasElement | null | undefined) => {
+    r = r ?? undefined;
+
+    if (r !== this.totalChartRef) {
+      this.totalChartRef = r;
+      this.totalChart = undefined;
+    }
+  }
+
+  setByTypeChartRef = (r: HTMLCanvasElement | null) => {
+    this.byTypeChartRef = r ?? undefined;
+  }
+
+  renderCharts() {
+    if (this.totalChartRef !== undefined) {
+      const chartConfig = {
+        type: 'bar' as const,
+        data: {
+          labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+          datasets: [{
+            label: '# of Votes',
+            data: [12, 19, 3, 5, 2, 3],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.2)',
+              'rgba(54, 162, 235, 0.2)',
+              'rgba(255, 206, 86, 0.2)',
+              'rgba(75, 192, 192, 0.2)',
+              'rgba(153, 102, 255, 0.2)',
+              'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)',
+              'rgba(153, 102, 255, 1)',
+              'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      };
+
+      if (this.totalChart === undefined) {
+        this.totalChart = new Chart(this.totalChartRef.getContext('2d')!, chartConfig);
+      } else {
+        this.totalChart.data = chartConfig.data;
+        this.totalChart.update();
+      }
+    }
   }
 
   renderHours(durationMs: number) {
