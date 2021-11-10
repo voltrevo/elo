@@ -57,7 +57,7 @@ export default class Page extends preact.Component {
 
         <div class="single-stat-boxes">
           <div>
-            <div class="bold">Combined</div>
+            <div class="bold">Total</div>
             <div>
               <span class="very-prominent-number third-accent-fgcolor">4.8</span>
               <span class="bold">&nbsp;per minute speaking</span>

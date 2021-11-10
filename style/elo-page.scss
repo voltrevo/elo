@@ -85,13 +85,15 @@
     > div {
       flex-grow: 1;
       flex-basis: 0;
+      border-radius: 1em;
+      padding: 1em;
+      box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 10px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
     }
   }
 
   .very-prominent-number {
     font-size: 4em;
     font-weight: 600;
-    line-height: 1em;
   }
 
   h1 {
