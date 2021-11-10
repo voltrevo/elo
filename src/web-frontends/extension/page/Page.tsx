@@ -70,7 +70,7 @@ export default class Page extends preact.Component {
             </div>
           </div>
           <div>
-            <div class="bold">ums and uhs</div>
+            <div class="bold">Ums &amp; Uhs</div>
             <div>
               <span class="very-prominent-number filler-fgcolor">2.1</span>
               <span class="bold">&nbsp;per minute speaking</span>
@@ -81,7 +81,7 @@ export default class Page extends preact.Component {
             </div>
           </div>
           <div>
-            <div class="bold">Filler and Hedge Words</div>
+            <div class="bold">Filler &amp; Hedge Words</div>
             <div>
               <span class="very-prominent-number other-disfluent-fgcolor">2.7</span>
               <span class="bold">&nbsp;per minute speaking</span>
