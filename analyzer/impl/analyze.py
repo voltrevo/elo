@@ -14,7 +14,7 @@ home = os.getenv('HOME')
 if home == "/root":
   data_dir = "/data"
 else:
-  data_dir = f"{home}/data/deepspeech-exp"
+  data_dir = f"{home}/data/elo"
 
 ds = deepspeech.Model(f"{data_dir}/models.tflite")
 # ds.enableExternalScorer(f"{data_dir}/models.scorer")

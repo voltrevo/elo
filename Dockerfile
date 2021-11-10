@@ -1,30 +1,26 @@
 FROM ubuntu:20.04
-# FROM nvcr.io/nvidia/tensorflow:20.06-tf1-py3
 
+# Install system packages
 RUN apt update -y
-# RUN apt install -y ffmpeg python3 python3-pip curl libcudnn7 python3-venv
-RUN apt install -y ffmpeg curl python3-venv
+RUN apt install -y ffmpeg curl python3-venv build-essential python3-dev
 
-ADD data/models.tflite /data/models.tflite
-
-RUN curl -L https://nodejs.org/dist/v16.0.0/node-v16.0.0-linux-x64.tar.xz >/data/node.tar.gz && \
-  tar xf /data/node.tar.gz -C /data && \
-  mkdir -p /data/recordings
-
-ENV PATH="/data/node-v16.0.0-linux-x64/bin:${PATH}"
-
-ENV HOST="0.0.0.0" PORT=36582
-
-RUN apt install -y build-essential python3-dev
-
-ADD . /app
-
+# Set up python
+ADD analyzer /app/analyzer
 WORKDIR /app/analyzer
-ENV PATH="/app/analyzer/venv/bin:$PATH"
+ENV PATH="/app/analyzer/venv/bin:${PATH}"
 RUN python3 -m venv venv
-RUN python -m pip install -U pip
-RUN python -m pip install wheel
-RUN python -m pip install numpy stt dataclasses typing_extensions webrtcvad
+RUN pip install -U pip
+RUN pip install -r requirements.txt
 
+# Install nodejs
+RUN curl -L https://nodejs.org/dist/v16.13.0/node-v16.13.0-linux-x64.tar.xz | tar xf - -C /data
+ENV PATH="/data/node-v16.13.0-linux-x64/bin:${PATH}"
+
+# Add remaining files
+ADD . /app
+RUN ln -s /app/data/models.tflite /data/models.tflite
+
+# Startup configuration
+ENV HOST="0.0.0.0" PORT=36582
 WORKDIR /app
 CMD [ "npm", "start" ]
