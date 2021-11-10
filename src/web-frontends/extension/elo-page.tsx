@@ -1,7 +1,7 @@
 import * as preact from 'preact';
 
-import Page from './page/Page';
+import ReportPrototype from './components/ReportPrototype';
 
 window.addEventListener('load', () => {
-  preact.render(<Page/>, document.body);
+  preact.render(<ReportPrototype/>, document.body);
 });

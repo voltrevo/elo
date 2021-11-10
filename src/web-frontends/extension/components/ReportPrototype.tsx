@@ -68,7 +68,7 @@ const sampleData = {
   ],
 };
 
-export default class Page extends preact.Component {
+export default class ReportPrototype extends preact.Component {
   totalChartRef?: HTMLCanvasElement;
   totalChart?: Chart;
   byTypeChartRef?: HTMLCanvasElement;
