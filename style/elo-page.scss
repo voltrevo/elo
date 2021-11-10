@@ -11,10 +11,10 @@
 
   a {
     text-decoration: none;
-    color: blue;
+    color: $other-disfluent-fgcolor;
 
     :visited {
-      color: blue;
+      color: $other-disfluent-fgcolor;
     }
   }
 
@@ -39,6 +39,11 @@
   }
 
   .important-value {
+    font-weight: 600;
+  }
+
+  .very-prominent-number {
+    font-size: 4em;
     font-weight: 600;
   }
 
@@ -141,8 +146,7 @@
     }
   }
 
-  .very-prominent-number {
-    font-size: 4em;
-    font-weight: 600;
+  .footer {
+    margin-top: 2em;
   }
 }

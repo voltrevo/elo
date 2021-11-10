@@ -170,6 +170,11 @@ export default class Page extends preact.Component {
             </div>
           </div>
         </div>
+
+        <div class="footer">
+          You can find all expressions and terms in your&nbsp;
+          <a href="#">personal dashboard</a>.
+        </div>
       </div>
     </div>;
   }
