@@ -2,6 +2,7 @@ import * as preact from 'preact';
 
 import {
   Chart,
+  ChartConfiguration,
   ArcElement,
   LineElement,
   BarElement,
@@ -71,8 +72,15 @@ export default class Page extends preact.Component {
   totalChartRef?: HTMLCanvasElement;
   totalChart?: Chart;
   byTypeChartRef?: HTMLCanvasElement;
+  byTypeChart?: Chart;
 
   render() {
+    (window as any).pages ??= [];
+
+    if (!(window as any).pages.includes(this)) {
+      (window as any).pages.push(this);
+    }
+
     setTimeout(() => this.renderCharts());
 
     return <div class="elo-page">
@@ -157,11 +165,11 @@ export default class Page extends preact.Component {
           </div>
 
           <div class="card">
-            <canvas ref={this.setTotalChartRef}></canvas>
+            <canvas ref={this.setTotalChartRef} style={{ height: '400px' }}></canvas>
           </div>
 
           <div class="card">
-            <canvas ref={this.setByTypeChartRef}></canvas>
+            <canvas ref={this.setByTypeChartRef} style={{ height: '400px' }}></canvas>
           </div>
 
           <div class="overview">
@@ -258,44 +266,44 @@ export default class Page extends preact.Component {
     }
   }
 
-  setByTypeChartRef = (r: HTMLCanvasElement | null) => {
-    this.byTypeChartRef = r ?? undefined;
+  setByTypeChartRef = (r: HTMLCanvasElement | null | undefined) => {
+    r = r ?? undefined;
+
+    if (r !== this.totalChartRef) {
+      this.byTypeChartRef = r;
+      this.byTypeChart = undefined;
+    }
   }
 
   renderCharts() {
     if (this.totalChartRef !== undefined) {
-      const chartConfig = {
-        type: 'bar' as const,
+      const chartConfig: ChartConfiguration<'line'> = {
+        type: 'line' as const,
         data: {
-          labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+          labels: [
+            'five weeks ago',
+            'four weeks ago',
+            '3 weeks ago',
+            '2 weeks ago',
+            'last week',
+            'this week',
+          ],
           datasets: [{
-            label: '# of Votes',
-            data: [12, 19, 3, 5, 2, 3],
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.2)',
-              'rgba(54, 162, 235, 0.2)',
-              'rgba(255, 206, 86, 0.2)',
-              'rgba(75, 192, 192, 0.2)',
-              'rgba(153, 102, 255, 0.2)',
-              'rgba(255, 159, 64, 0.2)'
-            ],
-            borderColor: [
-              'rgba(255, 99, 132, 1)',
-              'rgba(54, 162, 235, 1)',
-              'rgba(255, 206, 86, 1)',
-              'rgba(75, 192, 192, 1)',
-              'rgba(153, 102, 255, 1)',
-              'rgba(255, 159, 64, 1)'
-            ],
-            borderWidth: 1
+            label: 'Total',
+            data: [6.5, 6.3, 5.8, 6.1, 5.4, 4.8],
+            fill: false,
+            borderColor: 'rgb(0, 223, 223)',
+            tension: 0.1
           }]
         },
         options: {
           scales: {
             y: {
-              beginAtZero: true
+              min: 0,
+              max: 8,
             }
-          }
+          },
+          maintainAspectRatio: false,
         }
       };
 
@@ -304,6 +312,54 @@ export default class Page extends preact.Component {
       } else {
         this.totalChart.data = chartConfig.data;
         this.totalChart.update();
+      }
+    }
+
+    if (this.byTypeChartRef !== undefined) {
+      const chartConfig: ChartConfiguration<'line'> = {
+        type: 'line' as const,
+        data: {
+          labels: [
+            'five weeks ago',
+            'four weeks ago',
+            '3 weeks ago',
+            '2 weeks ago',
+            'last week',
+            'this week',
+          ],
+          datasets: [
+            {
+              label: 'Ums & Uhs',
+              data: [3.5, 3.4, 3.4, 3.3, 2.5, 2.1],
+              fill: false,
+              borderColor: 'rgb(0, 200, 255)',
+              tension: 0.1
+            },
+            {
+              label: 'Filler & Hedge Words',
+              data: [3, 2.9, 2.4, 2.8, 2.9, 2.7],
+              fill: false,
+              borderColor: 'rgb(179, 0, 255)',
+              tension: 0.1
+            },
+          ]
+        },
+        options: {
+          scales: {
+            y: {
+              min: 0,
+              max: 4,
+            }
+          },
+          maintainAspectRatio: false,
+        }
+      };
+
+      if (this.byTypeChart === undefined) {
+        this.byTypeChart = new Chart(this.byTypeChartRef.getContext('2d')!, chartConfig);
+      } else {
+        this.byTypeChart.data = chartConfig.data;
+        this.byTypeChart.update();
       }
     }
   }
