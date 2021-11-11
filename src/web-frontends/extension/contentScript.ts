@@ -1,3 +1,6 @@
+import PostMessageServer from "../helpers/PostMessageServer";
+import ContentApp from "./ContentApp";
+
 const eloExtension = document.createElement('div');
 eloExtension.id = 'elo-extension';
 document.documentElement.appendChild(eloExtension);
@@ -17,3 +20,10 @@ iconTag.setAttribute('id', 'icon-template');
 iconTag.src = chrome.runtime.getURL('assets/icons/icon128.png');
 iconTag.style.display = 'none';
 eloExtension.appendChild(iconTag);
+
+const contentApp = new ContentApp();
+
+new PostMessageServer(
+  'elo',
+  ({ method, args }: any) => (contentApp as any)[method](...args),
+);

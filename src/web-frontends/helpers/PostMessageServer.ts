@@ -3,7 +3,7 @@ import looseLookup from "./looseLookup";
 export default class PostMessageServer {
   constructor(
     public channel: string,
-    public handleRequest: (data: unknown) => Promise<unknown>,
+    public handleRequest: (data: unknown) => unknown,
   ) {
     window.addEventListener('message', this.messageListener);
   }
