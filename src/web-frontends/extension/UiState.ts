@@ -11,6 +11,7 @@ type UiState = {
 
 type WordBox = {
   text: string;
+  count: number;
   metric: string;
 };
 
@@ -23,11 +24,13 @@ function UiState(): UiState {
   
     fillerSoundBox: {
       text: '',
+      count: 0,
       metric: '',
     },
 
     fillerWordBox: {
       text: '',
+      count: 0,
       metric: '',
     },
   };

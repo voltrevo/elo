@@ -18,9 +18,13 @@ type WordBox = {
 };
 
 type State = {
+  uiState: UiState;
+
   left?: string;
   top?: string;
-  uiState: UiState;
+
+  highlightFillerSound: boolean;
+  highlightFillerWord: boolean;
 };
 
 export default class App extends preact.Component<Props, State> {
@@ -42,7 +46,11 @@ export default class App extends preact.Component<Props, State> {
   constructor() {
     super();
 
-    this.state = { uiState: UiState() };
+    this.state = {
+      uiState: UiState(),
+      highlightFillerSound: false,
+      highlightFillerWord: false,
+    };
   }
 
   componentWillMount() {
@@ -60,7 +68,35 @@ export default class App extends preact.Component<Props, State> {
           break;
         }
 
-        this.setState({ uiState: newUiState });
+        const highlights: Partial<State> = {};
+
+        if (newUiState.fillerSoundBox.count > this.state.uiState.fillerSoundBox.count) {
+          highlights.highlightFillerSound = true;
+          const count = newUiState.fillerSoundBox.count;
+
+          setTimeout(() => {
+            if (this.state.uiState.fillerSoundBox.count === count) {
+              this.setState({
+                highlightFillerSound: false,
+              });
+            }
+          }, 3000);
+        }
+
+        if (newUiState.fillerWordBox.count > this.state.uiState.fillerWordBox.count) {
+          highlights.highlightFillerWord = true;
+          const count = newUiState.fillerWordBox.count;
+
+          setTimeout(() => {
+            if (this.state.uiState.fillerWordBox.count === count) {
+              this.setState({
+                highlightFillerWord: false,
+              });
+            }
+          }, 3000);
+        }
+
+        this.setState({ uiState: newUiState, ...highlights });
       }
     })();
 
@@ -194,7 +230,7 @@ export default class App extends preact.Component<Props, State> {
               class={[
                 'common-centering',
                 'word-box',
-                // ...(this.state.fillerBox.highlight ? ['highlight'] : []),
+                ...(this.state.highlightFillerSound ? ['highlight'] : []),
               ].join(' ')}
             >
               {uiState.fillerSoundBox.text}
@@ -228,7 +264,7 @@ export default class App extends preact.Component<Props, State> {
               class={[
                 'common-centering',
                 'word-box',
-                // ...(this.state.otherDisfluentBox.highlight ? ['highlight'] : []),
+                ...(this.state.highlightFillerWord ? ['highlight'] : []),
               ].join(' ')}
             >
               {uiState.fillerWordBox.text}

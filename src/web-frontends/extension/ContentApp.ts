@@ -12,22 +12,7 @@ type SessionStats = {
 };
 
 export default class ContentApp implements PromisishApi<Protocol> {
-  uiState: UiState = {
-    index: 0,
-
-    active: false,
-    loading: false,
-
-    fillerSoundBox: {
-      text: '',
-      metric: '0.0',
-    },
-
-    fillerWordBox: {
-      text: '',
-      metric: '0.0',
-    },
-  };
+  uiState = UiState();
 
   sessionStats: SessionStats = {
     speakingTime: 0,
@@ -68,9 +53,11 @@ export default class ContentApp implements PromisishApi<Protocol> {
 
         if (fragment.value.category === 'filler') {
           this.uiState.fillerSoundBox.text = fragment.value.text;
+          this.uiState.fillerSoundBox.count++;
           this.fillerSoundEwma.observe(1);
         } else {
           this.uiState.fillerWordBox.text = fragment.value.text;
+          this.uiState.fillerWordBox.count++;
           this.fillerWordEwma.observe(1);
         }
 
