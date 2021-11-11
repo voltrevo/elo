@@ -1,7 +1,7 @@
 import * as preact from 'preact';
 
-import ReportPrototype from './components/ReportPrototype';
+import Dashboard from './components/Dashboard';
 
 window.addEventListener('load', () => {
-  preact.render(<ReportPrototype/>, document.body);
+  preact.render(<Dashboard/>, document.body);
 });

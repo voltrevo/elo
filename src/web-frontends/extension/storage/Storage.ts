@@ -11,11 +11,11 @@ export default class Storage {
   constructor(public rootKey: string) {}
 
   async read<T>(key: string): Promise<T | undefined> {
-    return (await browser.storage.sync.get(key))[key];
+    return (await browser.storage.local.get(key))[key];
   }
 
   async write<T>(key: string, value: T): Promise<void> {
-    await browser.storage.sync.set({ [key]: value });
+    await browser.storage.local.set({ [key]: value });
   }
 
   async readRoot(): Promise<StorageRoot> {
