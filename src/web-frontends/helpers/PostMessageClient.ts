@@ -7,26 +7,30 @@ export default class PostMessageClient {
     public channel: string,
   ) {}
 
-  post(data: unknown): Promise<unknown> {
+  post(request: unknown): Promise<unknown> {
     const channel = this.channel;
     const id = this.nextId++;
 
-    window.postMessage({ channel, id, data }, '*');
+    window.postMessage({ channel, id, request }, '*');
 
     return new Promise((resolve, reject) => {
       window.addEventListener('message', function messageListener(evt) {
-        if (looseLookup(evt.data, 'channel') !== channel || evt.data.id !== id) {
+        if (
+          looseLookup(evt.data, 'channel') !== channel ||
+          evt.data.id !== id ||
+          !('response' in evt.data)
+        ) {
           return;
         }
 
         window.removeEventListener('message', messageListener);
 
-        const { result } = evt.data;
+        const { response } = evt.data;
 
-        if ('error' in result) {
-          reject(result.error);
+        if ('error' in response) {
+          reject(new Error(response.error));
         } else {
-          resolve(result.value);
+          resolve(response.value);
         }
       });
     });
