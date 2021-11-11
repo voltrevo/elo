@@ -1,12 +1,13 @@
 import * as preact from 'preact';
 
 import never from '../../../helpers/never';
-import Callbacks from '../Callbacks';
 import TaskQueue from '../../../helpers/TaskQueue';
 import EwmaCalculator from '../../helpers/EwmaCalculator';
+import ContentAppClient from '../ContentAppClient';
+import UiState from '../UiState';
 
 type Props = {
-  callbacks: Callbacks,
+  contentApp: ReturnType<typeof ContentAppClient>,
 };
 
 type WordBox = {
@@ -17,27 +18,9 @@ type WordBox = {
 };
 
 type State = {
-  active: boolean;
-  loading: boolean;
-  word?: string;
   left?: string;
   top?: string;
-
-  fillerBox: WordBox;
-  otherDisfluentBox: WordBox;
-
-  fillerSoundRate: number;
-  fillerWordRate: number;
-
-  sessionStats: {
-    speakingTime: number;
-    totalTime: number;
-    featureCounts: Record<string, Record<string, number>>;
-  },
-};
-
-const disfluentRewriteMap: Record<string, string | undefined> = {
-  // Currently not rewriting anything
+  uiState: UiState;
 };
 
 export default class App extends preact.Component<Props, State> {
@@ -54,155 +37,32 @@ export default class App extends preact.Component<Props, State> {
     height: window.innerHeight,
   };
 
-  latestSessionStats: State['sessionStats'] = {
-    speakingTime: 0,
-    totalTime: 0,
-    featureCounts: {},
-  };
-
-  fillerSoundEwma = new EwmaCalculator(60, 60);
-  fillerWordEwma = new EwmaCalculator(60, 60);
-
   cleanupTasks = new TaskQueue();
 
   constructor() {
     super();
 
-    const initialState: State = {
-      active: false,
-      loading: false,
-      fillerBox: {
-        word: '',
-        count: 0,
-        highlight: false,
-      },
-      otherDisfluentBox: {
-        word: '',
-        count: 0,
-        highlight: false,
-      },
-      fillerSoundRate: 0,
-      fillerWordRate: 0,
-      sessionStats: this.latestSessionStats,
-    };
-
-    this.setState(initialState);
+    this.state = { uiState: UiState() };
   }
 
   componentWillMount() {
-    this.props.callbacks.onMessage = (msg) => {
-      console.debug('fluency message', msg);
+    let cleanedUp = false;
 
-      switch (msg.type) {
-        case 'getUserMedia-called': {
-          setTimeout(() => {
-            this.setState({
-              active: true,
-            });
-          });
+    this.cleanupTasks.push(() => {
+      cleanedUp = true;
+    });
 
+    (async () => {
+      while (true) {
+        const newUiState = await this.props.contentApp.getUiState(this.state.uiState.index);
+
+        if (cleanedUp) {
           break;
         }
 
-        case 'word': {
-          this.setState({ word: msg.value.text });
-          break;
-        }
-
-        case 'disfluent': {
-          const key = msg.value.category === 'filler'
-            ? 'fillerBox' as const
-            : 'otherDisfluentBox' as const;
-
-          clearTimeout(this.state[key].highlightTimerId);
-
-          this.latestSessionStats = {
-            ...this.latestSessionStats,
-            featureCounts: {
-              ...this.latestSessionStats.featureCounts,
-              [msg.value.category]: {
-                ...this.latestSessionStats.featureCounts[msg.value.category],
-                [msg.value.text]: (
-                  this.latestSessionStats.featureCounts[msg.value.category]?.[msg.value.text] ?? 0
-                ) + 1,
-              },
-            },
-          };
-
-          const ewmaKey = (msg.value.category === 'filler'
-            ? 'fillerSoundEwma' as const
-            : 'fillerWordEwma' as const
-          );
-
-          const rateKey = (msg.value.category === 'filler'
-            ? 'fillerSoundRate' as const
-            : 'fillerWordRate' as const
-          );
-
-          this[ewmaKey].observe(1);
-
-          this.setState({
-            [key]: {
-              word: disfluentRewriteMap[msg.value.text] ?? msg.value.text,
-              count: this.state[key].count + 1,
-              highlight: true,
-              highlightTimerId: window.setTimeout(() => {
-                this.setState({
-                  [key]: {
-                    ...this.state[key],
-                    highlight: false,
-                  },
-                });
-              }, 3000),
-            },
-            [rateKey]: this[ewmaKey].value,
-            sessionStats: this.latestSessionStats,
-          });
-
-          break;
-        }
-
-        case 'progress': {
-          this.latestSessionStats = {
-            ...this.latestSessionStats,
-            speakingTime: this.latestSessionStats.speakingTime + msg.value.speaking_time,
-            totalTime: this.latestSessionStats.totalTime + msg.value.audio_time,
-          };
-
-          this.fillerSoundEwma.timeDecay(msg.value.speaking_time);
-          this.fillerWordEwma.timeDecay(msg.value.speaking_time);
-
-          this.setState({
-            sessionStats: this.latestSessionStats,
-            fillerSoundRate: this.fillerSoundEwma.value,
-            fillerWordRate: this.fillerWordEwma.value,
-          });
-
-          break;
-        }
-
-        case 'connecting':
-        case 'reconnecting': {
-          this.setState({
-            loading: true,
-          });
-
-          break;
-        }
-
-        case 'connected': {
-          this.setState({
-            loading: false,
-          });
-
-          break;
-        }
-
-        default: {
-          never(msg);
-        }
+        this.setState({ uiState: newUiState });
       }
-    };
+    })();
 
     const onResize = () => {
       const lastWindowSize = this.windowSize;
@@ -316,17 +176,16 @@ export default class App extends preact.Component<Props, State> {
   }
 
   render(): preact.ComponentChild {
+    const { uiState, left = '', top = '' } = this.state;
+
     return <div
-      class={this.state.active ? 'app active' : 'app'}
+      class={uiState.active ? 'app active' : 'app'}
       ref={r => {
         this.appRef = r;
         this.dragRef = r;
         this.trySetupDragging();
       }}
-      style={{
-        left: this.state.left ?? '',
-        top: this.state.top ?? '',
-      }}
+      style={{ left, top }}
     >
       <div class="body">
         <div class="left spacer">
@@ -335,19 +194,19 @@ export default class App extends preact.Component<Props, State> {
               class={[
                 'common-centering',
                 'word-box',
-                ...(this.state.fillerBox.highlight ? ['highlight'] : []),
+                // ...(this.state.fillerBox.highlight ? ['highlight'] : []),
               ].join(' ')}
             >
-              {this.state.fillerBox.word}
+              {uiState.fillerSoundBox.text}
             </div>
           </div>
           <div class="common-centering counter">
-            {this.state.fillerSoundRate.toFixed(1)}
+            {uiState.fillerSoundBox.metric}
           </div>
         </div>
         <div class="center common-centering">
           <div class="content common-centering">
-            {this.state.loading
+            {uiState.loading
               ? <div class="spinner"></div>
               : <div class="logo" style={{
                 backgroundImage: `url("${(
@@ -362,17 +221,17 @@ export default class App extends preact.Component<Props, State> {
         </div>
         <div class="right spacer">
           <div class="common-centering counter">
-            {this.state.fillerWordRate.toFixed(1)}
+            {uiState.fillerWordBox.metric}
           </div>
           <div class="word-box-container spacer">
             <div
               class={[
                 'common-centering',
                 'word-box',
-                ...(this.state.otherDisfluentBox.highlight ? ['highlight'] : []),
+                // ...(this.state.otherDisfluentBox.highlight ? ['highlight'] : []),
               ].join(' ')}
             >
-              {this.state.otherDisfluentBox.word}
+              {uiState.fillerWordBox.text}
             </div>
           </div>
         </div>

@@ -14,4 +14,23 @@ type WordBox = {
   metric: string;
 };
 
+function UiState(): UiState {
+  return {
+    index: 0,
+
+    active: false,
+    loading: false,
+  
+    fillerSoundBox: {
+      text: '',
+      metric: '',
+    },
+
+    fillerWordBox: {
+      text: '',
+      metric: '',
+    },
+  };
+}
+
 export default UiState;

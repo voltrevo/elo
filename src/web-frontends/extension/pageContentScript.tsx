@@ -1,8 +1,9 @@
 import * as preact from 'preact';
-import analyzeStream from './analyzeStream';
-import Callbacks from './Callbacks';
 
+import PostMessageClient from '../helpers/PostMessageClient';
+import analyzeStream from './analyzeStream';
 import App from './components/App';
+import ContentAppClient from './ContentAppClient';
 import interceptGetUserMedia from './interceptGetUserMedia';
 
 const eloExtension = document.querySelector('#elo-extension')!;
@@ -11,11 +12,9 @@ const container = document.createElement('div');
 container.style.display = 'none';
 eloExtension.appendChild(container);
 
-const callbacks: Callbacks = {
-  onMessage: () => {},
-};
+const contentApp = ContentAppClient(new PostMessageClient('elo'));
 
-preact.render(<App callbacks={callbacks}/>, container);
+preact.render(<App contentApp={contentApp}/>, container);
 
 interceptGetUserMedia(({ constraints, streamPromise }) => {
   if (!constraints.audio) {
@@ -23,33 +22,16 @@ interceptGetUserMedia(({ constraints, streamPromise }) => {
   }
 
   container.style.display = '';
-  callbacks.onMessage({ type: 'getUserMedia-called', value: null });
+  contentApp.notifyGetUserMediaCalled();
 
   streamPromise.then(async stream => {
     const audioStream = new MediaStream(stream.getAudioTracks());
 
     while (true) {
-      callbacks.onMessage({ type: 'connecting', value: null });
+      contentApp.addConnectionEvent('connecting');
 
       try {
-        await analyzeStream(
-          audioStream,
-          {
-            onConnected: () => callbacks.onMessage({ type: 'connected', value: null }),
-            onWord: word => callbacks.onMessage({
-              type: 'word',
-              value: word,
-            }),
-            onDisfluent: disfluent => callbacks.onMessage({
-              type: 'disfluent',
-              value: disfluent,
-            }),
-            onProgress: progress => callbacks.onMessage({
-              type: 'progress',
-              value: progress,
-            }),
-          },
-        );
+        await analyzeStream(audioStream, contentApp);
       } catch (error) {
         console.error('fluency', error);
       }
@@ -61,7 +43,7 @@ interceptGetUserMedia(({ constraints, streamPromise }) => {
       }
 
       console.log('Fluency terminated even though the stream is still going. Restarting in 3s.');
-      callbacks.onMessage({ type: 'reconnecting', value: null });
+      contentApp.addConnectionEvent('reconnecting');
       await new Promise(resolve => setTimeout(resolve, 3000));
     }
   });

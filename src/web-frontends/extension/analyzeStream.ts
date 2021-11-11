@@ -1,22 +1,18 @@
-import { AnalysisDisfluent, AnalysisFragment, AnalysisProgress, AnalysisWord } from '../../analyze';
+import { AnalysisFragment } from '../../analyze';
 import never from '../../helpers/never';
+import ContentAppClient from './ContentAppClient';
 
 const maxLatency = 2; // seconds
 
 export default async function analyzeStream(
   stream: MediaStream,
-  callbacks: {
-    onConnected: () => void,
-    onWord: (word: AnalysisWord) => void,
-    onDisfluent: (disfluent: AnalysisDisfluent) => void,
-    onProgress: (progress: AnalysisProgress) => void,
-  },
+  contentApp: ReturnType<typeof ContentAppClient>,
 ) {
   const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const webSocket = new WebSocket(`${wsProto}//${process.env.API_HOST_AND_PORT}/analyze`);
 
   await new Promise(resolve => { webSocket.onopen = resolve; });
-  callbacks.onConnected();
+  contentApp.addConnectionEvent('connected');
 
   const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
 
@@ -93,17 +89,17 @@ export default async function analyzeStream(
       }
 
       case 'word': {
-        callbacks.onWord(fragment.value);
+        contentApp.addFragment(fragment);
         break;
       }
 
       case 'disfluent': {
-        callbacks.onDisfluent(fragment.value);
+        contentApp.addFragment(fragment);
         break;
       }
 
       case 'progress': {
-        callbacks.onProgress(fragment.value);
+        contentApp.addFragment(fragment);
 
         const duration = (Date.now() - startTime) / 1000;
         const latency = duration - fragment.value.duration;
