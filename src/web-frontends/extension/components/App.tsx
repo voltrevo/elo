@@ -179,7 +179,12 @@ export default class App extends preact.Component<Props, State> {
     }
 
     this.dragRef.addEventListener('mousedown', (evt) => {
-      if (this.dragData !== null || this.appRef === null || this.dragRef === null) {
+      if (
+        evt.button !== 0 ||
+        this.dragData !== null ||
+        this.appRef === null ||
+        this.dragRef === null
+      ) {
         return;
       }
 
