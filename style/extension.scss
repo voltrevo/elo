@@ -13,6 +13,10 @@
       opacity: 0.85;
     }
 
+    &:hover {
+      cursor: move;
+    }
+
     transition: opacity 0.2s;
 
     font-family: 'Source Sans Pro', sans-serif;
@@ -102,6 +106,10 @@
       height: 70%;
       position: relative;
       top: -4px;
+
+      &:hover {
+        cursor: pointer;
+      }
     }
 
     .spinner {
@@ -111,6 +119,10 @@
       background-color: black;
       position: relative;
       animation: rotating 1s linear infinite;
+
+      &:hover {
+        cursor: pointer;
+      }
     }
 
     @keyframes rotating {

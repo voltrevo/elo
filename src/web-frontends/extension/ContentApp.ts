@@ -1,3 +1,4 @@
+import browser from "webextension-polyfill";
 import { AnalysisDisfluent, AnalysisFragment } from "../../analyze";
 import never from "../../helpers/never";
 import TaskQueue from "../../helpers/TaskQueue";
@@ -130,6 +131,10 @@ export default class ContentApp implements PromisishApi<Protocol> {
     return new Promise<UiState>((resolve) => {
       this.uiStateRequests.push(() => resolve(this.uiState));
     });
+  }
+
+  getDashboardUrl() {
+    return browser.runtime.getURL('elo-page.html');
   }
 
   updateFeatureCount(disfluent: AnalysisDisfluent) {

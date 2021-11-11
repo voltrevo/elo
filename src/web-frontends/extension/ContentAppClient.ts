@@ -6,6 +6,7 @@ const methodSet: Record<keyof Protocol, true> = {
   addFragment: true,
   addConnectionEvent: true,
   getUiState: true,
+  getDashboardUrl: true,
 };
 
 export default function ContentAppClient(

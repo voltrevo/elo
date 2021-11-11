@@ -25,6 +25,8 @@ type State = {
 
   highlightFillerSound: boolean;
   highlightFillerWord: boolean;
+
+  dashboardUrl: string;
 };
 
 export default class App extends preact.Component<Props, State> {
@@ -43,14 +45,19 @@ export default class App extends preact.Component<Props, State> {
 
   cleanupTasks = new TaskQueue();
 
-  constructor() {
-    super();
+  constructor(props: Props) {
+    super(props);
 
     this.state = {
       uiState: UiState(),
       highlightFillerSound: false,
       highlightFillerWord: false,
+      dashboardUrl: '#',
     };
+
+    this.props.contentApp.getDashboardUrl().then(dashboardUrl => {
+      this.setState({ dashboardUrl });
+    });
   }
 
   componentWillMount() {
@@ -241,7 +248,11 @@ export default class App extends preact.Component<Props, State> {
           </div>
         </div>
         <div class="center common-centering">
-          <div class="content common-centering">
+          <a
+            class="content common-centering"
+            href={this.state.dashboardUrl}
+            style={{ display: 'flex' }}
+          >
             {uiState.loading
               ? <div class="spinner"></div>
               : <div class="logo" style={{
@@ -253,7 +264,7 @@ export default class App extends preact.Component<Props, State> {
                 backgroundRepeat: 'no-repeat',
               }}></div>
             }
-          </div>
+          </a>
         </div>
         <div class="right spacer">
           <div class="common-centering counter">

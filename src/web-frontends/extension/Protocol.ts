@@ -6,6 +6,7 @@ type Protocol = {
   addFragment(fragment: AnalysisFragment): void;
   addConnectionEvent(evt: ConnectionEvent): void;
   getUiState(afterIndex: number): UiState;
+  getDashboardUrl(): string;
 };
 
 export type ConnectionEvent = (

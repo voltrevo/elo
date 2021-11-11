@@ -17,7 +17,8 @@
   "web_accessible_resources": [
     "pageContentScript.bundle.js",
     "css/*",
-    "assets/icons/icon128.png"
+    "assets/icons/icon128.png",
+    "elo-page.html"
   ],
 
   "permissions": [
