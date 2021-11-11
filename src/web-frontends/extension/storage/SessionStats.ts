@@ -1,14 +1,20 @@
 type SessionStats = {
   lastSessionKey?: string;
+  title: string;
+  start: number;
+  end: number;
   speakingTime: number;
-  totalTime: number;
+  audioTime: number;
   featureCounts: Record<string, Record<string, number>>;
 };
 
-function SessionStats(): SessionStats {
+function SessionStats(title: string, time: number): SessionStats {
   return {
+    title,
+    start: time,
+    end: time,
     speakingTime: 0,
-    totalTime: 0,
+    audioTime: 0,
     featureCounts: {},
   };
 }

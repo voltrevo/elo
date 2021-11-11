@@ -182,8 +182,8 @@ export default class ReportPrototype extends preact.Component {
                   <hr/>
                 </div>
                 <div class="overview-subtext">
-                  Tip: You can select which expressions Elo looks out for by clocking on the dropdown
-                  in a video conference.
+                  Tip: You can select which expressions Elo looks out for by clicking on the
+                  dropdown in a video conference.
                 </div>
                 <table>
                   <thead></thead>

@@ -12,7 +12,7 @@ const sessionKey = RandomKey();
 
 export default class ContentApp implements PromisishApi<Protocol> {
   uiState = UiState();
-  sessionStats = SessionStats();
+  sessionStats = SessionStats(document.title, Date.now());
   uiStateRequests = new TaskQueue();
 
   fillerSoundEwma = new EwmaCalculator(60, 60);
@@ -164,8 +164,9 @@ export default class ContentApp implements PromisishApi<Protocol> {
   }
 
   updateStats(speakingTime: number, audioTime: number) {
+    this.sessionStats.end = Date.now();
     this.sessionStats.speakingTime += speakingTime;
-    this.sessionStats.totalTime += audioTime;
+    this.sessionStats.audioTime += audioTime;
 
     this.storage.write<SessionStats>(sessionKey, this.sessionStats);
   }
