@@ -19,6 +19,8 @@ export default class PostMessageClient {
           return;
         }
 
+        window.removeEventListener('message', messageListener);
+
         const { result } = evt.data;
 
         if ('error' in result) {
