@@ -67,8 +67,10 @@ export default class ContentApp implements PromisishApi<Protocol> {
         this.updateFeatureCount(fragment.value);
 
         if (fragment.value.category === 'filler') {
+          this.uiState.fillerSoundBox.text = fragment.value.text;
           this.fillerSoundEwma.observe(1);
         } else {
+          this.uiState.fillerWordBox.text = fragment.value.text;
           this.fillerWordEwma.observe(1);
         }
 
