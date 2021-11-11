@@ -77,7 +77,7 @@ export default class SessionReport extends preact.Component<Props> {
                 <span class="bold">&nbsp;per minute speaking</span>
               </div>
               <div>
-                Keep paying attention to your ehms and uhms till you catch yourself about to use them.
+                Keep paying attention to your ums and uhs till you catch yourself about to use them.
                 Then, err on silence instead to develop a smoother, polished delivery.
               </div>
             </div>
@@ -113,29 +113,7 @@ export default class SessionReport extends preact.Component<Props> {
                   Tip: You can select which expressions Elo looks out for by clicking on the
                   dropdown in a video conference.
                 </div>
-                <table>
-                  <thead></thead>
-                  <tbody>
-                    <tr>
-                      <td>like</td><td>40</td>
-                    </tr>
-                    <tr>
-                      <td>so...</td><td>22</td>
-                    </tr>
-                    <tr>
-                      <td>ok, so...</td><td>10</td>
-                    </tr>
-                    <tr>
-                      <td>I mean...</td><td>6</td>
-                    </tr>
-                    <tr>
-                      <td>right?</td><td>5</td>
-                    </tr>
-                    <tr>
-                      <td>ok</td><td>5</td>
-                    </tr>
-                  </tbody>
-                </table>
+                {this.renderAvoidsTable()}
               </div>
               <div>
                 <div>
@@ -147,29 +125,7 @@ export default class SessionReport extends preact.Component<Props> {
                   this…” is less impactful than “We should do this”. You can use them intentionally
                   but be mindful if you overuse them.
                 </div>
-                <table>
-                  <thead></thead>
-                  <tbody>
-                    <tr>
-                      <td>I guess</td><td>32</td>
-                    </tr>
-                    <tr>
-                      <td>I suppose</td><td>11</td>
-                    </tr>
-                    <tr>
-                      <td>kind of</td><td>6</td>
-                    </tr>
-                    <tr>
-                      <td>or something</td><td>5</td>
-                    </tr>
-                    <tr>
-                      <td>I just</td><td>5</td>
-                    </tr>
-                    <tr>
-                      <td>well...</td><td>5</td>
-                    </tr>
-                  </tbody>
-                </table>
+                {this.renderHedgeTable()}
               </div>
             </div>
           </div>
@@ -256,6 +212,58 @@ export default class SessionReport extends preact.Component<Props> {
     }
 
     return mostUsed;
+  }
+
+  renderHedgeTable() {
+    const { lastSession } = this.props;
+
+    const hedgeCounts = lastSession.featureCounts.hedge ?? {};
+
+    return <table>
+      <thead></thead>
+      <tbody>
+        {Object.entries(hedgeCounts)
+          .sort(([, a], [, b]) => b - a)
+          .map(([expression, count]) => (
+            <tr>
+              <td>{expression}</td>
+              <td>{count}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>;
+  }
+
+  renderAvoidsTable() {
+    const { lastSession } = this.props;
+
+    const avoidCounts: Record<string, number> = {};
+
+    for (const [category, countMap] of Object.entries(lastSession.featureCounts)) {
+      if (['filler', 'hedge'].includes(category)) {
+        continue;
+      }
+
+      for (const [expression, count] of Object.entries(countMap)) {
+        avoidCounts[expression] = count;
+      }
+    }
+
+    return <table>
+      <thead></thead>
+      <tbody>
+        {Object.entries(avoidCounts)
+          .sort(([, a], [, b]) => b - a)
+          .map(([expression, count]) => (
+            <tr>
+              <td>{expression}</td>
+              <td>{count}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>;
   }
 }
 

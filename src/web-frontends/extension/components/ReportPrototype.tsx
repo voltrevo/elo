@@ -143,7 +143,7 @@ export default class ReportPrototype extends preact.Component {
                 <span class="bold">&nbsp;per minute speaking</span>
               </div>
               <div>
-                Keep paying attention to your ehms and uhms till you catch yourself about to use them.
+                Keep paying attention to your ums and uhs till you catch yourself about to use them.
                 Then, err on silence instead to develop a smoother, polished delivery.
               </div>
             </div>
