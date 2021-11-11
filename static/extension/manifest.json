@@ -20,6 +20,10 @@
     "assets/icons/icon128.png"
   ],
 
+  "permissions": [
+    "storage"
+  ],
+
   "browser_action": {
     "default_icon": {
       "16": "assets/icons/icon16.png",

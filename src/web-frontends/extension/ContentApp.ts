@@ -3,27 +3,33 @@ import never from "../../helpers/never";
 import TaskQueue from "../../helpers/TaskQueue";
 import EwmaCalculator from "../helpers/EwmaCalculator";
 import Protocol, { ConnectionEvent, PromisishApi } from "./Protocol";
+import SessionStats from './storage/SessionStats';
+import Storage, { RandomKey } from './storage/Storage';
 import UiState from "./UiState";
 
-type SessionStats = {
-  speakingTime: number;
-  totalTime: number;
-  featureCounts: Record<string, Record<string, number>>;
-};
+const sessionKey = RandomKey();
 
 export default class ContentApp implements PromisishApi<Protocol> {
   uiState = UiState();
-
-  sessionStats: SessionStats = {
-    speakingTime: 0,
-    totalTime: 0,
-    featureCounts: {},
-  };
-
+  sessionStats = SessionStats();
   uiStateRequests = new TaskQueue();
 
   fillerSoundEwma = new EwmaCalculator(60, 60);
   fillerWordEwma = new EwmaCalculator(60, 60);
+
+  storage = new Storage('elo');
+
+  constructor() {
+    (async () => {
+      const root = await this.storage.readRoot();
+
+      this.sessionStats.lastSessionKey = root.lastSessionKey;
+      root.lastSessionKey = sessionKey;
+      await this.storage.writeRoot(root);
+
+      (window as any).storage = this.storage;
+    })();
+  }
 
   updateUi() {
     this.uiState.index++;
@@ -67,6 +73,8 @@ export default class ContentApp implements PromisishApi<Protocol> {
       }
 
       case 'progress': {
+        this.updateStats(fragment.value.speaking_time, fragment.value.audio_time);
+
         this.fillerSoundEwma.timeDecay(fragment.value.speaking_time);
         this.fillerWordEwma.timeDecay(fragment.value.speaking_time);
         this.updateMetrics();
@@ -148,5 +156,12 @@ export default class ContentApp implements PromisishApi<Protocol> {
 
       this.updateUi();
     }
+  }
+
+  updateStats(speakingTime: number, audioTime: number) {
+    this.sessionStats.speakingTime += speakingTime;
+    this.sessionStats.totalTime += audioTime;
+
+    this.storage.write<SessionStats>(sessionKey, this.sessionStats);
   }
 }
