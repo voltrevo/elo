@@ -164,6 +164,7 @@ export default class ContentApp implements PromisishApi<Protocol> {
   }
 
   updateStats(speakingTime: number, audioTime: number) {
+    this.sessionStats.title = document.title;
     this.sessionStats.end = Date.now();
     this.sessionStats.speakingTime += speakingTime;
     this.sessionStats.audioTime += audioTime;

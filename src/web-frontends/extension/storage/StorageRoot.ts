@@ -1,5 +1,6 @@
 type StorageRoot = {
   lastSessionKey?: string;
+  metricPreference?: string;
 };
 
 function StorageRoot(): StorageRoot {

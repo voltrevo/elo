@@ -32,6 +32,7 @@ export default class SessionReport extends preact.Component<Props, State> {
           <div class="heading">
             <div>
               <div class="your-weekly-report">Session Report</div>
+              <div>{session.title}</div>
               <div>{this.SessionDateTime()}</div>
               <div class="stats">
                 <table>
@@ -319,7 +320,13 @@ function TimeOfDayStr(unixTimeMs: number) {
 
   const amPm = date.getHours() < 12 ? 'am' : 'pm';
 
-  return `${date.getHours() % 12}:${date.getMinutes().toString().padStart(2, '0')}${amPm}`;
+  let displayHour = date.getHours() % 12;
+
+  if (displayHour === 0) {
+    displayHour = 12;
+  }
+
+  return `${displayHour}:${date.getMinutes().toString().padStart(2, '0')}${amPm}`;
 }
 
 function LocalDaysDifference(a: number, b: number) {
