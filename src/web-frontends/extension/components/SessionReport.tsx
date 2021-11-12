@@ -2,7 +2,6 @@ import * as preact from 'preact';
 
 import Storage from '../storage/Storage';
 import SessionStats from '../storage/SessionStats';
-import { stringify } from 'querystring';
 
 const storage = new Storage('elo');
 
@@ -23,7 +22,7 @@ export default class SessionReport extends preact.Component<Props> {
           <div class="heading">
             <div>
               <div class="your-weekly-report">Session Report</div>
-              <div>{this.renderSessionDateTime()}</div>
+              <div>{this.SessionDateTime()}</div>
               <div class="stats">
                 <table>
                   <thead></thead>
@@ -57,12 +56,12 @@ export default class SessionReport extends preact.Component<Props> {
               <div class="bold">Total</div>
               <div>
                 <span class="very-prominent-number third-accent-fgcolor">
-                  {this.renderTotalDisfluentsPerMinute()}
+                  {this.TotalDisfluentsPerMinute().toFixed(1)}
                 </span>
                 <span class="bold">&nbsp;per minute speaking</span>
               </div>
               <div>
-                <span class="bold third-accent-fgcolor">That’s pretty good!</span> The optimum frequency is
+                {this.PerMinuteComment()}The optimum frequency is
                 one filler per minute, but the average speaker uses five fillers per minute
                 (<a href="https://hbr.org/2018/08/how-to-stop-saying-um-ah-and-you-know">source</a>).
                 Keep improving with Elo and you’ll get there.
@@ -72,7 +71,7 @@ export default class SessionReport extends preact.Component<Props> {
               <div class="bold">Ums &amp; Uhs</div>
               <div>
                 <span class="very-prominent-number filler-fgcolor">
-                  {this.renderUmsUhsPerMinute()}
+                  {this.UmsUhsPerMinute().toFixed(1)}
                 </span>
                 <span class="bold">&nbsp;per minute speaking</span>
               </div>
@@ -85,7 +84,7 @@ export default class SessionReport extends preact.Component<Props> {
               <div class="bold">Filler &amp; Hedge Words</div>
               <div>
                 <span class="very-prominent-number other-disfluent-fgcolor">
-                  {this.renderFillerWordsPerMinute()}
+                  {this.FillerWordsPerMinute().toFixed(1)}
                 </span>
                 <span class="bold">&nbsp;per minute speaking</span>
               </div>
@@ -134,7 +133,7 @@ export default class SessionReport extends preact.Component<Props> {
     </div>;
   }
 
-  renderSessionDateTime() {
+  SessionDateTime() {
     const { lastSession } = this.props;
 
     const daysDiff = LocalDaysDifference(lastSession.end, lastSession.start);
@@ -146,7 +145,7 @@ export default class SessionReport extends preact.Component<Props> {
     ].join(' ');
   }
 
-  renderTotalDisfluentsPerMinute() {
+  TotalDisfluentsPerMinute() {
     const { lastSession } = this.props;
 
     let sum = 0;
@@ -157,10 +156,10 @@ export default class SessionReport extends preact.Component<Props> {
       }
     }
     
-    return (sum / lastSession.speakingTime).toFixed(1);
+    return (sum / lastSession.speakingTime);
   }
 
-  renderUmsUhsPerMinute() {
+  UmsUhsPerMinute() {
     const { lastSession } = this.props;
 
     let sum = 0;
@@ -171,10 +170,10 @@ export default class SessionReport extends preact.Component<Props> {
       sum += count;
     }
 
-    return (sum / lastSession.speakingTime).toFixed(1);
+    return (sum / lastSession.speakingTime);
   }
 
-  renderFillerWordsPerMinute() {
+  FillerWordsPerMinute() {
     const { lastSession } = this.props;
 
     let sum = 0;
@@ -189,7 +188,7 @@ export default class SessionReport extends preact.Component<Props> {
       }
     }
     
-    return (sum / lastSession.speakingTime).toFixed(1);
+    return (sum / lastSession.speakingTime);
   }
 
   MostUsedFillerWord() {
@@ -264,6 +263,14 @@ export default class SessionReport extends preact.Component<Props> {
         }
       </tbody>
     </table>;
+  }
+
+  PerMinuteComment() {
+    if (this.TotalDisfluentsPerMinute() >= 5) {
+      return <></>;
+    }
+
+    return <><span class="bold third-accent-fgcolor">That’s pretty good!</span> </>;
   }
 }
 
