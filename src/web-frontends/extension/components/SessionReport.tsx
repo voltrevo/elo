@@ -3,15 +3,24 @@ import * as preact from 'preact';
 import Storage from '../storage/Storage';
 import SessionStats from '../storage/SessionStats';
 
-const storage = new Storage('elo');
-
 type Props = {
   lastSession: SessionStats;
+  storage: Storage;
 };
 
-export default class SessionReport extends preact.Component<Props> {
+type State = {
+  session: SessionStats;
+};
+
+export default class SessionReport extends preact.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+
+    this.state = { session: props.lastSession };
+  }
+
   render() {
-    const { lastSession } = this.props;
+    const { session } = this.state;
 
     return <div class="elo-page">
       <div class="elo-page-container">
@@ -19,6 +28,7 @@ export default class SessionReport extends preact.Component<Props> {
 
         <div class="sections">
           <div/>
+          {this.renderPreviousLink()}
           <div class="heading">
             <div>
               <div class="your-weekly-report">Session Report</div>
@@ -30,14 +40,14 @@ export default class SessionReport extends preact.Component<Props> {
                     <tr>
                       <td>Speaking Time</td>
                       <td class="important-value numeric">
-                        {Math.round(lastSession.speakingTime / 60)}
+                        {Math.round(session.speakingTime / 60)}
                       </td>
                       <td>min</td>
                     </tr>
                     <tr>
                       <td>Total Time</td>
                       <td class="important-value numeric">
-                        {Math.round(lastSession.audioTime / 60)}
+                        {Math.round(session.audioTime / 60)}
                       </td>
                       <td>min</td>
                     </tr>
@@ -134,51 +144,51 @@ export default class SessionReport extends preact.Component<Props> {
   }
 
   SessionDateTime() {
-    const { lastSession } = this.props;
+    const { session } = this.state;
 
-    const daysDiff = LocalDaysDifference(lastSession.end, lastSession.start);
+    const daysDiff = LocalDaysDifference(session.end, session.start);
 
     return [
-      `${new Date(lastSession.start).toDateString()},`,
-      `${TimeOfDayStr(lastSession.start)} - ${TimeOfDayStr(lastSession.end)}`,
+      `${new Date(session.start).toDateString()},`,
+      `${TimeOfDayStr(session.start)} - ${TimeOfDayStr(session.end)}`,
       ...(daysDiff > 0 ? [`(+${daysDiff}d)`] : []),
     ].join(' ');
   }
 
   TotalDisfluentsPerMinute() {
-    const { lastSession } = this.props;
+    const { session } = this.state;
 
     let sum = 0;
 
-    for (const countMap of Object.values(lastSession.featureCounts)) {
+    for (const countMap of Object.values(session.featureCounts)) {
       for (const count of Object.values(countMap)) {
         sum += count;
       }
     }
     
-    return (sum / lastSession.speakingTime);
+    return (sum / session.speakingTime);
   }
 
   UmsUhsPerMinute() {
-    const { lastSession } = this.props;
+    const { session } = this.state;
 
     let sum = 0;
 
-    const fillerCountMap = lastSession.featureCounts.filler ?? {};
+    const fillerCountMap = session.featureCounts.filler ?? {};
 
     for (const count of Object.values(fillerCountMap)) {
       sum += count;
     }
 
-    return (sum / lastSession.speakingTime);
+    return (sum / session.speakingTime);
   }
 
   FillerWordsPerMinute() {
-    const { lastSession } = this.props;
+    const { session } = this.state;
 
     let sum = 0;
 
-    for (const [category, countMap] of Object.entries(lastSession.featureCounts)) {
+    for (const [category, countMap] of Object.entries(session.featureCounts)) {
       if (category === 'filler') {
         continue;
       }
@@ -188,16 +198,16 @@ export default class SessionReport extends preact.Component<Props> {
       }
     }
     
-    return (sum / lastSession.speakingTime);
+    return (sum / session.speakingTime);
   }
 
   MostUsedFillerWord() {
-    const { lastSession } = this.props;
+    const { session } = this.state;
 
     let mostUsed: string | undefined = undefined;
     let mostUsedCount = 0;
 
-    for (const [category, countMap] of Object.entries(lastSession.featureCounts)) {
+    for (const [category, countMap] of Object.entries(session.featureCounts)) {
       if (category === 'filler') {
         continue;
       }
@@ -214,9 +224,9 @@ export default class SessionReport extends preact.Component<Props> {
   }
 
   renderHedgeTable() {
-    const { lastSession } = this.props;
+    const { session } = this.state;
 
-    const hedgeCounts = lastSession.featureCounts.hedge ?? {};
+    const hedgeCounts = session.featureCounts.hedge ?? {};
 
     return <table>
       <thead></thead>
@@ -235,11 +245,11 @@ export default class SessionReport extends preact.Component<Props> {
   }
 
   renderAvoidsTable() {
-    const { lastSession } = this.props;
+    const { session } = this.state;
 
     const avoidCounts: Record<string, number> = {};
 
-    for (const [category, countMap] of Object.entries(lastSession.featureCounts)) {
+    for (const [category, countMap] of Object.entries(session.featureCounts)) {
       if (['filler', 'hedge'].includes(category)) {
         continue;
       }
@@ -271,6 +281,36 @@ export default class SessionReport extends preact.Component<Props> {
     }
 
     return <><span class="bold third-accent-fgcolor">That’s pretty good!</span> </>;
+  }
+
+  renderPreviousLink() {
+    const { session } = this.state;
+
+    if (session.lastSessionKey === undefined) {
+      return <></>;
+    }
+
+    return <div>
+      <a href="#" onClick={() => this.loadPreviousSession()}>
+        ⬅ Previous
+      </a>
+    </div>;
+  }
+
+  async loadPreviousSession() {
+    const { session } = this.state;
+
+    if (session.lastSessionKey === undefined) {
+      return;
+    }
+
+    const lastSession = await this.props.storage.read<SessionStats>(session.lastSessionKey);
+
+    if (lastSession === undefined) {
+      return;
+    }
+
+    this.setState({ session: lastSession });
   }
 }
 

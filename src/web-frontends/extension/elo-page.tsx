@@ -22,5 +22,5 @@ window.addEventListener('load', async () => {
     return;
   }
 
-  preact.render(<SessionReport lastSession={lastSession}/>, document.body);
+  preact.render(<SessionReport lastSession={lastSession} storage={storage}/>, document.body);
 });
