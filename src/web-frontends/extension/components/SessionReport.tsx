@@ -167,7 +167,7 @@ export default class SessionReport extends preact.Component<Props, State> {
       }
     }
     
-    return (sum / session.speakingTime);
+    return (sum / (session.speakingTime / 60));
   }
 
   UmsUhsPerMinute() {
@@ -181,7 +181,7 @@ export default class SessionReport extends preact.Component<Props, State> {
       sum += count;
     }
 
-    return (sum / session.speakingTime);
+    return (sum / (session.speakingTime / 60));
   }
 
   FillerWordsPerMinute() {
@@ -199,7 +199,7 @@ export default class SessionReport extends preact.Component<Props, State> {
       }
     }
     
-    return (sum / session.speakingTime);
+    return (sum / (session.speakingTime / 60));
   }
 
   MostUsedFillerWord() {
