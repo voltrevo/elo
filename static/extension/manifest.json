@@ -38,6 +38,8 @@
   "content_scripts": [{
     "matches": [
       "https://meet.google.com/*",
+      "https://meet-preprod.corp.google.com/*",
+      "https://preprod.meet.sandbox.google.com/*",
       "https://meet.jit.si/*",
       "https://meet.tokbox.com/*",
       "https://*.zoom.us/*"
