@@ -1,5 +1,7 @@
+// TODO: Rename MetricCalculator?
 export default class EwmaCalculator {
   value = 0;
+  sum = 0;
 
   constructor(
     public windowDuration: number,
@@ -8,9 +10,18 @@ export default class EwmaCalculator {
 
   observe(value: number) {
     this.value += value * this.windowDuration / this.decayWindowDuration;
+    this.sum += value;
   }
 
   timeDecay(dt: number) {
     this.value *= Math.exp(-dt / this.decayWindowDuration);
+  }
+
+  render(metricPreference?: string) {
+    if (metricPreference === 'ewma') {
+      return this.value.toFixed(1);
+    }
+
+    return this.sum.toFixed(0);
   }
 }

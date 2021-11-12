@@ -147,9 +147,11 @@ export default class ContentApp implements PromisishApi<Protocol> {
     category[disfluent.text] = (category[disfluent.text] ?? 0) + 1;
   }
 
-  updateMetrics() {
-    const fillerSoundMetric = this.fillerSoundEwma.value.toFixed(1);
-    const fillerWordMetric = this.fillerWordEwma.value.toFixed(1);
+  async updateMetrics() {
+    const { metricPreference } = (await this.storage.readRoot());
+
+    const fillerSoundMetric = this.fillerSoundEwma.render(metricPreference);
+    const fillerWordMetric = this.fillerWordEwma.render(metricPreference);
 
     if (
       this.uiState.fillerSoundBox.metric !== fillerSoundMetric ||
