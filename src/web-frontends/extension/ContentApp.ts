@@ -20,16 +20,14 @@ export default class ContentApp implements PromisishApi<Protocol> {
 
   storage = new Storage('elo');
 
-  constructor() {
-    (async () => {
-      const root = await this.storage.readRoot();
+  async activate() {
+    const root = await this.storage.readRoot();
 
-      this.sessionStats.lastSessionKey = root.lastSessionKey;
-      root.lastSessionKey = sessionKey;
-      await this.storage.writeRoot(root);
+    this.sessionStats.lastSessionKey = root.lastSessionKey;
+    root.lastSessionKey = sessionKey;
+    await this.storage.writeRoot(root);
 
-      (window as any).storage = this.storage;
-    })();
+    (window as any).contentApp = this;
   }
 
   updateUi() {
@@ -37,11 +35,12 @@ export default class ContentApp implements PromisishApi<Protocol> {
     this.uiStateRequests.run();
   }
 
-  notifyGetUserMediaCalled() {
+  async notifyGetUserMediaCalled() {
     if (this.uiState.active) {
       return;
     }
 
+    await this.activate();
     this.uiState.active = true;
     this.updateUi();
   }
@@ -170,5 +169,16 @@ export default class ContentApp implements PromisishApi<Protocol> {
     this.sessionStats.audioTime += audioTime;
 
     this.storage.write<SessionStats>(sessionKey, this.sessionStats);
+  }
+
+  async setMetricPreference(preference: string) {
+    const root = await this.storage.readRoot();
+
+    // TODO: Check string? Need to add typing to storage.
+    root.metricPreference = preference;
+
+    await this.storage.writeRoot(root);
+
+    return 'success';
   }
 }

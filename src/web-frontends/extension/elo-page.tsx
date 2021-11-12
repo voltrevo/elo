@@ -4,6 +4,9 @@ import SessionReport from './components/SessionReport';
 import ReportPrototype from './components/ReportPrototype';
 import Storage from './storage/Storage';
 import SessionStats from './storage/SessionStats';
+import ContentApp from './ContentApp';
+
+(window as any).contentApp = new ContentApp();
 
 window.addEventListener('load', async () => {
   const storage = new Storage('elo');
