@@ -256,6 +256,8 @@ export default class App extends preact.Component<Props, State> {
           <a
             class="content common-centering"
             href={this.state.dashboardUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             style={{ display: 'flex' }}
           >
             {uiState.loading
