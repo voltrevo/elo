@@ -5,6 +5,8 @@ import TaskQueue from '../../../helpers/TaskQueue';
 import EwmaCalculator from '../../helpers/EwmaCalculator';
 import ContentAppClient from '../ContentAppClient';
 import UiState from '../UiState';
+import CollapseIcon from './CollapseIcon';
+import Tour from './Tour';
 
 type Props = {
   contentApp: ReturnType<typeof ContentAppClient>,
@@ -235,6 +237,8 @@ export default class App extends preact.Component<Props, State> {
       }}
       style={{ left, top }}
     >
+      {/* <Tour/> */}
+      <CollapseIcon/>
       <div class="body">
         <div class="left spacer">
           <div class="word-box-container spacer">
