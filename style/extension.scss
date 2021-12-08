@@ -43,16 +43,17 @@
     .body {
       display: flex;
       flex-direction: row;
-      width: 18em;
-      height: 3em;
+      width: 17em;
+      height: 2.5em;
+      zoom: 85%;
 
       .word-box-container {
-        padding: 0.3em;
+        padding: 0.25em;
       }
 
       .word-box {
         height: 100%;
-        padding: 0.5em;
+        padding: 0.3em;
 
         transition: background-color 0.2s;
       }
@@ -102,10 +103,10 @@
     }
 
     .logo {
-      width: 70%;
-      height: 70%;
+      width: 80%;
+      height: 80%;
       position: relative;
-      top: -4px;
+      top: -2px;
 
       &:hover {
         cursor: pointer;
