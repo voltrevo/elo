@@ -22,6 +22,8 @@ type WordBox = {
 type State = {
   uiState: UiState;
 
+  collapsed: boolean;
+
   left?: string;
   top?: string;
 
@@ -52,6 +54,7 @@ export default class App extends preact.Component<Props, State> {
 
     this.state = {
       uiState: UiState(),
+      collapsed: false,
       highlightFillerSound: false,
       highlightFillerWord: false,
       dashboardUrl: '#',
@@ -237,8 +240,20 @@ export default class App extends preact.Component<Props, State> {
       }}
       style={{ left, top }}
     >
+      <div class="app-content">{this.renderAppContent()}</div>
+    </div>;
+  }
+
+  renderAppContent() {
+    const { uiState } = this.state;
+
+    if (this.state.collapsed) {
+      return <>Collapsed</>;
+    }
+
+    return <>
       {/* <Tour/> */}
-      <CollapseIcon/>
+      <CollapseIcon onAction={() => { this.setState({ collapsed: true }); }}/>
       <div class="body">
         <div class="left spacer">
           <div class="word-box-container spacer">
@@ -294,6 +309,6 @@ export default class App extends preact.Component<Props, State> {
           </div>
         </div>
       </div>
-    </div>;
+    </>;
   }
 }

@@ -1,10 +1,12 @@
 import * as preact from 'preact';
 
-export default class CollapseIcon extends preact.Component<{}, {}> {
-  render() {
-    this;
+type Props = {
+  onAction: () => void;
+};
 
-    return <div class="collapse-icon">
+export default class CollapseIcon extends preact.Component<Props, {}> {
+  render() {
+    return <div class="collapse-icon" onClick={this.props.onAction}>
       ‹
     </div>;
   }
