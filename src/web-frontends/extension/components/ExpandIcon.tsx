@@ -6,8 +6,11 @@ type Props = {
 
 export default class ExpandIcon extends preact.Component<Props, {}> {
   render() {
-    return <div class="expand-icon" onClick={this.props.onAction}>
-      ›
-    </div>;
+    return <>
+      <div class="hover-wing-right"/>
+      <div class="slider-icon expand-icon" onClick={this.props.onAction}>
+        ›
+      </div>
+    </>;
   }
 }

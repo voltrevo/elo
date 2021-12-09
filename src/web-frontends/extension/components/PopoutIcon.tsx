@@ -6,8 +6,11 @@ type Props = {
 
 export default class PopoutIcon extends preact.Component<Props, {}> {
   render() {
-    return <div class="popout-icon" onClick={this.props.onAction}>
-      ↗
-    </div>;
+    return <>
+      <div class="hover-wing-right"/>
+      <div class="slider-icon popout-icon" onClick={this.props.onAction}>
+        ↗
+      </div>
+    </>;
   }
 }

@@ -259,25 +259,17 @@ export default class App extends preact.Component<Props, State> {
       return <div class="body">
         <ExpandIcon onAction={() => { this.setState({ collapsed: false }); }}/>
         <div class="center common-centering">
-          <a
-            class="content common-centering"
-            href={this.state.dashboardUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ display: 'flex' }}
-          >
-            {uiState.loading
-              ? <div class="spinner"></div>
-              : <div class="logo" style={{
-                backgroundImage: `url("${(
-                  document.querySelector('#elo-extension #icon-template') as HTMLImageElement
-                ).src}")`,
-                backgroundSize: 'contain',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
-              }}></div>
-            }
-          </a>
+          {uiState.loading
+            ? <div class="spinner"></div>
+            : <div class="logo" style={{
+              backgroundImage: `url("${(
+                document.querySelector('#elo-extension #icon-template') as HTMLImageElement
+              ).src}")`,
+              backgroundSize: 'contain',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}></div>
+          }
         </div>
       </div>;
     }
@@ -304,25 +296,17 @@ export default class App extends preact.Component<Props, State> {
           </div>
         </div>
         <div class="center common-centering">
-          <a
-            class="content common-centering"
-            href={this.state.dashboardUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ display: 'flex' }}
-          >
-            {uiState.loading
-              ? <div class="spinner"></div>
-              : <div class="logo" style={{
-                backgroundImage: `url("${(
-                  document.querySelector('#elo-extension #icon-template') as HTMLImageElement
-                ).src}")`,
-                backgroundSize: 'contain',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
-              }}></div>
-            }
-          </a>
+          {uiState.loading
+            ? <div class="spinner"></div>
+            : <div class="logo" style={{
+              backgroundImage: `url("${(
+                document.querySelector('#elo-extension #icon-template') as HTMLImageElement
+              ).src}")`,
+              backgroundSize: 'contain',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}></div>
+          }
         </div>
         <div class="right spacer">
           <div class="common-centering counter">
