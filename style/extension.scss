@@ -51,10 +51,16 @@
       width: 16em;
       height: 2.5em;
       background-color: white;
-      border-radius:3px;
+      border-radius: 3px;
+      transition: opacity 0.2s;
 
       &.collapsed {
         width: initial;
+        opacity: 0.15;
+
+        &:hover {
+          opacity: 1;
+        }
       }
 
       .word-box-container {
@@ -165,9 +171,25 @@
     text-align: center;
   }
 
+  .expand-icon {
+    position: absolute;
+    cursor: pointer;
+    right: 0;
+    transition: right 0.2s;
+    line-height: 1.2em;
+    font-size: 2em;
+    z-index: -1;
+    width: 1em;
+    text-align: center;
+  }
+
   &:hover {
     .collapse-icon {
       left: -1em;
+    }
+
+    .expand-icon {
+      right: -1em;
     }
   }
 }

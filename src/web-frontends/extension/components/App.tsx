@@ -6,6 +6,7 @@ import EwmaCalculator from '../../helpers/EwmaCalculator';
 import ContentAppClient from '../ContentAppClient';
 import UiState from '../UiState';
 import CollapseIcon from './CollapseIcon';
+import ExpandIcon from './ExpandIcon';
 import Tour from './Tour';
 
 type Props = {
@@ -249,6 +250,7 @@ export default class App extends preact.Component<Props, State> {
 
     if (this.state.collapsed) {
       return <div class="body collapsed">
+        <ExpandIcon onAction={() => { this.setState({ collapsed: false }); }}/>
         <div class="center common-centering">
           <a
             class="content common-centering"
