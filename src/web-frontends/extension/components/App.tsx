@@ -1,24 +1,14 @@
 import * as preact from 'preact';
 
-import never from '../../../helpers/never';
 import TaskQueue from '../../../helpers/TaskQueue';
-import EwmaCalculator from '../../helpers/EwmaCalculator';
 import ContentAppClient from '../ContentAppClient';
 import UiState from '../UiState';
 import CollapseIcon from './CollapseIcon';
 import ExpandIcon from './ExpandIcon';
 import PopoutIcon from './PopoutIcon';
-import Tour from './Tour';
 
 type Props = {
   contentApp: ReturnType<typeof ContentAppClient>,
-};
-
-type WordBox = {
-  word: string;
-  count: number;
-  highlight: boolean;
-  highlightTimerId?: number;
 };
 
 type State = {
@@ -275,7 +265,6 @@ export default class App extends preact.Component<Props, State> {
     }
 
     return <>
-      {/* <Tour/> */}
       <CollapseIcon onAction={() => { this.setState({ collapsed: true }); }}/>
       <PopoutIcon onAction={() => { this.openDashboard(); }}/>
       <div class="body">
