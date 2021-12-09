@@ -21,17 +21,17 @@ function UiState(): UiState {
 
     active: false,
     loading: false,
-  
+
     fillerSoundBox: {
-      text: '',
+      text: 'ums & uhs',
       count: 0,
-      metric: '',
+      metric: '0',
     },
 
     fillerWordBox: {
-      text: '',
+      text: 'filler words',
       count: 0,
-      metric: '',
+      metric: '0',
     },
   };
 }
