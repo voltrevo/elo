@@ -248,7 +248,29 @@ export default class App extends preact.Component<Props, State> {
     const { uiState } = this.state;
 
     if (this.state.collapsed) {
-      return <>Collapsed</>;
+      return <div class="body collapsed">
+        <div class="center common-centering">
+          <a
+            class="content common-centering"
+            href={this.state.dashboardUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: 'flex' }}
+          >
+            {uiState.loading
+              ? <div class="spinner"></div>
+              : <div class="logo" style={{
+                backgroundImage: `url("${(
+                  document.querySelector('#elo-extension #icon-template') as HTMLImageElement
+                ).src}")`,
+                backgroundSize: 'contain',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+              }}></div>
+            }
+          </a>
+        </div>
+      </div>;
     }
 
     return <>

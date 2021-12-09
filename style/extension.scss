@@ -51,6 +51,11 @@
       width: 16em;
       height: 2.5em;
       background-color: white;
+      border-radius:3px;
+
+      &.collapsed {
+        width: initial;
+      }
 
       .word-box-container {
         padding: 0.2em;
