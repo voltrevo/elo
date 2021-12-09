@@ -1,5 +1,5 @@
-import { AnalysisFragment } from "../../analyze";
-import UiState from "./UiState";
+import { AnalysisFragment } from '../../analyze';
+import UiState from './UiState';
 
 type Protocol = {
   notifyGetUserMediaCalled(): void;

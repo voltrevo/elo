@@ -1,12 +1,12 @@
-import browser from "webextension-polyfill";
-import { AnalysisDisfluent, AnalysisFragment } from "../../analyze";
-import never from "../../helpers/never";
-import TaskQueue from "../../helpers/TaskQueue";
-import EwmaCalculator from "../helpers/EwmaCalculator";
-import Protocol, { ConnectionEvent, PromisishApi } from "./Protocol";
+import browser from 'webextension-polyfill';
+import { AnalysisDisfluent, AnalysisFragment } from '../../analyze';
+import never from '../../helpers/never';
+import TaskQueue from '../../helpers/TaskQueue';
+import EwmaCalculator from '../helpers/EwmaCalculator';
+import Protocol, { ConnectionEvent, PromisishApi } from './Protocol';
 import SessionStats from './storage/SessionStats';
 import Storage, { RandomKey } from './storage/Storage';
-import UiState from "./UiState";
+import UiState from './UiState';
 
 const sessionKey = RandomKey();
 
