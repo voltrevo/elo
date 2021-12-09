@@ -7,6 +7,7 @@ import ContentAppClient from '../ContentAppClient';
 import UiState from '../UiState';
 import CollapseIcon from './CollapseIcon';
 import ExpandIcon from './ExpandIcon';
+import PopoutIcon from './PopoutIcon';
 import Tour from './Tour';
 
 type Props = {
@@ -232,8 +233,14 @@ export default class App extends preact.Component<Props, State> {
   render(): preact.ComponentChild {
     const { uiState, left = '', top = '' } = this.state;
 
+    const classes = [
+      'app',
+      ...(uiState.active ? ['active'] : []),
+      ...(this.state.collapsed ? ['collapsed'] : []),
+    ];
+
     return <div
-      class={uiState.active ? 'app active' : 'app'}
+      class={classes.join(' ')}
       ref={r => {
         this.appRef = r;
         this.dragRef = r;
@@ -249,7 +256,7 @@ export default class App extends preact.Component<Props, State> {
     const { uiState } = this.state;
 
     if (this.state.collapsed) {
-      return <div class="body collapsed">
+      return <div class="body">
         <ExpandIcon onAction={() => { this.setState({ collapsed: false }); }}/>
         <div class="center common-centering">
           <a
@@ -278,6 +285,7 @@ export default class App extends preact.Component<Props, State> {
     return <>
       {/* <Tour/> */}
       <CollapseIcon onAction={() => { this.setState({ collapsed: true }); }}/>
+      <PopoutIcon onAction={() => { this.openDashboard(); }}/>
       <div class="body">
         <div class="left spacer">
           <div class="word-box-container spacer">
@@ -334,5 +342,13 @@ export default class App extends preact.Component<Props, State> {
         </div>
       </div>
     </>;
+  }
+
+  openDashboard() {
+    const anchorTag = document.createElement('a');
+    anchorTag.href = this.state.dashboardUrl;
+    anchorTag.setAttribute('target', '_blank');
+    anchorTag.setAttribute('rel', 'noopener noreferrer');
+    anchorTag.click();
   }
 }
