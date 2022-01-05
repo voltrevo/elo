@@ -132,6 +132,7 @@ export default class ContentApp implements PromisishApi<Protocol> {
     });
   }
 
+  // eslint-disable-next-line class-methods-use-this
   getDashboardUrl() {
     return browser.runtime.getURL('elo-page.html');
   }

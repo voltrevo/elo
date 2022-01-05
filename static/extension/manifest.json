@@ -35,6 +35,12 @@
     "default_title": "Elo"
   },
 
+  "background": {
+    "scripts": [
+      "backgroundScript.bundle.js"
+    ]
+  },
+
   "content_scripts": [{
     "matches": [
       "https://meet.google.com/*",

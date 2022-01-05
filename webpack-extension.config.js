@@ -15,6 +15,7 @@ const config = {
       'elo-page': './build/js/src/web-frontends/extension/elo-page.js',
       contentScript: './build/js/src/web-frontends/extension/contentScript.js',
       pageContentScript: './build/js/src/web-frontends/extension/pageContentScript.js',
+      backgroundScript: './build/js/src/web-frontends/extension/backgroundScript.js',
     },
     module: {
       rules: [
