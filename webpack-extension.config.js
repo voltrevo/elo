@@ -1,9 +1,12 @@
+const fs = require('fs');
 const path = require('path');
 
 const CopyPlugin = require('copy-webpack-plugin');
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 const webpack = require('webpack');
+
+const eloConfig = JSON.parse(fs.readFileSync(require.resolve('./config.json'), 'utf-8'));
 
 const config = {
   common: {
@@ -49,9 +52,7 @@ const config = {
         ],
       }),
       new webpack.DefinePlugin({
-        'process.env.API_HOST_AND_PORT': JSON.stringify(
-          process.env.API_HOST_AND_PORT ?? 'localhost:36582',
-        ),
+        'process.env.ELO_CONFIG_API': JSON.stringify(eloConfig.api),
       }),
     ],
   },

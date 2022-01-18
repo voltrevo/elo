@@ -1,0 +1,13 @@
+{
+  "db": {
+    "host": "localhost",
+    "dbname": "elo",
+    "port": 5432,
+    "password": "elodev"
+  },
+  "api": {
+    "tls": false,
+    "host": "localhost",
+    "port": 36582
+  }
+}

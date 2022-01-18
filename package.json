@@ -38,6 +38,7 @@
     "concurrently": "^6.0.0",
     "copy-webpack-plugin": "^8.1.0",
     "ffmpeg": "0.0.4",
+    "io-ts": "^2.2.16",
     "koa": "^2.13.1",
     "koa-route": "^3.2.0",
     "koa-static": "^5.0.0",
