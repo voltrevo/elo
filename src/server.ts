@@ -14,6 +14,9 @@ import dirs from './dirs';
 import launch from './helpers/launch';
 import analyze, { AnalysisFragment, analyzeRaw } from './analyze';
 
+import './pgTest';
+import config from './helpers/config';
+
 launch(async (emit) => {
   const app = websockify(new Koa());
 
@@ -106,8 +109,7 @@ launch(async (emit) => {
     ctx.websocket.on('close', () => write(null));
   }));
 
-  const host = process.env.HOST ?? '127.0.0.1';
-  const port = Number(process.env.PORT ?? 36582);
+  const { host, port } = config.server;
 
   await new Promise(resolve => app.listen(port, host, () => { resolve(null); }));
   emit(`HTTP: Listening on ${host}:${port}`);

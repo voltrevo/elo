@@ -2,12 +2,8 @@ import * as io from 'io-ts';
 
 export const ConfigType = io.type({
   server: io.type({
-    db: io.type({
-      host: io.string,
-      dbname: io.string,
-      port: io.number,
-      password: io.string,
-    }),
+    pgConnString: io.string,
+    host: io.string,
     port: io.number,
   }),
   client: io.type({

@@ -1,11 +1,7 @@
 {
   "server": {
-    "db": {
-      "host": "localhost",
-      "dbname": "elo",
-      "port": 5432,
-      "password": "elodev"
-    },
+    "pgConnString": "postgres://postgres:elodev@localhost:5432/elo",
+    "host": "0.0.0.0",
     "port": 36582
   },
   "client": {
