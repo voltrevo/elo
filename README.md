@@ -13,8 +13,8 @@ on your preferred distro without too much trouble.
 
 **Steps**
 
-1. `npm install`
-2. `cp config.example.json config.json` making appropriate updates (needed for production)
+1. `cp config.example.json config.json` and update values (needed for production)
+2. `npm install`
 3. `npm run build`
 4. Place your model at data/models.tflite (e.g. public [English model](https://github.com/coqui-ai/STT-models/releases/download/english/coqui/v0.9.3/model.tflite))
 5. `sudo docker build . -t elo-server` (~4min) (Note 2) 
