@@ -2,7 +2,7 @@ import * as preact from 'preact';
 
 import { Analysis, AnalysisFragment } from '../../analyze';
 import never from '../../helpers/never';
-import configApi from '../helpers/configApi';
+import clientConfig from '../helpers/clientConfig';
 import AnalysisBuilder from './AnalysisBuilder';
 import audio from './audio';
 import RecorderPanel from './RecorderPanel';
@@ -98,8 +98,8 @@ export default class App extends preact.Component<{}, State> {
     switch (this.state.recorder.name) {
       case 'init':
       case 'transcribed': {
-        const wsProto = configApi.tls ? 'wss:' : 'ws:';
-        const webSocket = new WebSocket(`${wsProto}//${configApi.host}:${configApi.port}/analyze`);
+        const wsProto = clientConfig.tls ? 'wss:' : 'ws:';
+        const webSocket = new WebSocket(`${wsProto}//${clientConfig.hostAndPort}/analyze`);
 
         await new Promise(resolve => {
           webSocket.addEventListener('open', resolve);

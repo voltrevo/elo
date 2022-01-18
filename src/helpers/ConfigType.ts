@@ -1,16 +1,18 @@
 import * as io from 'io-ts';
 
 export const ConfigType = io.type({
-  db: io.type({
-    host: io.string,
-    dbname: io.string,
+  server: io.type({
+    db: io.type({
+      host: io.string,
+      dbname: io.string,
+      port: io.number,
+      password: io.string,
+    }),
     port: io.number,
-    password: io.string,
   }),
-  api: io.type({
+  client: io.type({
     tls: io.boolean,
-    host: io.string,
-    port: io.number,
+    hostAndPort: io.string,
   }),
 });
 

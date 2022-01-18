@@ -1,13 +1,15 @@
 {
-  "db": {
-    "host": "localhost",
-    "dbname": "elo",
-    "port": 5432,
-    "password": "elodev"
-  },
-  "api": {
-    "tls": false,
-    "host": "localhost",
+  "server": {
+    "db": {
+      "host": "localhost",
+      "dbname": "elo",
+      "port": 5432,
+      "password": "elodev"
+    },
     "port": 36582
+  },
+  "client": {
+    "tls": false,
+    "hostAndPort": "localhost:36582"
   }
 }

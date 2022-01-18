@@ -1,6 +1,6 @@
 import { AnalysisFragment } from '../../analyze';
 import never from '../../helpers/never';
-import configApi from '../helpers/configApi';
+import clientConfig from '../helpers/clientConfig';
 import ContentAppClient from './ContentAppClient';
 
 const maxLatency = 2; // seconds
@@ -9,8 +9,8 @@ export default async function analyzeStream(
   stream: MediaStream,
   contentApp: ReturnType<typeof ContentAppClient>,
 ) {
-  const wsProto = configApi.tls ? 'wss:' : 'ws:';
-  const webSocket = new WebSocket(`${wsProto}//${configApi.host}:${configApi.port}/analyze`);
+  const wsProto = clientConfig.tls ? 'wss:' : 'ws:';
+  const webSocket = new WebSocket(`${wsProto}//${clientConfig.hostAndPort}/analyze`);
 
   await new Promise(resolve => { webSocket.onopen = resolve; });
   contentApp.addConnectionEvent('connected');
