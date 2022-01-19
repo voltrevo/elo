@@ -2,6 +2,7 @@ import browser from 'webextension-polyfill';
 import { AnalysisDisfluent, AnalysisFragment } from '../../analyze';
 import never from '../../helpers/never';
 import TaskQueue from '../../helpers/TaskQueue';
+import clientConfig from '../helpers/clientConfig';
 import EwmaCalculator from '../helpers/EwmaCalculator';
 import Protocol, { ConnectionEvent, PromisishApi } from './Protocol';
 import SessionStats from './storage/SessionStats';
@@ -26,6 +27,9 @@ export default class ContentApp implements PromisishApi<Protocol> {
     this.sessionStats.lastSessionKey = root.lastSessionKey;
     root.lastSessionKey = sessionKey;
     await this.storage.writeRoot(root);
+
+    const proto = clientConfig.tls ? 'https:' : 'http:';
+    fetch(`${proto}//${clientConfig.hostAndPort}/startSession`, { method: 'POST' });
 
     (window as any).contentApp = this;
   }
