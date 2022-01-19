@@ -6,7 +6,7 @@ set -euo pipefail
 # PORT=36582
 
 docker run \
-  --name elo-server-git-"$TAG" \
+  --name elo-server-"$TAG" \
   -d \
   -p"$PORT":36582 \
   --mount type=bind,source="$HOME"/elo-config/config-"$TAG".json,target=/app/config.json,readonly \
