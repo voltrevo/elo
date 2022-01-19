@@ -5,6 +5,13 @@ export const ConfigType = io.type({
     pgConnString: io.string,
     host: io.string,
     port: io.number,
+    https: io.union([
+      io.undefined,
+      io.type({
+        key: io.string,
+        cert: io.string,
+      }),
+    ]),
   }),
   client: io.type({
     tls: io.boolean,
