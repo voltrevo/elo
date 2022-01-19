@@ -1,3 +1,0 @@
-- final accuracy tweaks
-- experiment with CPUs in gcp
-- final testing
