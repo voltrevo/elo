@@ -50,7 +50,7 @@ const config = {
         ],
       }),
       new webpack.DefinePlugin({
-        'process.env.ELO_CONFIG_API': JSON.stringify(eloConfig.api),
+        'process.env.CLIENT_CONFIG': JSON.stringify(JSON.stringify(eloConfig.client)),
       }),
     ],
   },
