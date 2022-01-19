@@ -11,11 +11,9 @@ import type WebSocket from 'ws';
 import uuid from 'uuid';
 
 import dirs from './dirs';
+import config from './helpers/config';
 import launch from './helpers/launch';
 import analyze, { AnalysisFragment, analyzeRaw } from './analyze';
-
-import './pgTest';
-import config from './helpers/config';
 
 launch(async (emit) => {
   const app = websockify(new Koa());
