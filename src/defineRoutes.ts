@@ -13,10 +13,12 @@ import dirs from './dirs';
 import analyze, { AnalysisFragment, analyzeRaw } from './analyze';
 import wsDataToUint8Array from './helpers/wsDataToUint8Array';
 import type StatsGatherer from './StatsGatherer';
+import DbClient from './database/DbClient';
 
 export default function defineRoutes(
   app: App<Koa.DefaultState, Koa.DefaultContext>,
-  { statsGatherer }: {
+  { db, statsGatherer }: {
+    db: DbClient,
     statsGatherer: StatsGatherer,
   },
 ) {
@@ -109,5 +111,11 @@ export default function defineRoutes(
     });
 
     ctx.websocket.on('close', () => write(null));
+  }));
+
+  app.use(route.post('/startSession', async ctx => {
+    ctx.res.statusCode = 200;
+
+    await db.incSession();
   }));
 }

@@ -12,7 +12,7 @@ launch(async (emit) => {
   const db = new DbClient(config.server.pgConnString);
   const statsGatherer = new StatsGatherer(db);
 
-  defineRoutes(app, { statsGatherer });
+  defineRoutes(app, { db, statsGatherer });
 
   const { host, port } = config.server;
 
