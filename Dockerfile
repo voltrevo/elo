@@ -20,6 +20,9 @@ WORKDIR /data
 RUN curl -L https://nodejs.org/dist/v16.13.0/node-v16.13.0-linux-x64.tar.xz | tar xJf -
 ENV PATH="/data/node-v16.13.0-linux-x64/bin:${PATH}"
 
+# AWS rds ca
+RUN curl -LO https://truststore.pki.rds.amazonaws.com/ap-southeast-2/ap-southeast-2-bundle.pem
+
 # Add remaining files
 ADD . /app
 RUN ln -s /app/data/models.tflite /data/models.tflite
