@@ -3,7 +3,7 @@ import config from '../src/helpers/config';
 import launch from '../src/helpers/launch';
 
 launch(async () => {
-  const db = await DbClient.connect(config.server.pgConnString);
+  const db = new DbClient(config.server.pgConnString);
 
   await Promise.all([
     db.incSession(),
