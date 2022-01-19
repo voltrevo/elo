@@ -5,12 +5,14 @@ import config from './helpers/config';
 import launch from './helpers/launch';
 import defineRoutes from './defineRoutes';
 import DbClient from './database/DbClient';
+import StatsGatherer from './StatsGatherer';
 
 launch(async (emit) => {
   const app = websockify(new Koa());
   const db = await DbClient.connect(config.server.pgConnString);
+  const statsGatherer = new StatsGatherer(db);
 
-  defineRoutes(app, { db });
+  defineRoutes(app, { statsGatherer });
 
   const { host, port } = config.server;
 

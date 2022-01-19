@@ -12,12 +12,12 @@ import uuid from 'uuid';
 import dirs from './dirs';
 import analyze, { AnalysisFragment, analyzeRaw } from './analyze';
 import wsDataToUint8Array from './helpers/wsDataToUint8Array';
-import type DbClient from './database/DbClient';
+import type StatsGatherer from './StatsGatherer';
 
 export default function defineRoutes(
   app: App<Koa.DefaultState, Koa.DefaultContext>,
-  { db }: {
-    db: DbClient,
+  { statsGatherer }: {
+    statsGatherer: StatsGatherer,
   },
 ) {
   app.use(serveStaticCache(path.join(dirs.build), {
@@ -75,6 +75,8 @@ export default function defineRoutes(
       webmStream,
       fragment => {
         ctx.websocket.send(JSON.stringify(fragment));
+
+        statsGatherer.process(fragment);
 
         if (fragment.type === 'end') {
           ctx.websocket.close();
