@@ -12,7 +12,13 @@ export default async function analyzeStream(
   const wsProto = clientConfig.tls ? 'wss:' : 'ws:';
   const webSocket = new WebSocket(`${wsProto}//${clientConfig.hostAndPort}/analyze`);
 
-  await new Promise(resolve => { webSocket.onopen = resolve; });
+  await new Promise((resolve, reject) => {
+    webSocket.onopen = resolve;
+    webSocket.onerror = reject;
+  });
+
+  webSocket.onerror = null;
+
   contentApp.addConnectionEvent('connected');
 
   const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
