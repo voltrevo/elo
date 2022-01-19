@@ -9,7 +9,7 @@ import StatsGatherer from './StatsGatherer';
 
 launch(async (emit) => {
   const app = websockify(new Koa());
-  const db = await DbClient.connect(config.server.pgConnString);
+  const db = new DbClient(config.server.pgConnString);
   const statsGatherer = new StatsGatherer(db);
 
   defineRoutes(app, { statsGatherer });

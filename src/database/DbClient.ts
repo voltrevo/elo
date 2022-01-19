@@ -10,21 +10,81 @@ export type HourlyStat = {
 };
 
 export default class DbClient {
-  private constructor(private pgClient: PgClient) {}
+  private pgClientState?: {
+    client: PgClient;
+    connected: boolean;
+    connectionPromise: Promise<void>;
+  };
 
-  static async connect(pgConnString: string): Promise<DbClient> {
-    const pgClient = new PgClient(pgConnString);
-    await pgClient.connect();
+  constructor(private pgConnString: string) {}
 
-    return new DbClient(pgClient);
+  private async PgClient(): Promise<PgClient> {
+    if (this.pgClientState === undefined) {
+      const client = new PgClient(this.pgConnString);
+
+      const state: DbClient['pgClientState'] = {
+        client,
+        connected: false,
+        connectionPromise: client.connect(),
+      };
+
+      state.connectionPromise.then(
+        () => {
+          state.connected = true;
+        },
+        (error) => {
+          // eslint-disable-next-line no-console
+          console.error(error);
+
+          if (this.pgClientState === state) {
+            this.pgClientState = undefined;
+          }
+        },
+      );
+
+      state.client.on('error', (error) => {
+        // eslint-disable-next-line no-console
+        console.error(error);
+
+        if (this.pgClientState === state) {
+          this.pgClientState = undefined;
+        }
+      });
+
+      this.pgClientState = state;
+    }
+
+    if (!this.pgClientState.connected) {
+      await this.pgClientState.connectionPromise;
+    }
+
+    const client = this.pgClientState?.client;
+
+    if (client === undefined) {
+      throw new Error('Database connection failed');
+    }
+
+    return client;
   }
 
   async disconnect() {
-    await this.pgClient.end();
+    const state = this.pgClientState;
+
+    if (state === undefined) {
+      return;
+    }
+
+    await state.client.end();
+
+    if (this.pgClientState === state) {
+      this.pgClientState = undefined;
+    }
   }
 
   async HourlyStats(from: Date, to: Date): Promise<HourlyStat[]> {
-    const res = await this.pgClient.query(
+    const pgClient = await this.PgClient();
+
+    const res = await pgClient.query(
       `
         SELECT * FROM hourly_stats
         WHERE
@@ -72,12 +132,14 @@ export default class DbClient {
   }
 
   private async incField(now: Date, field: string) {
+    const pgClient = await this.PgClient();
+
     // Check field is from a fixed list to ensure there's no SQL injection opportunity.
     if (!['streams_pct', 'speakers_pct', 'sessions_started'].includes(field)) {
       throw new Error(`Unrecognized field "${field}"`);
     }
 
-    await this.pgClient.query(
+    await pgClient.query(
       `
         INSERT INTO hourly_stats (date_, hour, ${field})
         VALUES ($1, $2, 1)
