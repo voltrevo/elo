@@ -70,6 +70,39 @@ export default class DbClient {
       sessionsStarted: Number(sessions_started),
     }));
   }
+
+  private async incField(now: Date, field: string) {
+    // Check field is from a fixed list to ensure there's no SQL injection opportunity.
+    if (!['streams_pct', 'speakers_pct', 'sessions_started'].includes(field)) {
+      throw new Error(`Unrecognized field "${field}"`);
+    }
+
+    await this.pgClient.query(
+      `
+        INSERT INTO hourly_stats (date_, hour, ${field})
+        VALUES ($1, $2, 1)
+        ON CONFLICT (date_, hour)
+        DO
+          UPDATE SET ${field} = hourly_stats.${field} + 1;
+      `,
+      [
+        now.toISOString().split('T')[0],
+        now.getUTCHours(),
+      ],
+    );
+  }
+
+  async incStreamsPct(now = new Date()) {
+    await this.incField(now, 'streams_pct');
+  }
+
+  async incSpeakersPct(now = new Date()) {
+    await this.incField(now, 'speakers_pct');
+  }
+
+  async incSession(now = new Date()) {
+    await this.incField(now, 'sessions_started');
+  }
 }
 
 function assertRowType<Row>(rows: unknown[], requiredFields: ((keyof Row) & string)[]): Row[] {
