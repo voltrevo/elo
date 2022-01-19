@@ -26,5 +26,4 @@ RUN ln -s /app/data/models.tflite /data/models.tflite
 
 # Startup configuration
 WORKDIR /app
-ENV HOST="0.0.0.0" PORT=36582
 CMD [ "npm", "start" ]
