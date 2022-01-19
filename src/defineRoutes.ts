@@ -12,9 +12,13 @@ import uuid from 'uuid';
 import dirs from './dirs';
 import analyze, { AnalysisFragment, analyzeRaw } from './analyze';
 import wsDataToUint8Array from './helpers/wsDataToUint8Array';
+import type DbClient from './database/DbClient';
 
 export default function defineRoutes(
   app: App<Koa.DefaultState, Koa.DefaultContext>,
+  { db }: {
+    db: DbClient,
+  },
 ) {
   app.use(serveStaticCache(path.join(dirs.build), {
     alias: {
