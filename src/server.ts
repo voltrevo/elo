@@ -11,16 +11,16 @@ import DbClient from './database/DbClient';
 import StatsGatherer from './StatsGatherer';
 
 launch(async (emit) => {
-  const app = websockify(
-    new Koa(),
-    {},
-    {
-      ...(config.server.https ? {
+  const app = config.server.https
+    ? websockify(
+      new Koa(),
+      {},
+      {
         key: await fs.readFile(config.server.https.key),
         cert: await fs.readFile(config.server.https.cert),
-      } : {}),
-    },
-  );
+      },
+    )
+    : websockify(new Koa());
 
   app.use(cors());
 
