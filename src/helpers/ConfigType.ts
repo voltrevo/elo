@@ -12,6 +12,7 @@ export const ConfigType = io.type({
         cert: io.string,
       }),
     ]),
+    userIdGenerationSecret: io.string,
   }),
   client: io.type({
     tls: io.boolean,

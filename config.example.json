@@ -2,7 +2,8 @@
   "server": {
     "pgConnString": "postgres://postgres:elodev@localhost:5432/elo",
     "host": "0.0.0.0",
-    "port": 36582
+    "port": 36582,
+    "userIdEncryptionSecret": "secret"
   },
   "client": {
     "tls": false,
