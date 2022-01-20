@@ -14,6 +14,7 @@ import analyze, { AnalysisFragment, analyzeRaw } from './analyze';
 import wsDataToUint8Array from './helpers/wsDataToUint8Array';
 import type StatsGatherer from './StatsGatherer';
 import DbClient from './database/DbClient';
+import { generateUserId } from './userIds';
 
 export default function defineRoutes(
   app: App<Koa.DefaultState, Koa.DefaultContext>,
@@ -117,5 +118,9 @@ export default function defineRoutes(
     ctx.res.statusCode = 200;
 
     await db.incSession();
+  }));
+
+  app.use(route.post('/generateId', async ctx => {
+    ctx.body = generateUserId();
   }));
 }
