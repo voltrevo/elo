@@ -10,6 +10,7 @@ import Storage, { RandomKey } from './storage/Storage';
 import UiState from './UiState';
 
 const sessionKey = RandomKey();
+const apiBase = `${clientConfig.tls ? 'https:' : 'http:'}//${clientConfig.hostAndPort}`;
 
 export default class ContentApp implements PromisishApi<Protocol> {
   uiState = UiState();
@@ -24,12 +25,19 @@ export default class ContentApp implements PromisishApi<Protocol> {
   async activate() {
     const root = await this.storage.readRoot();
 
+    if (root.userId === undefined) {
+      root.userId = await fetch(`${apiBase}/generateId`, { method: 'POST' })
+        .then(res => res.text());
+    }
+
     this.sessionStats.lastSessionKey = root.lastSessionKey;
     root.lastSessionKey = sessionKey;
     await this.storage.writeRoot(root);
 
-    const proto = clientConfig.tls ? 'https:' : 'http:';
-    fetch(`${proto}//${clientConfig.hostAndPort}/startSession`, { method: 'POST' });
+    // TODO: Need to get a sessionToken from here. It's important not to expose userId to the page
+    // because that provides the page with an identifier for the user, which can be a privacy
+    // problem. (Especially because it's the same id across different origins.)
+    fetch(`${apiBase}/startSession`, { method: 'POST' });
 
     (window as any).contentApp = this;
   }

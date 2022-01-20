@@ -1,7 +1,6 @@
-import browser from "webextension-polyfill";
-import Range from "../../helpers/Range";
-import SessionStats from "./SessionStats";
-import StorageRoot from "./StorageRoot";
+import browser from 'webextension-polyfill';
+import Range from '../../helpers/Range';
+import StorageRoot from './StorageRoot';
 
 export function RandomKey() {
   return Range(64).map(() => Math.floor(16 * Math.random()).toString(16)).join('');
