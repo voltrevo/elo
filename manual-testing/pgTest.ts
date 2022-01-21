@@ -5,10 +5,12 @@ import launch from '../src/helpers/launch';
 launch(async () => {
   const db = new DbClient(config.server.pgConnString);
 
+  const userId = 'demo-user-id-3';
+
   await Promise.all([
-    db.incUserStreamHoursPct('demo-user-id'),
-    db.incUserSpeakingHoursPct('demo-user-id'),
-    db.incUserSessionsStarted('demo-user-id'),
+    db.incUserStreamHoursPct(userId),
+    db.incUserSpeakingHoursPct(userId),
+    db.incUserSessionsStarted(userId),
   ]);
 
   await db.disconnect();
