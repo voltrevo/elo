@@ -6,20 +6,12 @@ launch(async () => {
   const db = new DbClient(config.server.pgConnString);
 
   await Promise.all([
-    db.incSession(),
-    db.incSpeakersPct(),
-    db.incSpeakersPct(),
-    db.incStreamsPct(),
-    db.incStreamsPct(),
-    db.incStreamsPct(),
+    db.incUserStreamHoursPct('demo-user-id'),
+    db.incUserSpeakingHoursPct('demo-user-id'),
+    db.incUserSessionsStarted('demo-user-id'),
   ]);
-
-  const stats = await db.HourlyStats(
-    new Date(Date.now() - 86400000),
-    new Date(Date.now() + 3600000),
-  );
 
   await db.disconnect();
 
-  return stats;
+  return 'done';
 });

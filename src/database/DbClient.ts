@@ -162,10 +162,10 @@ function assertRowType<Row>(rows: unknown[], requiredFields: ((keyof Row) & stri
   return rows as Row[];
 }
 
-function formatFullDate(time: Date): string {
+export function formatFullDate(time: Date): string {
   return time.toISOString().split('T')[0];
 }
 
-function formatFullMonth(time: Date): string {
+export function formatFullMonth(time: Date): string {
   return `${time.getUTCFullYear()}${time.getUTCMonth().toString().padStart(2, '0')}`;
 }

@@ -1,3 +1,5 @@
+import 'source-map-support/register';
+
 import { generateUserId, validateUserId } from '../src/userIds';
 import assert from '../src/helpers/assert';
 import base58 from '../src/helpers/base58';
