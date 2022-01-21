@@ -3,6 +3,7 @@ import * as io from 'io-ts';
 import route from 'koa-route';
 import reporter from 'io-ts-reporters';
 import AppComponents from '../AppComponents';
+import { validateUserId } from '../userIds';
 
 const StartSessionBody = io.type({
   userId: io.string,
@@ -21,7 +22,13 @@ export default function defineStartSession({ koaApp, db, sessionTokenBicoder }: 
     db.incSession();
 
     const { userId } = decodeResult.right;
-    // TODO: Check userId is valid
+
+    if (!validateUserId(userId)) {
+      ctx.status = 400;
+      ctx.body = 'Invalid userId';
+      return;
+    }
+
     db.incUserSessionsStarted(userId);
 
     ctx.body = sessionTokenBicoder.encode({ userId });
