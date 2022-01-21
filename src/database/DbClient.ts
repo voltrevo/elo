@@ -75,7 +75,7 @@ export default class DbClient {
     }));
   }
 
-  private async incField(now: Date, field: string) {
+  private async incField(field: string, now: Date) {
     const pgClient = await this.PgClient();
 
     // Check field is from a fixed list to ensure there's no SQL injection opportunity.
@@ -92,22 +92,57 @@ export default class DbClient {
           UPDATE SET ${field} = hourly_stats.${field} + 1;
       `,
       [
-        now.toISOString().split('T')[0],
+        formatFullDate(now),
         now.getUTCHours(),
       ],
     );
   }
 
   async incStreamsPct(now = new Date()) {
-    await this.incField(now, 'streams_pct');
+    await this.incField('streams_pct', now);
   }
 
   async incSpeakersPct(now = new Date()) {
-    await this.incField(now, 'speakers_pct');
+    await this.incField('speakers_pct', now);
   }
 
   async incSession(now = new Date()) {
-    await this.incField(now, 'sessions_started');
+    await this.incField('sessions_started', now);
+  }
+
+  private async incUserMonthlyField(userId: string, field: string, now: Date) {
+    const pgClient = await this.PgClient();
+
+    // Check field is from a fixed list to ensure there's no SQL injection opportunity.
+    if (!['stream_hours_pct', 'speaking_hours_pct', 'sessions_started'].includes(field)) {
+      throw new Error(`Unrecognized field "${field}"`);
+    }
+
+    await pgClient.query(
+      `
+        INSERT INTO monthly_user_stats (user_id, month, ${field})
+        VALUES ($1, $2, 1)
+        ON CONFLICT (user_id, month)
+        DO
+          UPDATE SET ${field} = monthly_user_stats.${field} + 1;
+      `,
+      [
+        userId,
+        formatFullMonth(now),
+      ],
+    );
+  }
+
+  async incUserStreamHoursPct(userId: string, now = new Date()) {
+    await this.incUserMonthlyField(userId, 'stream_hours_pct', now);
+  }
+
+  async incUserSpeakingHoursPct(userId: string, now = new Date()) {
+    await this.incUserMonthlyField(userId, 'speaking_hours_pct', now);
+  }
+
+  async incUserSessionsStarted(userId: string, now = new Date()) {
+    await this.incUserMonthlyField(userId, 'sessions_started', now);
   }
 }
 
@@ -125,4 +160,12 @@ function assertRowType<Row>(rows: unknown[], requiredFields: ((keyof Row) & stri
   }
 
   return rows as Row[];
+}
+
+function formatFullDate(time: Date): string {
+  return time.toISOString().split('T')[0];
+}
+
+function formatFullMonth(time: Date): string {
+  return `${time.getUTCFullYear()}${time.getUTCMonth().toString().padStart(2, '0')}`;
 }
