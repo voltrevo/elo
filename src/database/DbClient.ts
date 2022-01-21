@@ -167,5 +167,5 @@ export function formatFullDate(time: Date): string {
 }
 
 export function formatFullMonth(time: Date): string {
-  return `${time.getUTCFullYear()}${time.getUTCMonth().toString().padStart(2, '0')}`;
+  return `${time.getUTCFullYear()}${(time.getUTCMonth() + 1).toString().padStart(2, '0')}`;
 }
