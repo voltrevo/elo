@@ -6,7 +6,7 @@ import delay from '../src/helpers/delay';
 import launch from '../src/helpers/launch';
 
 launch(async (emit) => {
-  const db = new DbClient(config.server.pgConnString);
+  const db = new DbClient({ config });
 
   while (true) {
     console.clear();

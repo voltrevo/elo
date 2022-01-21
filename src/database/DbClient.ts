@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 
+import AppComponents from '../AppComponents';
 import PgClient from './PgClient';
 import ReconnectablePgClient from './ReconnectablePgClient';
 
@@ -13,8 +14,8 @@ export type HourlyStat = {
 export default class DbClient {
   reconnectablePgClient: ReconnectablePgClient;
 
-  constructor(pgConnString: string) {
-    this.reconnectablePgClient = new ReconnectablePgClient(pgConnString);
+  constructor({ config }: AppComponents<'config'>) {
+    this.reconnectablePgClient = new ReconnectablePgClient(config.server.pgConnString);
   }
 
   private PgClient(): Promise<PgClient> {

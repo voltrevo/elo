@@ -3,7 +3,7 @@ import config from '../src/helpers/config';
 import launch from '../src/helpers/launch';
 
 launch(async () => {
-  const db = new DbClient(config.server.pgConnString);
+  const db = new DbClient({ config });
 
   const userId = 'demo-user-id-3';
 

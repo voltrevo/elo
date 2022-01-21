@@ -10,8 +10,8 @@ import AppComponents from './AppComponents';
 import SessionTokenBicoder from './SessionTokenBicoder';
 
 export default async function initAppComponents(): Promise<AppComponents> {
-  const db = new DbClient(config.server.pgConnString);
-  const statsGatherer = new StatsGatherer(db);
+  const db = new DbClient({ config });
+  const statsGatherer = new StatsGatherer({ db });
 
   const koaApp = config.server.https
     ? websockify(
@@ -24,7 +24,7 @@ export default async function initAppComponents(): Promise<AppComponents> {
     )
     : websockify(new Koa());
 
-  const sessionTokenBicoder = new SessionTokenBicoder(config.server.tokenEncryptionSecret);
+  const sessionTokenBicoder = new SessionTokenBicoder({ config });
 
   return {
     config,

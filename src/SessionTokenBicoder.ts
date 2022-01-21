@@ -1,9 +1,10 @@
 import * as io from 'io-ts';
-import msgpack from '@msgpack/msgpack';
+import * as msgpack from '@msgpack/msgpack';
 import reporter from 'io-ts-reporters';
 
 import createBranca, { Branca } from './helpers/createBranca';
 import ErrorData from './helpers/ErrorData';
+import AppComponents from './AppComponents';
 
 const SessionTokenData = io.type({
   userId: io.string,
@@ -14,8 +15,8 @@ export type SessionTokenData = io.TypeOf<typeof SessionTokenData>;
 export default class SessionTokenBicoder {
   private branca: Branca;
 
-  constructor(secret: string) {
-    this.branca = createBranca(secret);
+  constructor({ config }: AppComponents<'config'>) {
+    this.branca = createBranca(config.server.tokenEncryptionSecret);
   }
 
   encode(tokenData: SessionTokenData) {

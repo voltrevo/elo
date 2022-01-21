@@ -21,8 +21,9 @@ export default function defineStartSession({ koaApp, db, sessionTokenBicoder }: 
     db.incSession();
 
     const { userId } = decodeResult.right;
+    // TODO: Check userId is valid
     db.incUserSessionsStarted(userId);
 
-    return sessionTokenBicoder.encode({ userId });
+    ctx.body = sessionTokenBicoder.encode({ userId });
   }));
 }

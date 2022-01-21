@@ -1,18 +1,20 @@
 /* eslint-disable no-console */
 
 import { AnalysisFragment } from './analyze';
-import DbClient from './database/DbClient';
+import AppComponents from './AppComponents';
 
 const hour = 3600;
 const reportingThreshold = 0.01 * hour;
 
 export default class StatsGatherer {
+  db: AppComponents['db'];
+
   streamSeconds = 0;
   speakingSeconds = 0;
 
-  constructor(
-    public db: DbClient,
-  ) {}
+  constructor({ db }: AppComponents<'db'>) {
+    this.db = db;
+  }
 
   async process(fragment: AnalysisFragment) {
     try {
