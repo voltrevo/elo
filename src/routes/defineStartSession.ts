@@ -8,7 +8,7 @@ const StartSessionBody = io.type({
   userId: io.string,
 });
 
-export default function defineStartSession({ koaApp, db }: AppComponents) {
+export default function defineStartSession({ koaApp, db, sessionTokenBicoder }: AppComponents) {
   koaApp.use(route.post('/startSession', async ctx => {
     const decodeResult = StartSessionBody.decode(ctx.request.body);
 
@@ -18,10 +18,11 @@ export default function defineStartSession({ koaApp, db }: AppComponents) {
       return;
     }
 
-    const body = decodeResult.right;
+    db.incSession();
 
-    console.log(body);
+    const { userId } = decodeResult.right;
+    db.incUserSessionsStarted(userId);
 
-    await db.incSession();
+    return sessionTokenBicoder.encode({ userId });
   }));
 }

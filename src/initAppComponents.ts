@@ -7,6 +7,7 @@ import config from './helpers/config';
 import DbClient from './database/DbClient';
 import StatsGatherer from './StatsGatherer';
 import AppComponents from './AppComponents';
+import SessionTokenBicoder from './SessionTokenBicoder';
 
 export default async function initAppComponents(): Promise<AppComponents> {
   const db = new DbClient(config.server.pgConnString);
@@ -23,10 +24,13 @@ export default async function initAppComponents(): Promise<AppComponents> {
     )
     : websockify(new Koa());
 
+  const sessionTokenBicoder = new SessionTokenBicoder(config.server.tokenEncryptionSecret);
+
   return {
     config,
     db,
     statsGatherer,
     koaApp,
+    sessionTokenBicoder,
   };
 }
