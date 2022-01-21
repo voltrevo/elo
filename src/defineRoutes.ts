@@ -3,8 +3,6 @@
 import path from 'path';
 import { Readable } from 'stream';
 
-import type { App } from 'koa-websocket';
-import type Koa from 'koa';
 import route from 'koa-route';
 import serveStaticCache from 'koa-static-cache';
 import uuid from 'uuid';
@@ -12,24 +10,20 @@ import uuid from 'uuid';
 import dirs from './dirs';
 import analyze, { AnalysisFragment, analyzeRaw } from './analyze';
 import wsDataToUint8Array from './helpers/wsDataToUint8Array';
-import type StatsGatherer from './StatsGatherer';
-import DbClient from './database/DbClient';
 import { generateUserId } from './userIds';
+import defineStartSession from './routes/defineStartSession';
+import AppComponents from './AppComponents';
 
-export default function defineRoutes(
-  app: App<Koa.DefaultState, Koa.DefaultContext>,
-  { db, statsGatherer }: {
-    db: DbClient,
-    statsGatherer: StatsGatherer,
-  },
-) {
-  app.use(serveStaticCache(path.join(dirs.build), {
+export default function defineRoutes(appComponents: AppComponents) {
+  const { koaApp, statsGatherer } = appComponents;
+
+  koaApp.use(serveStaticCache(path.join(dirs.build), {
     alias: {
       '/': '/index.html',
     },
   }));
 
-  app.use(route.post('/analyze', async ctx => {
+  koaApp.use(route.post('/analyze', async ctx => {
     ctx.res.statusCode = 200;
 
     const analysisStream = analyzeRaw(ctx.req, error => {
@@ -42,7 +36,7 @@ export default function defineRoutes(
     await new Promise(resolve => analysisStream.on('end', resolve));
   }));
 
-  app.ws.use(route.all('/analyze', async ctx => {
+  koaApp.ws.use(route.all('/analyze', async ctx => {
     // TODO: Limit buffered chunks
     const chunks: (Uint8Array | null)[] = [];
     let readBytesWaiting = 1;
@@ -114,13 +108,9 @@ export default function defineRoutes(
     ctx.websocket.on('close', () => write(null));
   }));
 
-  app.use(route.post('/startSession', async ctx => {
-    ctx.res.statusCode = 200;
+  defineStartSession(appComponents);
 
-    await db.incSession();
-  }));
-
-  app.use(route.post('/generateId', async ctx => {
+  koaApp.use(route.post('/generateId', async ctx => {
     ctx.body = generateUserId();
   }));
 }

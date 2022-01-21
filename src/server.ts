@@ -1,37 +1,23 @@
-import fs from 'fs/promises';
-
-import Koa from 'koa';
-import websockify from 'koa-websocket';
 import cors from '@koa/cors';
+import bodyParser from 'koa-bodyparser';
 
-import config from './helpers/config';
 import launch from './helpers/launch';
 import defineRoutes from './defineRoutes';
-import DbClient from './database/DbClient';
-import StatsGatherer from './StatsGatherer';
+import initAppComponents from './initAppComponents';
 
 launch(async (emit) => {
-  const app = config.server.https
-    ? websockify(
-      new Koa(),
-      {},
-      {
-        key: await fs.readFile(config.server.https.key),
-        cert: await fs.readFile(config.server.https.cert),
-      },
-    )
-    : websockify(new Koa());
+  const appComponents = await initAppComponents();
 
-  app.use(cors());
+  const { config, koaApp } = appComponents;
 
-  const db = new DbClient(config.server.pgConnString);
-  const statsGatherer = new StatsGatherer(db);
+  koaApp.use(cors());
+  koaApp.use(bodyParser());
 
-  defineRoutes(app, { db, statsGatherer });
+  defineRoutes(appComponents);
 
   const { host, port } = config.server;
 
-  await new Promise(resolve => app.listen(port, host, () => { resolve(null); }));
+  await new Promise(resolve => koaApp.listen(port, host, () => { resolve(null); }));
   emit(`Serving ${config.server.https ? 'https' : 'http'} on ${host}:${port}`);
 
   await new Promise(() => {});
