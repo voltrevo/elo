@@ -56,6 +56,8 @@ export default class ContentApp implements PromisishApi<Protocol> {
     }
 
     this.sessionToken = sessionToken;
+    this.sessionStats.sessionToken = sessionToken;
+    await this.updateStats(0, 0);
 
     return sessionToken;
   }

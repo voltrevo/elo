@@ -1,5 +1,6 @@
 type SessionStats = {
   lastSessionKey?: string;
+  sessionToken?: string;
   title: string;
   start: number;
   end: number;
