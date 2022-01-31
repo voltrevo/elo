@@ -1,4 +1,4 @@
-import looseLookup from "./looseLookup";
+import looseLookup from './looseLookup';
 
 export default class PostMessageServer {
   constructor(
@@ -18,10 +18,10 @@ export default class PostMessageServer {
     try {
       response = { value: await this.handleRequest(evt.data.request) };
     } catch (error) {
-      response = { error: (error as Error).message };
+      response = { error: (error as Error).stack ?? '' };
     }
 
-    window.postMessage({ channel: this.channel, id: evt.data.id, response }, '*')
+    window.postMessage({ channel: this.channel, id: evt.data.id, response }, '*');
   };
 
   close() {
