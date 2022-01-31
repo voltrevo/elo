@@ -37,7 +37,15 @@ export default class ContentApp implements PromisishApi<Protocol> {
     // TODO: Need to get a sessionToken from here. It's important not to expose userId to the page
     // because that provides the page with an identifier for the user, which can be a privacy
     // problem. (Especially because it's the same id across different origins.)
-    fetch(`${apiBase}/startSession`, { method: 'POST' });
+    fetch(`${apiBase}/startSession`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify({
+        userId: root.userId,
+      }),
+    });
 
     (window as any).contentApp = this;
   }
