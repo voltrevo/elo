@@ -11,7 +11,16 @@ launch(async (emit) => {
   const { config, koaApp } = appComponents;
 
   koaApp.use(cors());
-  koaApp.use(bodyParser());
+
+  const bodyParserHandler = bodyParser();
+
+  koaApp.use(async (ctx, next) => {
+    if (ctx.path === '/analyze') {
+      await next();
+    } else {
+      return await bodyParserHandler(ctx, next);
+    }
+  });
 
   defineRoutes(appComponents);
 
