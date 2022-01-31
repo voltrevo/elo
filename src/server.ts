@@ -2,7 +2,7 @@ import cors from '@koa/cors';
 import bodyParser from 'koa-bodyparser';
 
 import launch from './helpers/launch';
-import defineRoutes from './defineRoutes';
+import defineRoutes from './routes/defineRoutes';
 import initAppComponents from './initAppComponents';
 
 launch(async (emit) => {
