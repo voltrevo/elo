@@ -1,5 +1,5 @@
-import PostMessageClient from "../helpers/PostMessageClient";
-import Protocol, { PromisifyApi } from "./Protocol";
+import PostMessageClient from '../helpers/PostMessageClient';
+import Protocol, { PromisifyApi } from './Protocol';
 
 const methodSet: Record<keyof Protocol, true> = {
   notifyGetUserMediaCalled: true,
@@ -7,6 +7,7 @@ const methodSet: Record<keyof Protocol, true> = {
   addConnectionEvent: true,
   getUiState: true,
   getDashboardUrl: true,
+  getSessionToken: true,
 };
 
 export default function ContentAppClient(
