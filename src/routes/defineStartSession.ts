@@ -6,7 +6,7 @@ import AppComponents from '../AppComponents';
 import { validateUserId } from '../userIds';
 
 const StartSessionBody = io.type({
-  userId: io.string,
+  userId: io.union([io.undefined, io.string]),
 });
 
 export default function defineStartSession({ koaApp, db, sessionTokenBicoder }: AppComponents) {
@@ -23,6 +23,13 @@ export default function defineStartSession({ koaApp, db, sessionTokenBicoder }: 
 
     const { userId } = decodeResult.right;
 
+    if (userId === undefined) {
+      // DEPRECATED: Not including userId.
+      // TODO: Measure usage and remove when reasonable.
+      ctx.status = 200;
+      return;
+    }
+
     if (!validateUserId(userId)) {
       ctx.status = 400;
       ctx.body = 'Invalid userId';
@@ -30,7 +37,6 @@ export default function defineStartSession({ koaApp, db, sessionTokenBicoder }: 
     }
 
     db.incUserSessionsStarted(userId);
-
     ctx.body = sessionTokenBicoder.encode({ userId });
   }));
 }
