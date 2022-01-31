@@ -6,8 +6,12 @@ import uuid from 'uuid';
 import analyze, { AnalysisFragment, analyzeRaw } from '../analyze';
 import AppComponents from '../AppComponents';
 import wsDataToUint8Array from '../helpers/wsDataToUint8Array';
+import UserStatsGatherer from '../UserStatsGatherer';
+import ErrorData from '../helpers/ErrorData';
 
-export default function defineAnalyze({ koaApp, statsGatherer }: AppComponents) {
+export default function defineAnalyze(appComponents: AppComponents) {
+  const { koaApp, statsGatherer, sessionTokenBicoder } = appComponents;
+
   koaApp.use(route.post('/analyze', async ctx => {
     ctx.res.statusCode = 200;
 
@@ -24,9 +28,34 @@ export default function defineAnalyze({ koaApp, statsGatherer }: AppComponents) 
   koaApp.ws.use(route.all('/analyze', async ctx => {
     const { sessionToken } = ctx.query;
 
-    if (sessionToken !== undefined) {
-      // TODO
+    let userId: string;
+
+    if (typeof sessionToken === 'string') {
+      const decodeResult = sessionTokenBicoder.decode(sessionToken);
+
+      if (decodeResult instanceof ErrorData) {
+        const id = uuid.v4();
+        const userMessage = `${id}: ${decodeResult.type}`;
+        console.error(userMessage, decodeResult.detail);
+
+        const errorFragment: AnalysisFragment = {
+          type: 'error',
+          value: { message: `${id}: ${decodeResult.type}` },
+        };
+
+        ctx.websocket.send(JSON.stringify(errorFragment));
+        ctx.websocket.close();
+
+        return;
+      }
+
+      userId = decodeResult.userId;
+    } else {
+      // Deprecated
+      userId = 'missing-session-token';
     }
+
+    const userStatsGatherer = new UserStatsGatherer(userId, appComponents);
 
     // TODO: Limit buffered chunks
     const chunks: (Uint8Array | null)[] = [];
@@ -65,6 +94,7 @@ export default function defineAnalyze({ koaApp, statsGatherer }: AppComponents) 
         ctx.websocket.send(JSON.stringify(fragment));
 
         statsGatherer.process(fragment);
+        userStatsGatherer.process(fragment);
 
         if (fragment.type === 'end') {
           ctx.websocket.close();
