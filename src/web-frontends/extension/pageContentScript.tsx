@@ -40,7 +40,7 @@ interceptGetUserMedia(async ({ constraints, streamPromise }) => {
       try {
         await analyzeStream(sessionToken, audioStream, contentApp);
       } catch (error) {
-        console.error('fluency', error);
+        console.error('elo', error);
       }
 
       const streamAlive = audioStream.getTracks().some(t => t.readyState !== 'ended');
@@ -49,7 +49,7 @@ interceptGetUserMedia(async ({ constraints, streamPromise }) => {
         break;
       }
 
-      console.log('Fluency terminated even though the stream is still going. Restarting in 3s.');
+      console.log('Elo terminated even though the stream is still going. Restarting in 3s.');
       contentApp.addConnectionEvent('reconnecting');
       await new Promise(resolve => setTimeout(resolve, 3000));
     }

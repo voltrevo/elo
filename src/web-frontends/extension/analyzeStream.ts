@@ -77,7 +77,7 @@ export default async function analyzeStream(
     clearTimeout(latencyTimeoutId);
 
     latencyTimeoutId = window.setTimeout(() => {
-      console.debug('fluency', 'Latency timeout');
+      console.debug('elo', 'Latency timeout');
       cleanup();
     }, (maxLatency + 1) * 1000);
 
@@ -113,7 +113,7 @@ export default async function analyzeStream(
         const latency = duration - fragment.value.duration;
 
         if (latency > maxLatency) {
-          console.error('fluency', 'reached max latency, resetting connection');
+          console.error('elo', 'reached max latency, resetting connection');
           cleanup();
         }
 
@@ -121,13 +121,13 @@ export default async function analyzeStream(
       }
 
       case 'error': {
-        console.error('fluency', 'Transcription error', fragment.value.message);
+        console.error('elo', 'Transcription error', fragment.value.message);
         cleanup();
         break;
       }
 
       case 'debug': {
-        console.error('fluency', 'Transcription debug', fragment.value.message);
+        console.error('elo', 'Transcription debug', fragment.value.message);
         break;
       }
 
