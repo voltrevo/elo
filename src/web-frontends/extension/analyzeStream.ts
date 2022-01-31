@@ -6,11 +6,12 @@ import ContentAppClient from './ContentAppClient';
 const maxLatency = 2; // seconds
 
 export default async function analyzeStream(
+  sessionToken: string,
   stream: MediaStream,
   contentApp: ReturnType<typeof ContentAppClient>,
 ) {
   const wsProto = clientConfig.tls ? 'wss:' : 'ws:';
-  const webSocket = new WebSocket(`${wsProto}//${clientConfig.hostAndPort}/analyze`);
+  const webSocket = new WebSocket(`${wsProto}//${clientConfig.hostAndPort}/analyze?sessionToken=${sessionToken}`);
 
   await new Promise((resolve, reject) => {
     webSocket.onopen = resolve;

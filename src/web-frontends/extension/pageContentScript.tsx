@@ -16,13 +16,20 @@ const contentApp = ContentAppClient(new PostMessageClient('elo'));
 
 preact.render(<App contentApp={contentApp}/>, container);
 
-interceptGetUserMedia(({ constraints, streamPromise }) => {
+interceptGetUserMedia(async ({ constraints, streamPromise }) => {
   if (!constraints.audio) {
     return; // Ignore intercepts without audio
   }
 
   container.style.display = '';
-  contentApp.notifyGetUserMediaCalled();
+  await contentApp.notifyGetUserMediaCalled();
+
+  const sessionToken = await contentApp.getSessionToken();
+
+  if (sessionToken === undefined) {
+    console.warn('Aborting due to missing sessionToken');
+    return;
+  }
 
   streamPromise.then(async stream => {
     const audioStream = new MediaStream(stream.getAudioTracks());
@@ -31,7 +38,7 @@ interceptGetUserMedia(({ constraints, streamPromise }) => {
       contentApp.addConnectionEvent('connecting');
 
       try {
-        await analyzeStream(audioStream, contentApp);
+        await analyzeStream(sessionToken, audioStream, contentApp);
       } catch (error) {
         console.error('fluency', error);
       }

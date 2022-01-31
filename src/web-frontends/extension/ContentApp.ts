@@ -15,6 +15,7 @@ const apiBase = `${clientConfig.tls ? 'https:' : 'http:'}//${clientConfig.hostAn
 export default class ContentApp implements PromisishApi<Protocol> {
   uiState = UiState();
   sessionStats = SessionStats(document.title, Date.now());
+  sessionToken?: string;
   uiStateRequests = new TaskQueue();
 
   fillerSoundEwma = new EwmaCalculator(60, 60);
@@ -23,6 +24,8 @@ export default class ContentApp implements PromisishApi<Protocol> {
   storage = new Storage('elo');
 
   async activate() {
+    (window as any).contentApp = this;
+
     const root = await this.storage.readRoot();
 
     if (root.userId === undefined) {
@@ -34,10 +37,7 @@ export default class ContentApp implements PromisishApi<Protocol> {
     root.lastSessionKey = sessionKey;
     await this.storage.writeRoot(root);
 
-    // TODO: Need to get a sessionToken from here. It's important not to expose userId to the page
-    // because that provides the page with an identifier for the user, which can be a privacy
-    // problem. (Especially because it's the same id across different origins.)
-    fetch(`${apiBase}/startSession`, {
+    const startSessionResponse = await fetch(`${apiBase}/startSession`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
@@ -45,9 +45,19 @@ export default class ContentApp implements PromisishApi<Protocol> {
       body: JSON.stringify({
         userId: root.userId,
       }),
-    });
+    }).then(res => res.text());
 
-    (window as any).contentApp = this;
+    let sessionToken: string;
+
+    if (startSessionResponse[0] === '{') {
+      sessionToken = JSON.parse(startSessionResponse).sessionToken;
+    } else {
+      sessionToken = startSessionResponse;
+    }
+
+    this.sessionToken = sessionToken;
+
+    return sessionToken;
   }
 
   updateUi() {
@@ -63,6 +73,10 @@ export default class ContentApp implements PromisishApi<Protocol> {
     await this.activate();
     this.uiState.active = true;
     this.updateUi();
+  }
+
+  async getSessionToken() {
+    return this.sessionToken;
   }
 
   addFragment(fragment: AnalysisFragment) {
