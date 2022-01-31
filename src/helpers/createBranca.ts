@@ -12,7 +12,7 @@ export default function createBranca(secret: string): Branca {
 
   return {
     encode: (buffer, timestamp) => instance.encode(buffer as any, timestamp),
-    decode: (token, ttl) => new Uint8Array(instance.decode(token, ttl).buffer),
+    decode: (token, ttl) => new Uint8Array(instance.decode(token, ttl)),
     timestamp: (token) => instance.timestamp(token),
   };
 }
