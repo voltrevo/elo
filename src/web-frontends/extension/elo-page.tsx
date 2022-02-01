@@ -15,27 +15,17 @@ const contentApp = makeLocalContentAppClient(new ContentApp());
 (window as any).contentApp = contentApp;
 
 window.addEventListener('load', async () => {
-  // const storage = new Storage('elo');
+  const pageCtx = initEloPageContext();
 
-  // const { lastSessionKey } = await storage.readRoot();
+  const { signupData } = await pageCtx.storage.readRoot();
 
-  // if (lastSessionKey === undefined) {
-  //   ReactDOM.render(<>No last session</>, document.body);
-  //   return;
-  // }
-
-  // const lastSession = await storage.read<SessionStats>(lastSessionKey);
-
-  // if (lastSession === undefined) {
-  //   ReactDOM.render(<>No last session</>, document.body);
-  //   return;
-  // }
-
-  // ReactDOM.render(<SessionReport lastSession={lastSession} storage={storage}/>, document.body);
+  pageCtx.update({
+    page: signupData ? 'LastSessionPage' : 'SignUpPage',
+  });
 
   ReactDOM.render(
     <ContentAppContext.Provider value={contentApp}>
-      <EloPageContext.Provider value={initEloPageContext()}>
+      <EloPageContext.Provider value={pageCtx}>
         <EloPage/>
       </EloPageContext.Provider>
     </ContentAppContext.Provider>,
