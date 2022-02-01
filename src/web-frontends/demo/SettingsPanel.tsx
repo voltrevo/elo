@@ -1,4 +1,4 @@
-import * as preact from 'preact';
+import * as React from 'react';
 
 import { Settings } from './App';
 
@@ -7,7 +7,7 @@ type Props = {
   onChange: (newSettings: Props['settings']) => void,
 };
 
-export default class SettingsPanel extends preact.Component<Props> {
+export default class SettingsPanel extends React.Component<Props> {
   render() {
     const { maximumGap, cursorCorrection } = this.props.settings;
 
@@ -19,7 +19,7 @@ export default class SettingsPanel extends preact.Component<Props> {
 
     const cursorCorrectionStr = (cursorCorrection >= 0 ? '+' : '') + cursorCorrection.toFixed(3);
 
-    return <div class="panel">
+    return <div className="panel">
       <div>Settings</div>
       <div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>

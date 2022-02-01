@@ -1,4 +1,4 @@
-import * as preact from 'preact';
+import * as React from 'react';
 
 import type { RecordingState } from './App';
 import never from '../../helpers/never';
@@ -10,7 +10,7 @@ type Props = {
   onFile: (file: File) => void,
 };
 
-export default class RecorderPanel extends preact.Component<Props> {
+export default class RecorderPanel extends React.Component<Props> {
   renderText() {
     const recordingState = this.props.recordingState;
 
@@ -39,7 +39,7 @@ export default class RecorderPanel extends preact.Component<Props> {
   }
 
   render() {
-    return <div class="recorder panel">
+    return <div className="recorder panel">
       <RecordButton
         active={this.props.recordingState.name === 'recording'}
         onClick={this.props.onRecordToggle}

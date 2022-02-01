@@ -1,4 +1,4 @@
-import * as preact from 'preact';
+import * as React from 'react';
 
 import nil from '../../helpers/nil';
 import TaskQueue from '../../helpers/TaskQueue';
@@ -15,7 +15,7 @@ type State = {
 
 const yPosSamples = 50;
 
-export default class WaveForm extends preact.Component<Props, State> {
+export default class WaveForm extends React.Component<Props, State> {
   container?: HTMLDivElement;
   cleanupTasks = new TaskQueue();
   canvas?: HTMLCanvasElement;

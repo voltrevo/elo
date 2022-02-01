@@ -1,7 +1,7 @@
-import * as preact from 'preact';
+import * as ReactDOM from 'react-dom';
 
 import LabellingTool from './LabellingTool';
 
 window.addEventListener('load', () => {
-  preact.render(<LabellingTool/>, document.body);
+  ReactDOM.render(<LabellingTool/>, document.body);
 });

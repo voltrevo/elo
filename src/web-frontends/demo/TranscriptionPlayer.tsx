@@ -1,4 +1,4 @@
-import * as preact from 'preact';
+import * as React from 'react';
 
 import type { Analysis, AnalysisToken } from '../../analyze';
 import { download } from '../helpers/download';
@@ -30,7 +30,7 @@ type CursorPos = {
 
 type ExpandedToken = (AnalysisToken & { disfluent: boolean }) | null;
 
-export default class TranscriptionPlayer extends preact.Component<Props, State> {
+export default class TranscriptionPlayer extends React.Component<Props, State> {
   state: State = {
     playing: false,
     time: 0,
@@ -292,7 +292,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     return expandedTokens;
   }
 
-  renderTranscript(): preact.JSX.Element {
+  renderTranscript(): React.ReactNode {
     const tokens = this.getTokens();
     const expandedTokens = this.getExpandedTokens();
 
@@ -305,7 +305,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
         const startTime = t.start_time;
 
         return <span
-          class={!t.disfluent ? 'token' : 'token spoken-incorrect'}
+          className={!t.disfluent ? 'token' : 'token spoken-incorrect'}
           ref={r => {
             this.tokenRefs[tokens.findIndex(tr => tr.start_time === startTime)] = r;
           }}
@@ -318,8 +318,8 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
           {t.text ?? ' '}
         </span>;
       })}
-      {this.props.data.analysis.complete ? null : <div class="spinner">
-        <div class="spinner-content"></div>
+      {this.props.data.analysis.complete ? null : <div className="spinner">
+        <div className="spinner-content"></div>
       </div>}
     </div>;
   }
@@ -346,12 +346,12 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
       textClasses.push('monospace');
     }
 
-    const panel = <div class="transcription-player panel">
-      <div class="play-btn" onClick={() => this.playPause()}>
-        <div class="play-btn-text">{this.state.playing ? '| |' : '▶'}</div>
+    const panel = <div className="transcription-player panel">
+      <div className="play-btn" onClick={() => this.playPause()}>
+        <div className="play-btn-text">{this.state.playing ? '| |' : '▶'}</div>
       </div>
-      <div class="transcription-box">
-        <div class={textClasses.join(' ')}>{this.renderTranscript()}</div>
+      <div className="transcription-box">
+        <div className={textClasses.join(' ')}>{this.renderTranscript()}</div>
         {(() => {
           const recording = this.props.data.recording;
 
@@ -401,7 +401,7 @@ export default class TranscriptionPlayer extends preact.Component<Props, State> 
     return <>
       {panel}
       {cursorPos && <div
-        class="transcription-cursor"
+        className="transcription-cursor"
         style={{
           left: `${cursorPos.x}px`,
           top: `${cursorPos.bottom + 2}px`,

@@ -1,4 +1,4 @@
-import * as preact from 'preact';
+import * as React from 'react';
 import clamp from '../../helpers/clamp';
 
 import nil from '../../helpers/nil';
@@ -22,7 +22,7 @@ type Props = {
   words: { time: number, text: string }[];
 };
 
-export default class WaveOverlay extends preact.Component<Props> {
+export default class WaveOverlay extends React.Component<Props> {
   render() {
     const {
       startTime, currentTime, loadingTime, endTime, hoverTime, totalTime,
@@ -38,7 +38,7 @@ export default class WaveOverlay extends preact.Component<Props> {
 
     return <div style={{ width: '100%', height: '100%', position: 'relative' }}>
       <div
-        class="wave-cursor"
+        className="wave-cursor"
         style={{ left: `${100 * progressOf(currentTime)}%` }}
       />
       {(() => {
@@ -59,11 +59,11 @@ export default class WaveOverlay extends preact.Component<Props> {
 
         return <>
           <div
-            class="wave-cursor faded"
+            className="wave-cursor faded"
             style={{ left: `${100 * progressOf(hoverTime)}%` }}
           />
           <div
-            class="wave-cursor-time"
+            className="wave-cursor-time"
             style={textStyle}
           >{renderTimeFromSeconds(hoverTime)}</div>
         </>;
@@ -74,7 +74,7 @@ export default class WaveOverlay extends preact.Component<Props> {
         }
 
         return <div
-          class="wave-cursor loading"
+          className="wave-cursor loading"
           style={{ left: `${100 * progressOf(loadingTime)}%` }}
         />;
       })()}
@@ -101,7 +101,7 @@ export default class WaveOverlay extends preact.Component<Props> {
           return <></>;
         }
 
-        return <div class="marker" style={{ left: `${100 * progress}%` }}>
+        return <div className="marker" style={{ left: `${100 * progress}%` }}>
           {marker.text}
         </div>;
       })}
@@ -113,7 +113,7 @@ export default class WaveOverlay extends preact.Component<Props> {
         }
 
         return <div
-          class="word"
+          className="word"
           style={{ right: `${100 * (1 - progress)}%` }}
         >
           {word.text}

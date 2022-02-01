@@ -1,4 +1,4 @@
-import * as preact from 'preact';
+import * as React from 'react';
 
 import nil from '../../helpers/nil';
 import TaskQueue from '../../helpers/TaskQueue';
@@ -12,7 +12,7 @@ type Props = {
   onDragEnd: () => void;
 };
 
-export default class LabelComponent extends preact.Component<Props> {
+export default class LabelComponent extends React.Component<Props> {
   cleanupTasks = new TaskQueue();
   ref?: HTMLDivElement;
 
@@ -67,11 +67,11 @@ export default class LabelComponent extends preact.Component<Props> {
     const classes = ['label', this.props.label.type];
 
     return <div
-      class={classes.join(' ')}
+      className={classes.join(' ')}
       ref={this.setRef}
       style={{ left: this.props.left }}
     >
-      <div class="circle">
+      <div className="circle">
         {(() => {
           const text = looseProp(this.props.label.data, 'text');
 
@@ -79,7 +79,7 @@ export default class LabelComponent extends preact.Component<Props> {
             return <></>;
           }
 
-          return <div class="text">{text}</div>;
+          return <div className="text">{text}</div>;
         })()}
       </div>
     </div>;

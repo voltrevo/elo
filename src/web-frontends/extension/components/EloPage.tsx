@@ -12,7 +12,7 @@ type State = {
   session: SessionStats;
 };
 
-export default class SessionReport extends React.Component<Props, State> {
+export default class EloPage extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 

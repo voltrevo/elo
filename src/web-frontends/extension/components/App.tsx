@@ -1,4 +1,4 @@
-import * as preact from 'preact';
+import * as React from 'react';
 
 import TaskQueue from '../../../helpers/TaskQueue';
 import ContentAppClient from '../ContentAppClient';
@@ -25,7 +25,7 @@ type State = {
   dashboardUrl: string;
 };
 
-export default class App extends preact.Component<Props, State> {
+export default class App extends React.Component<Props, State> {
   dragData: null | {
     mouseDownPos: { x: number, y: number },
     appPosAtMouseDown: { x: number, y: number },
@@ -100,7 +100,8 @@ export default class App extends preact.Component<Props, State> {
           }, 3000);
         }
 
-        this.setState({ uiState: newUiState, ...highlights });
+        // TODO: Avoid casting
+        this.setState({ uiState: newUiState, ...highlights } as State);
       }
     })();
 
@@ -220,7 +221,7 @@ export default class App extends preact.Component<Props, State> {
     });
   }
 
-  render(): preact.ComponentChild {
+  render(): React.ReactNode {
     const { uiState, left = '', top = '' } = this.state;
 
     const classes = [
@@ -230,7 +231,7 @@ export default class App extends preact.Component<Props, State> {
     ];
 
     return <div
-      class={classes.join(' ')}
+      className={classes.join(' ')}
       ref={r => {
         this.appRef = r;
         this.dragRef = r;
@@ -238,7 +239,7 @@ export default class App extends preact.Component<Props, State> {
       }}
       style={{ left, top }}
     >
-      <div class="app-content">{this.renderAppContent()}</div>
+      <div className="app-content">{this.renderAppContent()}</div>
     </div>;
   }
 
@@ -246,12 +247,12 @@ export default class App extends preact.Component<Props, State> {
     const { uiState } = this.state;
 
     if (this.state.collapsed) {
-      return <div class="body">
+      return <div className="body">
         <ExpandIcon onAction={() => { this.setState({ collapsed: false }); }}/>
-        <div class="center common-centering">
+        <div className="center common-centering">
           {uiState.loading
-            ? <div class="spinner"></div>
-            : <div class="logo" style={{
+            ? <div className="spinner"></div>
+            : <div className="logo" style={{
               backgroundImage: `url("${(
                 document.querySelector('#elo-extension #icon-template') as HTMLImageElement
               ).src}")`,
@@ -267,11 +268,11 @@ export default class App extends preact.Component<Props, State> {
     return <>
       <CollapseIcon onAction={() => { this.setState({ collapsed: true }); }}/>
       <PopoutIcon onAction={() => { this.openDashboard(); }}/>
-      <div class="body">
-        <div class="left spacer">
-          <div class="word-box-container spacer">
+      <div className="body">
+        <div className="left spacer">
+          <div className="word-box-container spacer">
             <div
-              class={[
+              className={[
                 'common-centering',
                 'word-box',
                 ...(this.state.highlightFillerSound ? ['highlight'] : []),
@@ -280,14 +281,14 @@ export default class App extends preact.Component<Props, State> {
               {uiState.fillerSoundBox.text}
             </div>
           </div>
-          <div class="common-centering counter">
+          <div className="common-centering counter">
             {uiState.fillerSoundBox.metric}
           </div>
         </div>
-        <div class="center common-centering">
+        <div className="center common-centering">
           {uiState.loading
-            ? <div class="spinner"></div>
-            : <div class="logo" style={{
+            ? <div className="spinner"></div>
+            : <div className="logo" style={{
               backgroundImage: `url("${(
                 document.querySelector('#elo-extension #icon-template') as HTMLImageElement
               ).src}")`,
@@ -297,13 +298,13 @@ export default class App extends preact.Component<Props, State> {
             }}></div>
           }
         </div>
-        <div class="right spacer">
-          <div class="common-centering counter">
+        <div className="right spacer">
+          <div className="common-centering counter">
             {uiState.fillerWordBox.metric}
           </div>
-          <div class="word-box-container spacer">
+          <div className="word-box-container spacer">
             <div
-              class={[
+              className={[
                 'common-centering',
                 'word-box',
                 ...(this.state.highlightFillerWord ? ['highlight'] : []),

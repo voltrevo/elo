@@ -1,10 +1,10 @@
-import * as preact from 'preact';
+import * as ReactDOM from 'react-dom';
 
 import App from './App';
 import audio from './audio';
 
 window.addEventListener('load', () => {
-  preact.render(<App/>, document.body);
+  ReactDOM.render(<App/>, document.body);
 });
 
 (window as any).audio = audio;

@@ -1,4 +1,4 @@
-import * as preact from 'preact';
+import * as React from 'react';
 
 import { Analysis, AnalysisFragment } from '../../analyze';
 import never from '../../helpers/never';
@@ -58,7 +58,7 @@ const initialState: State = {
   transcriptions: [],
 };
 
-export default class App extends preact.Component<{}, State> {
+export default class App extends React.Component<{}, State> {
   state = initialState;
 
   async updateLoop() {
@@ -244,7 +244,7 @@ export default class App extends preact.Component<{}, State> {
   }
 
   render() {
-    return <div class="recorder-app">
+    return <div className="recorder-app">
       <RecorderPanel
         recordingState={this.state.recorder}
         onRecordToggle={() => this.onRecordToggle()}

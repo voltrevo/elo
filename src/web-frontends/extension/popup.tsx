@@ -1,5 +1,5 @@
-import * as preact from 'preact';
+import * as ReactDOM from 'react-dom';
 
 window.addEventListener('load', () => {
-  preact.render(<div>Hello world</div>, document.body);
+  ReactDOM.render(<div>Hello world</div>, document.body);
 });

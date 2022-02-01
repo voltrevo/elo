@@ -1,13 +1,13 @@
-import * as preact from 'preact';
+import * as React from 'react';
 
 type Props = {
   onDrop: (file: File) => void;
 };
 
-export default class DropDetector extends preact.Component<Props> {
+export default class DropDetector extends React.Component<Props> {
   render() {
     return <div
-      class="drop-detector"
+      className="drop-detector"
       style={{
         position: 'absolute',
         left: 0,

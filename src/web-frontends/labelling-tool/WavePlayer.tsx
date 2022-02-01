@@ -1,4 +1,4 @@
-import * as preact from 'preact';
+import * as React from 'react';
 
 import nil from '../../helpers/nil';
 import WaveForm from './WaveForm';
@@ -44,7 +44,7 @@ export type Marker = {
 
 const maxPlaybackRate = 4;
 
-export default class WavePlayer extends preact.Component<Props, State> {
+export default class WavePlayer extends React.Component<Props, State> {
   latestState: State = {
     otherAudioMuted: false,
     currentTime: 0,
@@ -74,7 +74,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
     this.state = this.latestState;
   }
 
-  setState(updates: Partial<State>) {
+  update(updates: Partial<State>) {
     this.latestState = {
       ...this.latestState,
       ...updates,
@@ -93,7 +93,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
     this.mainAudioUrl = URL.createObjectURL(f);
     this.mainAudioElement!.src = this.mainAudioUrl;
 
-    this.setState({
+    this.update({
       mainAudioFile: f,
       audioBuffer,
       totalTime: audioBuffer.duration,
@@ -116,7 +116,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
       this.otherAudioElement!.currentTime = this.mainAudioElement.currentTime;
     }
 
-    this.setState({
+    this.update({
       otherAudioFile: f,
     });
   };
@@ -126,7 +126,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
     const labelStrs = labelStr.split('\n').filter(line => line.trim() !== '');
     const labelTimes = labelStrs.map(Number);
 
-    this.setState({
+    this.update({
       labelsFile: f,
       labels: {
         ...Object.fromEntries(labelTimes.map((t, i) => [`r${i}`, {
@@ -145,7 +145,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
 
     this.clearAnalysis();
 
-    this.setState({
+    this.update({
       loadingTime: 0,
       analysisFile: f,
     });
@@ -162,7 +162,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
       },
     );
 
-    this.setState({ analysis });
+    this.update({ analysis });
   }
 
   downloadAnalysis = () => {
@@ -185,7 +185,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
     this.mainAudioElement = mainAudioElement;
 
     mainAudioElement.ontimeupdate = () => {
-      this.setState({
+      this.update({
         currentTime: mainAudioElement.currentTime,
       });
 
@@ -285,7 +285,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
       this.otherAudioElement.playbackRate = playbackRate;
     }
 
-    this.setState({
+    this.update({
       playbackRate: maxPlaybackRate ** Number(this.playbackRangeElement.value),
     });
   };
@@ -297,7 +297,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
       this.otherAudioElement.volume = newMuteSetting ? 0 : 1;
     }
 
-    this.setState({
+    this.update({
       otherAudioMuted: newMuteSetting,
     });
   };
@@ -315,7 +315,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
       return;
     }
 
-    this.setState({
+    this.update({
       currentTime: (
         opt.referenceCurrentTime +
         this.state.playbackRate * (Date.now() - opt.referenceTime) / 1000
@@ -355,7 +355,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
 
     const newStart = newStartTime * this.state.audioBuffer.sampleRate;
 
-    this.setState({
+    this.update({
       start: newStart,
       end: newStart + (this.state.end - this.state.start),
     });
@@ -378,7 +378,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
     return samplePos / this.state.audioBuffer.length * this.state.audioBuffer.duration;
   }
 
-  handleTimelineClick = (evt: MouseEvent) => {
+  handleTimelineClick = (evt: React.MouseEvent) => {
     if (this.blockInteractionsCounter > 0 || evt.shiftKey || !this.state.audioBuffer) {
       return;
     }
@@ -409,7 +409,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
     }
   }
 
-  handleTimelineMouseDown = (evt: MouseEvent) => {
+  handleTimelineMouseDown = (evt: React.MouseEvent) => {
     if (
       this.blockInteractionsCounter > 0 ||
       !evt.shiftKey ||
@@ -472,9 +472,9 @@ export default class WavePlayer extends preact.Component<Props, State> {
       (rect.left <= evt.clientX && evt.clientX <= rect.right) &&
       (rect.top <= evt.clientY && evt.clientY <= rect.bottom)
     )) {
-      this.setState({ hoverTime: nil });
+      this.update({ hoverTime: nil });
     } else {
-      this.setState({
+      this.update({
         hoverTime: this.calculateClientXTime(evt.clientX),
       });
     }
@@ -526,7 +526,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
       end: clamp(0, current + (end - current) / factor, audioBuffer.length),
     };
 
-    this.setState(newProps);
+    this.update(newProps);
   }
 
   zoomInClose() {
@@ -548,7 +548,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
     const newStart = currentSample - currentProgress * targetSampleWidth;
     const newEnd = currentSample + (1 - currentProgress) * targetSampleWidth;
 
-    this.setState({
+    this.update({
       start: clamp(0, newStart, audioBuffer.length),
       end: clamp(0, newEnd, audioBuffer.length),
     });
@@ -559,7 +559,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
       return;
     }
 
-    this.setState({
+    this.update({
       start: 0,
       end: this.state.audioBuffer.length,
     });
@@ -572,7 +572,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
       return;
     }
 
-    this.setState({
+    this.update({
       labels: {
         ...this.state.labels,
         [labelKey]: { ...this.state.labels[labelKey], time },
@@ -581,7 +581,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
   };
 
   addLabel = () => {
-    this.setState({
+    this.update({
       labels: {
         ...this.state.labels,
         [`r${Math.random()}`]: {
@@ -617,14 +617,14 @@ export default class WavePlayer extends preact.Component<Props, State> {
       const newLabels = { ...this.latestState.labels };
       delete newLabels[closestLabelKey];
 
-      this.setState({
+      this.update({
         labels: newLabels,
       });
     }
   };
 
   clearAnalysis() {
-    this.setState({
+    this.update({
       words: [],
       labels: this.getLabels('reference'),
       analysisFile: nil,
@@ -639,7 +639,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
 
     this.clearAnalysis();
 
-    this.setState({ loadingTime: 0 });
+    this.update({ loadingTime: 0 });
 
     const analysis: AnalysisFragment[] = [];
 
@@ -653,7 +653,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
       },
     );
 
-    this.setState({ analysis });
+    this.update({ analysis });
   };
 
   addAnalysisFragment(fragment: AnalysisFragment) {
@@ -662,7 +662,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
       fragment.value.category === 'filler' &&
       fragment.value.end_time !== null
     ) {
-      this.setState({
+      this.update({
         labels: {
           ...this.latestState.labels,
           [`g${Math.random()}`]: {
@@ -675,7 +675,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
     }
 
     if (fragment.type === 'word' && fragment.value.end_time !== null) {
-      this.setState({
+      this.update({
         words: [
           ...this.latestState.words,
           { time: fragment.value.end_time, text: fragment.value.text },
@@ -684,13 +684,13 @@ export default class WavePlayer extends preact.Component<Props, State> {
     }
 
     if (fragment.type === 'progress') {
-      this.setState({
+      this.update({
         loadingTime: fragment.value.duration,
       });
     }
 
     if (fragment.type === 'end') {
-      this.setState({
+      this.update({
         loadingTime: nil,
       });
     }
@@ -779,7 +779,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
   render() {
     const marks = this.calculateMarks();
 
-    return <div class="wave-player">
+    return <div className="wave-player">
       <div
         style={{ height: '300px', position: 'relative' }}
         onClick={this.handleTimelineClick}
@@ -841,7 +841,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
         Accuracy: {Math.round(100 * marks.correct / marks.total)}%
         &nbsp;({marks.correct}/{marks.total})
       </div>
-      <div class="tool-row">
+      <div className="tool-row">
         {(() => {
           const style = { width: '5em' };
 
@@ -888,7 +888,7 @@ export default class WavePlayer extends preact.Component<Props, State> {
         <button onClick={this.addLabel}>Add label</button>
         <button onClick={this.removeLabel}>Remove label</button>
       </div>
-      <table class="files-table">
+      <table className="files-table">
         <thead></thead>
         <tbody>
           <tr>
@@ -963,8 +963,8 @@ export default class WavePlayer extends preact.Component<Props, State> {
   }
 }
 
-function FileRequest(props: { onDrop: (f: File) => void, children?: preact.ComponentChildren }) {
-  return <div class="file-request">
+function FileRequest(props: { onDrop: (f: File) => void, children?: React.ReactNode }) {
+  return <div className="file-request">
     <DropDetector onDrop={props.onDrop}/>
     {props.children}
   </div>;

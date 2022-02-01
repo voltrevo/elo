@@ -1,4 +1,4 @@
-import * as preact from 'preact';
+import * as ReactDOM from 'react-dom';
 
 import PostMessageClient from '../helpers/PostMessageClient';
 import analyzeStream from './analyzeStream';
@@ -14,7 +14,7 @@ eloExtension.appendChild(container);
 
 const contentApp = ContentAppClient(new PostMessageClient('elo'));
 
-preact.render(<App contentApp={contentApp}/>, container);
+ReactDOM.render(<App contentApp={contentApp}/>, container);
 
 interceptGetUserMedia(async ({ constraints, streamPromise }) => {
   if (!constraints.audio) {

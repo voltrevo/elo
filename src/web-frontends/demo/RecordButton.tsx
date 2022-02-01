@@ -1,4 +1,4 @@
-import * as preact from 'preact';
+import * as React from 'react';
 
 type Props = Readonly<{
   active: boolean,
@@ -6,10 +6,10 @@ type Props = Readonly<{
   onFile: (file: File) => void,
 }>;
 
-export default class RecordButton extends preact.Component<Props> {
+export default class RecordButton extends React.Component<Props> {
   render() {
     return <div
-      class={`record-btn${this.props.active ? ' active' : ''}`}
+      className={`record-btn${this.props.active ? ' active' : ''}`}
       style={{ position: 'relative' }} onClick={this.props.onClick}
       onDrop={async (event) => {
         event.preventDefault();
@@ -58,9 +58,9 @@ export default class RecordButton extends preact.Component<Props> {
           top: '50%',
           transform: 'translate(-50%, -50%)',
         }}
-        class="record-btn-outer"
+        className="record-btn-outer"
       >
-        <div class="record-btn-inner"></div>
+        <div className="record-btn-inner"></div>
       </div>
     </div>;
   }

@@ -1,14 +1,14 @@
-import * as preact from 'preact';
+import * as React from 'react';
 
 type Props = {
   onAction: () => void;
 };
 
-export default class CollapseIcon extends preact.Component<Props, {}> {
+export default class CollapseIcon extends React.Component<Props, {}> {
   render() {
     return <>
-      <div class="hover-wing-left"/>
-      <div class="slider-icon collapse-icon" onClick={this.props.onAction}>
+      <div className="hover-wing-left"/>
+      <div className="slider-icon collapse-icon" onClick={this.props.onAction}>
         ‹
       </div>
     </>;
