@@ -4,6 +4,7 @@ import PostMessageClient from '../helpers/PostMessageClient';
 import analyzeStream from './analyzeStream';
 import App from './components/App';
 import ContentAppClient from './ContentAppClient';
+import ContentAppContext from './ContentAppContext';
 import interceptGetUserMedia from './interceptGetUserMedia';
 
 const eloExtension = document.querySelector('#elo-extension')!;
@@ -14,7 +15,12 @@ eloExtension.appendChild(container);
 
 const contentApp = ContentAppClient(new PostMessageClient('elo'));
 
-ReactDOM.render(<App contentApp={contentApp}/>, container);
+ReactDOM.render(
+  <ContentAppContext.Provider value={contentApp}>
+    <App/>
+  </ContentAppContext.Provider>,
+  container,
+);
 
 interceptGetUserMedia(async ({ constraints, streamPromise }) => {
   if (!constraints.audio) {

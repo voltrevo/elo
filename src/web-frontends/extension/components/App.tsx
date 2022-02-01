@@ -1,16 +1,14 @@
 import * as React from 'react';
+import ContentAppContext from '../ContentAppContext';
 
-import ContentAppClient from '../ContentAppClient';
 import UiState from '../UiState';
 import CollapseIcon from './CollapseIcon';
 import ExpandIcon from './ExpandIcon';
 import PopoutIcon from './PopoutIcon';
 
-type Props = {
-  contentApp: ReturnType<typeof ContentAppClient>,
-};
+const App: React.FunctionComponent = () => {
+  const contentApp = React.useContext(ContentAppContext);
 
-const App: React.FunctionComponent<Props> = ({ contentApp }: Props) => {
   const dragData = React.useRef<{
     mouseDownPos: { x: number, y: number },
     appPosAtMouseDown: { x: number, y: number },
