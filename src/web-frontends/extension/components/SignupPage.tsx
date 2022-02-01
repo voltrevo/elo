@@ -1,7 +1,11 @@
 import * as React from 'react';
+
+import switch_ from '../../../helpers/switch_';
+import ContentAppContext from '../ContentAppContext';
 import EloPageContext from '../EloPageContext';
 
 const SignUpPage: React.FunctionComponent = () => {
+  const appCtx = React.useContext(ContentAppContext);
   const pageCtx = React.useContext(EloPageContext);
 
   const [authChoice, setAuthChoice] = React.useState<'signup' | 'login'>('signup');
@@ -66,7 +70,10 @@ const SignUpPage: React.FunctionComponent = () => {
       <td colSpan={2}>
         <button
           disabled={!(email && email !== sentEmail && passwd && passwd === confirmPasswd)}
-          onClick={() => setSentEmail(email)}
+          onClick={() => {
+            setSentEmail(email);
+            appCtx.sendVerificationEmail(email);
+          }}
         >
           {email && email === sentEmail ? 'Sent' : 'Send verification email'}
         </button>
@@ -84,6 +91,16 @@ const SignUpPage: React.FunctionComponent = () => {
           type="text"
           onInput={(evt: React.ChangeEvent<HTMLInputElement>) => {
             setVerificationCode(evt.target.value);
+          }}
+          style={{
+            backgroundColor: switch_(
+              [
+                [verificationCode.length === 0, ''],
+                [verificationCode.length < 6, 'lightyellow'],
+                [verificationCode.length === 6, 'lightblue'],
+              ],
+              'pink',
+            ),
           }}
         />
       </td>

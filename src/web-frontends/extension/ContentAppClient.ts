@@ -9,6 +9,8 @@ const methodSet: Record<keyof Protocol, true> = {
   getUiState: true,
   getDashboardUrl: true,
   getSessionToken: true,
+  sendVerificationEmail: true,
+  checkVerificationEmail: true,
 };
 
 export default function ContentAppClient(

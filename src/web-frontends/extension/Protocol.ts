@@ -8,6 +8,8 @@ type Protocol = {
   getUiState(afterIndex: number): UiState;
   getDashboardUrl(): string;
   getSessionToken(): string | undefined;
+  sendVerificationEmail(email: string): void;
+  checkVerificationEmail(email: string, code: string): boolean;
 };
 
 export type ConnectionEvent = (

@@ -1,5 +1,7 @@
+import { keccak_256 } from 'js-sha3';
 import browser from 'webextension-polyfill';
 import { AnalysisDisfluent, AnalysisFragment } from '../../analyze';
+import delay from '../../helpers/delay';
 import never from '../../helpers/never';
 import TaskQueue from '../../helpers/TaskQueue';
 import clientConfig from '../helpers/clientConfig';
@@ -219,5 +221,17 @@ export default class ContentApp implements PromisishApi<Protocol> {
     await this.storage.writeRoot(root);
 
     return 'success';
+  }
+
+  sendVerificationEmail(email: string) {
+    this;
+    console.log(keccak_256(email).slice(0, 6));
+  }
+
+  async checkVerificationEmail(email: string, code: string) {
+    this;
+    await delay(500);
+
+    return code === keccak_256(email).slice(0, 6);
   }
 }
