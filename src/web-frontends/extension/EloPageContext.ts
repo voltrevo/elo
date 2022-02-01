@@ -3,6 +3,8 @@ import { EventEmitter } from 'events';
 import * as React from 'react';
 import TypedEventEmitter from 'typed-emitter';
 
+import Storage from './storage/Storage';
+
 type EloPageContext = ReturnType<typeof initEloPageContext>;
 
 export function initEloPageContext() {
@@ -15,6 +17,7 @@ export function initEloPageContext() {
 
   const context = {
     events,
+    storage: new Storage('elo'),
     state,
     update: (updates: Partial<typeof state>) => {
       for (const key of (Object.keys(updates) as (keyof typeof state)[])) {

@@ -1,20 +1,37 @@
 import * as React from 'react';
+
 import EloPageContext, { useEloPageContext } from '../EloPageContext';
+import SessionStats from '../storage/SessionStats';
+import SessionReport from './SessionReport';
 
 const EloPage: React.FunctionComponent = () => {
-  const test = useEloPageContext(state => state.test);
+  const pageCtx = React.useContext(EloPageContext);
 
-  const ctx = React.useContext(EloPageContext);
+  const [lastSession, setLastSession] = React.useState<SessionStats>();
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    const intervalId = setInterval(() => {
-      ctx.update({ test: ctx.state.test + 1 });
-    }, 1000);
+    (async () => {
+      const { lastSessionKey } = await pageCtx.storage.readRoot();
 
-    return () => { clearInterval(intervalId); };
+      if (lastSessionKey === undefined) {
+        return;
+      }
+
+      setLastSession(await pageCtx.storage.read<SessionStats>(lastSessionKey));
+      setLoading(false);
+    })();
   });
 
-  return <>{test}</>;
+  if (loading) {
+    return <>Loading...</>;
+  }
+
+  if (lastSession === undefined) {
+    return <>No last session</>;
+  }
+
+  return <SessionReport lastSession={lastSession} storage={pageCtx.storage}/>;
 };
 
 export default EloPage;
