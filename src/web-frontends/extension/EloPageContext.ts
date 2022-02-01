@@ -5,7 +5,7 @@ import TypedEventEmitter from 'typed-emitter';
 
 type EloPageContext = ReturnType<typeof initEloPageContext>;
 
-function initEloPageContext() {
+export function initEloPageContext() {
   const state = {
     page: '',
     test: 37,
@@ -14,43 +14,44 @@ function initEloPageContext() {
   const events = new EventEmitter() as TypedEventEmitter<{ update(): void }>;
 
   const context = {
-    ...events,
+    events,
     state,
     update: (updates: Partial<typeof state>) => {
       for (const key of (Object.keys(updates) as (keyof typeof state)[])) {
         (state as any)[key] = updates[key];
       }
+
+      events.emit('update');
     },
   };
 
   return context;
 }
 
-const EloPageContext = {
-  ...React.createContext<EloPageContext>({} as EloPageContext),
-  use: <T>(
-    extract: (state: EloPageContext['state']) => T,
-    compare: (a: T, b: T) => boolean = (a, b) => a === b,
-  ): T => {
-    const ctx = React.useContext(EloPageContext);
-    const [value, setValue] = React.useState(extract(ctx.state));
+const EloPageContext = React.createContext<EloPageContext>({} as EloPageContext);
 
-    React.useEffect(() => {
-      const onUpdate = () => {
-        const newValue = extract(ctx.state);
+export function useEloPageContext<T>(
+  extract: (state: EloPageContext['state']) => T,
+  compare: (a: T, b: T) => boolean = (a, b) => a === b,
+): T {
+  const ctx = React.useContext(EloPageContext);
+  const [value, setValue] = React.useState(extract(ctx.state));
 
-        if (!compare(value, newValue)) {
-          setValue(newValue);
-        }
-      };
+  React.useEffect(() => {
+    const onUpdate = () => {
+      const newValue = extract(ctx.state);
 
-      ctx.on('update', onUpdate);
+      if (!compare(value, newValue)) {
+        setValue(newValue);
+      }
+    };
 
-      return () => { ctx.off('update', onUpdate); };
-    });
+    ctx.events.on('update', onUpdate);
 
-    return value;
-  },
-};
+    return () => { ctx.events.off('update', onUpdate); };
+  });
+
+  return value;
+}
 
 export default EloPageContext;

@@ -1,4 +1,4 @@
-import looseLookup from "./looseLookup";
+import looseLookup from './looseLookup';
 
 export default class PostMessageClient {
   nextId = 0;
