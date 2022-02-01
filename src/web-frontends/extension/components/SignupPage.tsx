@@ -5,8 +5,27 @@ const SignUpPage: React.FunctionComponent = () => {
   const pageCtx = React.useContext(EloPageContext);
 
   return <>
-    Sign up page<br/>
-    <a onClick={() => pageCtx.update({ page: 'LastSessionPage' })}>Session reports</a>
+    <h1>Welcome to Elo!</h1>
+    <table>
+      <tr>
+        <td>Email</td>
+        <td>
+          <input type="text" />
+        </td>
+      </tr>
+      <tr>
+        <td>Password</td>
+        <td>
+          <input type="password" />
+        </td>
+      </tr>
+      <tr>
+        <td>Confirm Password</td>
+        <td>
+          <input type="password" />
+        </td>
+      </tr>
+    </table>
   </>;
 };
 
