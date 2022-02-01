@@ -25,7 +25,7 @@ import {
   Filler,
   Legend,
   Title,
-  Tooltip
+  Tooltip,
 } from 'chart.js';
 
 Chart.register(
@@ -51,7 +51,7 @@ Chart.register(
   Filler,
   Legend,
   Title,
-  Tooltip
+  Tooltip,
 );
 
 const sampleData = {
@@ -293,18 +293,18 @@ export default class ReportPrototype extends preact.Component {
             data: [6.5, 6.3, 5.8, 6.1, 5.4, 4.8],
             fill: false,
             borderColor: 'rgb(0, 223, 223)',
-            tension: 0.1
-          }]
+            tension: 0.1,
+          }],
         },
         options: {
           scales: {
             y: {
               min: 0,
               max: 8,
-            }
+            },
           },
           maintainAspectRatio: false,
-        }
+        },
       };
 
       if (this.totalChart === undefined) {
@@ -333,26 +333,26 @@ export default class ReportPrototype extends preact.Component {
               data: [3.5, 3.4, 3.4, 3.3, 2.5, 2.1],
               fill: false,
               borderColor: 'rgb(0, 200, 255)',
-              tension: 0.1
+              tension: 0.1,
             },
             {
               label: 'Filler & Hedge Words',
               data: [3, 2.9, 2.4, 2.8, 2.9, 2.7],
               fill: false,
               borderColor: 'rgb(179, 0, 255)',
-              tension: 0.1
+              tension: 0.1,
             },
-          ]
+          ],
         },
         options: {
           scales: {
             y: {
               min: 0,
               max: 4,
-            }
+            },
           },
           maintainAspectRatio: false,
-        }
+        },
       };
 
       if (this.byTypeChart === undefined) {

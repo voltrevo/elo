@@ -166,7 +166,7 @@ export default class SessionReport extends preact.Component<Props, State> {
         sum += count;
       }
     }
-    
+
     return (sum / (session.speakingTime / 60));
   }
 
@@ -198,7 +198,7 @@ export default class SessionReport extends preact.Component<Props, State> {
         sum += count;
       }
     }
-    
+
     return (sum / (session.speakingTime / 60));
   }
 
