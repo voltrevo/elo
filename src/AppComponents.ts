@@ -2,12 +2,12 @@ import type { App as KoaApp } from 'koa-websocket';
 import type Koa from 'koa';
 
 import type DbClient from './database/DbClient';
-import type { ConfigType } from './helpers/ConfigType';
 import type StatsGatherer from './StatsGatherer';
 import type SessionTokenBicoder from './SessionTokenBicoder';
+import type { ServerConfig } from './helpers/serverConfig';
 
 type AppComponentMap = {
-  config: ConfigType;
+  config: ServerConfig;
   db: DbClient;
   statsGatherer: StatsGatherer;
   koaApp: KoaApp<Koa.DefaultState, Koa.DefaultContext>;

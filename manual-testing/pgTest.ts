@@ -1,5 +1,5 @@
 import DbClient from '../src/database/DbClient';
-import config from '../src/helpers/config';
+import config from '../src/helpers/serverConfig';
 import launch from '../src/helpers/launch';
 
 launch(async () => {

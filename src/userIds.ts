@@ -3,11 +3,13 @@ import crypto from 'crypto';
 import { keccak256 } from 'js-sha3';
 
 import base58 from './helpers/base58';
-import config from './helpers/config';
+
+// TODO: Inject this
+import config from './helpers/serverConfig';
 
 function generateChecksum(data: Uint8Array) {
   const hash = keccak256.create();
-  hash.update(config.server.userIdGenerationSecret);
+  hash.update(config.userIdGenerationSecret);
   hash.update(data);
 
   return new Uint8Array(hash.arrayBuffer().slice(0, 4));

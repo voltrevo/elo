@@ -15,7 +15,7 @@ export default class DbClient {
   reconnectablePgClient: ReconnectablePgClient;
 
   constructor({ config }: AppComponents<'config'>) {
-    this.reconnectablePgClient = new ReconnectablePgClient(config.server.pgConnString);
+    this.reconnectablePgClient = new ReconnectablePgClient(config.pgConnString);
   }
 
   private PgClient(): Promise<PgClient> {

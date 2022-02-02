@@ -10,4 +10,10 @@ if ('left' in decodeResult) {
   throw new Error(reporter.report(decodeResult).join('\n'));
 }
 
-export default decodeResult.right;
+if (decodeResult.right === undefined) {
+  throw new Error('Missing client config');
+}
+
+const clientConfig = decodeResult.right;
+
+export default clientConfig;

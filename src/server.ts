@@ -24,10 +24,10 @@ launch(async (emit) => {
 
   defineRoutes(appComponents);
 
-  const { host, port } = config.server;
+  const { host, port } = config;
 
   await new Promise(resolve => koaApp.listen(port, host, () => { resolve(null); }));
-  emit(`Serving ${config.server.https ? 'https' : 'http'} on ${host}:${port}`);
+  emit(`Serving ${config.https ? 'https' : 'http'} on ${host}:${port}`);
 
   await new Promise(() => {});
 });

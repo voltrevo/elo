@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
 import DbClient from '../src/database/DbClient';
-import config from '../src/helpers/config';
+import config from '../src/helpers/serverConfig';
 import delay from '../src/helpers/delay';
 import launch from '../src/helpers/launch';
 
