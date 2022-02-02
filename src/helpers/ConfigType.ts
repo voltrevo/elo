@@ -15,6 +15,9 @@ export const ConfigType = io.type({
   client: optional(io.type({
     tls: io.boolean,
     hostAndPort: io.string,
+    featureFlags: io.type({
+      signupEnabled: io.boolean,
+    }),
   })),
 });
 

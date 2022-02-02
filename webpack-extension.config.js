@@ -8,6 +8,10 @@ const webpack = require('webpack');
 
 const eloConfig = JSON.parse(fs.readFileSync(require.resolve('./config.json'), 'utf-8'));
 
+if (eloConfig.client === undefined) {
+  throw new Error('Missing client config');
+}
+
 const config = {
   common: {
     entry: {
