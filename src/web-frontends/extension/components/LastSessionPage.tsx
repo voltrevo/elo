@@ -19,8 +19,9 @@ const LastSessionPage: React.FunctionComponent = () => {
       }
 
       setLastSession(await pageCtx.storage.read<SessionStats>(lastSessionKey));
+    })().then(() => {
       setLoading(false);
-    })();
+    });
   });
 
   if (loading) {
