@@ -14,11 +14,11 @@ const contentApp = makeLocalContentAppClient(new ContentApp());
 window.addEventListener('load', async () => {
   const pageCtx = initEloPageContext();
 
-  const { signupData } = await pageCtx.storage.readRoot();
-  const needsSignup = clientConfig.featureFlags.signupEnabled && !signupData;
+  const { registrationData } = await pageCtx.storage.readRoot();
+  const needsAuth = clientConfig.featureFlags.authEnabled && !registrationData;
 
   pageCtx.update({
-    page: needsSignup ? 'SignUpPage' : 'LastSessionPage',
+    page: needsAuth ? 'AuthPage' : 'LastSessionPage',
   });
 
   ReactDOM.render(

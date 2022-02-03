@@ -3,7 +3,7 @@ type StorageRoot = {
   metricPreference?: string;
   userId?: string;
   installTriggered?: true;
-  signupData?: {
+  registrationData?: {
     userId: string;
     email: string;
     passwordHash?: string;

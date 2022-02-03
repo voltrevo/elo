@@ -2,13 +2,13 @@ import * as React from 'react';
 
 import { useEloPageContext } from '../EloPageContext';
 import LastSessionPage from './LastSessionPage';
-import SignUpPage from './SignupPage';
+import AuthPage from './AuthPage';
 
 const EloPage: React.FunctionComponent = () => {
   const page = useEloPageContext(state => state.page);
 
-  if (page === 'SignUpPage') {
-    return <SignUpPage />;
+  if (page === 'AuthPage') {
+    return <AuthPage />;
   }
 
   if (page === 'LastSessionPage') {

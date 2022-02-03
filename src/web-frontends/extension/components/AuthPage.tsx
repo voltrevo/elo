@@ -3,24 +3,24 @@ import * as React from 'react';
 import switch_ from '../../../helpers/switch_';
 import ContentAppContext from '../ContentAppContext';
 
-const SignUpPage: React.FunctionComponent = () => {
-  const [authChoice, setAuthChoice] = React.useState<'signup' | 'login'>('signup');
+const AuthPage: React.FunctionComponent = () => {
+  const [authChoice, setAuthChoice] = React.useState<'register' | 'login'>('register');
 
   return <>
     <h1>Welcome to Elo!</h1>
 
     <div>
-      <input type="radio" checked={authChoice === 'signup'} onClick={() => setAuthChoice('signup')} /> Sign Up
+      <input type="radio" checked={authChoice === 'register'} onClick={() => setAuthChoice('register')} /> Register
     </div>
     <div>
       <input type="radio" checked={authChoice === 'login'} onClick={() => setAuthChoice('login')} /> Log In
     </div>
 
-    {authChoice === 'login' ? <LoginForm/> : <SignupForm/>}
+    {authChoice === 'login' ? <LoginForm/> : <RegistrationForm/>}
   </>;
 };
 
-export default SignUpPage;
+export default AuthPage;
 
 function LoginForm() {
   const appCtx = React.useContext(ContentAppContext);
@@ -103,7 +103,7 @@ function LoginForm() {
   </table>;
 }
 
-function SignupForm() {
+function RegistrationForm() {
   const appCtx = React.useContext(ContentAppContext);
 
   const [email, setEmail] = React.useState('');
@@ -247,7 +247,7 @@ function SignupForm() {
             setRegisterState({ success, message });
           }}
         >
-          Sign Up
+          Register
         </button>
       </td>
       <td>

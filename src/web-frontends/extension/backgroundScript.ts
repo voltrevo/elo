@@ -4,7 +4,7 @@ import Storage from './storage/Storage';
 import clientConfig from '../helpers/clientConfig';
 
 Browser.runtime.onInstalled.addListener(async () => {
-  if (clientConfig.featureFlags.signupEnabled) {
+  if (clientConfig.featureFlags.authEnabled) {
     const storage = new Storage('elo');
     const root = await storage.readRoot();
 
