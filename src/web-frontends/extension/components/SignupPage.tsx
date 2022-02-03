@@ -63,6 +63,9 @@ function signupForm() {
     correct: boolean,
   }>();
 
+  const validEmailAndPassword = email && passwd && passwd === confirmPasswd;
+  const validSentEmail = validEmailAndPassword && email === sentEmail;
+
   return <table>
     <tr>
       <td>Email</td>
@@ -96,7 +99,7 @@ function signupForm() {
     <tr>
       <td colSpan={2}>
         <button
-          disabled={!(email && email !== sentEmail && passwd && passwd === confirmPasswd)}
+          disabled={!(validEmailAndPassword && email !== sentEmail)}
           onClick={() => {
             setSentEmail(email);
             appCtx.sendVerificationEmail(email);
@@ -104,14 +107,11 @@ function signupForm() {
         >
           {email && email === sentEmail ? 'Sent' : 'Send verification email'}
         </button>
+
+        {validSentEmail && <button>Resend</button>}
       </td>
     </tr>
-    {email && email === sentEmail && <tr>
-      <td colSpan={2}>
-        <button>Resend</button>
-      </td>
-    </tr>}
-    {email && email === sentEmail && <tr>
+    {validSentEmail && <tr>
       <td>Verification code</td>
       <td>
         <input
@@ -155,6 +155,15 @@ function signupForm() {
             ),
           }}
         />
+      </td>
+    </tr>}
+    {validSentEmail && <tr>
+      <td colSpan={2}>
+        <button
+          disabled={!(verificationCheck?.code === verificationCode && verificationCheck?.correct)}
+        >
+          Sign Up
+        </button>
       </td>
     </tr>}
   </table>;
