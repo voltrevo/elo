@@ -23,8 +23,17 @@ const SignUpPage: React.FunctionComponent = () => {
 export default SignUpPage;
 
 function LoginForm() {
+  const appCtx = React.useContext(ContentAppContext);
+
   const [email, setEmail] = React.useState('');
   const [passwd, setPasswd] = React.useState('');
+
+  type LoginResult = {
+    success: boolean;
+    message?: string;
+  };
+
+  const [loginState, setLoginState] = React.useState<'loading' | LoginResult>();
 
   return <table>
     <tr>
@@ -46,14 +55,51 @@ function LoginForm() {
       </td>
     </tr>
     <tr>
-      <td colSpan={2}>
+      <td>
         <button
-          disabled={!(email && passwd)}
+          disabled={!(email && passwd && loginState !== 'loading' && (!loginState?.success))}
+          onClick={async () => {
+            setLoginState('loading');
+
+            let success: LoginResult['success'];
+            let message: LoginResult['message'];
+
+            try {
+              await appCtx.login(email, passwd);
+              success = true;
+              message = undefined;
+            } catch (error) {
+              success = false;
+              message = (error as Error).message;
+            }
+
+            setLoginState({ success, message });
+          }}
         >
           Log In
         </button>
       </td>
+      <td>
+        {(() => {
+          if (loginState === undefined) {
+            return undefined;
+          }
+
+          if (loginState === 'loading') {
+            return <>Loading...</>;
+          }
+
+          return <>{loginState.success ? '✅' : '❌'}</>;
+        })()}
+      </td>
     </tr>
+    {loginState !== 'loading' && loginState?.message !== undefined && <tr>
+      <td colSpan={2}>
+        <p style={{ color: loginState?.success ? '' : 'red' }}>
+          {loginState.message}
+        </p>
+      </td>
+    </tr>}
   </table>;
 }
 
