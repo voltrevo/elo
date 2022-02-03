@@ -118,6 +118,13 @@ function SignupForm() {
     correct: boolean,
   }>();
 
+  type RegisterResult = {
+    success: boolean;
+    message?: string;
+  };
+
+  const [registerState, setRegisterState] = React.useState<'loading' | RegisterResult>();
+
   const validEmailAndPassword = email && passwd && passwd === confirmPasswd;
   const validSentEmail = validEmailAndPassword && email === sentEmail;
 
@@ -171,6 +178,7 @@ function SignupForm() {
       <td>
         <input
           type="text"
+          value={verificationCode}
           onInput={async (evt: React.ChangeEvent<HTMLInputElement>) => {
             const newCode = evt.target.value;
             setVerificationCode(newCode);
@@ -213,12 +221,54 @@ function SignupForm() {
       </td>
     </tr>}
     {validSentEmail && <tr>
-      <td colSpan={2}>
+      <td>
         <button
-          disabled={!(verificationCheck?.code === verificationCode && verificationCheck?.correct)}
+          disabled={!(
+            verificationCheck?.code === verificationCode &&
+            verificationCheck?.correct &&
+            registerState !== 'loading' &&
+            !registerState?.success
+          )}
+          onClick={async () => {
+            setRegisterState('loading');
+
+            let success: RegisterResult['success'];
+            let message: RegisterResult['message'];
+
+            try {
+              await appCtx.register(email, passwd, verificationCode);
+              success = true;
+              message = undefined;
+            } catch (error) {
+              success = false;
+              message = (error as Error).message;
+            }
+
+            setRegisterState({ success, message });
+          }}
         >
           Sign Up
         </button>
+      </td>
+      <td>
+        {(() => {
+          if (registerState === undefined) {
+            return undefined;
+          }
+
+          if (registerState === 'loading') {
+            return <>Loading...</>;
+          }
+
+          return <>{registerState.success ? '✅' : '❌'}</>;
+        })()}
+      </td>
+    </tr>}
+    {registerState !== 'loading' && registerState?.message !== undefined && <tr>
+      <td colSpan={2}>
+        <p style={{ color: registerState?.success ? '' : 'red' }}>
+          {registerState.message}
+        </p>
       </td>
     </tr>}
   </table>;
