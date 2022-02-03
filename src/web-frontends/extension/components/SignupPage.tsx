@@ -45,6 +45,15 @@ function LoginForm() {
         />
       </td>
     </tr>
+    <tr>
+      <td colSpan={2}>
+        <button
+          disabled={!(email && passwd)}
+        >
+          Log In
+        </button>
+      </td>
+    </tr>
   </table>;
 }
 
