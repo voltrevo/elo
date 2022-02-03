@@ -10,6 +10,21 @@ type Protocol = {
   getSessionToken(): string | undefined;
   sendVerificationEmail(email: string): void;
   checkVerificationEmail(email: string, code: string): boolean;
+  register(email: string, password: string, code: string): void;
+  login(email: string, password: string): void;
+};
+
+export const protocolKeyMap: Record<keyof Protocol, true> = {
+  notifyGetUserMediaCalled: true,
+  addFragment: true,
+  addConnectionEvent: true,
+  getUiState: true,
+  getDashboardUrl: true,
+  getSessionToken: true,
+  sendVerificationEmail: true,
+  checkVerificationEmail: true,
+  register: true,
+  login: true,
 };
 
 export type ConnectionEvent = (

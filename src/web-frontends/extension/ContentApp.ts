@@ -1,5 +1,6 @@
 import { keccak_256 } from 'js-sha3';
 import browser from 'webextension-polyfill';
+
 import { AnalysisDisfluent, AnalysisFragment } from '../../analyze';
 import delay from '../../helpers/delay';
 import never from '../../helpers/never';
@@ -233,5 +234,23 @@ export default class ContentApp implements PromisishApi<Protocol> {
     await delay(500);
 
     return code === keccak_256(email).slice(0, 6);
+  }
+
+  async register(email: string, password: string, _code: string) {
+    this;
+    await delay(500);
+
+    if (password !== 'test') {
+      throw new Error('password was not "test"');
+    }
+  }
+
+  async login(email: string, password: string) {
+    this;
+    await delay(500);
+
+    if (password !== 'test') {
+      throw new Error('password was not "test"');
+    }
   }
 }

@@ -1,24 +1,13 @@
 import PostMessageClient from '../helpers/PostMessageClient';
 import type ContentApp from './ContentApp';
-import Protocol, { PromisifyApi } from './Protocol';
-
-const methodSet: Record<keyof Protocol, true> = {
-  notifyGetUserMediaCalled: true,
-  addFragment: true,
-  addConnectionEvent: true,
-  getUiState: true,
-  getDashboardUrl: true,
-  getSessionToken: true,
-  sendVerificationEmail: true,
-  checkVerificationEmail: true,
-};
+import Protocol, { PromisifyApi, protocolKeyMap } from './Protocol';
 
 export default function ContentAppClient(
   postMessageClient: PostMessageClient,
 ): PromisifyApi<Protocol> {
   const api = {} as any;
 
-  for (const method of Object.keys(methodSet)) {
+  for (const method of Object.keys(protocolKeyMap)) {
     api[method] = (...args: unknown[]) => postMessageClient.post({ method, args });
   }
 
@@ -28,7 +17,7 @@ export default function ContentAppClient(
 export function makeLocalContentAppClient(contentApp: ContentApp): PromisifyApi<Protocol> {
   const api = {} as any;
 
-  for (const method of Object.keys(methodSet)) {
+  for (const method of Object.keys(protocolKeyMap)) {
     api[method] = async (...args: unknown[]) => (contentApp as any)[method](...args);
   }
 
