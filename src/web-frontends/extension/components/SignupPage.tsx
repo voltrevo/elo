@@ -16,13 +16,13 @@ const SignUpPage: React.FunctionComponent = () => {
       <input type="radio" checked={authChoice === 'login'} onClick={() => setAuthChoice('login')} /> Log In
     </div>
 
-    {authChoice === 'login' ? loginForm() : signupForm()}
+    {authChoice === 'login' ? <LoginForm/> : <SignupForm/>}
   </>;
 };
 
 export default SignUpPage;
 
-function loginForm() {
+function LoginForm() {
   const [email, setEmail] = React.useState('');
   const [passwd, setPasswd] = React.useState('');
 
@@ -48,7 +48,7 @@ function loginForm() {
   </table>;
 }
 
-function signupForm() {
+function SignupForm() {
   const appCtx = React.useContext(ContentAppContext);
 
   const [email, setEmail] = React.useState('');
