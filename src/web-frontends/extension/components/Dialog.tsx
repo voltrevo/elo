@@ -10,7 +10,7 @@ const Dialog: React.FunctionComponent = ({ children }) => {
     open={true}
     onClose={() => { pageCtx.update({ dialog: '' }); }}
   >
-    <div style={{
+    <div className="elo-page" style={{
       outline: 0,
       position: 'absolute',
       left: '50%',
