@@ -1,4 +1,5 @@
 import { AnalysisFragment } from '../../analyze';
+import type { Feedback } from './components/FeedbackDialog';
 import UiState from './UiState';
 
 type Protocol = {
@@ -12,6 +13,7 @@ type Protocol = {
   checkVerificationEmail(email: string, code: string): boolean;
   register(email: string, password: string, code: string): void;
   login(email: string, password: string): void;
+  sendFeedback(feedback: Feedback): string;
 };
 
 export const protocolKeyMap: Record<keyof Protocol, true> = {
@@ -25,6 +27,7 @@ export const protocolKeyMap: Record<keyof Protocol, true> = {
   checkVerificationEmail: true,
   register: true,
   login: true,
+  sendFeedback: true,
 };
 
 export type ConnectionEvent = (

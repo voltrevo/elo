@@ -7,6 +7,7 @@ import never from '../../helpers/never';
 import TaskQueue from '../../helpers/TaskQueue';
 import clientConfig from '../helpers/clientConfig';
 import EwmaCalculator from '../helpers/EwmaCalculator';
+import type { Feedback } from './components/FeedbackDialog';
 import Protocol, { ConnectionEvent, PromisishApi } from './Protocol';
 import SessionStats from './storage/SessionStats';
 import Storage, { RandomKey } from './storage/Storage';
@@ -252,5 +253,22 @@ export default class ContentApp implements PromisishApi<Protocol> {
     if (password !== 'test') {
       throw new Error('password was not "test"');
     }
+  }
+
+  async sendFeedback(feedback: Feedback) {
+    this;
+    await delay(500);
+
+    console.log({ feedback });
+
+    if (feedback.positive) {
+      return 'Thanks! We\'re so glad you\'re enjoying Elo.';
+    }
+
+    if (feedback.negative) {
+      return "We're sorry to hear that. Thanks for letting us know.";
+    }
+
+    return 'Thanks!';
   }
 }
