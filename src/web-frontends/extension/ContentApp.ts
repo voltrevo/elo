@@ -261,6 +261,10 @@ export default class ContentApp implements PromisishApi<Protocol> {
 
     console.log({ feedback });
 
+    if (feedback.message === 'error') {
+      throw new Error('Example error');
+    }
+
     if (feedback.positive) {
       return 'Thanks! We\'re so glad you\'re enjoying Elo.';
     }

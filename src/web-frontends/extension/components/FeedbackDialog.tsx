@@ -20,6 +20,7 @@ const FeedbackDialog: React.FunctionComponent = () => {
   const [anonymous, setAnonymous] = React.useState(false);
   const [emailInterest, setEmailInterest] = React.useState(false);
   const [email, setEmail] = React.useState('');
+  const [submitState, setSubmitState] = React.useState<'not-started' | 'loading' | 'success' | Error>('not-started');
 
   const emojis = ['😡', '🙁', '🤷', '🙂', '😀'];
   const positiveEmojis = ['🙂', '😀'];
@@ -100,20 +101,34 @@ const FeedbackDialog: React.FunctionComponent = () => {
       <div
         className="submit-button"
         onClick={async () => {
-          const autoReply = await appCtx.sendFeedback({
-            sentiment,
-            positive: positiveEmojis.includes(sentiment ?? ''),
-            negative: negativeEmojis.includes(sentiment ?? ''),
-            message: message || undefined,
-            anonymous,
-            emailInterest: !anonymous && emailInterest,
-            email: anonymous ? undefined : email,
-          });
+          setSubmitState('loading');
 
-          console.log(autoReply);
+          try {
+            const autoReply = await appCtx.sendFeedback({
+              sentiment,
+              positive: positiveEmojis.includes(sentiment ?? ''),
+              negative: negativeEmojis.includes(sentiment ?? ''),
+              message: message || undefined,
+              anonymous,
+              emailInterest: !anonymous && emailInterest,
+              email: anonymous ? undefined : email,
+            });
+
+            console.log(autoReply);
+
+            setSubmitState('success');
+          } catch (error) {
+            setSubmitState(error as Error);
+          }
         }}
       >
         Submit
+      </div>
+
+      <div>
+        {submitState === 'loading' && 'Loading...'}
+        {submitState === 'success' && '✅'}
+        {submitState instanceof Error && <div className='error'>{submitState.message}</div>}
       </div>
     </div>
   </div>;
