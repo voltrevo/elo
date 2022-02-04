@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import Storage from '../storage/Storage';
 import SessionStats from '../storage/SessionStats';
+import EloPageContext from '../EloPageContext';
 
 type Props = {
   lastSession: SessionStats;
@@ -22,11 +23,17 @@ export default class SessionReport extends React.Component<Props, State> {
   render() {
     const { session } = this.state;
 
+    const pageCtx = React.useContext(EloPageContext);
+
     return <div className="elo-page">
       <div className="elo-page-container">
         <img src="/assets/icons/icon128.png" width="64" height="64" />
 
         <div className="sections">
+          <div/>
+          <div>
+            <a onClick={() => pageCtx.update({ dialog: 'FeedbackDialog' })}>Send Feedback</a>
+          </div>
           <div/>
           {this.renderPreviousLink()}
           <div className="heading">

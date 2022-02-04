@@ -10,6 +10,7 @@ type EloPageContext = ReturnType<typeof initEloPageContext>;
 export function initEloPageContext() {
   const state = {
     page: '',
+    dialog: '',
     test: 37,
   };
 
