@@ -12,8 +12,13 @@ const Dialog: React.FunctionComponent = ({ children }) => {
   >
     <div style={{
       outline: 0,
-      backgroundColor: 'white',
-    }}>{children}</div>
+      position: 'absolute',
+      left: '50%',
+      top: '50%',
+      transform: 'translate(-50%, -50%)',
+    }}>
+      {children}
+    </div>
   </Modal>;
 };
 
