@@ -2,6 +2,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;600&display=swap');
 
 .elo-page {
+  * {
+    box-sizing: border-box;
+  }
+
   font-family: 'Source Sans Pro', sans-serif;
   font-weight: 300;
   font-size: 1.5em;
@@ -151,6 +155,52 @@
           font-weight: 600;
         }
       }
+    }
+  }
+
+  .feedback {
+    background-color: white;
+    width: 700px;
+    border-radius: 5px;
+    padding: 20px;
+    font-size: 1em;
+
+    .question {
+      margin-top: 20px;
+    }
+
+    .emoji-selector {
+      display: flex;
+      flex-direction: row;
+      margin: 10px;
+
+      > div {
+        flex-grow: 1;
+        text-align: center;
+        font-size: 2em;
+      }
+
+      .emoji {
+        transition: all 200ms;
+        cursor: pointer;
+        border-radius: 5px;
+        padding: 5px;
+        user-select: none;
+
+        &.selected {
+          background-color: $first-accent;
+        }
+      }
+    }
+
+    textarea {
+      width: 100%;
+      outline: none;
+      height: 5em;
+      padding: 1em;
+      margin: 10px 0;
+      font-family: 'Source Sans Pro', sans-serif;
+      font-size: 1em;
     }
   }
 }
