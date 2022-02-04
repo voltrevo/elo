@@ -167,9 +167,27 @@
 
     .question {
       margin-top: 20px;
+
+      textarea {
+        width: 100%;
+        outline: none;
+        height: 5em;
+        padding: 1em;
+        margin: 10px 0;
+        font-family: 'Source Sans Pro', sans-serif;
+        font-size: 1em;
+      }
+
+      input[type=text] {
+        padding: 1em;
+        outline: none;
+        font-family: 'Source Sans Pro', sans-serif;
+        font-size: 1em;
+        margin: 10px 0;
+      }
     }
 
-    .emoji-selector {
+    .row-selector {
       display: flex;
       flex-direction: row;
       margin: 10px;
@@ -180,7 +198,7 @@
         font-size: 2em;
       }
 
-      .emoji {
+      .cell {
         transition: all 200ms;
         cursor: pointer;
         border-radius: 5px;
@@ -193,14 +211,24 @@
       }
     }
 
-    textarea {
-      width: 100%;
-      outline: none;
-      height: 5em;
-      padding: 1em;
-      margin: 10px 0;
-      font-family: 'Source Sans Pro', sans-serif;
-      font-size: 1em;
+    .submit-container {
+      margin-top: 50px;
+      text-align: center;
+
+      .submit-button {
+        display: inline-block;
+        background-color: $second-accent;
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        user-select: none;
+        cursor: pointer;
+        font-weight: bold;
+
+        &:active {
+          filter: brightness(90%);
+        }
+      }
     }
   }
 }

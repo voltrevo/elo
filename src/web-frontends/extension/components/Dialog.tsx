@@ -14,8 +14,10 @@ const Dialog: React.FunctionComponent = ({ children }) => {
       outline: 0,
       position: 'absolute',
       left: '50%',
-      top: '35%',
-      transform: 'translate(-50%, -50%)',
+      top: '50px',
+      transform: 'translate(-50%, 0)',
+      maxHeight: 'calc(100vh - 100px)',
+      overflowY: 'auto',
     }}>
       {children}
     </div>
