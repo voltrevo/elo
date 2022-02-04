@@ -20,9 +20,12 @@
   "author": "Andrew Morris",
   "private": true,
   "dependencies": {
+    "@emotion/react": "^11.7.1",
+    "@emotion/styled": "^11.6.0",
     "@jorgeferrero/stream-to-buffer": "^2.0.6",
     "@koa/cors": "^3.1.0",
     "@msgpack/msgpack": "^2.7.1",
+    "@mui/material": "^5.4.0",
     "@types/branca": "^0.4.0",
     "@types/chrome": "^0.0.154",
     "@types/diff": "^5.0.0",
