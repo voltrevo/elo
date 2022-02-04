@@ -9,22 +9,12 @@ type Props = {
   storage: Storage;
 };
 
-type State = {
-  session: SessionStats;
-};
+const SessionReport: React.FunctionComponent<Props> = (props: Props) => {
+  const pageCtx = React.useContext(EloPageContext);
 
-export default class SessionReport extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
+  const [session, setSession] = React.useState(props.lastSession);
 
-    this.state = { session: props.lastSession };
-  }
-
-  render() {
-    const { session } = this.state;
-
-    const pageCtx = React.useContext(EloPageContext);
-
+  function render() {
     return <div className="elo-page">
       <div className="elo-page-container">
         <img src="/assets/icons/icon128.png" width="64" height="64" />
@@ -35,12 +25,12 @@ export default class SessionReport extends React.Component<Props, State> {
             <a onClick={() => pageCtx.update({ dialog: 'FeedbackDialog' })}>Send Feedback</a>
           </div>
           <div/>
-          {this.renderPreviousLink()}
+          {renderPreviousLink()}
           <div className="heading">
             <div>
               <div className="your-weekly-report">Session Report</div>
               <div>{session.title}</div>
-              <div>{this.SessionDateTime()}</div>
+              <div>{SessionDateTime()}</div>
               <div className="stats">
                 <table>
                   <thead></thead>
@@ -74,12 +64,12 @@ export default class SessionReport extends React.Component<Props, State> {
               <div className="bold">Total</div>
               <div>
                 <span className="very-prominent-number third-accent-fgcolor">
-                  {this.TotalDisfluentsPerMinute().toFixed(1)}
+                  {TotalDisfluentsPerMinute().toFixed(1)}
                 </span>
                 <span className="bold">&nbsp;per minute speaking</span>
               </div>
               <div>
-                {this.PerMinuteComment()}The optimum frequency is
+                {PerMinuteComment()}The optimum frequency is
                 one filler per minute, but the average speaker uses five fillers per minute
                 (<a href="https://hbr.org/2018/08/how-to-stop-saying-um-ah-and-you-know">source</a>).
                 Keep improving with Elo and you’ll get there.
@@ -89,7 +79,7 @@ export default class SessionReport extends React.Component<Props, State> {
               <div className="bold">Ums &amp; Uhs</div>
               <div>
                 <span className="very-prominent-number filler-fgcolor">
-                  {this.UmsUhsPerMinute().toFixed(1)}
+                  {UmsUhsPerMinute().toFixed(1)}
                 </span>
                 <span className="bold">&nbsp;per minute speaking</span>
               </div>
@@ -102,13 +92,13 @@ export default class SessionReport extends React.Component<Props, State> {
               <div className="bold">Filler &amp; Hedge Words</div>
               <div>
                 <span className="very-prominent-number other-disfluent-fgcolor">
-                  {this.FillerWordsPerMinute().toFixed(1)}
+                  {FillerWordsPerMinute().toFixed(1)}
                 </span>
                 <span className="bold">&nbsp;per minute speaking</span>
               </div>
               <div>
                 Your most used filler word was
-                “<span className="bold other-disfluent-fgcolor">{this.MostUsedFillerWord()}</span>”.
+                “<span className="bold other-disfluent-fgcolor">{MostUsedFillerWord()}</span>”.
                 <p>
                   By eliminating fillers and hedge words you boost your credibility by speaking with
                   authority and conviction.
@@ -130,7 +120,7 @@ export default class SessionReport extends React.Component<Props, State> {
                   Tip: You can select which expressions Elo looks out for by clicking on the
                   dropdown in a video conference.
                 </div>
-                {this.renderAvoidsTable()}
+                {renderAvoidsTable()}
               </div>
               <div>
                 <div>
@@ -142,7 +132,7 @@ export default class SessionReport extends React.Component<Props, State> {
                   this…” is less impactful than “We should do this”. You can use them intentionally
                   but be mindful if you overuse them.
                 </div>
-                {this.renderHedgeTable()}
+                {renderHedgeTable()}
               </div>
             </div>
           </div>
@@ -151,9 +141,33 @@ export default class SessionReport extends React.Component<Props, State> {
     </div>;
   }
 
-  SessionDateTime() {
-    const { session } = this.state;
+  function renderPreviousLink() {
+    if (session.lastSessionKey === undefined) {
+      return <></>;
+    }
 
+    return <div>
+      <a href="#" onClick={() => loadPreviousSession()}>
+        ⬅ Previous
+      </a>
+    </div>;
+  }
+
+  async function loadPreviousSession() {
+    if (session.lastSessionKey === undefined) {
+      return;
+    }
+
+    const lastSession = await pageCtx.storage.read<SessionStats>(session.lastSessionKey);
+
+    if (lastSession === undefined) {
+      return;
+    }
+
+    setSession(lastSession);
+  }
+
+  function SessionDateTime() {
     const daysDiff = LocalDaysDifference(session.end, session.start);
 
     return [
@@ -163,9 +177,7 @@ export default class SessionReport extends React.Component<Props, State> {
     ].join(' ');
   }
 
-  TotalDisfluentsPerMinute() {
-    const { session } = this.state;
-
+  function TotalDisfluentsPerMinute() {
     let sum = 0;
 
     for (const countMap of Object.values(session.featureCounts)) {
@@ -177,9 +189,15 @@ export default class SessionReport extends React.Component<Props, State> {
     return (sum / (session.speakingTime / 60));
   }
 
-  UmsUhsPerMinute() {
-    const { session } = this.state;
+  function PerMinuteComment() {
+    if (TotalDisfluentsPerMinute() >= 5) {
+      return <></>;
+    }
 
+    return <><span className="bold third-accent-fgcolor">That’s pretty good!</span> </>;
+  }
+
+  function UmsUhsPerMinute() {
     let sum = 0;
 
     const fillerCountMap = session.featureCounts.filler ?? {};
@@ -191,9 +209,7 @@ export default class SessionReport extends React.Component<Props, State> {
     return (sum / (session.speakingTime / 60));
   }
 
-  FillerWordsPerMinute() {
-    const { session } = this.state;
-
+  function FillerWordsPerMinute() {
     let sum = 0;
 
     for (const [category, countMap] of Object.entries(session.featureCounts)) {
@@ -209,9 +225,7 @@ export default class SessionReport extends React.Component<Props, State> {
     return (sum / (session.speakingTime / 60));
   }
 
-  MostUsedFillerWord() {
-    const { session } = this.state;
-
+  function MostUsedFillerWord() {
     let mostUsed: string | undefined = undefined;
     let mostUsedCount = 0;
 
@@ -231,9 +245,7 @@ export default class SessionReport extends React.Component<Props, State> {
     return mostUsed;
   }
 
-  renderHedgeTable() {
-    const { session } = this.state;
-
+  function renderHedgeTable() {
     const hedgeCounts = session.featureCounts.hedge ?? {};
 
     return <table>
@@ -252,9 +264,7 @@ export default class SessionReport extends React.Component<Props, State> {
     </table>;
   }
 
-  renderAvoidsTable() {
-    const { session } = this.state;
-
+  function renderAvoidsTable() {
     const avoidCounts: Record<string, number> = {};
 
     for (const [category, countMap] of Object.entries(session.featureCounts)) {
@@ -283,44 +293,10 @@ export default class SessionReport extends React.Component<Props, State> {
     </table>;
   }
 
-  PerMinuteComment() {
-    if (this.TotalDisfluentsPerMinute() >= 5) {
-      return <></>;
-    }
+  return render();
+};
 
-    return <><span className="bold third-accent-fgcolor">That’s pretty good!</span> </>;
-  }
-
-  renderPreviousLink() {
-    const { session } = this.state;
-
-    if (session.lastSessionKey === undefined) {
-      return <></>;
-    }
-
-    return <div>
-      <a href="#" onClick={() => this.loadPreviousSession()}>
-        ⬅ Previous
-      </a>
-    </div>;
-  }
-
-  async loadPreviousSession() {
-    const { session } = this.state;
-
-    if (session.lastSessionKey === undefined) {
-      return;
-    }
-
-    const lastSession = await this.props.storage.read<SessionStats>(session.lastSessionKey);
-
-    if (lastSession === undefined) {
-      return;
-    }
-
-    this.setState({ session: lastSession });
-  }
-}
+export default SessionReport;
 
 function TimeOfDayStr(unixTimeMs: number) {
   const date = new Date(unixTimeMs);
