@@ -30,10 +30,10 @@ const EloPage: React.FunctionComponent = () => {
     return undefined;
   })();
 
-  return <>
+  return <div className="elo-page">
     {pageElement}
     {dialogElement && <Dialog>{dialogElement}</Dialog>}
-  </>;
+  </div>;
 };
 
 export default EloPage;
