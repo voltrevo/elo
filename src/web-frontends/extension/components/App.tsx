@@ -68,7 +68,7 @@ const App: React.FunctionComponent = () => {
     })();
 
     return () => { cleanedUp = true; };
-  });
+  }, []);
 
   const onResize = () => {
     const lastWindowSize = windowSize.current;
@@ -129,7 +129,7 @@ const App: React.FunctionComponent = () => {
     window.addEventListener('resize', onResize);
 
     return () => window.removeEventListener('resize', onResize);
-  });
+  }, []);
 
   const trySetupDragging = () => {
     if (appRef.current === undefined || dragRef.current === undefined) {

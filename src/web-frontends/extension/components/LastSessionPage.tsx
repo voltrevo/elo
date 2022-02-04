@@ -22,7 +22,7 @@ const LastSessionPage: React.FunctionComponent = () => {
     })().then(() => {
       setLoading(false);
     });
-  });
+  }, []);
 
   if (loading) {
     return <>Loading...</>;

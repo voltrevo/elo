@@ -53,7 +53,7 @@ export function useEloPageContext<T>(
     ctx.events.on('update', onUpdate);
 
     return () => { ctx.events.off('update', onUpdate); };
-  });
+  }, []);
 
   return value;
 }
