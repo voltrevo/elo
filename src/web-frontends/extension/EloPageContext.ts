@@ -40,12 +40,14 @@ export function useEloPageContext<T>(
 ): T {
   const ctx = React.useContext(EloPageContext);
   const [value, setValue] = React.useState(extract(ctx.state));
+  let lastValue = value;
 
   React.useEffect(() => {
     const onUpdate = () => {
       const newValue = extract(ctx.state);
 
-      if (!compare(value, newValue)) {
+      if (!compare(lastValue, newValue)) {
+        lastValue = newValue;
         setValue(newValue);
       }
     };
