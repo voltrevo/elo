@@ -18,6 +18,7 @@
     "koa-bodyparser": "^4.3.0",
     "koa-route": "^3.2.0",
     "slack": "^11.0.2",
+    "source-map-support": "^0.5.21",
     "typescript": "^4.5.5"
   }
 }
