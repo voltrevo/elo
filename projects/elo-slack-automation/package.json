@@ -1,0 +1,14 @@
+{
+  "name": "elo-slack-automation",
+  "version": "0.0.0",
+  "description": "",
+  "main": "dist/src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Andrew Morris",
+  "private": true,
+  "dependencies": {
+    "typescript": "^4.5.5"
+  }
+}
