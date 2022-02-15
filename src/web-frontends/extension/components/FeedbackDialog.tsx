@@ -1,5 +1,7 @@
 import * as React from 'react';
+import delay from '../../../helpers/delay';
 import ContentAppContext from '../ContentAppContext';
+import EloPageContext from '../EloPageContext';
 import RowSelector from './RowSelector';
 
 export type Feedback = {
@@ -14,6 +16,7 @@ export type Feedback = {
 
 const FeedbackDialog: React.FunctionComponent = () => {
   const appCtx = React.useContext(ContentAppContext);
+  const pageCtx = React.useContext(EloPageContext);
 
   const [sentiment, setSentiment] = React.useState<string>();
   const [message, setMessage] = React.useState('');
@@ -21,10 +24,27 @@ const FeedbackDialog: React.FunctionComponent = () => {
   const [emailInterest, setEmailInterest] = React.useState(false);
   const [email, setEmail] = React.useState('');
   const [submitState, setSubmitState] = React.useState<'not-started' | 'loading' | 'success' | Error>('not-started');
+  const [autoReply, setAutoReply] = React.useState<string>();
 
   const emojis = ['😡', '🙁', '🤷', '🙂', '😀'];
   const positiveEmojis = ['🙂', '😀'];
   const negativeEmojis = ['😡', '🙁'];
+
+  if (autoReply !== undefined) {
+    return <div className="feedback">
+      <div className="result">
+        {autoReply}
+      </div>
+      <div className="footer">
+        <div
+          className="button"
+          onClick={() => pageCtx.update({ dialog: '' })}
+        >
+          Close
+        </div>
+      </div>
+    </div>;
+  }
 
   return <div className="feedback">
     <h1>Feedback</h1>
@@ -97,14 +117,14 @@ const FeedbackDialog: React.FunctionComponent = () => {
       }} />
     </div>}
 
-    <div className="submit-container">
+    <div className="footer">
       <div
-        className="submit-button"
+        className="button"
         onClick={async () => {
           setSubmitState('loading');
 
           try {
-            const autoReply = await appCtx.sendFeedback({
+            const sendFeedbackResult = await appCtx.sendFeedback({
               sentiment,
               positive: positiveEmojis.includes(sentiment ?? ''),
               negative: negativeEmojis.includes(sentiment ?? ''),
@@ -114,9 +134,11 @@ const FeedbackDialog: React.FunctionComponent = () => {
               email: anonymous ? undefined : email,
             });
 
-            console.log(autoReply);
-
             setSubmitState('success');
+
+            await delay(500);
+
+            setAutoReply(sendFeedbackResult);
           } catch (error) {
             setSubmitState(error as Error);
           }

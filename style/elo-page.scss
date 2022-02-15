@@ -211,28 +211,33 @@
       }
     }
 
-    .submit-container {
+    .footer {
       margin-top: 50px;
       text-align: center;
+    }
 
-      .submit-button {
-        display: inline-block;
-        background-color: $second-accent;
-        color: white;
-        padding: 10px;
-        border-radius: 5px;
-        user-select: none;
-        cursor: pointer;
-        font-weight: bold;
+    .button {
+      display: inline-block;
+      background-color: $second-accent;
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      user-select: none;
+      cursor: pointer;
+      font-weight: bold;
 
-        &:active {
-          filter: brightness(90%);
-        }
+      &:active {
+        filter: brightness(90%);
       }
     }
 
     .error {
       color: red;
+    }
+
+    .result {
+      text-align: center;
+      margin-top: 30px;
     }
   }
 }
