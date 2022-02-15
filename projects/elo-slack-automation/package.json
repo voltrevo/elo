@@ -10,6 +10,9 @@
   "author": "Andrew Morris",
   "private": true,
   "dependencies": {
+    "io-ts": "^2.2.16",
+    "js-sha3": "^0.8.0",
+    "koa": "^2.13.4",
     "slack": "^11.0.2",
     "typescript": "^4.5.5"
   }

@@ -1,4 +1,5 @@
 {
   "slackToken": "(add slack token here)",
-  "feedbackChannel": "feedback"
+  "feedbackChannel": "feedback",
+  "userIdGenerationSecret": "(add user id generation secret here)"
 }
