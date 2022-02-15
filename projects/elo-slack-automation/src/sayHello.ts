@@ -1,13 +1,11 @@
 import * as slack from 'slack';
 
-const config = require('../../config.json');
-
-const slackToken: string = config.slackToken;
+import * as config from './config';
 
 export default async function sayHello() {
   const resp = await slack.chat.postMessage({
-    token: slackToken,
-    channel: 'automation-testing',
+    token: config.slackToken,
+    channel: config.feedbackChannel,
     text: 'Hello!',
   });
 

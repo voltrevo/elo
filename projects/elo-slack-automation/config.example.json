@@ -1,3 +1,4 @@
 {
-  "slackToken": "(add slack token here)"
+  "slackToken": "(add slack token here)",
+  "feedbackChannel": "feedback"
 }
