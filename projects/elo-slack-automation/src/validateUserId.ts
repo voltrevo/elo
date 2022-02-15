@@ -25,7 +25,7 @@ export default function validateUserId(userId: string) {
   return true;
 }
 
-function generateChecksum(data: Uint8Array) {
+export function generateChecksum(data: Uint8Array) {
   const hash = keccak256.create();
   hash.update(config.userIdGenerationSecret);
   hash.update(data);
