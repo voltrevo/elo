@@ -3,7 +3,7 @@
 set -euo pipefail
 
 PROJECT="elo-slack-automation"
-# TAG=git-eff1a71-model-35d4164
+# TAG=git-5f5db96
 # PORT=53047
 
 docker run \
