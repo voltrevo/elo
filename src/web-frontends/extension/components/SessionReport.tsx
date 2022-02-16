@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Question } from 'phosphor-react';
 
 import Storage from '../storage/Storage';
 import SessionStats from '../storage/SessionStats';
@@ -21,11 +22,23 @@ const SessionReport: React.FunctionComponent<Props> = (props: Props) => {
       <div className="sections">
         <div/>
         <div>
-          <div
-            className="button"
-            onClick={() => pageCtx.update({ dialog: 'FeedbackDialog' })}
-          >
-            Send Feedback
+          <div style={{
+            display: 'inline-block',
+          }}>
+            <div
+              className="button"
+              onClick={() => pageCtx.update({ dialog: 'FeedbackDialog' })}
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                gap: '5px',
+              }}
+            >
+              <div>Send Feedback</div>
+              <div style={{ fontSize: '1px' }}>
+                <Question size={24} />
+              </div>
+            </div>
           </div>
         </div>
         <div/>
