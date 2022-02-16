@@ -5,7 +5,9 @@
   "main": "dist/src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node dist/programs/server.js"
+    "start": "node dist/programs/server.js",
+    "build": "tsc",
+    "watch": "tsc -w"
   },
   "author": "Andrew Morris",
   "private": true,
