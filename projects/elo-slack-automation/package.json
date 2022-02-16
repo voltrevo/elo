@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/programs/server.js",
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
     "watch": "tsc -w"
   },
   "author": "Andrew Morris",
