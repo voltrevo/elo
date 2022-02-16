@@ -1,2 +1,4 @@
 build/*.tar.gz
 analyzer/venv
+config.json
+projects
