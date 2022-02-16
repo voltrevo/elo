@@ -1,6 +1,21 @@
+import * as io from 'io-ts';
+import reporter from 'io-ts-reporters';
+
 const rawConfig = require('../../config.json');
 
-export const port: number = rawConfig.port;
-export const slackToken: string = rawConfig.slackToken;
-export const feedbackChannel: string = rawConfig.feedbackChannel;
-export const userIdGenerationSecret: string = rawConfig.userIdGenerationSecret;
+const Config = io.type({
+  port: io.number,
+  slackToken: io.string,
+  feedbackChannel: io.string,
+  userIdGenerationSecret: io.string,
+});
+
+const decodeResult = Config.decode(rawConfig);
+
+if ('left' in decodeResult) {
+  throw new Error(reporter.report(decodeResult).join('\n'));
+}
+
+const config = decodeResult.right;
+
+export default config;

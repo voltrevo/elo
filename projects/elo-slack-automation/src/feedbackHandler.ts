@@ -3,7 +3,7 @@ import route from 'koa-route';
 import reporter from 'io-ts-reporters';
 import * as slack from 'slack';
 
-import * as config from './config';
+import config from './config';
 import validateUserId from './validateUserId';
 
 type Handler = Parameters<typeof route.post>[1];

@@ -1,7 +1,7 @@
 import { keccak256 } from 'js-sha3';
 
 import base58 from './helpers/base58';
-import * as config from './config';
+import config from './config';
 
 export default function validateUserId(userId: string) {
   let userIdBuf: Uint8Array;

@@ -1,6 +1,6 @@
 import * as slack from 'slack';
 
-import * as config from './config';
+import config from './config';
 
 export default async function sayHello() {
   const resp = await slack.chat.postMessage({
