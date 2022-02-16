@@ -21,7 +21,12 @@ const SessionReport: React.FunctionComponent<Props> = (props: Props) => {
       <div className="sections">
         <div/>
         <div>
-          <a onClick={() => pageCtx.update({ dialog: 'FeedbackDialog' })}>Send Feedback</a>
+          <div
+            className="button"
+            onClick={() => pageCtx.update({ dialog: 'FeedbackDialog' })}
+          >
+            Send Feedback
+          </div>
         </div>
         <div/>
         {renderPreviousLink()}
