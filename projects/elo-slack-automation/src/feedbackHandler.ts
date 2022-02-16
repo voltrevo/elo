@@ -25,7 +25,7 @@ const FeedbackBody = io.type({
   }),
 });
 
-type Feedback = io.TypeOf<typeof FeedbackBody>['feedback'];
+export type Feedback = io.TypeOf<typeof FeedbackBody>['feedback'];
 
 const feedbackHandler: Handler = async (ctx) => {
   const decodeResult = FeedbackBody.decode(ctx.request.body);
