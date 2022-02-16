@@ -273,8 +273,6 @@ export default class ContentApp implements PromisishApi<Protocol> {
   }
 
   async sendFeedback(feedback: Feedback) {
-    this;
-
     if (feedback.sentiment === undefined && feedback.message === undefined) {
       throw new Error('Please include an emoji or a message.');
     }

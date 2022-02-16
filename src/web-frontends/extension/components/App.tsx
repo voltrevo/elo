@@ -32,37 +32,39 @@ const App: React.FunctionComponent = () => {
 
   React.useEffect(() => {
     let cleanedUp = false;
+    let lastUiState = uiState;
 
     (async () => {
       while (true) {
-        const newUiState = await contentApp.getUiState(uiState.index);
+        const newUiState = await contentApp.getUiState(lastUiState.index);
 
         if (cleanedUp) {
           break;
         }
 
-        if (newUiState.fillerSoundBox.count > uiState.fillerSoundBox.count) {
+        if (newUiState.fillerSoundBox.count > lastUiState.fillerSoundBox.count) {
           setHighlightFillerSound(true);
           const count = newUiState.fillerSoundBox.count;
 
           setTimeout(() => {
-            if (uiState.fillerSoundBox.count === count) {
+            if (lastUiState.fillerSoundBox.count === count) {
               setHighlightFillerSound(false);
             }
           }, 3000);
         }
 
-        if (newUiState.fillerWordBox.count > uiState.fillerWordBox.count) {
+        if (newUiState.fillerWordBox.count > lastUiState.fillerWordBox.count) {
           setHighlightFillerWord(true);
           const count = newUiState.fillerWordBox.count;
 
           setTimeout(() => {
-            if (uiState.fillerWordBox.count === count) {
+            if (lastUiState.fillerWordBox.count === count) {
               setHighlightFillerWord(false);
             }
           }, 3000);
         }
 
+        lastUiState = newUiState;
         setUiState(newUiState);
       }
     })();
