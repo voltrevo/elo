@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 
-import type { Feedback } from '../feedbackHandler';
+import type { Feedback } from '../FeedbackHandler';
 import PgClient from './PgClient';
 import ReconnectablePgClient from './ReconnectablePgClient';
 

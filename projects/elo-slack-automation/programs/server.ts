@@ -6,12 +6,15 @@ import bodyParser from 'koa-bodyparser';
 import route from 'koa-route';
 
 import config from '../src/config';
-import feedbackHandler from '../src/feedbackHandler';
+import FeedbackHandler from '../src/FeedbackHandler';
+import DbClient from '../src/database/DbClient';
 
 const app = new Koa();
 app.use(cors());
 app.use(bodyParser());
 
-app.use(route.post('/feedback', feedbackHandler));
+const dbClient = new DbClient(config.pgConnString);
+
+app.use(route.post('/feedback', FeedbackHandler(dbClient)));
 
 app.listen(config.port);

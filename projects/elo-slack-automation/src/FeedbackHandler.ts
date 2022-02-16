@@ -5,6 +5,7 @@ import * as slack from 'slack';
 
 import config from './config';
 import validateUserId from './validateUserId';
+import type DbClient from './database/DbClient';
 
 type Handler = Parameters<typeof route.post>[1];
 
@@ -27,30 +28,37 @@ const FeedbackBody = io.type({
 
 export type Feedback = io.TypeOf<typeof FeedbackBody>['feedback'];
 
-const feedbackHandler: Handler = async (ctx) => {
-  const decodeResult = FeedbackBody.decode(ctx.request.body);
+export default function FeedbackHandler(dbClient: DbClient): Handler {
+  return async (ctx) => {
+    const decodeResult = FeedbackBody.decode(ctx.request.body);
 
-  if ('left' in decodeResult) {
-    ctx.status = 400;
-    ctx.body = reporter.report(decodeResult);
-    return;
-  }
+    if ('left' in decodeResult) {
+      ctx.status = 400;
+      ctx.body = reporter.report(decodeResult);
+      return;
+    }
 
-  const { userId, feedback } = decodeResult.right;
+    const { userId, feedback } = decodeResult.right;
 
-  if (!validateUserId(userId)) {
-    ctx.status = 403;
-    return;
-  }
+    if (!validateUserId(userId)) {
+      ctx.status = 403;
+      return;
+    }
 
-  await slack.chat.postMessage({
-    token: config.slackToken,
-    channel: config.feedbackChannel,
-    text: renderFeedbackMessage(userId, feedback),
-  });
+    await dbClient.insertFeedback(
+      feedback.anonymous ? undefined : userId,
+      feedback,
+    );
 
-  ctx.status = 200;
-};
+    await slack.chat.postMessage({
+      token: config.slackToken,
+      channel: config.feedbackChannel,
+      text: renderFeedbackMessage(userId, feedback),
+    });
+
+    ctx.status = 200;
+  };
+}
 
 function renderFeedbackMessage(userId: string, feedback: Feedback): string {
   if (feedback.anonymous) {
@@ -71,5 +79,3 @@ function renderFeedbackMessage(userId: string, feedback: Feedback): string {
     ),
   ].filter(line => typeof line === 'string').join('\n');
 }
-
-export default feedbackHandler;
