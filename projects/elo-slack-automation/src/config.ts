@@ -8,6 +8,7 @@ const Config = io.type({
   slackToken: io.string,
   feedbackChannel: io.string,
   userIdGenerationSecret: io.string,
+  pgConnString: io.string,
 });
 
 const decodeResult = Config.decode(rawConfig);

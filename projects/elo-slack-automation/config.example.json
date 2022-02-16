@@ -1,5 +1,7 @@
 {
+  "port": 53047,
   "slackToken": "(add slack token here)",
-  "feedbackChannel": "feedback",
-  "userIdGenerationSecret": "(add user id generation secret here)"
+  "feedbackChannel": "automation-testing",
+  "userIdGenerationSecret": "(add user id generation secret here)",
+  "pgConnString": "(add postgres connection string here)"
 }
