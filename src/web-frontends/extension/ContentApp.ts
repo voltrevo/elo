@@ -275,6 +275,10 @@ export default class ContentApp implements PromisishApi<Protocol> {
   async sendFeedback(feedback: Feedback) {
     this;
 
+    if (feedback.sentiment === undefined && feedback.message === undefined) {
+      throw new Error('Please include an emoji or a message.');
+    }
+
     const feedbackResponse = await fetch(`${apiBase}/feedback`, {
       method: 'POST',
       headers: {
@@ -288,10 +292,6 @@ export default class ContentApp implements PromisishApi<Protocol> {
 
     if (feedbackResponse.status !== 200) {
       throw new Error(await feedbackResponse.text());
-    }
-
-    if (feedback.message === 'error') {
-      throw new Error('Example error');
     }
 
     if (feedback.positive) {

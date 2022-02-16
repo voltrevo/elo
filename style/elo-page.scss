@@ -111,6 +111,20 @@
     }
   }
 
+  @keyframes rotating {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .spinner {
+    font-size: 1px;
+    animation: rotating 2s linear infinite;
+  }
+
   .single-stat-boxes {
     display: flex;
     flex-direction: row;

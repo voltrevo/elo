@@ -1,3 +1,4 @@
+import { Check, Spinner } from 'phosphor-react';
 import * as React from 'react';
 import delay from '../../../helpers/delay';
 import ContentAppContext from '../ContentAppContext';
@@ -118,38 +119,53 @@ const FeedbackDialog: React.FunctionComponent = () => {
     </div>}
 
     <div className="footer">
-      <div
-        className="button"
-        onClick={async () => {
-          setSubmitState('loading');
+      <div style={{ display: 'inline-block' }}>
+        <div
+          className="button"
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            gap: '5px',
+          }}
+          onClick={async () => {
+            if (submitState === 'loading') {
+              return;
+            }
 
-          try {
-            const sendFeedbackResult = await appCtx.sendFeedback({
-              sentiment,
-              positive: positiveEmojis.includes(sentiment ?? ''),
-              negative: negativeEmojis.includes(sentiment ?? ''),
-              message: message || undefined,
-              anonymous,
-              emailInterest: !anonymous && emailInterest,
-              email: anonymous ? undefined : email,
-            });
+            setSubmitState('loading');
 
-            setSubmitState('success');
+            try {
+              const sendFeedbackResult = await appCtx.sendFeedback({
+                sentiment,
+                positive: positiveEmojis.includes(sentiment ?? ''),
+                negative: negativeEmojis.includes(sentiment ?? ''),
+                message: message || undefined,
+                anonymous,
+                emailInterest: !anonymous && emailInterest,
+                email: anonymous ? undefined : email,
+              });
 
-            await delay(500);
+              setSubmitState('success');
 
-            setAutoReply(sendFeedbackResult);
-          } catch (error) {
-            setSubmitState(error as Error);
-          }
-        }}
-      >
-        Submit
+              await delay(500);
+
+              setAutoReply(sendFeedbackResult);
+            } catch (error) {
+              setSubmitState(error as Error);
+            }
+          }}
+        >
+          <div>Submit</div>
+          {submitState === 'loading' && <div className="spinner">
+            <Spinner size={24} />
+          </div>}
+          {submitState === 'success' && <div style={{ fontSize: '1px' }}>
+            <Check size={24} />
+          </div>}
+        </div>
       </div>
 
       <div>
-        {submitState === 'loading' && 'Loading...'}
-        {submitState === 'success' && '✅'}
         {submitState instanceof Error && <div className='error'>{submitState.message}</div>}
       </div>
     </div>
