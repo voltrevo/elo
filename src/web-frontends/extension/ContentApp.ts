@@ -27,6 +27,23 @@ export default class ContentApp implements PromisishApi<Protocol> {
 
   storage = new Storage('elo');
 
+  async UserId() {
+    const root = await this.storage.readRoot();
+    let userId: string;
+
+    if (root.userId === undefined) {
+      userId = await fetch(`${apiBase}/generateId`, { method: 'POST' })
+        .then(res => res.text());
+
+      root.userId = userId;
+      await this.storage.writeRoot(root);
+    } else {
+      userId = root.userId;
+    }
+
+    return userId;
+  }
+
   async activate() {
     (window as any).contentApp = this;
 
@@ -257,9 +274,21 @@ export default class ContentApp implements PromisishApi<Protocol> {
 
   async sendFeedback(feedback: Feedback) {
     this;
-    await delay(500);
 
-    console.log({ feedback });
+    const feedbackResponse = await fetch(`${apiBase}/feedback`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify({
+        userId: await this.UserId(),
+        feedback,
+      }),
+    });
+
+    if (feedbackResponse.status !== 200) {
+      throw new Error(await feedbackResponse.text());
+    }
 
     if (feedback.message === 'error') {
       throw new Error('Example error');
