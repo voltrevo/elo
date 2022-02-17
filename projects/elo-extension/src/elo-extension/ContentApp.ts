@@ -9,9 +9,9 @@ import Protocol, { ConnectionEvent, PromisishApi } from './Protocol';
 import SessionStats from './storage/SessionStats';
 import Storage, { RandomKey } from './storage/Storage';
 import UiState from './UiState';
-import never from '../link-src/common-pure/never';
-import delay from '../link-src/common-pure/delay';
-import TaskQueue from '../link-src/common-pure/TaskQueue';
+import never from '../common-pure/never';
+import delay from '../common-pure/delay';
+import TaskQueue from '../common-pure/TaskQueue';
 
 const sessionKey = RandomKey();
 const apiBase = `${clientConfig.tls ? 'https:' : 'http:'}//${clientConfig.hostAndPort}`;
