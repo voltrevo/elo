@@ -4,7 +4,7 @@ import reporter from 'io-ts-reporters';
 const configJson = require("../../../../config.json");
 
 const Config = io.type({
-  sampleKey: io.string,
+  sampleStorage: io.record(io.string, io.unknown),
 });
 
 const decodeResult = Config.decode(configJson);
