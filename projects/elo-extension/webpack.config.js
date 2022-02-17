@@ -16,9 +16,9 @@ const config = {
   common: {
     entry: {
       'elo-page': './build/js/src/elo-page.js',
-      contentScript: './build/js/src/web-frontends/extension/contentScript.js',
-      pageContentScript: './build/js/src/web-frontends/extension/pageContentScript.js',
-      backgroundScript: './build/js/src/web-frontends/extension/backgroundScript.js',
+      contentScript: './build/js/src/contentScript.js',
+      pageContentScript: './build/js/src/pageContentScript.js',
+      backgroundScript: './build/js/src/backgroundScript.js',
     },
     module: {
       rules: [
@@ -43,16 +43,12 @@ const config = {
       publicPath: '/',
     },
     devServer: {
-      contentBase: path.join(__dirname, 'build', 'extension'),
+      contentBase: path.join(__dirname, 'build'),
     },
     plugins: [
       new CopyPlugin({
         patterns: [
-          'static/extension',
-          { from: 'build/css/extension.css', to: 'css/extension.css' },
-          { from: 'build/css/extension.css.map', to: 'css/extension.css.map' },
-          { from: 'build/css/elo-page.css', to: 'css/elo-page.css' },
-          { from: 'build/css/elo-page.css.map', to: 'css/elo-page.css.map' },
+          'static',
         ],
       }),
       new webpack.DefinePlugin({
