@@ -5,7 +5,7 @@ const Config = io.type({
   sampleKey: io.string,
 });
 
-const configJson = JSON.parse(process.env.CLIENT_CONFIG ?? '{}');
+const configJson = JSON.parse(process.env.CONFIG ?? '{}');
 
 const decodeResult = Config.decode(configJson);
 
