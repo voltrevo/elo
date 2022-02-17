@@ -1,11 +1,11 @@
 import Browser from 'webextension-polyfill';
 
-import Storage from './storage/Storage';
+import Storage from '../elo-page/storage/Storage';
 import clientConfig from './helpers/clientConfig';
 
 Browser.runtime.onInstalled.addListener(async () => {
   if (clientConfig.featureFlags.authEnabled) {
-    const storage = new Storage('elo');
+    const storage = new Storage(Browser.storage.local, 'elo');
     const root = await storage.readRoot();
 
     if (!root.installTriggered) {

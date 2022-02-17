@@ -1,5 +1,5 @@
-import browser from 'webextension-polyfill';
 import Range from '../../common-pure/Range';
+import IRawStorage from './IRawStorage';
 import StorageRoot from './StorageRoot';
 
 export function RandomKey() {
@@ -7,14 +7,14 @@ export function RandomKey() {
 }
 
 export default class Storage {
-  constructor(public rootKey: string) {}
+  constructor(public rawStorage: IRawStorage, public rootKey: string) {}
 
   async read<T>(key: string): Promise<T | undefined> {
-    return (await browser.storage.local.get(key))[key];
+    return (await this.rawStorage.get(key))[key];
   }
 
   async write<T>(key: string, value: T): Promise<void> {
-    await browser.storage.local.set({ [key]: value });
+    await this.rawStorage.set({ [key]: value });
   }
 
   async readRoot(): Promise<StorageRoot> {

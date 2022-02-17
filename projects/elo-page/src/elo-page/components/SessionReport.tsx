@@ -2,8 +2,8 @@ import * as React from 'react';
 import { Question } from 'phosphor-react';
 
 import Storage from '../storage/Storage';
-import SessionStats from '../storage/SessionStats';
 import EloPageContext from '../EloPageContext';
+import SessionStats from '../../elo-types/SessionStats';
 
 type Props = {
   lastSession: SessionStats;

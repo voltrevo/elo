@@ -1,7 +1,7 @@
 import { Check, Spinner } from 'phosphor-react';
 import * as React from 'react';
 import delay from '../../common-pure/delay';
-import ContentAppContext from '../../elo-page/ContentAppContext';
+import ContentAppContext from '../ContentAppContext';
 import EloPageContext from '../EloPageContext';
 import RowSelector from './RowSelector';
 

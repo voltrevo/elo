@@ -7,7 +7,7 @@ import Storage from './storage/Storage';
 
 type EloPageContext = ReturnType<typeof initEloPageContext>;
 
-export function initEloPageContext() {
+export function initEloPageContext(storage: Storage) {
   const state = {
     page: '',
     dialog: '',
@@ -18,7 +18,7 @@ export function initEloPageContext() {
 
   const context = {
     events,
-    storage: new Storage('elo'),
+    storage,
     state,
     update: (updates: Partial<typeof state>) => {
       for (const key of (Object.keys(updates) as (keyof typeof state)[])) {
