@@ -5,7 +5,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const webpackConfig = {
   common: {
     entry: {
-      index: './build/js/src/webapp-template/index.js',
+      index: './build/js/src/elo-page/index.js',
     },
     module: {
       rules: [
