@@ -1,0 +1,11 @@
+{
+  "name": "common-pure",
+  "version": "0.0.0",
+  "main": "dist/src/index.js",
+  "author": "Andrew Morris",
+  "private": true,
+  "dependencies": {
+    "confusing-browser-globals": "^1.0.11",
+    "io-ts": "^2.2.16"
+  }
+}
