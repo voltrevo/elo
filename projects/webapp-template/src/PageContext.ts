@@ -2,10 +2,11 @@ import { EventEmitter } from 'events';
 
 import * as React from 'react';
 import TypedEventEmitter from 'typed-emitter';
+import config from './config';
 
 type PageContext = ReturnType<typeof initPageContext>;
 
-export function initPageContext() {
+export function initPageContext(configParam = config) {
   const state = {
     page: 'home',
     counter: 0,
@@ -16,6 +17,7 @@ export function initPageContext() {
   const context = {
     events,
     state,
+    config: configParam,
     update: (updates: Partial<typeof state>) => {
       for (const key of (Object.keys(updates) as (keyof typeof state)[])) {
         (state as any)[key] = updates[key];
