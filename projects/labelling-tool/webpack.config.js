@@ -5,7 +5,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const webpackConfig = {
   common: {
     entry: {
-      index: './build/js/src/index.js',
+      index: './build/js/src/labelling-tool/index.js',
     },
     module: {
       rules: [

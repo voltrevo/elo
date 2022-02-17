@@ -1,7 +1,7 @@
 import * as io from 'io-ts';
 import reporter from 'io-ts-reporters';
 
-const rawConfig = require('../../config.json');
+const rawConfig = require('../../../config.json');
 
 const Config = io.type({
   port: io.number,

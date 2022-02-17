@@ -1,7 +1,7 @@
 import * as io from 'io-ts';
 import reporter from 'io-ts-reporters';
 
-const configJson = require("../../../config.json");
+const configJson = require("../../../../config.json");
 
 const Config = io.type({
   tls: io.boolean,

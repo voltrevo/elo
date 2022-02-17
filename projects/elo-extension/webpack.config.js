@@ -15,10 +15,10 @@ if (eloConfig.client === undefined) {
 const config = {
   common: {
     entry: {
-      'elo-page': './build/js/src/elo-page.js',
-      contentScript: './build/js/src/contentScript.js',
-      pageContentScript: './build/js/src/pageContentScript.js',
-      backgroundScript: './build/js/src/backgroundScript.js',
+      'elo-page': './build/js/src/elo-extension/elo-page.js',
+      contentScript: './build/js/src/elo-extension/contentScript.js',
+      pageContentScript: './build/js/src/elo-extension/pageContentScript.js',
+      backgroundScript: './build/js/src/elo-extension/backgroundScript.js',
     },
     module: {
       rules: [
