@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Analysis, AnalysisFragment } from '../to-be-linked/analyze';
-import never from '../helpers/never';
+import never from '../../link-src/common-pure/never';
 import AnalysisBuilder from './AnalysisBuilder';
 import audio from './audio';
 import RecorderPanel from './RecorderPanel';

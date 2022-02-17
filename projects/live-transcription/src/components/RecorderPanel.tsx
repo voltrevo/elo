@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import type { RecordingState } from './App';
-import never from '../helpers/never';
+import never from '../../link-src/common-pure/never';
 import RecordButton from './RecordButton';
 
 type Props = {

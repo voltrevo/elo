@@ -1,5 +1,5 @@
 import { Analysis, AnalysisFragment } from '../to-be-linked/analyze';
-import never from '../helpers/never';
+import never from '../../link-src/common-pure/never';
 
 export default class AnalysisBuilder {
   analysis: Analysis = {
