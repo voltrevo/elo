@@ -15,8 +15,7 @@ if (eloConfig.client === undefined) {
 const config = {
   common: {
     entry: {
-      popup: './build/js/src/web-frontends/extension/popup.js',
-      'elo-page': './build/js/src/web-frontends/extension/elo-page.js',
+      'elo-page': './build/js/src/elo-page.js',
       contentScript: './build/js/src/web-frontends/extension/contentScript.js',
       pageContentScript: './build/js/src/web-frontends/extension/pageContentScript.js',
       backgroundScript: './build/js/src/web-frontends/extension/backgroundScript.js',
