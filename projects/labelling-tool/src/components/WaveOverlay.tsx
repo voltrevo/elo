@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import clamp from '../helpers/clamp';
-import nil from '../helpers/nil';
+import clamp from '../../link-src/common-pure/clamp';
+import nil from '../../link-src/common-pure/nil';
 import renderTimeFromSeconds from '../helpers/renderTimeFromSeconds';
 import Label from '../Label';
 import LabelComponent from './LabelComponent';
