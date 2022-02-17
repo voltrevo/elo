@@ -3,7 +3,6 @@ import browser from 'webextension-polyfill';
 
 import clientConfig from './helpers/clientConfig';
 import EwmaCalculator from './helpers/EwmaCalculator';
-import type { Feedback } from './components/FeedbackDialog';
 import Protocol, { ConnectionEvent, PromisishApi } from './Protocol';
 import SessionStats from './storage/SessionStats';
 import Storage, { RandomKey } from './storage/Storage';
@@ -12,6 +11,7 @@ import never from '../common-pure/never';
 import delay from '../common-pure/delay';
 import TaskQueue from '../common-pure/TaskQueue';
 import { AnalysisDisfluent, AnalysisFragment } from '../elo-types/Analysis';
+import Feedback from '../elo-types/Feedback';
 
 const sessionKey = RandomKey();
 const apiBase = `${clientConfig.tls ? 'https:' : 'http:'}//${clientConfig.hostAndPort}`;

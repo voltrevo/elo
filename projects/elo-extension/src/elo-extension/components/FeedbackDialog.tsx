@@ -5,16 +5,6 @@ import ContentAppContext from '../ContentAppContext';
 import EloPageContext from '../EloPageContext';
 import RowSelector from './RowSelector';
 
-export type Feedback = {
-  sentiment: string | undefined;
-  positive: boolean;
-  negative: boolean;
-  message: string | undefined;
-  anonymous: boolean;
-  emailInterest: boolean;
-  email: string | undefined;
-};
-
 const FeedbackDialog: React.FunctionComponent = () => {
   const appCtx = React.useContext(ContentAppContext);
   const pageCtx = React.useContext(EloPageContext);

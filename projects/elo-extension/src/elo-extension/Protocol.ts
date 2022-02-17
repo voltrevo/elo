@@ -1,5 +1,5 @@
 import { AnalysisFragment } from '../elo-types/Analysis';
-import type { Feedback } from './components/FeedbackDialog';
+import Feedback from '../elo-types/Feedback';
 import UiState from './UiState';
 
 type Protocol = {
