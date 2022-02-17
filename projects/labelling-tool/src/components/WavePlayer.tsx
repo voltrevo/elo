@@ -1,11 +1,11 @@
 import * as React from 'react';
 
-import nil from '../../link-src/common-pure/nil';
+import nil from '../../common-pure/nil';
 import WaveForm from './WaveForm';
 import WaveOverlay from './WaveOverlay';
 import audioContext from '../audioContext';
-import TaskQueue from '../../link-src/common-pure/TaskQueue';
-import clamp from '../../link-src/common-pure/clamp';
+import TaskQueue from '../../common-pure/TaskQueue';
+import clamp from '../../common-pure/clamp';
 import renderTimeFromSeconds from '../helpers/renderTimeFromSeconds';
 import Label from '../Label';
 import DropDetector from './DropDetector';

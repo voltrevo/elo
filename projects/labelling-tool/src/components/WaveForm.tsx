@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import nil from '../../link-src/common-pure/nil';
-import TaskQueue from '../../link-src/common-pure/TaskQueue';
+import nil from '../../common-pure/nil';
+import TaskQueue from '../../common-pure/TaskQueue';
 
 type Props = {
   data: Float32Array,

@@ -5,9 +5,9 @@ import cors from '@koa/cors';
 import bodyParser from 'koa-bodyparser';
 import route from 'koa-route';
 
-import config from '../src/config';
-import FeedbackHandler from '../src/FeedbackHandler';
-import DbClient from '../link-src/database/DbClient';
+import config from '../src/elo-slack-automation/config';
+import FeedbackHandler from '../src/elo-slack-automation/FeedbackHandler';
+import DbClient from '../src/database/DbClient';
 
 const app = new Koa();
 app.use(cors());

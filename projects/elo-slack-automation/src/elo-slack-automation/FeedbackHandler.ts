@@ -5,8 +5,8 @@ import * as slack from 'slack';
 
 import config from './config';
 import validateUserId from './validateUserId';
-import type DbClient from '../link-src/database/DbClient';
-import Feedback from '../link-src/elo-types/Feedback';
+import type DbClient from '../database/DbClient';
+import Feedback from '../elo-types/Feedback';
 
 type Handler = Parameters<typeof route.post>[1];
 
