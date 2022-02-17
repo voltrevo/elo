@@ -12,7 +12,7 @@
     "watch-css": "yarn build-css --watch",
     "watch-web": "webpack -w",
     "watch": "rm -rf build && concurrently yarn:build-js yarn:build-css && concurrently yarn:watch-* yarn:start",
-    "start": "live-server build",
+    "start": "live-server build --wait=500",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Andrew Morris",
