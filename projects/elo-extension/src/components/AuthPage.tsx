@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import switch_ from '../../../helpers/switch_';
+import switch_ from './helpers/switch_';
 import ContentAppContext from '../ContentAppContext';
 
 const AuthPage: React.FunctionComponent = () => {

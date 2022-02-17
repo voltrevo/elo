@@ -2,11 +2,11 @@ import { keccak_256 } from 'js-sha3';
 import browser from 'webextension-polyfill';
 
 import { AnalysisDisfluent, AnalysisFragment } from '../../analyze';
-import delay from '../../helpers/delay';
-import never from '../../helpers/never';
-import TaskQueue from '../../helpers/TaskQueue';
-import clientConfig from '../helpers/clientConfig';
-import EwmaCalculator from '../helpers/EwmaCalculator';
+import delay from './helpers/delay';
+import never from './helpers/never';
+import TaskQueue from './helpers/TaskQueue';
+import clientConfig from './helpers/clientConfig';
+import EwmaCalculator from './helpers/EwmaCalculator';
 import type { Feedback } from './components/FeedbackDialog';
 import Protocol, { ConnectionEvent, PromisishApi } from './Protocol';
 import SessionStats from './storage/SessionStats';

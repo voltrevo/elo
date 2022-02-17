@@ -25,9 +25,9 @@ export default function interceptGetUserMedia(
 
   // old
   (() => {
-    const originalGum = navigator.getUserMedia.bind(navigator);
+    const originalGum = (navigator as any).getUserMedia.bind(navigator);
 
-    navigator.getUserMedia = (...args) => {
+    (navigator as any).getUserMedia = (...args: any[]) => {
       const [constraints, successCallback, errorCallback] = args;
 
       if (constraints === undefined) {
@@ -37,11 +37,11 @@ export default function interceptGetUserMedia(
       const streamPromise = new Promise<MediaStream>((resolve, reject) => {
         originalGum(
           constraints,
-          (stream) => {
+          (stream: MediaStream) => {
             resolve(stream);
             successCallback(stream);
           },
-          (error) => {
+          (error: Error) => {
             reject(error);
             errorCallback(error);
           },

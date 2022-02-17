@@ -1,6 +1,6 @@
 import Browser from 'webextension-polyfill';
 
-import PostMessageServer from '../helpers/PostMessageServer';
+import PostMessageServer from './helpers/PostMessageServer';
 import ContentApp from './ContentApp';
 
 const eloExtension = document.createElement('div');

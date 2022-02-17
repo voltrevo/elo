@@ -1,4 +1,4 @@
-import PostMessageClient from '../helpers/PostMessageClient';
+import PostMessageClient from './helpers/PostMessageClient';
 import type ContentApp from './ContentApp';
 import Protocol, { PromisifyApi, protocolKeyMap } from './Protocol';
 

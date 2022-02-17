@@ -1,6 +1,6 @@
 import * as ReactDOM from 'react-dom';
 
-import PostMessageClient from '../helpers/PostMessageClient';
+import PostMessageClient from './helpers/PostMessageClient';
 import analyzeStream from './analyzeStream';
 import App from './components/App';
 import ContentAppClient from './ContentAppClient';

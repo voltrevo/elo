@@ -1,0 +1,217 @@
+@import "./variables";
+@import url('https://fonts.googleapis.com/css2?family=Amita&family=Source+Sans+Pro:wght@300&display=swap');
+
+#elo-extension {
+  .app {
+    * {
+      box-sizing: border-box;
+    }
+
+    opacity: 0;
+
+    &.active {
+      opacity: 0.85;
+    }
+
+    &:hover {
+      cursor: move;
+    }
+
+    transition: opacity 0.2s;
+
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 1.1em;
+
+    z-index: 100;
+    position: fixed;
+    left: 2em;
+    top: 4em;
+    background-color: white;
+    border: 1px solid rgba(230, 230, 230, 1);
+    border-radius: 3px;
+
+    .app-content {
+      zoom: 85%;
+    }
+
+    .spacer {
+      flex-grow: 1;
+      flex-basis: 0;
+    }
+
+    .common-centering {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    &.collapsed {
+      .body {
+        width: initial;
+      }
+
+      opacity: 0.15;
+
+      &:hover {
+        opacity: 0.85;
+      }
+    }
+
+    .body {
+      display: flex;
+      flex-direction: row;
+      width: 16em;
+      height: 2.5em;
+      background-color: white;
+      border-radius: 3px;
+      transition: opacity 0.2s;
+
+      .word-box-container {
+        padding: 0.2em;
+      }
+
+      .word-box {
+        height: 100%;
+        padding: 0.3em;
+
+        transition: background-color 0.2s;
+
+        border-radius: 3px;
+      }
+
+      > .left {
+        display: flex;
+
+        .word-box {
+          justify-content: flex-end;
+
+          &.highlight {
+            background-color: $filler-bgcolor;
+          }
+        }
+
+        .counter {
+          color: $filler-fgcolor;
+        }
+      }
+
+      > .center {
+        display: flex;
+
+        width: 3em;
+        height: 100%;
+        font-family: 'Amita', cursive;
+        position: relative;
+      }
+
+      > .right {
+        display: flex;
+
+        .word-box {
+          justify-content: flex-start;
+
+          &.highlight {
+            background-color: $other-disfluent-bgcolor;
+          }
+        }
+
+        .counter {
+          color: $other-disfluent-fgcolor;
+        }
+      }
+    }
+
+    .logo {
+      width: 80%;
+      height: 80%;
+      position: relative;
+      top: -3px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 0.2em;
+      height: 1em;
+      background-color: black;
+      position: relative;
+      animation: rotating 1s linear infinite;
+    }
+
+    @keyframes rotating {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  }
+
+  .slider-icon {
+    position: absolute;
+    cursor: pointer;
+    z-index: -1;
+    text-align: center;
+    background-color: rgba(230, 230, 230, 0.7);
+  }
+
+  .collapse-icon {
+    left: 0;
+    transition: left 0.2s;
+    line-height: 1.25em;
+    font-size: 2em;
+    width: 1em;
+    text-align: center;
+    border-radius: 5px 0 0 5px;
+  }
+
+  .expand-icon {
+    right: 0;
+    transition: right 0.2s;
+    line-height: 1.25em;
+    font-size: 2em;
+    width: 1em;
+    text-align: center;
+    border-radius: 0 5px 5px 0;
+  }
+
+  .popout-icon {
+    right: 0;
+    transition: right 0.2s;
+    line-height: 2.5em;
+    width: 2em;
+    text-align: center;
+    font-weight: bold;
+    border-radius: 0 5px 5px 0;
+  }
+
+  &:hover {
+    .collapse-icon {
+      left: -1em;
+    }
+
+    .expand-icon {
+      right: -1em;
+    }
+
+    .popout-icon {
+      right: -2em;
+    }
+  }
+
+  .hover-wing-left {
+    position: absolute;
+    left: -2em;
+    height: 2.5em;
+    width: 2em;
+    z-index: -2;
+  }
+
+  .hover-wing-right {
+    position: absolute;
+    right: -2em;
+    height: 2.5em;
+    width: 2em;
+    z-index: -2;
+  }
+}

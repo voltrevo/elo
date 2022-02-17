@@ -6,7 +6,7 @@ import ContentApp from './ContentApp';
 import { makeLocalContentAppClient } from './ContentAppClient';
 import ContentAppContext from './ContentAppContext';
 import EloPageContext, { initEloPageContext } from './EloPageContext';
-import clientConfig from '../helpers/clientConfig';
+import clientConfig from './helpers/clientConfig';
 
 const contentApp = makeLocalContentAppClient(new ContentApp());
 (window as any).contentApp = contentApp;
