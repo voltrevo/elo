@@ -1,12 +1,6 @@
-const fs = require('fs');
 const path = require('path');
 
 const CopyPlugin = require('copy-webpack-plugin');
-
-// eslint-disable-next-line import/no-extraneous-dependencies
-const webpack = require('webpack');
-
-const config = JSON.parse(fs.readFileSync(require.resolve('./config.json'), 'utf-8'));
 
 const webpackConfig = {
   common: {
@@ -43,9 +37,6 @@ const webpackConfig = {
         patterns: [
           'static',
         ],
-      }),
-      new webpack.DefinePlugin({
-        'process.env.CONFIG': JSON.stringify(JSON.stringify(config)),
       }),
     ],
   },

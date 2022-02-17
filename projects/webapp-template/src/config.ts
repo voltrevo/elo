@@ -1,11 +1,11 @@
 import * as io from 'io-ts';
 import reporter from 'io-ts-reporters';
 
+const configJson = require("../../../config.json");
+
 const Config = io.type({
   sampleKey: io.string,
 });
-
-const configJson = JSON.parse(process.env.CONFIG ?? '{}');
 
 const decodeResult = Config.decode(configJson);
 
