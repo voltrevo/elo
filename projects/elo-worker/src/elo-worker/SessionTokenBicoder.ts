@@ -3,7 +3,7 @@ import * as msgpack from '@msgpack/msgpack';
 import reporter from 'io-ts-reporters';
 
 import createBranca, { Branca } from './helpers/createBranca';
-import ErrorData from '../link-src/common-pure/ErrorData';
+import ErrorData from '../common-pure/ErrorData';
 import AppComponents from './AppComponents';
 
 const SessionTokenData = io.type({

@@ -1,4 +1,4 @@
-import type { ServerConfig } from '../src/helpers/serverConfig';
+import type { ServerConfig } from '../src/elo-worker/helpers/serverConfig';
 
 const testConfig: ServerConfig = {
   pgConnString: 'pgconnstring',

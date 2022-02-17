@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 
-import DbClient from '../link-src/database/DbClient';
-import config from '../src/helpers/serverConfig';
-import delay from '../link-src/common-pure/delay';
-import launch from '../src/helpers/launch';
+import DbClient from '../src/database/DbClient';
+import config from '../src/elo-worker/helpers/serverConfig';
+import delay from '../src/common-pure/delay';
+import launch from '../src/elo-worker/helpers/launch';
 
 launch(async (emit) => {
   const db = new DbClient(config.pgConnString);

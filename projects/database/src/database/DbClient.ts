@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 
-import Feedback from '../link-src/elo-types/Feedback';
+import Feedback from '../elo-types/Feedback';
 import PgClient from './PgClient';
 import ReconnectablePgClient from './ReconnectablePgClient';
 

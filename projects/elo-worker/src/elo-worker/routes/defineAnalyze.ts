@@ -7,7 +7,7 @@ import analyze, { AnalysisFragment, analyzeRaw } from '../analyze';
 import AppComponents from '../AppComponents';
 import wsDataToUint8Array from '../helpers/wsDataToUint8Array';
 import UserStatsGatherer from '../UserStatsGatherer';
-import ErrorData from '../../link-src/common-pure/ErrorData';
+import ErrorData from '../../common-pure/ErrorData';
 
 export default function defineAnalyze(appComponents: AppComponents) {
   const { koaApp, statsGatherer, sessionTokenBicoder } = appComponents;
