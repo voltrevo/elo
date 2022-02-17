@@ -1,8 +1,8 @@
 import * as React from 'react';
 
-import nil from '../../helpers/nil';
-import TaskQueue from '../../helpers/TaskQueue';
-import Label from './Label';
+import nil from '../helpers/nil';
+import TaskQueue from '../helpers/TaskQueue';
+import Label from '../Label';
 
 type Props = {
   label: Label; // TODO: Unused

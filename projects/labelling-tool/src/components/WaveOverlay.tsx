@@ -1,9 +1,9 @@
 import * as React from 'react';
-import clamp from '../../helpers/clamp';
 
-import nil from '../../helpers/nil';
-import renderTimeFromSeconds from './helpers/renderTimeFromSeconds';
-import Label from './Label';
+import clamp from '../helpers/clamp';
+import nil from '../helpers/nil';
+import renderTimeFromSeconds from '../helpers/renderTimeFromSeconds';
+import Label from '../Label';
 import LabelComponent from './LabelComponent';
 import type { Marker } from './WavePlayer';
 

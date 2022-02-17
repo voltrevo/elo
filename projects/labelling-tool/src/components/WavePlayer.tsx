@@ -1,18 +1,19 @@
 import * as React from 'react';
 
-import nil from '../../helpers/nil';
+import nil from '../helpers/nil';
 import WaveForm from './WaveForm';
 import WaveOverlay from './WaveOverlay';
-import audioContext from './audioContext';
-import TaskQueue from '../../helpers/TaskQueue';
-import clamp from '../../helpers/clamp';
-import renderTimeFromSeconds from './helpers/renderTimeFromSeconds';
-import Label from './Label';
+import audioContext from '../audioContext';
+import TaskQueue from '../helpers/TaskQueue';
+import clamp from '../helpers/clamp';
+import renderTimeFromSeconds from '../helpers/renderTimeFromSeconds';
+import Label from '../Label';
 import DropDetector from './DropDetector';
 import { download } from '../helpers/download';
-import analyzeViaFetch from '../../analyzeViaFetch';
-import type { AnalysisFragment } from '../../analyze';
-import readLines from '../../helpers/readLines';
+import analyzeViaFetch from '../analyzeViaFetch';
+import type { AnalysisFragment } from '../to-be-linked/analyze';
+import readLines from '../helpers/readLines';
+import config from '../config';
 
 type Props = {};
 
@@ -141,7 +142,8 @@ export default class WavePlayer extends React.Component<Props, State> {
   setAnalysisFile = async (f: File) => {
     this.clearAnalysis();
 
-    readLines(f.stream(), () => {});
+    // TODO: Is this relevant? (Duplicated with await down further)
+    readLines(f.stream() as unknown as ReadableStream<Uint8Array>, () => {});
 
     this.clearAnalysis();
 
@@ -153,7 +155,7 @@ export default class WavePlayer extends React.Component<Props, State> {
     const analysis: AnalysisFragment[] = [];
 
     await readLines(
-      f.stream(),
+      f.stream() as unknown as ReadableStream<Uint8Array>,
       line => {
         const fragment: AnalysisFragment = JSON.parse(line);
         console.log(fragment);
@@ -644,7 +646,7 @@ export default class WavePlayer extends React.Component<Props, State> {
     const analysis: AnalysisFragment[] = [];
 
     await analyzeViaFetch(
-      '/analyze',
+      `${config.tls ? 'https' : 'http'}://${config.hostAndPort}/analyze`,
       this.state.mainAudioFile,
       fragment => {
         console.log(fragment);

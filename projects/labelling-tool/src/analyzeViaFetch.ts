@@ -1,4 +1,4 @@
-import type { AnalysisFragment } from './analyze';
+import type { AnalysisFragment } from './to-be-linked/analyze';
 import readLines from './helpers/readLines';
 
 export default async function analyzeViaFetch(
