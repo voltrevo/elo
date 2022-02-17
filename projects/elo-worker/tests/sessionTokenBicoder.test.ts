@@ -1,7 +1,7 @@
 import 'source-map-support/register';
 
-import assert from '../src/helpers/assert';
-import ErrorData from '../src/helpers/ErrorData';
+import assert from '../link-src/common-pure/assert';
+import ErrorData from '../link-src/common-pure/ErrorData';
 
 import SessionTokenBicoder from '../src/SessionTokenBicoder';
 import testConfig from './testConfig';

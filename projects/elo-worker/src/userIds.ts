@@ -2,7 +2,7 @@ import crypto from 'crypto';
 
 import { keccak256 } from 'js-sha3';
 
-import base58 from './helpers/base58';
+import base58 from '../link-src/common-pure/base58';
 
 // TODO: Inject this
 import config from './helpers/serverConfig';

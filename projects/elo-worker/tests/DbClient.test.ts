@@ -1,7 +1,7 @@
 import 'source-map-support/register';
 
 import { formatFullDate, formatFullMonth } from '../src/database/DbClient';
-import assert from '../src/helpers/assert';
+import assert from '../link-src/common-pure/assert';
 
 describe('formats', () => {
   it('generates expected date format', () => {

@@ -1,8 +1,8 @@
 import 'source-map-support/register';
 
 import { generateUserId, validateUserId } from '../src/userIds';
-import assert from '../src/helpers/assert';
-import base58 from '../src/helpers/base58';
+import assert from '../link-src/common-pure/assert';
+import base58 from '../link-src/common-pure/base58';
 
 describe('userIds', () => {
   it('generates user ids', () => {

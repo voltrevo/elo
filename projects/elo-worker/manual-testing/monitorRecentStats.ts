@@ -2,7 +2,7 @@
 
 import DbClient from '../src/database/DbClient';
 import config from '../src/helpers/serverConfig';
-import delay from '../src/helpers/delay';
+import delay from '../link-src/common-pure/delay';
 import launch from '../src/helpers/launch';
 
 launch(async (emit) => {
