@@ -5,8 +5,8 @@
   "scripts": {
     "build": "rm -rf build && tsc",
     "watch": "rm -rf build && tsc -w --pretty",
-    "start": "node build/js/src/server.js",
-    "debug": "node --inspect build/js/src/server.js",
+    "start": "node build/js/src/elo-worker/server.js",
+    "debug": "node --inspect build/js/src/elo-worker/server.js",
     "test": "mocha build/js/**/*.test.js"
   },
   "author": "Andrew Morris",
