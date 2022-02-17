@@ -1,5 +1,5 @@
-import { Analysis, AnalysisFragment } from '../to-be-linked/analyze';
 import never from '../../common-pure/never';
+import { Analysis, AnalysisFragment } from '../../elo-types/Analysis';
 
 export default class AnalysisBuilder {
   analysis: Analysis = {

@@ -1,4 +1,4 @@
-import { AnalysisFragment } from './to-be-linked/analyze';
+import { AnalysisFragment } from '../elo-types/Analysis';
 import type { Feedback } from './components/FeedbackDialog';
 import UiState from './UiState';
 

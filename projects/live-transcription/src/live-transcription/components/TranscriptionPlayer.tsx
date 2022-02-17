@@ -1,6 +1,6 @@
 import * as React from 'react';
+import { Analysis, AnalysisToken } from '../../elo-types/Analysis';
 
-import type { Analysis, AnalysisToken } from '../to-be-linked/analyze';
 import { download } from '../helpers/download';
 import { Settings } from './App';
 import audio from './audio';

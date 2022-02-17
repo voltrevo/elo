@@ -1,4 +1,4 @@
-import type { AnalysisFragment } from './to-be-linked/analyze';
+import { AnalysisFragment } from '../elo-types/Analysis';
 import readLines from './helpers/readLines';
 
 export default async function analyzeViaFetch(

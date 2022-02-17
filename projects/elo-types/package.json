@@ -6,6 +6,7 @@
   "private": true,
   "dependencies": {
     "confusing-browser-globals": "^1.0.11",
-    "io-ts": "^2.2.16"
+    "io-ts": "^2.2.16",
+    "typescript": "^4.5.5"
   }
 }

@@ -11,9 +11,9 @@ import Label from '../Label';
 import DropDetector from './DropDetector';
 import { download } from '../helpers/download';
 import analyzeViaFetch from '../analyzeViaFetch';
-import type { AnalysisFragment } from '../to-be-linked/analyze';
 import readLines from '../helpers/readLines';
 import config from '../config';
+import { AnalysisFragment } from '../../elo-types/Analysis';
 
 type Props = {};
 

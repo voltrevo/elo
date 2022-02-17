@@ -1,7 +1,6 @@
 import { keccak_256 } from 'js-sha3';
 import browser from 'webextension-polyfill';
 
-import { AnalysisDisfluent, AnalysisFragment } from './to-be-linked/analyze';
 import clientConfig from './helpers/clientConfig';
 import EwmaCalculator from './helpers/EwmaCalculator';
 import type { Feedback } from './components/FeedbackDialog';
@@ -12,6 +11,7 @@ import UiState from './UiState';
 import never from '../common-pure/never';
 import delay from '../common-pure/delay';
 import TaskQueue from '../common-pure/TaskQueue';
+import { AnalysisDisfluent, AnalysisFragment } from '../elo-types/Analysis';
 
 const sessionKey = RandomKey();
 const apiBase = `${clientConfig.tls ? 'https:' : 'http:'}//${clientConfig.hostAndPort}`;

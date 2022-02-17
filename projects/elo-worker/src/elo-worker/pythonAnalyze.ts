@@ -2,8 +2,8 @@ import * as stream from 'stream';
 import * as child_process from 'child_process';
 import readline from 'readline';
 
-import type { AnalysisFragment } from './analyze';
 import dirs from './dirs';
+import { AnalysisFragment } from '../elo-types/Analysis';
 
 export default function pythonAnalyze(
   wavStream: stream.Readable,

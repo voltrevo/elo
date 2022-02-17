@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-import { AnalysisFragment } from './analyze';
+import { AnalysisFragment } from '../elo-types/Analysis';
 import AppComponents from './AppComponents';
 
 const hour = 3600;

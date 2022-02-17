@@ -3,11 +3,12 @@ import { Readable } from 'stream';
 import route from 'koa-route';
 import uuid from 'uuid';
 
-import analyze, { AnalysisFragment, analyzeRaw } from '../analyze';
+import analyze, { analyzeRaw } from '../analyze';
 import AppComponents from '../AppComponents';
 import wsDataToUint8Array from '../helpers/wsDataToUint8Array';
 import UserStatsGatherer from '../UserStatsGatherer';
 import ErrorData from '../../common-pure/ErrorData';
+import { AnalysisFragment } from '../../elo-types/Analysis';
 
 export default function defineAnalyze(appComponents: AppComponents) {
   const { koaApp, statsGatherer, sessionTokenBicoder } = appComponents;

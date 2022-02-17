@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-import { Analysis, AnalysisFragment } from '../to-be-linked/analyze';
 import never from '../../common-pure/never';
 import AnalysisBuilder from './AnalysisBuilder';
 import audio from './audio';
@@ -8,6 +7,7 @@ import RecorderPanel from './RecorderPanel';
 import SettingsPanel from './SettingsPanel';
 import TranscriptionPlayer from './TranscriptionPlayer';
 import config from '../config';
+import { Analysis, AnalysisFragment } from '../../elo-types/Analysis';
 
 export type Settings = {
   maximumGap: number | null,
