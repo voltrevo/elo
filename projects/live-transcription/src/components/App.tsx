@@ -1,13 +1,13 @@
 import * as React from 'react';
 
-import { Analysis, AnalysisFragment } from '../../analyze';
-import never from '../../helpers/never';
-import clientConfig from '../helpers/clientConfig';
+import { Analysis, AnalysisFragment } from '../to-be-linked/analyze';
+import never from '../helpers/never';
 import AnalysisBuilder from './AnalysisBuilder';
 import audio from './audio';
 import RecorderPanel from './RecorderPanel';
 import SettingsPanel from './SettingsPanel';
 import TranscriptionPlayer from './TranscriptionPlayer';
+import config from '../config';
 
 export type Settings = {
   maximumGap: number | null,
@@ -98,8 +98,8 @@ export default class App extends React.Component<{}, State> {
     switch (this.state.recorder.name) {
       case 'init':
       case 'transcribed': {
-        const wsProto = clientConfig.tls ? 'wss:' : 'ws:';
-        const webSocket = new WebSocket(`${wsProto}//${clientConfig.hostAndPort}/analyze`);
+        const wsProto = config.tls ? 'wss:' : 'ws:';
+        const webSocket = new WebSocket(`${wsProto}//${config.hostAndPort}/analyze`);
 
         await new Promise(resolve => {
           webSocket.addEventListener('open', resolve);

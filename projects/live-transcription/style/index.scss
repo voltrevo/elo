@@ -1,0 +1,180 @@
+@import "./variables";
+
+$bgcolor: #222;
+$fgcolor: #fff;
+
+$default-font: sans-serif;
+
+$record-color: rgba(255, 0, 0, 1);
+$record-color-dull: rgba(255, 0, 0, .5);
+
+$highlight-color: rgba(255, 255, 0, 1);
+
+$subtle-mark-color: rgba(255, 255, 255, .2);
+$subtle-brighten: rgba(255, 255, 255, 5%);
+$subtle-brighten-2: rgba(255, 255, 255, 10%);
+
+$spoken-incorrect-color: hsl(338deg, 100%, 72%);
+$missed-color: rgba(255, 137, 137, 1);
+
+body {
+  background-color: $bgcolor;
+  color: $fgcolor;
+  font-family: $default-font;
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.recorder-app {
+  .panel {
+    background-color: $subtle-brighten;
+    border-bottom: 1px solid $subtle-brighten;
+    border-top: 1px solid $subtle-brighten;
+    display: grid;
+    grid-auto-rows: minmax(7.5em, auto);
+    grid-template-columns: 7em 1fr;
+    margin-bottom: 2em;
+
+    > div {
+      align-items: center;
+      display: flex;
+      padding: 2em;
+
+      &:nth-child(odd) {
+        border-right: 1px solid $subtle-brighten;
+        cursor: pointer;
+        justify-content: center;
+        transition: background-color 100ms;
+
+        &:hover {
+          background-color: $subtle-brighten;
+        }
+      }
+    }
+  }
+
+  .monospace {
+    font-family: consolas, monospace;
+  }
+
+  .transcription-player {
+    .play-btn-text {
+      font-size: 3em;
+    }
+
+    .transcription-box {
+      position: relative;
+
+      .transcription-text {
+        // line-height: 3em;
+        white-space: pre-wrap;
+
+        .raise {
+          position: relative;
+          top: -1em;
+        }
+
+        .spoken-incorrect {
+          color: $spoken-incorrect-color;
+        }
+
+        .missed {
+          color: $missed-color;
+          z-index: -1;
+        }
+
+        .token {
+          cursor: pointer;
+        }
+      }
+
+      .text-start {
+        border-left: 1px solid $subtle-mark-color;
+      }
+
+      .text-end {
+        border-right: 1px solid $subtle-mark-color;
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 0.2em;
+        height: 1em;
+        background-color: $fgcolor;
+        position: relative;
+        top: 0.15em;
+        margin-left: 1em;
+        animation: rotating 1s linear infinite;
+      }
+
+      @keyframes rotating {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    }
+  }
+
+  .record-btn {
+    .record-btn-outer {
+      border: 3px solid $record-color-dull;
+      border-radius: 100%;
+      height: 3em;
+      position: relative;
+      width: 3em;
+
+      .record-btn-inner {
+        background-color: $record-color;
+        border-radius: 100%;
+        display: inline-block;
+        height: calc(3em - 12px);
+        left: 50%;
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: calc(3em - 12px);
+      }
+    }
+
+    &.active {
+      .record-btn-outer {
+        border: 3px solid $record-color;
+      }
+    }
+  }
+
+  .drop-me {
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 10px,
+      $subtle-brighten 10px,
+      $subtle-brighten 20px
+    );
+  }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+}
+
+.transcription-cursor {
+  background-color: $highlight-color;
+  border-radius: 100%;
+  height: 5px;
+  opacity: 1;
+  position: absolute;
+  transform: translateX(-50%);
+  width: 5px;
+
+  &.fade-out {
+    animation: fade-out 200ms;
+    opacity: 0;
+  }
+}
