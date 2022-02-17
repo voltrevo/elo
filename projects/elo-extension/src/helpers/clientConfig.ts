@@ -1,6 +1,6 @@
 import reporter from 'io-ts-reporters';
 
-import { ConfigType } from '../helpers/ConfigType';
+import { ConfigType } from '../to-be-linked/ConfigType';
 
 const configApiJson = JSON.parse(process.env.CLIENT_CONFIG ?? '{}');
 

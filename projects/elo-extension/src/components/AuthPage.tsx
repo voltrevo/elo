@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import switch_ from './helpers/switch_';
 import ContentAppContext from '../ContentAppContext';
+import switch_ from '../helpers/switch_';
 
 const AuthPage: React.FunctionComponent = () => {
   const [authChoice, setAuthChoice] = React.useState<'register' | 'login'>('register');

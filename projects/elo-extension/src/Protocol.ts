@@ -1,4 +1,4 @@
-import { AnalysisFragment } from '../../analyze';
+import { AnalysisFragment } from './to-be-linked/analyze';
 import type { Feedback } from './components/FeedbackDialog';
 import UiState from './UiState';
 

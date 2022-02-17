@@ -1,7 +1,7 @@
 import { keccak_256 } from 'js-sha3';
 import browser from 'webextension-polyfill';
 
-import { AnalysisDisfluent, AnalysisFragment } from '../../analyze';
+import { AnalysisDisfluent, AnalysisFragment } from './to-be-linked/analyze';
 import delay from './helpers/delay';
 import never from './helpers/never';
 import TaskQueue from './helpers/TaskQueue';
