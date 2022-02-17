@@ -1,0 +1,9 @@
+{
+  "client": {
+    "tls": true,
+    "hostAndPort": "elo-dev.com",
+    "featureFlags": {
+      "authEnabled": false
+    }
+  }
+}
