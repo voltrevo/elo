@@ -1,7 +1,7 @@
 import clientConfig from './helpers/clientConfig';
-import ContentAppClient from './ContentAppClient';
 import never from '../common-pure/never';
 import { AnalysisFragment } from '../elo-types/Analysis';
+import ContentAppClient from '../elo-page/ContentAppClient';
 
 const maxLatency = 2; // seconds
 

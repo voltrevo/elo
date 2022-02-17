@@ -1,7 +1,7 @@
 import * as React from 'react';
-import ContentAppContext from '../ContentAppContext';
+import ContentAppContext from '../../elo-page/ContentAppContext';
 
-import UiState from '../UiState';
+import UiState from '../../elo-page/UiState';
 import CollapseIcon from './CollapseIcon';
 import ExpandIcon from './ExpandIcon';
 import PopoutIcon from './PopoutIcon';

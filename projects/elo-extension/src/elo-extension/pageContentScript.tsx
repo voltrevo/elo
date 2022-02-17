@@ -1,10 +1,10 @@
 import * as ReactDOM from 'react-dom';
+import ContentAppClient from '../elo-page/ContentAppClient';
+import ContentAppContext from '../elo-page/ContentAppContext';
 
-import PostMessageClient from './helpers/PostMessageClient';
+import PostMessageClient from '../elo-page/helpers/PostMessageClient';
 import analyzeStream from './analyzeStream';
 import App from './components/App';
-import ContentAppClient from './ContentAppClient';
-import ContentAppContext from './ContentAppContext';
 import interceptGetUserMedia from './interceptGetUserMedia';
 
 const eloExtension = document.querySelector('#elo-extension')!;

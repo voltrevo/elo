@@ -1,6 +1,5 @@
 import PostMessageClient from './helpers/PostMessageClient';
-import type ContentApp from './ContentApp';
-import Protocol, { PromisifyApi, protocolKeyMap } from './Protocol';
+import Protocol, { PromisifyApi, PromisishApi, protocolKeyMap } from './Protocol';
 
 export default function ContentAppClient(
   postMessageClient: PostMessageClient,
@@ -14,7 +13,7 @@ export default function ContentAppClient(
   return api;
 }
 
-export function makeLocalContentAppClient(contentApp: ContentApp): PromisifyApi<Protocol> {
+export function makeLocalContentAppClient(contentApp: PromisishApi<Protocol>): PromisifyApi<Protocol> {
   const api = {} as any;
 
   for (const method of Object.keys(protocolKeyMap)) {

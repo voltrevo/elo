@@ -3,10 +3,10 @@ import browser from 'webextension-polyfill';
 
 import clientConfig from './helpers/clientConfig';
 import EwmaCalculator from './helpers/EwmaCalculator';
-import Protocol, { ConnectionEvent, PromisishApi } from './Protocol';
+import Protocol, { ConnectionEvent, PromisishApi } from '../elo-page/Protocol';
 import SessionStats from './storage/SessionStats';
 import Storage, { RandomKey } from './storage/Storage';
-import UiState from './UiState';
+import UiState from '../elo-page/UiState';
 import never from '../common-pure/never';
 import delay from '../common-pure/delay';
 import TaskQueue from '../common-pure/TaskQueue';
