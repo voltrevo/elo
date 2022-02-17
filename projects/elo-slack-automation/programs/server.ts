@@ -7,7 +7,7 @@ import route from 'koa-route';
 
 import config from '../src/config';
 import FeedbackHandler from '../src/FeedbackHandler';
-import DbClient from '../src/database/DbClient';
+import DbClient from '../link-src/database/DbClient';
 
 const app = new Koa();
 app.use(cors());

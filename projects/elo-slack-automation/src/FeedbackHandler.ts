@@ -5,28 +5,15 @@ import * as slack from 'slack';
 
 import config from './config';
 import validateUserId from './validateUserId';
-import type DbClient from './database/DbClient';
+import type DbClient from '../link-src/database/DbClient';
+import Feedback from '../link-src/elo-types/Feedback';
 
 type Handler = Parameters<typeof route.post>[1];
 
-function optional<Type extends io.Mixed>(type: Type) {
-  return io.union([io.undefined, type]);
-}
-
 const FeedbackBody = io.type({
   userId: io.string,
-  feedback: io.type({
-    sentiment: optional(io.string),
-    positive: io.boolean,
-    negative: io.boolean,
-    message: optional(io.string),
-    anonymous: io.boolean,
-    emailInterest: io.boolean,
-    email: optional(io.string),
-  }),
+  feedback: Feedback,
 });
-
-export type Feedback = io.TypeOf<typeof FeedbackBody>['feedback'];
 
 export default function FeedbackHandler(dbClient: DbClient): Handler {
   return async (ctx) => {
