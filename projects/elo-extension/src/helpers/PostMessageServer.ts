@@ -1,4 +1,4 @@
-import looseLookup from './looseLookup';
+import looseLookup from '../../link-src/common-pure/looseLookup';
 
 export default class PostMessageServer {
   constructor(

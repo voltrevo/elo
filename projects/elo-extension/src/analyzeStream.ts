@@ -1,7 +1,7 @@
 import { AnalysisFragment } from './to-be-linked/analyze';
-import never from './helpers/never';
 import clientConfig from './helpers/clientConfig';
 import ContentAppClient from './ContentAppClient';
+import never from '../link-src/common-pure/never';
 
 const maxLatency = 2; // seconds
 

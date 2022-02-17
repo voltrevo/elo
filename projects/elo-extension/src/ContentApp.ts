@@ -2,9 +2,6 @@ import { keccak_256 } from 'js-sha3';
 import browser from 'webextension-polyfill';
 
 import { AnalysisDisfluent, AnalysisFragment } from './to-be-linked/analyze';
-import delay from './helpers/delay';
-import never from './helpers/never';
-import TaskQueue from './helpers/TaskQueue';
 import clientConfig from './helpers/clientConfig';
 import EwmaCalculator from './helpers/EwmaCalculator';
 import type { Feedback } from './components/FeedbackDialog';
@@ -12,6 +9,9 @@ import Protocol, { ConnectionEvent, PromisishApi } from './Protocol';
 import SessionStats from './storage/SessionStats';
 import Storage, { RandomKey } from './storage/Storage';
 import UiState from './UiState';
+import never from '../link-src/common-pure/never';
+import delay from '../link-src/common-pure/delay';
+import TaskQueue from '../link-src/common-pure/TaskQueue';
 
 const sessionKey = RandomKey();
 const apiBase = `${clientConfig.tls ? 'https:' : 'http:'}//${clientConfig.hostAndPort}`;

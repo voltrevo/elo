@@ -1,5 +1,5 @@
 import browser from 'webextension-polyfill';
-import Range from '../helpers/Range';
+import Range from '../../link-src/common-pure/Range';
 import StorageRoot from './StorageRoot';
 
 export function RandomKey() {
