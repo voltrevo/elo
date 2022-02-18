@@ -72,10 +72,10 @@ window.addEventListener('load', async () => {
   const pageCtx = initEloPageContext(new Storage(rawStorage, 'elo'), config.featureFlags);
 
   const { registrationData } = await pageCtx.storage.readRoot();
-  const needsAuth = pageCtx.featureFlags.authEnabled && !registrationData;
+  pageCtx.state.needsAuth = pageCtx.featureFlags.authEnabled && !registrationData;
 
   pageCtx.update({
-    page: needsAuth ? 'AuthPage' : 'OverviewPage',
+    page: pageCtx.state.needsAuth ? 'WelcomePage' : 'OverviewPage',
   });
 
   ReactDOM.render(

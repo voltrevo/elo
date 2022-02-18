@@ -13,6 +13,7 @@ export function initEloPageContext(storage: Storage, featureFlags: ExtensionFeat
     page: '',
     dialog: '',
     test: 37,
+    needsAuth: false,
   };
 
   const events = new EventEmitter() as TypedEventEmitter<{ update(): void }>;

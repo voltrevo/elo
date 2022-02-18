@@ -88,6 +88,17 @@ body {
     }
   }
 
+  .welcome-container {
+    text-align: center;
+
+    .welcome-form {
+      display: inline-block;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
+  }
+
   .page-content {
     flex-grow: 1;
     overflow-y: auto;

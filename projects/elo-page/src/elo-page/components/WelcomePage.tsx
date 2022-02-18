@@ -4,24 +4,28 @@ import switch_ from '../../common-pure/switch_';
 import ContentAppContext from '../ContentAppContext';
 import Page from './Page';
 
-const AuthPage: React.FunctionComponent = () => {
+const WelcomePage: React.FunctionComponent = () => {
   const [authChoice, setAuthChoice] = React.useState<'register' | 'login'>('register');
 
   return <Page>
     <h1>Welcome</h1>
 
-    <div>
-      <input type="radio" checked={authChoice === 'register'} onClick={() => setAuthChoice('register')} /> Register
-    </div>
-    <div>
-      <input type="radio" checked={authChoice === 'login'} onClick={() => setAuthChoice('login')} /> Log In
-    </div>
+    <div className="welcome-container">
+      <div className="welcome-form">
+        <div>
+          <input type="radio" checked={authChoice === 'register'} onClick={() => setAuthChoice('register')} /> Register
+        </div>
+        <div>
+          <input type="radio" checked={authChoice === 'login'} onClick={() => setAuthChoice('login')} /> Log In
+        </div>
 
-    {authChoice === 'login' ? <LoginForm/> : <RegistrationForm/>}
+        {authChoice === 'login' ? <LoginForm/> : <RegistrationForm/>}
+      </div>
+    </div>
   </Page>;
 };
 
-export default AuthPage;
+export default WelcomePage;
 
 function LoginForm() {
   const appCtx = React.useContext(ContentAppContext);

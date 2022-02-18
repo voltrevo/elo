@@ -1,4 +1,4 @@
-import { ChartLine, Gear, PresentationChart, Question } from 'phosphor-react';
+import { ChartLine, Gear, PresentationChart, Question, Star } from 'phosphor-react';
 import * as react from 'react';
 import EloPageContext, { useEloPageContext } from '../EloPageContext';
 
@@ -7,8 +7,15 @@ import NavLink from './NavLink';
 const Nav: react.FunctionComponent = () => {
   const pageCtx = react.useContext(EloPageContext);
   const page = useEloPageContext(s => s.page);
+  const needsAuth = useEloPageContext(s => s.needsAuth);
 
-  const links = [
+  const links = needsAuth ? [
+    {
+      text: 'Welcome',
+      page: 'WelcomePage',
+      icon: <Star size={24}/>,
+    },
+  ] : [
     {
       text: 'Overview',
       page: 'OverviewPage',

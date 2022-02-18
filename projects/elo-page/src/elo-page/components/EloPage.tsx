@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { useEloPageContext } from '../EloPageContext';
 import ReportsPage from './ReportsPage';
-import AuthPage from './AuthPage';
+import WelcomePage from './WelcomePage';
 import FeedbackPage from './FeedbackPage';
 import Dialog from './Dialog';
 import Nav from './Nav';
@@ -13,8 +13,8 @@ const EloPage: React.FunctionComponent = () => {
   // const dialog = useEloPageContext(state => state.dialog);
 
   const pageElement = (() => {
-    if (page === 'AuthPage') {
-      return <AuthPage />;
+    if (page === 'WelcomePage') {
+      return <WelcomePage />;
     }
 
     if (page === 'ReportsPage') {
