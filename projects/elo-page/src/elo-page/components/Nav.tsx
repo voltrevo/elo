@@ -1,17 +1,49 @@
-import { Article, ChartLine, Gear, House, PresentationChart, Question, TrendUp } from 'phosphor-react';
+import { ChartLine, Gear, PresentationChart, Question } from 'phosphor-react';
 import * as react from 'react';
+import EloPageContext, { useEloPageContext } from '../EloPageContext';
 
 import NavLink from './NavLink';
 
 const Nav: react.FunctionComponent = () => {
+  const pageCtx = react.useContext(EloPageContext);
+  const page = useEloPageContext(s => s.page);
+
+  const links = [
+    {
+      text: 'Overview',
+      page: 'OverviewPage',
+      icon: <ChartLine size={24}/>,
+    },
+    {
+      text: 'Reports',
+      page: 'ReportsPage',
+      icon: <PresentationChart size={24}/>,
+    },
+    {
+      text: 'Settings',
+      page: 'SettingsPage',
+      icon: <Gear size={24}/>,
+    },
+    {
+      text: 'Feedback',
+      page: 'FeedbackPage',
+      icon: <Question size={24}/>,
+    },
+  ];
+
   return <div className="nav">
     <div className="logo-box"/>
 
     <div className="links">
-      <NavLink selected={false} icon={<ChartLine size={24}/>}>Overview</NavLink>
-      <NavLink selected={true} icon={<PresentationChart size={24}/>}>Reports</NavLink>
-      <NavLink selected={false} icon={<Gear size={24}/>}>Settings</NavLink>
-      <NavLink selected={false} icon={<Question size={24}/>}>Feedback</NavLink>
+      {links.map(link => (
+        <NavLink
+          icon={link.icon}
+          selected={link.page === page}
+          onClick={() => pageCtx.update({ page: link.page })}
+        >
+          {link.text}
+        </NavLink>
+      ))}
     </div>
   </div>;
 };
