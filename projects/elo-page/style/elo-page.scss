@@ -48,8 +48,10 @@ body {
         user-select: none;
         cursor: pointer;
 
+        background-color: white;
         border-top: 1px solid hsla(0, 0, 50, 0.2);
         border-bottom: 1px solid hsla(0, 0, 50, 0.2);
+        transition: background-color 200ms;
 
         .content {
           padding: 0.5em 0;
@@ -69,11 +71,14 @@ body {
         }
 
         &.selected {
-          border: none;
           background-color: $second-accent;
           color: white;
           border-top: 1px solid transparent;
           border-bottom: 1px solid transparent;
+        }
+
+        &:active {
+          filter: brightness(95%);
         }
       }
     }
