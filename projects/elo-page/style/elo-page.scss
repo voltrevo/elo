@@ -272,12 +272,14 @@ body {
 
   .feedback {
     background-color: white;
+    height: 100%;
     max-width: 1000px;
     border-radius: 5px;
     padding: 20px;
     font-size: 1em;
     margin-left: auto;
     margin-right: auto;
+    position: relative;
 
     .question {
       margin-top: 20px;
@@ -336,7 +338,10 @@ body {
 
     .result {
       text-align: center;
-      margin-top: 30px;
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
   }
 }

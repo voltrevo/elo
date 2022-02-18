@@ -1,4 +1,6 @@
+import delay from '../common-pure/delay';
 import { AnalysisFragment } from '../elo-types/Analysis';
+import Feedback from '../elo-types/Feedback';
 import Protocol, { ConnectionEvent, PromisishApi } from './Protocol';
 import UiState from './UiState';
 
@@ -43,7 +45,9 @@ export default class SimulContentApp implements PromisishApi<Protocol> {
     throw new Error('Method not implemented.');
   }
 
-  sendFeedback(feedback: { sentiment: string | undefined; positive: boolean; negative: boolean; message: string | undefined; anonymous: boolean; emailInterest: boolean; email: string | undefined; }): string | Promise<string> {
-    throw new Error('Method not implemented.');
+  async sendFeedback(feedback: Feedback) {
+    await delay(500);
+
+    return "(Feedback response)";
   }
 }

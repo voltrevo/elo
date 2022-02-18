@@ -24,14 +24,14 @@ const FeedbackPage: React.FunctionComponent = () => {
   if (autoReply !== undefined) {
     return <div className="feedback">
       <div className="result">
-        {autoReply}
-      </div>
-      <div className="footer">
-        <div
-          className="button"
-          onClick={() => pageCtx.update({ dialog: '' })}
-        >
-          Close
+        <div>{autoReply}</div>
+        <div className="footer">
+          <div
+            className="button"
+            onClick={() => pageCtx.update({ page: 'OverviewPage' })}
+          >
+            Close
+          </div>
         </div>
       </div>
     </div>;
