@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import switch_ from '../../common-pure/switch_';
 import ContentAppContext from '../ContentAppContext';
+import Button from './Button';
 import Page from './Page';
 import RowSelector from './RowSelector';
 
@@ -137,39 +138,47 @@ function RegistrationForm() {
 
   const [registerState, setRegisterState] = React.useState<'loading' | RegisterResult>();
 
-  const validEmailAndPassword = email && passwd && passwd === confirmPasswd;
+  const validEmailAndPassword = Boolean(email && passwd && passwd === confirmPasswd);
   const validSentEmail = validEmailAndPassword && email === sentEmail;
 
-  return <table>
-    <tr>
-      <td>Email</td>
-      <td>
-        <input
-          type="text"
-          onInput={(evt: React.ChangeEvent<HTMLInputElement>) => setEmail(evt.target.value)}
-        />
-      </td>
-    </tr>
-    <tr>
-      <td>Password</td>
-      <td>
+  return <>
+    <div className="field">
+      <div>Email</div>
+      <div><input
+        type="text"
+        onInput={(evt: React.ChangeEvent<HTMLInputElement>) => setEmail(evt.target.value)}
+      /></div>
+    </div>
+    <div className="field">
+      <div>Password</div>
+      <div>
         <input
           type="password"
           onInput={(evt: React.ChangeEvent<HTMLInputElement>) => setPasswd(evt.target.value)}
         />
-      </td>
-    </tr>
-    <tr>
-      <td>Confirm Password</td>
-      <td>
+      </div>
+    </div>
+    <div className="field">
+      <div>Confirm Password</div>
+      <div>
         <input
           type="password"
-          onInput={(evt: React.ChangeEvent<HTMLInputElement>) => {
-            setConfirmPasswd(evt.target.value);
-          }}
+          onInput={(evt: React.ChangeEvent<HTMLInputElement>) => setConfirmPasswd(evt.target.value)}
         />
-      </td>
-    </tr>
+      </div>
+    </div>
+    <div className="button-row">
+      <Button
+        enabled={validEmailAndPassword && email !== sentEmail}
+        onClick={() => {
+          setSentEmail(email);
+          appCtx.sendVerificationEmail(email);
+        }}
+      >
+        {email && email === sentEmail ? 'Sent' : 'Send verification email'}
+      </Button>
+    </div>
+    {/*
     <tr>
       <td colSpan={2}>
         <button
@@ -282,6 +291,6 @@ function RegistrationForm() {
           {registerState.message}
         </p>
       </td>
-    </tr>}
-  </table>;
+    </tr>} */}
+  </>;
 }
