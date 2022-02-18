@@ -1,10 +1,12 @@
 import * as io from 'io-ts';
 import reporter from 'io-ts-reporters';
+import ExtensionFeatureFlags from '../elo-types/ExtensionFeatureFlags';
 
 const configJson = require("../../../../config.json");
 
 const Config = io.type({
   sampleStorage: io.record(io.string, io.unknown),
+  featureFlags: ExtensionFeatureFlags,
 });
 
 const decodeResult = Config.decode(configJson);

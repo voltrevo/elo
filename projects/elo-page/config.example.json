@@ -1,3 +1,6 @@
 {
-  "sampleStorage": {}
+  "sampleStorage": {},
+  "featureFlags": {
+    "authEnabled": false
+  }
 }

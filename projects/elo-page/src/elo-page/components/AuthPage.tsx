@@ -2,12 +2,13 @@ import * as React from 'react';
 
 import switch_ from '../../common-pure/switch_';
 import ContentAppContext from '../ContentAppContext';
+import Page from './Page';
 
 const AuthPage: React.FunctionComponent = () => {
   const [authChoice, setAuthChoice] = React.useState<'register' | 'login'>('register');
 
-  return <>
-    <h1>Welcome to Elo!</h1>
+  return <Page>
+    <h1>Welcome</h1>
 
     <div>
       <input type="radio" checked={authChoice === 'register'} onClick={() => setAuthChoice('register')} /> Register
@@ -17,7 +18,7 @@ const AuthPage: React.FunctionComponent = () => {
     </div>
 
     {authChoice === 'login' ? <LoginForm/> : <RegistrationForm/>}
-  </>;
+  </Page>;
 };
 
 export default AuthPage;

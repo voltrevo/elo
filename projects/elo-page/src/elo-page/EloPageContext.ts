@@ -2,12 +2,13 @@ import { EventEmitter } from 'events';
 
 import * as React from 'react';
 import TypedEventEmitter from 'typed-emitter';
+import ExtensionFeatureFlags from '../elo-types/ExtensionFeatureFlags';
 
 import Storage from './storage/Storage';
 
 type EloPageContext = ReturnType<typeof initEloPageContext>;
 
-export function initEloPageContext(storage: Storage) {
+export function initEloPageContext(storage: Storage, featureFlags: ExtensionFeatureFlags) {
   const state = {
     page: '',
     dialog: '',
@@ -20,6 +21,7 @@ export function initEloPageContext(storage: Storage) {
     events,
     storage,
     state,
+    featureFlags,
     update: (updates: Partial<typeof state>) => {
       for (const key of (Object.keys(updates) as (keyof typeof state)[])) {
         (state as any)[key] = updates[key];

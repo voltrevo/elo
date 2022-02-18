@@ -69,9 +69,14 @@ window.addEventListener('load', async () => {
   document.body.appendChild(appDiv);
 
   const eloClient = makeLocalContentAppClient(new SimulContentApp());
-  const pageCtx = initEloPageContext(new Storage(rawStorage, 'elo'));
+  const pageCtx = initEloPageContext(new Storage(rawStorage, 'elo'), config.featureFlags);
 
-  pageCtx.state.page = 'ReportsPage';
+  const { registrationData } = await pageCtx.storage.readRoot();
+  const needsAuth = pageCtx.featureFlags.authEnabled && !registrationData;
+
+  pageCtx.update({
+    page: needsAuth ? 'AuthPage' : 'OverviewPage',
+  });
 
   ReactDOM.render(
     <ContentAppContext.Provider value={eloClient}>
