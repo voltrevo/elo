@@ -285,6 +285,30 @@ body {
     }
   }
 
+  .row-selector {
+    display: flex;
+    flex-direction: row;
+    margin: 10px;
+
+    > div {
+      flex-grow: 1;
+      text-align: center;
+      font-size: 2em;
+    }
+
+    .cell {
+      transition: all 200ms;
+      cursor: pointer;
+      border-radius: 5px;
+      padding: 5px;
+      user-select: none;
+
+      &.selected {
+        background-color: $first-accent;
+      }
+    }
+  }
+
   .feedback {
     background-color: white;
     height: 100%;
@@ -315,30 +339,6 @@ body {
         font-family: 'Source Sans Pro', sans-serif;
         font-size: 1em;
         margin: 10px 0;
-      }
-    }
-
-    .row-selector {
-      display: flex;
-      flex-direction: row;
-      margin: 10px;
-
-      > div {
-        flex-grow: 1;
-        text-align: center;
-        font-size: 2em;
-      }
-
-      .cell {
-        transition: all 200ms;
-        cursor: pointer;
-        border-radius: 5px;
-        padding: 5px;
-        user-select: none;
-
-        &.selected {
-          background-color: $first-accent;
-        }
       }
     }
 

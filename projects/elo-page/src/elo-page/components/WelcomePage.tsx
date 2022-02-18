@@ -3,6 +3,7 @@ import * as React from 'react';
 import switch_ from '../../common-pure/switch_';
 import ContentAppContext from '../ContentAppContext';
 import Page from './Page';
+import RowSelector from './RowSelector';
 
 const WelcomePage: React.FunctionComponent = () => {
   const [authChoice, setAuthChoice] = React.useState<'register' | 'login'>('register');
@@ -12,12 +13,18 @@ const WelcomePage: React.FunctionComponent = () => {
 
     <div className="welcome-container">
       <div className="welcome-form">
-        <div>
-          <input type="radio" checked={authChoice === 'register'} onClick={() => setAuthChoice('register')} /> Register
-        </div>
-        <div>
-          <input type="radio" checked={authChoice === 'login'} onClick={() => setAuthChoice('login')} /> Log In
-        </div>
+        <RowSelector
+          options={['register', 'login']}
+          displayMap={{
+            register: 'Register',
+            login: 'Log In',
+          }}
+          default_={{
+            value: 'register',
+            allowNoSelection: false,
+          }}
+          onSelect={(selection) => setAuthChoice(selection as any)}
+        />
 
         {authChoice === 'login' ? <LoginForm/> : <RegistrationForm/>}
       </div>
