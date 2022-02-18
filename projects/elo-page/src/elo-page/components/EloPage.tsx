@@ -5,6 +5,7 @@ import LastSessionPage from './LastSessionPage';
 import AuthPage from './AuthPage';
 import FeedbackDialog from './FeedbackDialog';
 import Dialog from './Dialog';
+import Nav from './Nav';
 
 const EloPage: React.FunctionComponent = () => {
   const page = useEloPageContext(state => state.page);
@@ -31,7 +32,10 @@ const EloPage: React.FunctionComponent = () => {
   })();
 
   return <div className="elo-page">
-    {pageElement}
+    <Nav/>
+    <div className="page-content">
+      {pageElement}
+    </div>
     {dialogElement && <Dialog>{dialogElement}</Dialog>}
   </div>;
 };

@@ -1,17 +1,39 @@
 @import "./variables";
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;600&display=swap');
 
+body {
+  margin: 0;
+}
+
 .elo-page {
   * {
     box-sizing: border-box;
   }
 
+  display: flex;
+  flex-direction: row;
+
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+
   font-family: 'Source Sans Pro', sans-serif;
   font-weight: 300;
   font-size: 1.5em;
-  max-width: 1000px;
-  margin-left: auto;
-  margin-right: auto;
+
+  .nav {
+    min-width: 200px;
+
+    .logo-box {
+      background: center no-repeat url('/assets/icons/icon128.png');
+      height: 200px;
+    }
+  }
+
+  .page-content {
+    flex-grow: 1;
+    overflow-y: auto;
+  }
 
   a {
     text-decoration: none;
