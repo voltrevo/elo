@@ -1,5 +1,5 @@
 @import "./variables";
-@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap');
 
 body {
   margin: 0;
@@ -37,6 +37,7 @@ body {
 
       div {
         font-size: 1.5em;
+        font-weight: 400;
         padding: 0.5em;
         user-select: none;
         cursor: pointer;
