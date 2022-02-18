@@ -5,8 +5,10 @@ const Nav: react.FunctionComponent = () => {
     <div className="logo-box"/>
 
     <div className="links">
-      <div className="active">Active Test</div>
-      <div>Test</div>
+      <div>Overview</div>
+      <div className="active">Reports</div>
+      <div>Settings</div>
+      <div>Feedback</div>
     </div>
   </div>;
 };
