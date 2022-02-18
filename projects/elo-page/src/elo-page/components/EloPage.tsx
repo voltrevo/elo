@@ -32,9 +32,11 @@ const EloPage: React.FunctionComponent = () => {
   })();
 
   return <div className="elo-page">
-    <Nav/>
-    <div className="page-content">
-      {pageElement}
+    <div className="main">
+      <Nav/>
+      <div className="page-content">
+        {pageElement}
+      </div>
     </div>
     {dialogElement && <Dialog>{dialogElement}</Dialog>}
   </div>;
