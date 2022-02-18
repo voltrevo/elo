@@ -39,7 +39,13 @@ const Nav: react.FunctionComponent = () => {
         <NavLink
           icon={link.icon}
           selected={link.page === page}
-          onClick={() => pageCtx.update({ page: link.page })}
+          onClick={() => {
+            if (link.page === 'FeedbackPage') {
+              pageCtx.update({ dialog: 'FeedbackDialog' })
+            } else {
+              pageCtx.update({ page: link.page });
+            }
+          }}
         >
           {link.text}
         </NavLink>
