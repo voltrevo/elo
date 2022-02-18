@@ -24,13 +24,17 @@ body {
   .nav {
     min-width: 250px;
     border-right: 1px solid hsla(0, 0, 50, 0.2);
+    display: flex;
+    flex-direction: column;
 
     .logo-box {
       background: center no-repeat url('/assets/icons/icon128.png');
-      height: 200px;
+      min-height: 200px;
     }
 
     .links {
+      flex-grow: 1;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 20px;
