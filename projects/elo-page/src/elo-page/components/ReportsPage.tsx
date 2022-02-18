@@ -5,7 +5,7 @@ import ContentAppContext from '../ContentAppContext';
 import EloPageContext from '../EloPageContext';
 import SessionReport from './SessionReport';
 
-const LastSessionPage: React.FunctionComponent = () => {
+const ReportsPage: React.FunctionComponent = () => {
   const eloClient = React.useContext(ContentAppContext);
   const pageCtx = React.useContext(EloPageContext);
 
@@ -37,4 +37,4 @@ const LastSessionPage: React.FunctionComponent = () => {
   return <SessionReport lastSession={lastSession} storage={pageCtx.storage}/>;
 };
 
-export default LastSessionPage;
+export default ReportsPage;

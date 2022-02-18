@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { useEloPageContext } from '../EloPageContext';
-import LastSessionPage from './LastSessionPage';
+import ReportsPage from './ReportsPage';
 import AuthPage from './AuthPage';
 import FeedbackDialog from './FeedbackDialog';
 import Dialog from './Dialog';
@@ -16,8 +16,8 @@ const EloPage: React.FunctionComponent = () => {
       return <AuthPage />;
     }
 
-    if (page === 'LastSessionPage') {
-      return <LastSessionPage />;
+    if (page === 'ReportsPage') {
+      return <ReportsPage />;
     }
 
     return <>Page not found: "{page}"</>;

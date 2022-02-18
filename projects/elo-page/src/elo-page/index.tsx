@@ -71,7 +71,7 @@ window.addEventListener('load', async () => {
   const eloClient = makeLocalContentAppClient(new SimulContentApp());
   const pageCtx = initEloPageContext(new Storage(rawStorage, 'elo'));
 
-  pageCtx.state.page = 'LastSessionPage';
+  pageCtx.state.page = 'ReportsPage';
 
   ReactDOM.render(
     <ContentAppContext.Provider value={eloClient}>
