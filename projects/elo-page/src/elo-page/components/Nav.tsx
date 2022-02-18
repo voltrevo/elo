@@ -1,14 +1,16 @@
 import * as react from 'react';
 
+import NavLink from './NavLink';
+
 const Nav: react.FunctionComponent = () => {
   return <div className="nav">
     <div className="logo-box"/>
 
     <div className="links">
-      <div>Overview</div>
-      <div className="active">Reports</div>
-      <div>Settings</div>
-      <div>Feedback</div>
+      <NavLink selected={false}>Overview</NavLink>
+      <NavLink selected={true}>Reports</NavLink>
+      <NavLink selected={false}>Settings</NavLink>
+      <NavLink selected={false}>Feedback</NavLink>
     </div>
   </div>;
 };
