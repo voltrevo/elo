@@ -23,10 +23,35 @@ body {
 
   .nav {
     min-width: 200px;
+    border-right: 1px solid hsla(0, 0, 50, 0.2);
 
     .logo-box {
       background: center no-repeat url('/assets/icons/icon128.png');
       height: 200px;
+    }
+
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      div {
+        font-size: 1.5em;
+        padding: 0.5em;
+        user-select: none;
+        cursor: pointer;
+
+        border-top: 1px solid hsla(0, 0, 50, 0.2);
+        border-bottom: 1px solid hsla(0, 0, 50, 0.2);
+
+        &.active {
+          border: none;
+          background-color: $second-accent;
+          color: white;
+          border-top: 1px solid transparent;
+          border-bottom: 1px solid transparent;
+        }
+      }
     }
   }
 
@@ -62,6 +87,9 @@ body {
 
   .elo-page-container {
     padding: 25px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .important-value {

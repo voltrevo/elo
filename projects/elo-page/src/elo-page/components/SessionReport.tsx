@@ -17,8 +17,6 @@ const SessionReport: React.FunctionComponent<Props> = (props: Props) => {
 
   function render() {
     return <div className="elo-page-container">
-      <img src="/assets/icons/icon128.png" width="64" height="64" />
-
       <div className="sections">
         <div/>
         <div>
