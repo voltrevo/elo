@@ -6,6 +6,7 @@ import AuthPage from './AuthPage';
 import FeedbackDialog from './FeedbackDialog';
 import Dialog from './Dialog';
 import Nav from './Nav';
+import ReportPrototype from './ReportPrototype';
 
 const EloPage: React.FunctionComponent = () => {
   const page = useEloPageContext(state => state.page);
@@ -18,6 +19,10 @@ const EloPage: React.FunctionComponent = () => {
 
     if (page === 'ReportsPage') {
       return <ReportsPage />;
+    }
+
+    if (page === 'OverviewPage') {
+      return <ReportPrototype />;
     }
 
     return <>Page not found: "{page}"</>;
