@@ -5,7 +5,7 @@ import ContentAppContext from '../ContentAppContext';
 import EloPageContext from '../EloPageContext';
 import RowSelector from './RowSelector';
 
-const FeedbackDialog: React.FunctionComponent = () => {
+const FeedbackPage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ContentAppContext);
   const pageCtx = React.useContext(EloPageContext);
 
@@ -162,4 +162,4 @@ const FeedbackDialog: React.FunctionComponent = () => {
   </div>;
 };
 
-export default FeedbackDialog;
+export default FeedbackPage;

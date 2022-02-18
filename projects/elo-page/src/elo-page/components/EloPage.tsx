@@ -3,14 +3,14 @@ import * as React from 'react';
 import { useEloPageContext } from '../EloPageContext';
 import ReportsPage from './ReportsPage';
 import AuthPage from './AuthPage';
-import FeedbackDialog from './FeedbackDialog';
+import FeedbackPage from './FeedbackPage';
 import Dialog from './Dialog';
 import Nav from './Nav';
 import ReportPrototype from './ReportPrototype';
 
 const EloPage: React.FunctionComponent = () => {
   const page = useEloPageContext(state => state.page);
-  const dialog = useEloPageContext(state => state.dialog);
+  // const dialog = useEloPageContext(state => state.dialog);
 
   const pageElement = (() => {
     if (page === 'AuthPage') {
@@ -25,13 +25,17 @@ const EloPage: React.FunctionComponent = () => {
       return <ReportPrototype />;
     }
 
+    if (page === 'FeedbackPage') {
+      return <FeedbackPage />;
+    }
+
     return <>Page not found: "{page}"</>;
   })();
 
   const dialogElement = (() => {
-    if (dialog === 'FeedbackDialog') {
-      return <FeedbackDialog />;
-    }
+    // if (dialog === 'FeedbackPage') {
+    //   return <FeedbackPage />;
+    // }
 
     return undefined;
   })();
