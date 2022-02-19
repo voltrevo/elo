@@ -1,7 +1,10 @@
 import * as React from 'react';
+import delay from '../../common-pure/delay';
 
 import switch_ from '../../common-pure/switch_';
 import ContentAppContext from '../ContentAppContext';
+import EloPageContext from '../EloPageContext';
+import AsyncButton from './AsyncButton';
 import Button from './Button';
 import Page from './Page';
 import RowSelector from './RowSelector';
@@ -117,6 +120,7 @@ function LoginForm() {
 }
 
 function RegistrationForm() {
+  const pageCtx = React.useContext(EloPageContext);
   const appCtx = React.useContext(ContentAppContext);
 
   const [email, setEmail] = React.useState('');
@@ -168,15 +172,25 @@ function RegistrationForm() {
       </div>
     </div>
     <div className="button-row">
-      <Button
+      <AsyncButton
+        key={validEmailAndPassword && email || ''}
         enabled={validEmailAndPassword && email !== sentEmail}
-        onClick={() => {
+        defaultResult={email === sentEmail ? 'success' : undefined}
+        onClick={async () => {
+          // appCtx.sendVerificationEmail(email);
+          await delay(500);
           setSentEmail(email);
-          appCtx.sendVerificationEmail(email);
         }}
       >
-        {email && email === sentEmail ? 'Sent' : 'Send verification email'}
-      </Button>
+        Send verification email
+      </AsyncButton>
+      {validSentEmail && <Button
+        onClick={() => {
+          pageCtx.update({ dialog: 'ResendEmailDialog' });
+        }}
+      >
+        Resend?
+      </Button>}
     </div>
     {/*
     <tr>

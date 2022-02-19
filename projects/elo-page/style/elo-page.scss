@@ -235,6 +235,13 @@ body {
 
   .button {
     display: inline-block;
+
+    > div {
+      display: flex;
+      flex-direction: row;
+      gap: 5px;
+    }
+
     background-color: $second-accent;
     color: white;
     padding: 10px;
