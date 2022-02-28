@@ -1,8 +1,19 @@
+import * as io from 'io-ts';
+
 import { AnalysisFragment } from '../elo-types/Analysis';
 import Feedback from '../elo-types/Feedback';
 import UiState from './UiState';
 
-type Protocol = {
+export const GoogleAuthResult = io.type({
+  issued_to: io.string,
+  expires_in: io.number,
+  email: io.string,
+  verified_email: io.boolean,
+});
+
+export type GoogleAuthResult = io.TypeOf<typeof GoogleAuthResult>;
+
+export type Protocol = {
   notifyGetUserMediaCalled(): void;
   addFragment(fragment: AnalysisFragment): void;
   addConnectionEvent(evt: ConnectionEvent): void;
@@ -14,6 +25,8 @@ type Protocol = {
   register(email: string, password: string, code: string): void;
   login(email: string, password: string): void;
   sendFeedback(feedback: Feedback): string;
+  googleAuth(): GoogleAuthResult;
+  googleAuthLogout(): void;
 };
 
 export const protocolKeyMap: Record<keyof Protocol, true> = {
@@ -28,6 +41,8 @@ export const protocolKeyMap: Record<keyof Protocol, true> = {
   register: true,
   login: true,
   sendFeedback: true,
+  googleAuth: true,
+  googleAuthLogout: true,
 };
 
 export type ConnectionEvent = (

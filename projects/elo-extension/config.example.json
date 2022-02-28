@@ -5,6 +5,6 @@
     "featureFlags": {
       "authEnabled": false
     },
-    "googleOathClientId": "insert client id"
+    "googleOauthClientId": "insert client id"
   }
 }

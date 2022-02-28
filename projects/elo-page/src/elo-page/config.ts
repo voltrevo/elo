@@ -7,7 +7,7 @@ const configJson = require("../../../../config.json");
 export const Config = io.type({
   sampleStorage: io.record(io.string, io.unknown),
   featureFlags: ExtensionFeatureFlags,
-  googleOathClientId: io.string,
+  googleOauthClientId: io.string,
 });
 
 export type Config = io.TypeOf<typeof Config>;

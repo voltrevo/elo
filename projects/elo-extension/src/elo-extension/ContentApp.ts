@@ -3,7 +3,7 @@ import browser from 'webextension-polyfill';
 
 import clientConfig from './helpers/clientConfig';
 import EwmaCalculator from './helpers/EwmaCalculator';
-import Protocol, { ConnectionEvent, PromisishApi } from '../elo-page/Protocol';
+import Protocol, { ConnectionEvent, GoogleAuthResult, PromisishApi } from '../elo-page/Protocol';
 import SessionStats from '../elo-types/SessionStats';
 import Storage, { RandomKey } from '../elo-page/storage/Storage';
 import UiState from '../elo-page/UiState';
@@ -301,5 +301,81 @@ export default class ContentApp implements PromisishApi<Protocol> {
     }
 
     return 'Thanks!';
+  }
+
+  async googleAuth() {
+    const authUrlObj = new URL('https://accounts.google.com/o/oauth2/auth');
+    authUrlObj.searchParams.append('client_id', clientConfig.googleOauthClientId);
+    authUrlObj.searchParams.append('redirect_uri', browser.identity.getRedirectURL("oauth2.html"));
+    authUrlObj.searchParams.append('response_type', 'token');
+    authUrlObj.searchParams.append('scope', 'email');
+
+    const responseUrl = await browser.identity.launchWebAuthFlow(
+      {
+        url: authUrlObj.toString(),
+        interactive: true,
+      },
+    );
+
+    const responseUrlHash = new URL(responseUrl).hash;
+    const accessToken = new URLSearchParams(responseUrlHash.slice(1)).get('access_token');
+
+    if (accessToken === null) {
+      throw new Error('Missing access_token');
+    }
+
+    // TODO: Server needs to do this too (maybe only on server?)
+    const tokenInfoJson = await fetch('https://www.googleapis.com/oauth2/v1/tokeninfo', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }).then(res => res.json());
+
+    const decodeResult = GoogleAuthResult.decode(tokenInfoJson);
+
+    if ('left' in decodeResult) {
+      // TODO: Use reporter
+      throw new Error(decodeResult.left.map(e => e.message).join('\n'));
+    }
+
+    const authResult = decodeResult.right;
+
+    if (authResult.issued_to !== clientConfig.googleOauthClientId) {
+      throw new Error('Client id mismatch');
+    }
+
+    if (!authResult.verified_email) {
+      throw new Error(`Unverified email ${authResult.email}`);
+    }
+
+    return authResult;
+  }
+
+  async googleAuthLogout(): Promise<void> {
+    try {
+      await browser.identity.launchWebAuthFlow({
+        url: 'https://accounts.google.com/logout',
+        interactive: false,
+      });
+    } catch {}
+
+    const authUrlObj = new URL('https://accounts.google.com/o/oauth2/auth');
+    authUrlObj.searchParams.append('client_id', clientConfig.googleOauthClientId);
+    authUrlObj.searchParams.append('redirect_uri', browser.identity.getRedirectURL("oauth2.html"));
+    authUrlObj.searchParams.append('response_type', 'token');
+    authUrlObj.searchParams.append('scope', 'email');
+
+    try {
+      await browser.identity.launchWebAuthFlow(
+        {
+          url: authUrlObj.toString(),
+          interactive: false,
+        },
+      );
+
+      throw new Error('Failed to log out');
+    } catch {
+      return;
+    }
   }
 }

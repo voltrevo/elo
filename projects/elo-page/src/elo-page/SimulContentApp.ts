@@ -50,4 +50,12 @@ export default class SimulContentApp implements PromisishApi<Protocol> {
 
     return "(Feedback response)";
   }
+
+  async googleAuth(): Promise<never> {
+    throw new Error('Method not implemented.');
+  }
+
+  async googleAuthLogout(): Promise<never> {
+    throw new Error('Method not implemented.');
+  }
 }

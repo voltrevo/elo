@@ -11,7 +11,7 @@ import Page from './Page';
 import RowSelector from './RowSelector';
 
 const WelcomePage: React.FunctionComponent = () => {
-  const pageCtx = React.useContext(EloPageContext);
+  const appCtx = React.useContext(ContentAppContext);
   const [authChoice, setAuthChoice] = React.useState<'register' | 'login'>('register');
 
   return <Page>
@@ -19,61 +19,14 @@ const WelcomePage: React.FunctionComponent = () => {
 
     <div className="welcome-container">
       <Button onClick={async () => {
-        const authUrlObj = new URL('https://accounts.google.com/o/oauth2/auth');
-        authUrlObj.searchParams.append('client_id', pageCtx.config.googleOathClientId);
-        authUrlObj.searchParams.append('redirect_uri', Browser.identity.getRedirectURL("oauth2.html"));
-        authUrlObj.searchParams.append('response_type', 'token');
-        // authUrlObj.searchParams.append('scope', 'profile');
-        authUrlObj.searchParams.append('scope', 'email');
-        console.log(authUrlObj.toString());
+        const authResult = await appCtx.googleAuth();
 
-        const responseUrl = await Browser.identity.launchWebAuthFlow(
-          {
-            url: authUrlObj.toString(),
-            interactive: true,
-          },
-        );
-
-        console.log({ responseUrl });
-
-        const responseUrlHash = new URL(responseUrl).hash;
-        const accessToken = new URLSearchParams(responseUrlHash.slice(1)).get('access_token');
-
-        if (accessToken === null) {
-          throw new Error('Missing access_token');
-        }
-
-        // TODO: Server needs to do this too (maybe only on server?)
-        const tokenInfoJson = await fetch('https://www.googleapis.com/oauth2/v1/tokeninfo', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }).then(res => res.json());
-
-        console.log(tokenInfoJson);
-
-        const decodeResult = io.type({
-          issued_to: io.string,
-          expires_in: io.number,
-          email: io.string,
-          verified_email: io.boolean,
-        }).decode(tokenInfoJson);
-
-        if ('left' in decodeResult) {
-          // TODO: Use reporter
-          throw new Error(decodeResult.left.map(e => e.message).join('\n'));
-        }
-
-        if (decodeResult.right.issued_to !== pageCtx.config.googleOathClientId) {
-          throw new Error('Client id mismatch');
-        }
-
-        if (!decodeResult.right.verified_email) {
-          console.log('Unverified email', decodeResult.right.email);
-        } else {
-          console.log('Verified as', decodeResult.right.email);
-        }
-      }}>Test</Button>
+        console.log("Verified as", authResult.email);
+      }}>Google Auth</Button>
+      <Button onClick={async () => {
+        await appCtx.googleAuthLogout();
+        console.log('Logged out');
+      }}>Google Auth Logout</Button>
       <div className="welcome-form">
         <RowSelector
           options={['register', 'login']}

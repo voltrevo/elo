@@ -18,7 +18,7 @@ export const ConfigType = io.type({
     hostAndPort: io.string,
     sampleStorage: io.record(io.string, io.unknown),
     featureFlags: ExtensionFeatureFlags,
-    googleOathClientId: io.string,
+    googleOauthClientId: io.string,
   })),
 });
 
