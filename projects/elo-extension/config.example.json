@@ -4,6 +4,7 @@
     "hostAndPort": "elo-dev.com",
     "featureFlags": {
       "authEnabled": false
-    }
+    },
+    "googleOathClientId": "insert client id"
   }
 }

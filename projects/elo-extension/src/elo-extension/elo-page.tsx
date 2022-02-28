@@ -14,13 +14,13 @@ const contentApp = makeLocalContentAppClient(new ContentApp());
 (window as any).contentApp = contentApp;
 
 window.addEventListener('load', async () => {
-  const pageCtx = initEloPageContext(new Storage(Browser.storage.local, 'elo'), clientConfig.featureFlags);
+  const pageCtx = initEloPageContext(new Storage(Browser.storage.local, 'elo'), clientConfig);
 
   const { registrationData } = await pageCtx.storage.readRoot();
   const needsAuth = clientConfig.featureFlags.authEnabled && !registrationData;
 
   pageCtx.update({
-    page: needsAuth ? 'AuthPage' : 'LastSessionPage',
+    page: needsAuth ? 'WelcomePage' : 'LastSessionPage',
   });
 
   ReactDOM.render(

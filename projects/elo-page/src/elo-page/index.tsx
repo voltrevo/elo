@@ -69,10 +69,10 @@ window.addEventListener('load', async () => {
   document.body.appendChild(appDiv);
 
   const eloClient = makeLocalContentAppClient(new SimulContentApp());
-  const pageCtx = initEloPageContext(new Storage(rawStorage, 'elo'), config.featureFlags);
+  const pageCtx = initEloPageContext(new Storage(rawStorage, 'elo'), config);
 
   const { registrationData } = await pageCtx.storage.readRoot();
-  pageCtx.state.needsAuth = pageCtx.featureFlags.authEnabled && !registrationData;
+  pageCtx.state.needsAuth = pageCtx.config.featureFlags.authEnabled && !registrationData;
 
   pageCtx.update({
     page: pageCtx.state.needsAuth ? 'WelcomePage' : 'OverviewPage',

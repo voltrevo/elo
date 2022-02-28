@@ -1,4 +1,5 @@
 import * as io from 'io-ts';
+import ExtensionFeatureFlags from '../../elo-types/ExtensionFeatureFlags';
 
 export const ConfigType = io.type({
   server: optional(io.type({
@@ -15,9 +16,9 @@ export const ConfigType = io.type({
   client: optional(io.type({
     tls: io.boolean,
     hostAndPort: io.string,
-    featureFlags: io.type({
-      authEnabled: io.boolean,
-    }),
+    sampleStorage: io.record(io.string, io.unknown),
+    featureFlags: ExtensionFeatureFlags,
+    googleOathClientId: io.string,
   })),
 });
 

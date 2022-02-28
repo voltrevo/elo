@@ -4,10 +4,13 @@ import ExtensionFeatureFlags from '../elo-types/ExtensionFeatureFlags';
 
 const configJson = require("../../../../config.json");
 
-const Config = io.type({
+export const Config = io.type({
   sampleStorage: io.record(io.string, io.unknown),
   featureFlags: ExtensionFeatureFlags,
+  googleOathClientId: io.string,
 });
+
+export type Config = io.TypeOf<typeof Config>;
 
 const decodeResult = Config.decode(configJson);
 
@@ -19,6 +22,6 @@ if (decodeResult.right === undefined) {
   throw new Error('Missing client config');
 }
 
-const config = decodeResult.right;
+export const config = decodeResult.right;
 
 export default config;

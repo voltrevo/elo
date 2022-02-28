@@ -23,7 +23,8 @@
   ],
 
   "permissions": [
-    "storage"
+    "storage",
+    "identity"
   ],
 
   "browser_action": {
