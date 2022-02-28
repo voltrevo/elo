@@ -1,6 +1,4 @@
 import * as React from 'react';
-import * as io from 'io-ts';
-import Browser from 'webextension-polyfill';
 import delay from '../../common-pure/delay';
 
 import ContentAppContext from '../ContentAppContext';
