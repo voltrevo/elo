@@ -14,7 +14,7 @@ const contentApp = makeLocalContentAppClient(new ContentApp());
 (window as any).contentApp = contentApp;
 
 window.addEventListener('load', async () => {
-  const pageCtx = initEloPageContext(new Storage(Browser.storage.local, 'elo'));
+  const pageCtx = initEloPageContext(new Storage(Browser.storage.local, 'elo'), clientConfig.featureFlags);
 
   const { registrationData } = await pageCtx.storage.readRoot();
   const needsAuth = clientConfig.featureFlags.authEnabled && !registrationData;
