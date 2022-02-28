@@ -15,6 +15,11 @@ const Nav: react.FunctionComponent = () => {
       page: 'WelcomePage',
       icon: <Star size={24}/>,
     },
+    {
+      text: 'Feedback',
+      page: 'FeedbackPage',
+      icon: <Question size={24}/>,
+    },
   ] : [
     {
       text: 'Overview',

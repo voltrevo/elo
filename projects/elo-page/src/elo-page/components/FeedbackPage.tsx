@@ -28,7 +28,14 @@ const FeedbackPage: React.FunctionComponent = () => {
         <div className="footer">
           <div
             className="button"
-            onClick={() => pageCtx.update({ page: 'OverviewPage' })}
+            onClick={() => {
+              const page = (pageCtx.config.featureFlags.authEnabled
+                ? 'WelcomePage'
+                : 'OverviewPage'
+              );
+
+              pageCtx.update({ page });
+            }}
           >
             Close
           </div>
