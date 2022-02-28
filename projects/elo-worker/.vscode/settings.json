@@ -1,6 +1,6 @@
 {
   "deno.enable": false,
-  "editor.rulers": [100],
+  "editor.rulers": [80],
   "editor.codeActionsOnSave": {
     "source.fixAll": true
   },
