@@ -1,6 +1,6 @@
 import * as React from 'react';
-import delay from '../../common-pure/delay';
 
+import delay from '../../common-pure/delay';
 import ContentAppContext from '../ContentAppContext';
 import EloPageContext from '../EloPageContext';
 import AsyncButton from './AsyncButton';
@@ -16,15 +16,15 @@ const WelcomePage: React.FunctionComponent = () => {
     <h1>Welcome</h1>
 
     <div className="welcome-container">
-      <Button onClick={async () => {
+      <AsyncButton onClick={async () => {
         const authResult = await appCtx.googleAuth();
 
         console.log("Verified as", authResult.email);
-      }}>Google Auth</Button>
-      <Button onClick={async () => {
+      }}>Google Auth</AsyncButton>
+      <AsyncButton onClick={async () => {
         await appCtx.googleAuthLogout();
         console.log('Logged out');
-      }}>Google Auth Logout</Button>
+      }}>Google Auth Logout</AsyncButton>
       <div className="welcome-form">
         <RowSelector
           options={['register', 'login']}
