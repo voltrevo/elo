@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-import delay from '../../common-pure/delay';
 import ContentAppContext from '../ContentAppContext';
 import EloPageContext from '../EloPageContext';
 import AsyncButton from './AsyncButton';

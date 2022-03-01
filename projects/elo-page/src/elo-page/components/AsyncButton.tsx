@@ -1,4 +1,4 @@
-import { Check, Spinner, X } from 'phosphor-react';
+import { CheckCircle, Circle, CircleNotch, XCircle } from 'phosphor-react';
 import * as react from 'react';
 
 import Button from './Button';
@@ -35,20 +35,22 @@ const AsyncButton: react.FunctionComponent<Props> = (props) => {
       {(() => {
         if (loading) {
           return <div className="spinner">
-            <Spinner size={24} />
+            <CircleNotch size={24} />
           </div>;
         }
 
         if (result !== undefined) {
           return <div style={{ fontSize: '1px' }}>
             {result === 'success'
-              ? <Check size={24} />
-              : <X size={24} />
+              ? <CheckCircle size={24} />
+              : <XCircle size={24} />
             }
           </div>;
         }
 
-        return <></>;
+        return <div style={{ fontSize: '1px', opacity: '0.3' }}>
+          <Circle size={24} />
+        </div>
       })()}
     </div>
   </Button>
