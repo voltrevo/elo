@@ -13,8 +13,9 @@ import TermsAndConditionsDialog from './TermsAndConditionsDialog';
 
 const WelcomePage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ContentAppContext);
-  const [authMethod, setAuthMethod] = React.useState<'service' | 'password'>('service');
+  const [authMethod, setAuthMethod] = React.useState<'service' | 'password'>();
   const [authChoice, setAuthChoice] = React.useState<'register' | 'login'>('register');
+  const [serviceEmail, setServiceEmail] = React.useState<string>();
 
   return <Page>
     <h1>Welcome</h1>
@@ -25,17 +26,33 @@ const WelcomePage: React.FunctionComponent = () => {
         <div className="button-column">
           <AsyncButton
             primary={false}
+            enabled={authMethod !== 'service' || serviceEmail === undefined}
             onClick={async () => {
-              setAuthMethod('service')
+              setAuthMethod('service');
+
+              if (serviceEmail !== undefined) {
+                return;
+              }
+
               const authResult = await appCtx.googleAuth();
 
-              console.log("Verified as", authResult.email);
+              if (!authResult.verified_email) {
+                throw new Error(`Verified google account but its email address is unverified.`)
+              }
+
+              setServiceEmail(authResult.email);
             }}
           >
             Continue with Google
           </AsyncButton>
-          <Button primary={false} onClick={() => setAuthMethod('password')}>
-            Use a Password
+          <Button
+            primary={false}
+            enabled={authMethod !== 'password'}
+            onClick={() => {
+              setAuthMethod('password');
+            }}
+          >
+            Use Email
           </Button>
         </div>
 
@@ -55,6 +72,12 @@ const WelcomePage: React.FunctionComponent = () => {
 
           {authChoice === 'login' ? <LoginForm/> : <RegistrationForm/>}
         </>}
+
+        {
+          authMethod === 'service' &&
+          serviceEmail !== undefined &&
+          <ServiceForm email={serviceEmail}/>
+        }
       </div>
     </div>
   </Page>;
@@ -213,26 +236,55 @@ function RegistrationForm() {
         </div>
       </div>
     </div>}
-    {validSentEmail && <div className="tos-notice">
+    {validSentEmail && <RegisterSegment
+      onClick={async () => {
+        await appCtx.register(email, passwd, verificationCode);
+      }}
+      enabled={
+        verificationCheck?.code === verificationCode &&
+        verificationCheck?.correct
+      }
+    />}
+  </>;
+}
+
+function ServiceForm({ email }: { email: string }) {
+  // const appCtx = React.useContext(ContentAppContext);
+
+  return <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <div style={{ marginTop: '2em' }}>
+      Hi {email}. We don't have an account for you yet. Would you like to
+      register one?
+    </div>
+    <RegisterSegment onClick={async () => {
+      // await appCtx.register(email, passwd, verificationCode);
+      throw new Error('Not implemented: register with service email');
+    }}/>
+  </div>;
+}
+
+function RegisterSegment({
+  onClick,
+  enabled = true,
+}: {
+  onClick: () => Promise<void>;
+  enabled?: boolean;
+}) {
+  const pageCtx = React.useContext(EloPageContext);
+
+  return <>
+    <div className="tos-notice">
       By clicking <b>Register</b> below, you are agreeing to Elo's&nbsp;
       <a onClick={() => {
         pageCtx.update({ dialog: <TermsAndConditionsDialog/> })
       }}>
         Terms and Conditions
       </a>.
-    </div>}
-    {validSentEmail && <div className="button-column" style={{ marginTop: '1em' }}>
-      <AsyncButton
-        onClick={async () => {
-          await appCtx.register(email, passwd, verificationCode);
-        }}
-        enabled={
-          verificationCheck?.code === verificationCode &&
-          verificationCheck?.correct
-        }
-      >
+    </div>
+    <div className="button-column" style={{ marginTop: '1em' }}>
+      <AsyncButton onClick={onClick} enabled={enabled}>
         Register
       </AsyncButton>
-    </div>}
+    </div>
   </>;
 }

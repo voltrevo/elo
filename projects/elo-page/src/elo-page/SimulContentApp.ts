@@ -1,6 +1,7 @@
 import delay from '../common-pure/delay';
 import { AnalysisFragment } from '../elo-types/Analysis';
 import Feedback from '../elo-types/Feedback';
+import config from './config';
 import Protocol, { ConnectionEvent, PromisishApi } from './Protocol';
 import UiState from './UiState';
 
@@ -52,9 +53,15 @@ export default class SimulContentApp implements PromisishApi<Protocol> {
     return "(Feedback response)";
   }
 
-  async googleAuth(): Promise<never> {
+  async googleAuth() {
     await delay(500);
-    throw new Error('Method not implemented.');
+
+    return {
+      issued_to: config.googleOauthClientId,
+      expires_in: 3599,
+      email: "alice@example.com",
+      verified_email: true,
+    };
   }
 
   async googleAuthLogout(): Promise<never> {
