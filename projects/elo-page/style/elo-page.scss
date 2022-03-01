@@ -298,6 +298,7 @@ body {
 
   .button {
     display: inline-block;
+    position: relative;
 
     > div {
       display: flex;
@@ -342,6 +343,32 @@ body {
         color: white;
         border: 1px solid transparent;
         filter: saturate(10%) brightness(100%);
+      }
+    }
+
+    &:hover {
+      .button-error-wrapper {
+        display: inherit;
+      }
+    }
+
+    .button-error-wrapper {
+      display: none;
+      color: red;
+      font-weight: 300;
+
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 0.5em);
+      transform: translateX(-50%);
+      width: 700px;
+
+
+      .button-error {
+        display: inline-block;
+        border-radius: 5px;
+        padding: 0.5em 1em;
+        background-color: hsl(0, 0, 95);
       }
     }
   }

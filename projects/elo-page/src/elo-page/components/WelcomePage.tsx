@@ -68,8 +68,6 @@ function LoginForm() {
   const [email, setEmail] = React.useState('');
   const [passwd, setPasswd] = React.useState('');
 
-  const [loginErrorMessage, setLoginErrorMessage] = React.useState<string>();
-
   return <>
     <div className="field">
       <div>Email</div>
@@ -91,22 +89,12 @@ function LoginForm() {
       <AsyncButton
         enabled={Boolean(email && passwd)}
         onClick={async () => {
-          setLoginErrorMessage(undefined);
-
-          try {
-            await appCtx.login(email, passwd);
-          } catch (error) {
-            setLoginErrorMessage((error as Error).message);
-            throw error;
-          }
+          await appCtx.login(email, passwd);
         }}
       >
         Log In
       </AsyncButton>
     </div>
-    {loginErrorMessage !== undefined && <div className="welcome-error">
-      {loginErrorMessage}
-    </div>}
   </>;
 }
 
@@ -125,8 +113,6 @@ function RegistrationForm() {
     code: string,
     correct: boolean,
   }>();
-
-  const [registerErrorMessage, setRegisterErrorMessage] = React.useState<string>();
 
   const validEmailAndPassword = Boolean(email && passwd && passwd === confirmPasswd);
   const validSentEmail = validEmailAndPassword && email === sentEmail;
@@ -238,12 +224,7 @@ function RegistrationForm() {
     {validSentEmail && <div className="button-column" style={{ marginTop: '1em' }}>
       <AsyncButton
         onClick={async () => {
-          try {
-            await appCtx.register(email, passwd, verificationCode);
-          } catch (error) {
-            setRegisterErrorMessage((error as Error).message);
-            throw error;
-          }
+          await appCtx.register(email, passwd, verificationCode);
         }}
         enabled={
           verificationCheck?.code === verificationCode &&
@@ -252,9 +233,6 @@ function RegistrationForm() {
       >
         Register
       </AsyncButton>
-    </div>}
-    {registerErrorMessage !== undefined && <div className="welcome-error">
-      {registerErrorMessage}
     </div>}
   </>;
 }
