@@ -174,7 +174,7 @@ body {
       .button-column {
         display: flex;
         flex-direction: column;
-        width: 300px;
+        width: 350px;
         align-self: center;
         gap: 1em;
         text-align: center;
@@ -314,12 +314,11 @@ body {
       border: 1px solid transparent;
     }
 
-    padding: 10px;
+    padding: 0.5em 1em;
     border-radius: 5px;
     user-select: none;
     cursor: pointer;
     font-weight: bold;
-    margin: 0 1em;
 
     &:active {
       filter: brightness(95%);
@@ -349,6 +348,10 @@ body {
 
   .button-row {
     text-align: center;
+
+    .button {
+      margin: 0 1em;
+    }
   }
 
   @keyframes rotating {
