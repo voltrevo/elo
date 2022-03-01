@@ -9,7 +9,7 @@ import Page from './Page';
 import BarSelector from './BarSelector';
 import ResendEmailDialog from './ResendEmailDialog';
 import switch_ from '../../common-pure/switch_';
-import { Spinner } from 'phosphor-react';
+import { Check, Spinner, X } from 'phosphor-react';
 
 const WelcomePage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ContentAppContext);
@@ -202,11 +202,11 @@ function RegistrationForm() {
               });
             }
           }}
-          style={{
-            backgroundColor: switch_(
+        />
+        <div className="field-icon">
+          <div className="vertical-helper">
+            {switch_<React.ReactNode>(
               [
-                [verificationCode.length === 0, ''],
-                [verificationCode.length < 6, 'lightyellow'],
                 [verificationCode.length === 6, switch_(
                   [
                     [
@@ -214,20 +214,17 @@ function RegistrationForm() {
                         verificationCheck?.email !== email ||
                         verificationCheck?.code !== verificationCode
                       ),
-                      'lightblue',
+                      <div className="spinner">
+                        <Spinner size={24}/>
+                      </div>,
                     ],
-                    [verificationCheck?.correct === true, 'lightgreen'],
+                    [verificationCheck?.correct === true, <Check size={24}/>],
                   ],
-                  'pink',
+                  <X size={24}/>,
                 )],
               ],
-              'pink',
-            ),
-          }}
-        />
-        <div className="field-icon">
-          <div className="vertical-helper">
-            <Spinner size={24}/>
+              <></>,
+            )}
           </div>
         </div>
       </div>

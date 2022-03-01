@@ -147,6 +147,7 @@ body {
             position: absolute;
             right: 0.7em;
             vertical-align: middle;
+            pointer-events: none;
 
             .vertical-helper {
               width: initial;
@@ -155,6 +156,10 @@ body {
               display: flex;
               flex-direction: column;
               justify-content: center;
+
+              .spinner {
+                width: initial;
+              }
             }
           }
         }
