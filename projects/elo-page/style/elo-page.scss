@@ -410,7 +410,18 @@ body {
       text-align: center;
       font-size: 1.5em;
       font-weight: 400;
+
+      &:first-child {
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+      }
+
+      &:last-child {
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+      }
     }
+
     border-collapse: collapse;
 
     .cell {
