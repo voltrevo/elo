@@ -162,6 +162,7 @@ function RegistrationForm() {
         key={validEmailAndPassword && email || ''}
         enabled={validEmailAndPassword}
         defaultResult={email === sentEmail ? 'success' : undefined}
+        primary={email !== sentEmail}
         onClick={async () => {
           if (email !== sentEmail) {
             await appCtx.sendVerificationEmail(email);
@@ -173,7 +174,7 @@ function RegistrationForm() {
           }
         }}
       >
-        Send verification email
+        Send Verification Email
       </AsyncButton>
     </div>
     {validSentEmail && <div className="field">

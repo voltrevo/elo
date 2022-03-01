@@ -39,7 +39,7 @@ const ResendEmailDialog: React.FunctionComponent<ResendEmailProps> = (props) => 
           await appCtx.sendVerificationEmail(props.sentEmail);
         }}
       >
-        Resend verification email
+        Resend Verification Email
       </AsyncButton>
     </div>
   </div>
