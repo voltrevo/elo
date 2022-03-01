@@ -114,7 +114,7 @@ body {
         flex-direction: row;
         margin-top: 1em;
 
-        div {
+        > div {
           width: 350px;
 
           &:first-child {
@@ -146,7 +146,6 @@ body {
 
           .field-icon {
             display: inline-block;
-            width: initial;
             height: 100%;
             position: absolute;
             right: 0.7em;
@@ -154,16 +153,11 @@ body {
             pointer-events: none;
 
             .vertical-helper {
-              width: initial;
               padding: 0;
               height: 100%;
               display: flex;
               flex-direction: column;
               justify-content: center;
-
-              .spinner {
-                width: initial;
-              }
             }
           }
         }

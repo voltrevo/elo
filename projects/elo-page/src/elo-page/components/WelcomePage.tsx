@@ -8,7 +8,7 @@ import Page from './Page';
 import BarSelector from './BarSelector';
 import ResendEmailDialog from './ResendEmailDialog';
 import switch_ from '../../common-pure/switch_';
-import { Check, Spinner, X } from 'phosphor-react';
+import { CheckCircle, Circle, CircleNotch, XCircle } from 'phosphor-react';
 import TermsAndConditionsDialog from './TermsAndConditionsDialog';
 
 const WelcomePage: React.FunctionComponent = () => {
@@ -211,15 +211,17 @@ function RegistrationForm() {
                         verificationCheck?.code !== verificationCode
                       ),
                       <div className="spinner">
-                        <Spinner size={24}/>
+                        <CircleNotch size={24}/>
                       </div>,
                     ],
-                    [verificationCheck?.correct === true, <Check size={24}/>],
+                    [verificationCheck?.correct === true, <CheckCircle size={24}/>],
                   ],
-                  <X size={24}/>,
+                  <XCircle size={24}/>,
                 )],
               ],
-              <></>,
+              <div style={{ fontSize: '1px', opacity: '0.3' }}>
+                <Circle size={24} />
+              </div>,
             )}
           </div>
         </div>
