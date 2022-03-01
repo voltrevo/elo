@@ -8,6 +8,8 @@ import Button from './Button';
 import Page from './Page';
 import BarSelector from './BarSelector';
 import ResendEmailDialog from './ResendEmailDialog';
+import switch_ from '../../common-pure/switch_';
+import { Spinner } from 'phosphor-react';
 
 const WelcomePage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ContentAppContext);
@@ -179,22 +181,58 @@ function RegistrationForm() {
         Send verification email
       </AsyncButton>
     </div>
-    {/*
-    <tr>
-      <td colSpan={2}>
-        <button
-          disabled={!(validEmailAndPassword && email !== sentEmail)}
-          onClick={() => {
-            setSentEmail(email);
-            appCtx.sendVerificationEmail(email);
-          }}
-        >
-          {email && email === sentEmail ? 'Sent' : 'Send verification email'}
-        </button>
+    {validSentEmail && <div className="field">
+      <div>Verification Code</div>
+      <div className="field-text-wrapper">
+        <input
+          type="text"
+          onInput={async (evt: React.ChangeEvent<HTMLInputElement>) => {
+            const newCode = evt.target.value;
+            setVerificationCode(newCode);
 
-        {validSentEmail && <button>Resend</button>}
-      </td>
-    </tr>
+            if (newCode.length === 6) {
+              const currentEmail = email;
+              const currentCode = newCode;
+              const correct = await appCtx.checkVerificationEmail(email, newCode);
+
+              setVerificationCheck({
+                email: currentEmail,
+                code: currentCode,
+                correct,
+              });
+            }
+          }}
+          style={{
+            backgroundColor: switch_(
+              [
+                [verificationCode.length === 0, ''],
+                [verificationCode.length < 6, 'lightyellow'],
+                [verificationCode.length === 6, switch_(
+                  [
+                    [
+                      (
+                        verificationCheck?.email !== email ||
+                        verificationCheck?.code !== verificationCode
+                      ),
+                      'lightblue',
+                    ],
+                    [verificationCheck?.correct === true, 'lightgreen'],
+                  ],
+                  'pink',
+                )],
+              ],
+              'pink',
+            ),
+          }}
+        />
+        <div className="field-icon">
+          <div className="vertical-helper">
+            <Spinner size={24}/>
+          </div>
+        </div>
+      </div>
+    </div>}
+    {/*
     {validSentEmail && <tr>
       <td>Verification code</td>
       <td>

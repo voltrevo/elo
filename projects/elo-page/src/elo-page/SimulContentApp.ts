@@ -33,8 +33,9 @@ export default class SimulContentApp implements PromisishApi<Protocol> {
     await delay(500);
   }
 
-  checkVerificationEmail(email: string, code: string): boolean | Promise<boolean> {
-    throw new Error('Method not implemented.');
+  async checkVerificationEmail(email: string, code: string): Promise<boolean> {
+    await delay(500);
+    return code === '123456';
   }
 
   register(email: string, password: string, code: string): void | Promise<void> {
