@@ -3,7 +3,7 @@ import * as React from 'react';
 import delay from '../../common-pure/delay';
 import ContentAppContext from '../ContentAppContext';
 import EloPageContext from '../EloPageContext';
-import RowSelector from './RowSelector';
+import BarSelector from './BarSelector';
 
 const FeedbackPage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ContentAppContext);
@@ -51,11 +51,11 @@ const FeedbackPage: React.FunctionComponent = () => {
       Thanks for taking a moment to do this. It means a lot to us.
     </div>
 
-    <div className="question">
+    <div className="question emoji">
       <div>
         How do you feel about Elo in this moment?
       </div>
-      <RowSelector
+      <BarSelector
         options={emojis}
         onSelect={emoji => setSentiment(emoji)}
       />
@@ -76,7 +76,7 @@ const FeedbackPage: React.FunctionComponent = () => {
       <div>
         Would you like to be anonymous?
       </div>
-      <RowSelector
+      <BarSelector
         options={['No', 'Yes']}
         default_={{
           value: 'No',
@@ -96,7 +96,7 @@ const FeedbackPage: React.FunctionComponent = () => {
       <div>
         Are you interested in an email reply?
       </div>
-      <RowSelector
+      <BarSelector
         options={['No', 'Yes']}
         default_={{
           value: 'No',
