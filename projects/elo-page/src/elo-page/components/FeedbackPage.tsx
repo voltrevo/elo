@@ -5,6 +5,7 @@ import ContentAppContext from '../ContentAppContext';
 import EloPageContext from '../EloPageContext';
 import AsyncButton from './AsyncButton';
 import BarSelector from './BarSelector';
+import Button from './Button';
 
 const FeedbackPage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ContentAppContext);
@@ -27,8 +28,7 @@ const FeedbackPage: React.FunctionComponent = () => {
       <div className="result">
         <div>{autoReply}</div>
         <div className="footer">
-          <div
-            className="button"
+          <Button
             onClick={() => {
               const page = (pageCtx.config.featureFlags.authEnabled
                 ? 'WelcomePage'
@@ -39,7 +39,7 @@ const FeedbackPage: React.FunctionComponent = () => {
             }}
           >
             Close
-          </div>
+          </Button>
         </div>
       </div>
     </div>;
