@@ -5,6 +5,7 @@ import Button from './Button';
 
 type Props = {
   enabled?: boolean;
+  primary?: boolean;
   onClick: () => Promise<void>;
   defaultResult?: 'success' | 'error';
 };
@@ -15,6 +16,7 @@ const AsyncButton: react.FunctionComponent<Props> = (props) => {
 
   return <Button
     enabled={!loading && props.enabled}
+    primary={props.primary}
     onClick={async () => {
       setLoading(true);
 

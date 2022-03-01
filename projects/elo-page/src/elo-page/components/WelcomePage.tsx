@@ -10,36 +10,48 @@ import BarSelector from './BarSelector';
 
 const WelcomePage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ContentAppContext);
+  const [authMethod, setAuthMethod] = React.useState<'service' | 'password'>('service');
   const [authChoice, setAuthChoice] = React.useState<'register' | 'login'>('register');
 
   return <Page>
     <h1>Welcome</h1>
 
     <div className="welcome-container">
-      {/* <AsyncButton onClick={async () => {
-        const authResult = await appCtx.googleAuth();
-
-        console.log("Verified as", authResult.email);
-      }}>Google Auth</AsyncButton>
-      <AsyncButton onClick={async () => {
-        await appCtx.googleAuthLogout();
-        console.log('Logged out');
-      }}>Google Auth Logout</AsyncButton> */}
+      <p>It looks like you're new here. You'll need an account to get started.</p>
       <div className="welcome-form">
-        <BarSelector
-          options={['register', 'login']}
-          displayMap={{
-            register: 'Register',
-            login: 'Log In',
-          }}
-          default_={{
-            value: 'register',
-            allowNoSelection: false,
-          }}
-          onSelect={(selection) => setAuthChoice(selection as any)}
-        />
+        <div className="button-column">
+          <AsyncButton
+            primary={false}
+            onClick={async () => {
+              setAuthMethod('service')
+              const authResult = await appCtx.googleAuth();
 
-        {authChoice === 'login' ? <LoginForm/> : <RegistrationForm/>}
+              console.log("Verified as", authResult.email);
+            }}
+          >
+            Continue with Google
+          </AsyncButton>
+          <Button primary={false} onClick={() => setAuthMethod('password')}>
+            Use a Password
+          </Button>
+        </div>
+
+        {authMethod === 'password' &&  <>
+          <BarSelector
+            options={['register', 'login']}
+            displayMap={{
+              register: 'Register',
+              login: 'Log In',
+            }}
+            default_={{
+              value: 'register',
+              allowNoSelection: false,
+            }}
+            onSelect={(selection) => setAuthChoice(selection as any)}
+          />
+
+          {authChoice === 'login' ? <LoginForm/> : <RegistrationForm/>}
+        </>}
       </div>
     </div>
   </Page>;

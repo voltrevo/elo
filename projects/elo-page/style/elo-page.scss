@@ -127,10 +127,30 @@ body {
       }
 
       .button-row {
-        margin-top: 1.5em;
+        &:not(:first-child) {
+          margin-top: 1.5em;
+        }
+
         margin-bottom: 1.5em;
 
         text-align: center;
+      }
+
+      .button-column {
+        display: flex;
+        flex-direction: column;
+        width: 300px;
+        align-self: center;
+        gap: 1em;
+        text-align: center;
+
+        div {
+          justify-content: center;
+        }
+      }
+
+      .bar-selector:not(:first-child) {
+        margin-top: 1.5em;
       }
     }
   }
@@ -239,8 +259,14 @@ body {
       gap: 5px;
     }
 
-    background-color: $second-accent;
-    color: white;
+    border: 1px solid black;
+
+    &.primary {
+      background-color: $second-accent;
+      color: white;
+      border: none;
+    }
+
     padding: 10px;
     border-radius: 5px;
     user-select: none;
@@ -250,11 +276,22 @@ body {
 
     &:active {
       filter: brightness(90%);
+
+      &.disabled {
+        filter: none;
+      }
     }
 
     &.disabled {
-      background-color: $second-accent-light;
-      filter: saturate(10%) brightness(100%);
+      background-color: hsl(0, 0, 95);
+      color: grey;
+      border: 1px solid grey;
+
+      &.primary {
+        background-color: $second-accent-light;
+        color: white;
+        filter: saturate(10%) brightness(100%);
+      }
     }
   }
 
