@@ -358,6 +358,38 @@ body {
     }
   }
 
+  .bar-selector {
+    display: flex;
+    flex-direction: row;
+
+    > div {
+      flex-grow: 1;
+      flex-basis: 0;
+      text-align: center;
+      font-size: 1.5em;
+      font-weight: 400;
+    }
+    border-collapse: collapse;
+
+    .cell {
+      border: 1px solid hsla(0, 0, 50, 0.2);
+
+      &:first-child {
+        border-right: none;
+      }
+
+      transition: all 200ms;
+      cursor: pointer;
+      padding: 5px;
+      user-select: none;
+
+      &.selected {
+        background-color: $second-accent;
+        color: white;
+      }
+    }
+  }
+
   .feedback {
     background-color: white;
     height: 100%;

@@ -6,7 +6,7 @@ import EloPageContext from '../EloPageContext';
 import AsyncButton from './AsyncButton';
 import Button from './Button';
 import Page from './Page';
-import RowSelector from './RowSelector';
+import BarSelector from './BarSelector';
 
 const WelcomePage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ContentAppContext);
@@ -16,7 +16,7 @@ const WelcomePage: React.FunctionComponent = () => {
     <h1>Welcome</h1>
 
     <div className="welcome-container">
-      <AsyncButton onClick={async () => {
+      {/* <AsyncButton onClick={async () => {
         const authResult = await appCtx.googleAuth();
 
         console.log("Verified as", authResult.email);
@@ -24,9 +24,9 @@ const WelcomePage: React.FunctionComponent = () => {
       <AsyncButton onClick={async () => {
         await appCtx.googleAuthLogout();
         console.log('Logged out');
-      }}>Google Auth Logout</AsyncButton>
+      }}>Google Auth Logout</AsyncButton> */}
       <div className="welcome-form">
-        <RowSelector
+        <BarSelector
           options={['register', 'login']}
           displayMap={{
             register: 'Register',
