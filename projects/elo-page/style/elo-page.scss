@@ -114,7 +114,7 @@ body {
           width: 300px;
 
           &:first-child {
-            padding: 0.5em;
+            padding: 0.5em 0;
           }
         }
 
@@ -191,9 +191,14 @@ body {
       }
     }
 
-    .login-error {
+    .welcome-error {
       text-align: center;
       color: red;
+    }
+
+    .tos-notice {
+      text-align: center;
+      margin-top: 1.5em;
     }
   }
 
@@ -205,6 +210,7 @@ body {
   a {
     text-decoration: none;
     color: $other-disfluent-fgcolor;
+    cursor: pointer;
 
     :visited {
       color: $other-disfluent-fgcolor;
@@ -555,6 +561,22 @@ body {
     padding: 20px;
     font-size: 1em;
     
+    h1 {
+      text-align: center;
+    }
+
+    .button-row {
+      margin-top: 2.5em;
+    }
+  }
+
+  .terms-and-conditions-dialog {
+    background-color: white;
+    width: 700px;
+    border-radius: 5px;
+    padding: 20px;
+    font-size: 1em;
+
     h1 {
       text-align: center;
     }

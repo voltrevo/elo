@@ -10,6 +10,7 @@ import BarSelector from './BarSelector';
 import ResendEmailDialog from './ResendEmailDialog';
 import switch_ from '../../common-pure/switch_';
 import { Check, Spinner, X } from 'phosphor-react';
+import TermsAndConditionsDialog from './TermsAndConditionsDialog';
 
 const WelcomePage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ContentAppContext);
@@ -104,7 +105,7 @@ function LoginForm() {
         Log In
       </AsyncButton>
     </div>
-    {loginErrorMessage !== undefined && <div className="login-error">
+    {loginErrorMessage !== undefined && <div className="welcome-error">
       {loginErrorMessage}
     </div>}
   </>;
@@ -126,12 +127,7 @@ function RegistrationForm() {
     correct: boolean,
   }>();
 
-  type RegisterResult = {
-    success: boolean;
-    message?: string;
-  };
-
-  const [registerState, setRegisterState] = React.useState<'loading' | RegisterResult>();
+  const [registerErrorMessage, setRegisterErrorMessage] = React.useState<string>();
 
   const validEmailAndPassword = Boolean(email && passwd && passwd === confirmPasswd);
   const validSentEmail = validEmailAndPassword && email === sentEmail;
@@ -229,104 +225,34 @@ function RegistrationForm() {
         </div>
       </div>
     </div>}
-    {/*
-    {validSentEmail && <tr>
-      <td>Verification code</td>
-      <td>
-        <input
-          type="text"
-          value={verificationCode}
-          onInput={async (evt: React.ChangeEvent<HTMLInputElement>) => {
-            const newCode = evt.target.value;
-            setVerificationCode(newCode);
-
-            if (newCode.length === 6) {
-              const currentEmail = email;
-              const currentCode = newCode;
-              const correct = await appCtx.checkVerificationEmail(email, newCode);
-
-              setVerificationCheck({
-                email: currentEmail,
-                code: currentCode,
-                correct,
-              });
-            }
-          }}
-          style={{
-            backgroundColor: switch_(
-              [
-                [verificationCode.length === 0, ''],
-                [verificationCode.length < 6, 'lightyellow'],
-                [verificationCode.length === 6, switch_(
-                  [
-                    [
-                      (
-                        verificationCheck?.email !== email ||
-                        verificationCheck?.code !== verificationCode
-                      ),
-                      'lightblue',
-                    ],
-                    [verificationCheck?.correct === true, 'lightgreen'],
-                  ],
-                  'pink',
-                )],
-              ],
-              'pink',
-            ),
-          }}
-        />
-      </td>
-    </tr>}
-    {validSentEmail && <tr>
-      <td>
-        <button
-          disabled={!(
-            verificationCheck?.code === verificationCode &&
-            verificationCheck?.correct &&
-            registerState !== 'loading' &&
-            !registerState?.success
-          )}
-          onClick={async () => {
-            setRegisterState('loading');
-
-            let success: RegisterResult['success'];
-            let message: RegisterResult['message'];
-
-            try {
-              await appCtx.register(email, passwd, verificationCode);
-              success = true;
-              message = undefined;
-            } catch (error) {
-              success = false;
-              message = (error as Error).message;
-            }
-
-            setRegisterState({ success, message });
-          }}
-        >
-          Register
-        </button>
-      </td>
-      <td>
-        {(() => {
-          if (registerState === undefined) {
-            return undefined;
+    {validSentEmail && <div className="tos-notice">
+      By clicking <b>Register</b> below, you are agreeing to Elo's&nbsp;
+      <a onClick={() => {
+        pageCtx.update({ dialog: <TermsAndConditionsDialog/> })
+      }}>
+        Terms and Conditions
+      </a>.
+    </div>}
+    {validSentEmail && <div className="button-column" style={{ marginTop: '1em' }}>
+      <AsyncButton
+        onClick={async () => {
+          try {
+            await appCtx.register(email, passwd, verificationCode);
+          } catch (error) {
+            setRegisterErrorMessage((error as Error).message);
+            throw error;
           }
-
-          if (registerState === 'loading') {
-            return <>Loading...</>;
-          }
-
-          return <>{registerState.success ? '✅' : '❌'}</>;
-        })()}
-      </td>
-    </tr>}
-    {registerState !== 'loading' && registerState?.message !== undefined && <tr>
-      <td colSpan={2}>
-        <p style={{ color: registerState?.success ? '' : 'red' }}>
-          {registerState.message}
-        </p>
-      </td>
-    </tr>} */}
+        }}
+        enabled={
+          verificationCheck?.code === verificationCode &&
+          verificationCheck?.correct
+        }
+      >
+        Register
+      </AsyncButton>
+    </div>}
+    {registerErrorMessage !== undefined && <div className="welcome-error">
+      {registerErrorMessage}
+    </div>}
   </>;
 }
