@@ -15,7 +15,6 @@ const TermsAndConditionsDialog: React.FunctionComponent = () => {
 
     <div className="button-row">
       <Button
-        primary={false}
         onClick={() => pageCtx.update({ dialog: undefined })}
       >
         Close

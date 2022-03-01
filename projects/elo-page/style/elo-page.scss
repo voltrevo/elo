@@ -84,6 +84,10 @@ body {
 
         &:active {
           filter: brightness(95%);
+
+          &.selected {
+            filter: none;
+          }
         }
       }
     }
@@ -308,6 +312,7 @@ body {
     }
 
     border: 1px solid black;
+    background-color: white;
 
     &.primary {
       background-color: $second-accent;
@@ -323,7 +328,11 @@ body {
     margin: 0 1em;
 
     &:active {
-      filter: brightness(90%);
+      filter: brightness(95%);
+
+      &.primary {
+        filter: brightness(90%);
+      }
 
       &.disabled {
         filter: none;
@@ -436,7 +445,6 @@ body {
     }
 
     .cell {
-      transition: all 200ms;
       cursor: pointer;
       border-radius: 5px;
       padding: 5px;
@@ -479,14 +487,23 @@ body {
         border-right: none;
       }
 
-      transition: all 200ms;
       cursor: pointer;
       padding: 5px;
       user-select: none;
+      background-color: white;
 
       &.selected {
         background-color: $second-accent;
+
         color: white;
+      }
+
+      &:active {
+        filter: brightness(95%);
+
+        &.selected {
+          filter: none;
+        }
       }
     }
   }
