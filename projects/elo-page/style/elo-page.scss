@@ -93,7 +93,7 @@ body {
 
     .welcome-form {
       display: flex;
-      max-width: 550px;
+      max-width: 600px;
       flex-direction: column;
       margin-left: auto;
       margin-right: auto;
@@ -110,13 +110,10 @@ body {
         margin-top: 1em;
 
         div {
-          &:first-child {
-            width: 250px;
-            padding: 0.5em;
-          }
+          width: 300px;
 
-          &:not(:first-child) {
-            width: 300px;
+          &:first-child {
+            padding: 0.5em;
           }
         }
 
