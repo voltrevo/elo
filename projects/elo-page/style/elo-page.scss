@@ -349,7 +349,7 @@ body {
 
     &:hover {
       .button-error-wrapper {
-        display: inherit;
+        display: block;
       }
     }
 
@@ -357,13 +357,13 @@ body {
       display: none;
       color: red;
       font-weight: 300;
+      text-align: center;
 
       position: absolute;
       left: 50%;
       bottom: calc(100% + 0.5em);
       transform: translateX(-50%);
       width: 700px;
-
 
       .button-error {
         display: inline-block;

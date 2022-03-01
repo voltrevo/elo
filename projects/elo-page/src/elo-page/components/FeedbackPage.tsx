@@ -3,6 +3,7 @@ import * as React from 'react';
 import delay from '../../common-pure/delay';
 import ContentAppContext from '../ContentAppContext';
 import EloPageContext from '../EloPageContext';
+import AsyncButton from './AsyncButton';
 import BarSelector from './BarSelector';
 
 const FeedbackPage: React.FunctionComponent = () => {
@@ -116,55 +117,23 @@ const FeedbackPage: React.FunctionComponent = () => {
     </div>}
 
     <div className="footer">
-      <div style={{ display: 'inline-block' }}>
-        <div
-          className="button"
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            gap: '5px',
-          }}
-          onClick={async () => {
-            if (submitState === 'loading') {
-              return;
-            }
+      <AsyncButton onClick={async () => {
+        const sendFeedbackResult = await appCtx.sendFeedback({
+          sentiment,
+          positive: positiveEmojis.includes(sentiment ?? ''),
+          negative: negativeEmojis.includes(sentiment ?? ''),
+          message: message || undefined,
+          anonymous,
+          emailInterest: !anonymous && emailInterest,
+          email: anonymous ? undefined : email,
+        });
 
-            setSubmitState('loading');
-
-            try {
-              const sendFeedbackResult = await appCtx.sendFeedback({
-                sentiment,
-                positive: positiveEmojis.includes(sentiment ?? ''),
-                negative: negativeEmojis.includes(sentiment ?? ''),
-                message: message || undefined,
-                anonymous,
-                emailInterest: !anonymous && emailInterest,
-                email: anonymous ? undefined : email,
-              });
-
-              setSubmitState('success');
-
-              await delay(500);
-
-              setAutoReply(sendFeedbackResult);
-            } catch (error) {
-              setSubmitState(error as Error);
-            }
-          }}
-        >
-          <div>Submit</div>
-          {submitState === 'loading' && <div className="spinner">
-            <Spinner size={24} />
-          </div>}
-          {submitState === 'success' && <div style={{ fontSize: '1px' }}>
-            <Check size={24} />
-          </div>}
-        </div>
-      </div>
-
-      <div>
-        {submitState instanceof Error && <div className='error'>{submitState.message}</div>}
-      </div>
+        delay(500).then(() => {
+          setAutoReply(sendFeedbackResult);
+        });
+      }}>
+        Submit
+      </AsyncButton>
     </div>
   </div>;
 };
