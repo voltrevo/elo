@@ -159,10 +159,10 @@ function RegistrationForm() {
         />
       </div>
     </div>
-    <div className="button-row">
+    <div className="button-column" style={{ marginTop: '1em' }}>
       <AsyncButton
         key={validEmailAndPassword && email || ''}
-        enabled={validEmailAndPassword && email !== sentEmail}
+        enabled={validEmailAndPassword}
         defaultResult={email === sentEmail ? 'success' : undefined}
         onClick={async () => {
           // appCtx.sendVerificationEmail(email);
@@ -172,13 +172,6 @@ function RegistrationForm() {
       >
         Send verification email
       </AsyncButton>
-      {validSentEmail && <Button
-        onClick={() => {
-          pageCtx.update({ dialog: 'ResendEmailDialog' });
-        }}
-      >
-        Resend?
-      </Button>}
     </div>
     {/*
     <tr>
