@@ -65,79 +65,46 @@ function LoginForm() {
   const [email, setEmail] = React.useState('');
   const [passwd, setPasswd] = React.useState('');
 
-  type LoginResult = {
-    success: boolean;
-    message?: string;
-  };
+  const [loginErrorMessage, setLoginErrorMessage] = React.useState<string>();
 
-  const [loginState, setLoginState] = React.useState<'loading' | LoginResult>();
-
-  return <table>
-    <tr>
-      <td>Email</td>
-      <td>
-        <input
-          type="text"
-          onInput={(evt: React.ChangeEvent<HTMLInputElement>) => setEmail(evt.target.value)}
-        />
-      </td>
-    </tr>
-    <tr>
-      <td>Password</td>
-      <td>
+  return <>
+    <div className="field">
+      <div>Email</div>
+      <div><input
+        type="text"
+        onInput={(evt: React.ChangeEvent<HTMLInputElement>) => setEmail(evt.target.value)}
+      /></div>
+    </div>
+    <div className="field">
+      <div>Password</div>
+      <div>
         <input
           type="password"
           onInput={(evt: React.ChangeEvent<HTMLInputElement>) => setPasswd(evt.target.value)}
         />
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <button
-          disabled={!(email && passwd && loginState !== 'loading' && (!loginState?.success))}
-          onClick={async () => {
-            setLoginState('loading');
+      </div>
+    </div>
+    <div className="button-column" style={{ marginTop: '1em' }}>
+      <AsyncButton
+        enabled={Boolean(email && passwd)}
+        onClick={async () => {
+          setLoginErrorMessage(undefined);
 
-            let success: LoginResult['success'];
-            let message: LoginResult['message'];
-
-            try {
-              await appCtx.login(email, passwd);
-              success = true;
-              message = undefined;
-            } catch (error) {
-              success = false;
-              message = (error as Error).message;
-            }
-
-            setLoginState({ success, message });
-          }}
-        >
-          Log In
-        </button>
-      </td>
-      <td>
-        {(() => {
-          if (loginState === undefined) {
-            return undefined;
+          try {
+            await appCtx.login(email, passwd);
+          } catch (error) {
+            setLoginErrorMessage((error as Error).message);
+            throw error;
           }
-
-          if (loginState === 'loading') {
-            return <>Loading...</>;
-          }
-
-          return <>{loginState.success ? '✅' : '❌'}</>;
-        })()}
-      </td>
-    </tr>
-    {loginState !== 'loading' && loginState?.message !== undefined && <tr>
-      <td colSpan={2}>
-        <p style={{ color: loginState?.success ? '' : 'red' }}>
-          {loginState.message}
-        </p>
-      </td>
-    </tr>}
-  </table>;
+        }}
+      >
+        Log In
+      </AsyncButton>
+    </div>
+    {loginErrorMessage !== undefined && <div className="login-error">
+      {loginErrorMessage}
+    </div>}
+  </>;
 }
 
 function RegistrationForm() {
