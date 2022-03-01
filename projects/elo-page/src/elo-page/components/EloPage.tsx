@@ -10,7 +10,7 @@ import ReportPrototype from './ReportPrototype';
 
 const EloPage: React.FunctionComponent = () => {
   const page = useEloPageContext(state => state.page);
-  // const dialog = useEloPageContext(state => state.dialog);
+  const dialog = useEloPageContext(state => state.dialog);
 
   const pageElement = (() => {
     if (page === 'WelcomePage') {
@@ -32,14 +32,6 @@ const EloPage: React.FunctionComponent = () => {
     return <>Page not found: "{page}"</>;
   })();
 
-  const dialogElement = (() => {
-    // if (dialog === 'FeedbackPage') {
-    //   return <FeedbackPage />;
-    // }
-
-    return undefined;
-  })();
-
   return <div className="elo-page">
     <div className="main">
       <Nav/>
@@ -47,7 +39,7 @@ const EloPage: React.FunctionComponent = () => {
         {pageElement}
       </div>
     </div>
-    {dialogElement && <Dialog>{dialogElement}</Dialog>}
+    {dialog && <Dialog>{dialog}</Dialog>}
   </div>;
 };
 

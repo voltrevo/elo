@@ -11,7 +11,7 @@ type EloPageContext = ReturnType<typeof initEloPageContext>;
 export function initEloPageContext(storage: Storage, config: Config) {
   const state = {
     page: '',
-    dialog: '',
+    dialog: undefined as (React.ReactNode | undefined),
     test: 37,
     needsAuth: false,
   };

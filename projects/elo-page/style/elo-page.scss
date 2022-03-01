@@ -6,11 +6,13 @@ body {
 }
 
 .elo-page {
+  font-size: 18px;
+  width: 100vw;
+  height: 100vh;
+
   * {
     box-sizing: border-box;
   }
-
-  height: 100%;
 
   .main {
     display: flex;
@@ -23,7 +25,6 @@ body {
 
   font-family: 'Source Sans Pro', sans-serif;
   font-weight: 300;
-  font-size: 1.5em;
 
   .nav {
     min-width: 220px;
@@ -139,8 +140,6 @@ body {
         }
 
         margin-bottom: 1.5em;
-
-        text-align: center;
       }
 
       .button-column {
@@ -306,6 +305,10 @@ body {
         filter: saturate(10%) brightness(100%);
       }
     }
+  }
+
+  .button-row {
+    text-align: center;
   }
 
   @keyframes rotating {
@@ -499,6 +502,34 @@ body {
       top: 30%;
       left: 50%;
       transform: translate(-50%, -50%);
+    }
+  }
+
+  &.dialog {
+    width: initial;
+    height: initial;
+    outline: 0;
+    position: absolute;
+    left: calc(110px + 50vw);
+    top: 50px;
+    transform: translate(-50%, 0);
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+
+  .resend-email-dialog {
+    background-color: white;
+    width: 700px;
+    border-radius: 5px;
+    padding: 20px;
+    font-size: 1em;
+    
+    h1 {
+      text-align: center;
+    }
+
+    .button-row {
+      margin-top: 2.5em;
     }
   }
 }

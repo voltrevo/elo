@@ -63,9 +63,6 @@ const rawStorage: IRawStorage = {
 
 window.addEventListener('load', async () => {
   const appDiv = document.createElement('div');
-  appDiv.style.fontSize = '12px'; // This is the default in extensions (?)
-  appDiv.style.width = '100vw';
-  appDiv.style.height = '100vh';
   document.body.appendChild(appDiv);
 
   const eloClient = makeLocalContentAppClient(new SimulContentApp());

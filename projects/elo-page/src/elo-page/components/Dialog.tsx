@@ -10,15 +10,7 @@ const Dialog: React.FunctionComponent = ({ children }) => {
     open={true}
     onClose={() => { pageCtx.update({ dialog: '' }); }}
   >
-    <div className="elo-page" style={{
-      outline: 0,
-      position: 'absolute',
-      left: '50%',
-      top: '50px',
-      transform: 'translate(-50%, 0)',
-      maxHeight: 'calc(100vh - 100px)',
-      overflowY: 'auto',
-    }}>
+    <div className="elo-page dialog">
       {children}
     </div>
   </Modal>;

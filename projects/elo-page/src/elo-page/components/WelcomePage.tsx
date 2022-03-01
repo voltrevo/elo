@@ -7,6 +7,7 @@ import AsyncButton from './AsyncButton';
 import Button from './Button';
 import Page from './Page';
 import BarSelector from './BarSelector';
+import ResendEmailDialog from './ResendEmailDialog';
 
 const WelcomePage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ContentAppContext);
@@ -165,9 +166,14 @@ function RegistrationForm() {
         enabled={validEmailAndPassword}
         defaultResult={email === sentEmail ? 'success' : undefined}
         onClick={async () => {
-          // appCtx.sendVerificationEmail(email);
-          await delay(500);
-          setSentEmail(email);
+          if (email !== sentEmail) {
+            await appCtx.sendVerificationEmail(email);
+            setSentEmail(email);
+          } else {
+            pageCtx.update({
+              dialog: <ResendEmailDialog sentEmail={sentEmail}/>,
+            });
+          }
         }}
       >
         Send verification email
