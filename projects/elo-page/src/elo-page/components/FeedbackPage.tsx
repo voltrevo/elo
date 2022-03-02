@@ -30,7 +30,12 @@ const FeedbackPage: React.FunctionComponent = () => {
         <div className="footer">
           <Button
             onClick={() => {
-              const page = (pageCtx.config.featureFlags.authEnabled
+              const needsAuth = (
+                pageCtx.config.featureFlags.authEnabled &&
+                email === undefined
+              );
+
+              const page = (needsAuth
                 ? 'WelcomePage'
                 : 'OverviewPage'
               );
