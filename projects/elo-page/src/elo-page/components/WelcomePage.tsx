@@ -15,7 +15,9 @@ import Section from './Section';
 import Field from './Field';
 
 const WelcomePage: React.FunctionComponent = () => {
+  const pageCtx = React.useContext(EloPageContext);
   const appCtx = React.useContext(ContentAppContext);
+
   const [authMethod, setAuthMethod] = React.useState<'service' | 'password'>();
   const [authChoice, setAuthChoice] = React.useState<'register' | 'login'>('register');
   const [serviceEmail, setServiceEmail] = React.useState<string>();
@@ -30,7 +32,7 @@ const WelcomePage: React.FunctionComponent = () => {
       <div className="button-column">
         <AsyncButton
           primary={false}
-          enabled={authMethod !== 'service' || serviceEmail === undefined}
+          enabled={authMethod !== 'service' || googleAccessToken === ''}
           onClick={async () => {
             setAuthMethod('service');
 
@@ -44,8 +46,14 @@ const WelcomePage: React.FunctionComponent = () => {
               throw new Error(`Verified google account but its email address is unverified.`);
             }
 
-            setServiceEmail(authResult.detail.email);
             setGoogleAccessToken(authResult.token);
+
+            if (authResult.registered) {
+              await appCtx.login({ googleAccessToken: authResult.token });
+              proceed(pageCtx);
+            } else {
+              setServiceEmail(authResult.detail.email);
+            }
           }}
         >
           Continue with Google
@@ -98,7 +106,6 @@ function LoginForm() {
 
   const [email, setEmail] = React.useState('');
   const [passwd, setPasswd] = React.useState('');
-  const [done, setDone] = React.useState(false);
 
   return <>
     <Section>
@@ -118,10 +125,10 @@ function LoginForm() {
       </Field>
       <div className="button-column">
         <AsyncButton
-          enabled={Boolean(email && passwd && !done)}
+          once={true}
+          enabled={Boolean(email && passwd)}
           onClick={async () => {
             await appCtx.login({ email, password: passwd });
-            setDone(true);
             proceed(pageCtx);
           }}
         >
@@ -283,7 +290,6 @@ function RegisterSegment({
   enabled?: boolean;
 }) {
   const pageCtx = React.useContext(EloPageContext);
-  const [done, setDone] = React.useState(false);
 
   return <Section>
     <div className="tos-notice">
@@ -296,12 +302,12 @@ function RegisterSegment({
     </div>
     <div className="button-column">
       <AsyncButton
+        once={true}
         onClick={async () => {
           await onClick();
-          setDone(true);
           proceed(pageCtx);
         }}
-        enabled={enabled && !done}
+        enabled={enabled}
       >
         Register
       </AsyncButton>

@@ -128,6 +128,27 @@ body {
       font-size: 0.75em;
     }
 
+    textarea, input[type=text] {
+      width: 100%;
+      outline: none;
+      padding: 1em;
+      font-family: 'Source Sans Pro', sans-serif;
+      font-size: 1em;
+      font-weight: 300;
+
+      border: 1px solid hsl(0, 0, 70);
+
+      &:focus {
+        border: 1px solid black;
+      }
+
+      border-radius: 5px;
+    }
+
+    textarea {
+      height: 5em;
+    }
+
     .field {
       font-size: 1.5em;
       display: flex;
@@ -535,83 +556,17 @@ body {
     }
   }
 
-  .feedback {
-    background-color: white;
-    height: 100%;
-    max-width: 700px;
-    border-radius: 5px;
-    padding: 20px;
-    font-size: 1em;
-    margin-left: auto;
-    margin-right: auto;
-    position: relative;
-
+  .feedback-page {
     .question {
-      margin-top: 20px;
-
-      &.emoji {
-        .bar-selector {
-          font-size: 2em;
-        }
-      }
-
-      textarea {
-        width: 100%;
-        outline: none;
-        height: 5em;
-        padding: 1em;
-        margin: 10px 0;
-        font-family: 'Source Sans Pro', sans-serif;
-        font-size: 1em;
-        font-weight: 300;
-
-        border: 1px solid hsl(0, 0, 70);
-
-        &:focus {
-          border: 1px solid black;
-        }
-
-        border-radius: 5px;
-      }
-
-      input[type=text] {
-        padding: 1em;
-        outline: none;
-        font-family: 'Source Sans Pro', sans-serif;
-        font-size: 1em;
-        font-weight: 300;
-        margin: 10px 0;
-
-        border: 1px solid hsl(0, 0, 70);
-
-        &:focus {
-          border: 1px solid black;
-        }
-
-        border-radius: 5px;
-      }
+      margin-bottom: 0.3em;
     }
 
-    .bar-selector {
-      margin-top: 10px;
-      font-size: 1.5em;
+    .section {
+      gap: 1.5em;
     }
 
-    .footer {
-      margin-top: 50px;
-      text-align: center;
-    }
-
-    .error {
-      color: red;
-    }
-
-    .result {
-      text-align: center;
-      position: absolute;
-      top: 30%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+    .bar-selector.emojis {
+      font-size: 2em;
     }
   }
 

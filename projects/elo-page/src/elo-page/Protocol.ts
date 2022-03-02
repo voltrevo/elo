@@ -8,6 +8,7 @@ import UiState from './UiState';
 
 export const GoogleAuthResult = io.type({
   token: io.string,
+  registered: io.boolean,
   detail: io.type({
     issued_to: io.string,
     expires_in: io.number,

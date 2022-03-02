@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 type Props = {
+  classes?: string[];
   options: string[];
   displayMap?: Record<string, string>;
   default_?: {
@@ -12,6 +13,7 @@ type Props = {
 
 const BarSelector: React.FunctionComponent<Props> = (
   {
+    classes = [],
     options,
     displayMap = {},
     default_,
@@ -29,7 +31,7 @@ const BarSelector: React.FunctionComponent<Props> = (
     doSelect(selection);
   }, []);
 
-  return <div className="bar-selector">
+  return <div className={['bar-selector', ...classes].join(' ')}>
     {options.map(option => (
       <div
         className={`cell ${option === selection && 'selected'}`}

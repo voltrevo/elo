@@ -24,6 +24,7 @@ const AccountPage: React.FunctionComponent = () => {
       </Field>
       <div className="button-column">
         <AsyncButton
+          once={true}
           onClick={async () => {
             await appCtx.logout();
             pageCtx.update({ needsAuth: true });

@@ -8,6 +8,22 @@ import Protocol, { ConnectionEvent, PromisishApi } from './Protocol';
 import UiState from './UiState';
 import Storage from './storage/Storage';
 
+let shiftKey = false;
+
+window.addEventListener('load', () => {
+  document.addEventListener('keydown', evt => {
+    if (evt.key === 'Shift') {
+      shiftKey = true;
+    }
+  });
+
+  document.addEventListener('keyup', evt => {
+    if (evt.key === 'Shift') {
+      shiftKey = false;
+    }
+  });
+});
+
 export default class SimulContentApp implements PromisishApi<Protocol> {
   constructor(public storage: Storage) {}
 
@@ -91,6 +107,7 @@ export default class SimulContentApp implements PromisishApi<Protocol> {
 
     return {
       token: 'fake-token',
+      registered: shiftKey,
       detail: {
         issued_to: config.googleOauthClientId,
         expires_in: 3599,

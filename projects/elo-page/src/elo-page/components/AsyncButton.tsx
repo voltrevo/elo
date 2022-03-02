@@ -7,16 +7,21 @@ type Props = {
   enabled?: boolean;
   primary?: boolean;
   onClick: () => Promise<void>;
+  once?: boolean;
   defaultResult?: 'success' | 'error';
 };
 
 const AsyncButton: react.FunctionComponent<Props> = (props) => {
+  const { once = false } = props;
+
   const [loading, setLoading] = react.useState(false);
   const [result, setResult] = react.useState<'success' | 'error' | undefined>(props.defaultResult);
   const [errorMessage, setErrorMessage] = react.useState<string>();
 
+  const finished = once && result === 'success';
+
   return <Button
-    enabled={!loading && props.enabled}
+    enabled={!loading && !finished && props.enabled}
     primary={props.primary}
     onClick={async () => {
       setLoading(true);

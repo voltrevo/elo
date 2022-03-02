@@ -6,6 +6,8 @@ import EloPageContext, { useEloPageContext } from '../EloPageContext';
 import AsyncButton from './AsyncButton';
 import BarSelector from './BarSelector';
 import Button from './Button';
+import Page from './Page';
+import Section from './Section';
 
 const FeedbackPage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ContentAppContext);
@@ -25,10 +27,13 @@ const FeedbackPage: React.FunctionComponent = () => {
   const negativeEmojis = ['😡', '🙁'];
 
   if (autoReply !== undefined) {
-    return <div className="feedback">
-      <div className="result">
-        <div>{autoReply}</div>
-        <div className="footer">
+    return <Page classes={['form-page']}>
+      <Section>
+        <h1>Feedback Submitted</h1>
+        <div>
+          {autoReply}
+        </div>
+        <div className="button-column">
           <Button
             onClick={() => {
               pageCtx.update({
@@ -41,101 +46,101 @@ const FeedbackPage: React.FunctionComponent = () => {
             Close
           </Button>
         </div>
-      </div>
-    </div>;
+      </Section>
+    </Page>;
   }
 
-  return <div className="feedback">
-    <h1>Feedback</h1>
-
-    <div className="question">
+  return <Page classes={['form-page', 'feedback-page']}>
+    <Section>
+      <h1>Feedback</h1>
       Thanks for taking a moment to do this. It means a lot to us.
-    </div>
+    </Section>
 
-    <div className="question emoji">
+    <Section>
       <div>
-        How do you feel about Elo in this moment?
-      </div>
-      <BarSelector
-        options={emojis}
-        onSelect={emoji => setSentiment(emoji)}
-      />
-    </div>
-
-    <div className="question">
-      <div>
-        Is there anything specific you'd like to say?
+        <div className="question">
+          How do you feel about Elo in this moment?
+        </div>
+        <BarSelector
+          classes={['emojis']}
+          options={emojis}
+          onSelect={emoji => setSentiment(emoji)}
+        />
       </div>
       <div>
-        <textarea onInput={(evt: React.ChangeEvent<HTMLTextAreaElement>) => {
-          setMessage(evt.target.value);
-        }}></textarea>
+        <div className="question">
+          Is there anything specific you'd like to say?
+        </div>
+        <div>
+          <textarea onInput={(evt: React.ChangeEvent<HTMLTextAreaElement>) => {
+            setMessage(evt.target.value);
+          }}></textarea>
+        </div>
       </div>
-    </div>
-
-    <div className="question">
       <div>
-        Would you like to be anonymous?
+        <div className="question">
+          Would you like to be anonymous?
+        </div>
+        <BarSelector
+          options={['No', 'Yes']}
+          default_={{
+            value: 'No',
+            allowNoSelection: false,
+          }}
+          onSelect={selection => setAnonymous(selection !== 'No')}
+        />
       </div>
-      <BarSelector
-        options={['No', 'Yes']}
-        default_={{
-          value: 'No',
-          allowNoSelection: false,
-        }}
-        onSelect={selection => setAnonymous(selection !== 'No')}
-      />
-    </div>
 
-    {anonymous && <div className="question">
-      Ok, we won't link this feedback with your account.
-    </div>}
+      {anonymous && <div>
+        Ok, we won't link this feedback with your account.
+      </div>}
 
-    <div className="question" style={{
-      display: anonymous ? 'none' : '',
-    }}>
-      <div>
-        Are you interested in an email reply?
+      {!anonymous && <div>
+        <div className="question">
+          Are you interested in an email reply?
+        </div>
+        <BarSelector
+          options={['No', 'Yes']}
+          default_={{
+            value: 'No',
+            allowNoSelection: false,
+          }}
+          onSelect={selection => setEmailInterest(selection === 'Yes')}
+        />
+      </div>}
+
+      {!anonymous && emailInterest && <div>
+        <div className="question">
+          We can't guarantee this, but we'll try. What's your email?
+        </div>
+        <input type="text" onInput={(evt: React.ChangeEvent<HTMLInputElement>) => {
+          setEmail(evt.target.value);
+        }} />
+      </div>}
+    </Section>
+
+    <Section>
+      <div className="button-column">
+        <AsyncButton once={true} onClick={async () => {
+          const sendFeedbackResult = await appCtx.sendFeedback({
+            sentiment,
+            positive: positiveEmojis.includes(sentiment ?? ''),
+            negative: negativeEmojis.includes(sentiment ?? ''),
+            message: message || undefined,
+            anonymous,
+            emailInterest: !anonymous && emailInterest,
+            email: anonymous ? undefined : email,
+          });
+
+          delay(500).then(() => {
+            setAutoReply(sendFeedbackResult);
+          });
+        }}>
+          Submit
+        </AsyncButton>
       </div>
-      <BarSelector
-        options={['No', 'Yes']}
-        default_={{
-          value: 'No',
-          allowNoSelection: false,
-        }}
-        onSelect={selection => setEmailInterest(selection === 'Yes')}
-      />
-    </div>
-
-    {!anonymous && emailInterest && <div className="question">
-      <div>
-        We can't guarantee this, but we'll try. What's your email?
-      </div>
-      <input type="text" style={{ width: '100%' }} onInput={(evt: React.ChangeEvent<HTMLInputElement>) => {
-        setEmail(evt.target.value);
-      }} />
-    </div>}
-
-    <div className="footer">
-      <AsyncButton onClick={async () => {
-        const sendFeedbackResult = await appCtx.sendFeedback({
-          sentiment,
-          positive: positiveEmojis.includes(sentiment ?? ''),
-          negative: negativeEmojis.includes(sentiment ?? ''),
-          message: message || undefined,
-          anonymous,
-          emailInterest: !anonymous && emailInterest,
-          email: anonymous ? undefined : email,
-        });
-
-        delay(500).then(() => {
-          setAutoReply(sendFeedbackResult);
-        });
-      }}>
-        Submit
-      </AsyncButton>
-    </div>
-  </div>;
+    </Section>
+  </Page>;
 };
 
 export default FeedbackPage;
