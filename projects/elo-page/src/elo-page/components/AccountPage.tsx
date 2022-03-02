@@ -5,12 +5,13 @@ import ContentAppContext from '../ContentAppContext';
 import EloPageContext from '../EloPageContext';
 import AsyncButton from './AsyncButton';
 import AsyncContent from './AsyncContent';
+import Page from './Page';
 
 const AccountPage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ContentAppContext);
   const pageCtx = React.useContext(EloPageContext);
 
-  return <div className="account-page">
+  return <Page classes={['form-page']}>
     <h1>Account</h1>
 
     <div className="field">
@@ -34,7 +35,7 @@ const AccountPage: React.FunctionComponent = () => {
         Log Out
       </AsyncButton>
     </div>
-  </div>;
+  </Page>;
 };
 
 export default AccountPage;

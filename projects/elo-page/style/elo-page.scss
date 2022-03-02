@@ -106,6 +106,8 @@ body {
 
   .form-page {
     display: flex;
+    flex-direction: column;
+    gap: 2.5em;
     max-width: 700px;
     flex-direction: column;
     margin-left: auto;
@@ -116,6 +118,12 @@ body {
     background-color: white;
     min-height: 100%;
 
+    .section {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+    }
+
     .row-selector {
       font-size: 0.75em;
     }
@@ -124,12 +132,11 @@ body {
       font-size: 1.5em;
       display: flex;
       flex-direction: row;
-      margin-top: 1em;
 
-      > div {
-        width: 350px;
+      > * {
+        flex: 1;
 
-        &:first-child {
+        > div {
           padding: 0.5em 1em;
         }
       }
@@ -152,6 +159,8 @@ body {
 
       .field-text-wrapper {
         position: relative;
+        padding: 0;
+        height: 100%;
 
         input {
           position: absolute;
@@ -176,14 +185,6 @@ body {
       }
     }
 
-    .button-row {
-      &:not(:first-child) {
-        margin-top: 1.5em;
-      }
-
-      margin-bottom: 1.5em;
-    }
-
     .button-column {
       display: flex;
       flex-direction: column;
@@ -198,23 +199,10 @@ body {
     }
   }
 
-  .welcome-container {
-    .welcome-form {
-      display: flex;
-      flex-direction: column;
-
-      .bar-selector:not(:first-child) {
-        margin-top: 1.5em;
-      }
-    }
-
+  .welcome-page {
     .welcome-error {
       text-align: center;
       color: red;
-    }
-
-    .tos-notice {
-      margin-top: 1.5em;
     }
   }
 
@@ -227,6 +215,7 @@ body {
       border-left: 1px solid hsla(0, 0, 50, 0.2);
       border-right: 1px solid hsla(0, 0, 50, 0.2);
       background-color: white;
+      min-height: 100%;
     }
   }
 
@@ -644,10 +633,6 @@ body {
     border-radius: 5px;
     padding: 20px;
     font-size: 1em;
-
-    .button-row {
-      margin-top: 2.5em;
-    }
   }
 
   .terms-and-conditions-dialog {
@@ -656,9 +641,5 @@ body {
     border-radius: 5px;
     padding: 20px;
     font-size: 1em;
-
-    .button-row {
-      margin-top: 2.5em;
-    }
   }
 }
