@@ -5,7 +5,7 @@ import config from './config';
 import { makeLocalExtensionAppClient } from './ExtensionAppClient';
 import ExtensionAppContext from './ExtensionAppContext';
 import EloPageContext, { initEloPageContext } from './EloPageContext';
-import SimulContentApp from './SimulContentApp';
+import SimulExtensionApp from './SimulExtensionApp';
 import IRawStorage from './storage/IRawStorage';
 import Storage from './storage/Storage';
 
@@ -67,7 +67,7 @@ window.addEventListener('load', async () => {
 
   const storage = new Storage(rawStorage, 'elo');
 
-  const eloClient = makeLocalExtensionAppClient(new SimulContentApp(storage));
+  const eloClient = makeLocalExtensionAppClient(new SimulExtensionApp(storage));
   const pageCtx = initEloPageContext(storage, config);
 
   const { email } = await pageCtx.storage.readRoot();

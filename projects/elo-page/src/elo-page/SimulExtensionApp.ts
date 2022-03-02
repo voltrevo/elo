@@ -25,7 +25,7 @@ window.addEventListener('load', () => {
   });
 });
 
-export default class SimulContentApp implements PromisishApi<Protocol> {
+export default class SimulExtensionApp implements PromisishApi<Protocol> {
   constructor(public storage: Storage) {}
 
   notifyGetUserMediaCalled(): void | Promise<void> {

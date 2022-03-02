@@ -14,11 +14,11 @@ export default function ExtensionAppClient(
   return api;
 }
 
-export function makeLocalExtensionAppClient(contentApp: PromisishApi<Protocol>): PromisifyApi<Protocol> {
+export function makeLocalExtensionAppClient(extensionApp: PromisishApi<Protocol>): PromisifyApi<Protocol> {
   const api = {} as any;
 
   for (const method of Object.keys(protocolKeyMap)) {
-    api[method] = async (...args: unknown[]) => (contentApp as any)[method](...args);
+    api[method] = async (...args: unknown[]) => (extensionApp as any)[method](...args);
   }
 
   return api;

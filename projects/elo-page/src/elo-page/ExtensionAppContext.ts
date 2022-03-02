@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import ExtensionAppClient from './ExtensionAppClient';
 
-type ContentApp = ReturnType<typeof ExtensionAppClient>;
-const ExtensionAppContext = React.createContext<ContentApp>({} as ContentApp);
+type ExtensionApp = ReturnType<typeof ExtensionAppClient>;
+const ExtensionAppContext = React.createContext<ExtensionApp>({} as ExtensionApp);
 
 export default ExtensionAppContext;
