@@ -2,7 +2,7 @@ import * as ReactDOM from 'react-dom';
 
 import EloPage from './components/EloPage';
 import config from './config';
-import { makeLocalContentAppClient } from './ContentAppClient';
+import { makeLocalExtensionAppClient } from './ExtensionAppClient';
 import ContentAppContext from './ContentAppContext';
 import EloPageContext, { initEloPageContext } from './EloPageContext';
 import SimulContentApp from './SimulContentApp';
@@ -67,7 +67,7 @@ window.addEventListener('load', async () => {
 
   const storage = new Storage(rawStorage, 'elo');
 
-  const eloClient = makeLocalContentAppClient(new SimulContentApp(storage));
+  const eloClient = makeLocalExtensionAppClient(new SimulContentApp(storage));
   const pageCtx = initEloPageContext(storage, config);
 
   const { email } = await pageCtx.storage.readRoot();
