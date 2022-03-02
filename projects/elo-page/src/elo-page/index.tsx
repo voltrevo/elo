@@ -65,11 +65,17 @@ window.addEventListener('load', async () => {
   const appDiv = document.createElement('div');
   document.body.appendChild(appDiv);
 
-  const eloClient = makeLocalContentAppClient(new SimulContentApp());
-  const pageCtx = initEloPageContext(new Storage(rawStorage, 'elo'), config);
+  const storage = new Storage(rawStorage, 'elo');
 
-  const { registrationData } = await pageCtx.storage.readRoot();
-  pageCtx.state.needsAuth = pageCtx.config.featureFlags.authEnabled && !registrationData;
+  const eloClient = makeLocalContentAppClient(new SimulContentApp(storage));
+  const pageCtx = initEloPageContext(storage, config);
+
+  const { email } = await pageCtx.storage.readRoot();
+
+  pageCtx.state.needsAuth = (
+    pageCtx.config.featureFlags.authEnabled &&
+    email === undefined
+  );
 
   pageCtx.update({
     page: pageCtx.state.needsAuth ? 'WelcomePage' : 'OverviewPage',

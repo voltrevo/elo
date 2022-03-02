@@ -3,11 +3,7 @@ type StorageRoot = {
   metricPreference?: string;
   userId?: string;
   installTriggered?: true;
-  registrationData?: {
-    userId: string;
-    email: string;
-    passwordHash?: string;
-  };
+  email?: string;
 };
 
 function StorageRoot(): StorageRoot {

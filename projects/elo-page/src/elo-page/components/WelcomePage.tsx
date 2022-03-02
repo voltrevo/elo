@@ -10,6 +10,7 @@ import ResendEmailDialog from './ResendEmailDialog';
 import switch_ from '../../common-pure/switch_';
 import { CheckCircle, Circle, CircleNotch, XCircle } from 'phosphor-react';
 import TermsAndConditionsDialog from './TermsAndConditionsDialog';
+import delay from '../../common-pure/delay';
 
 const WelcomePage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ContentAppContext);
@@ -89,9 +90,11 @@ export default WelcomePage;
 
 function LoginForm() {
   const appCtx = React.useContext(ContentAppContext);
+  const pageCtx = React.useContext(EloPageContext);
 
   const [email, setEmail] = React.useState('');
   const [passwd, setPasswd] = React.useState('');
+  const [done, setDone] = React.useState(false);
 
   return <>
     <div className="field">
@@ -112,9 +115,11 @@ function LoginForm() {
     </div>
     <div className="button-column" style={{ marginTop: '1em' }}>
       <AsyncButton
-        enabled={Boolean(email && passwd)}
+        enabled={Boolean(email && passwd && !done)}
         onClick={async () => {
           await appCtx.login({ email, password: passwd });
+          setDone(true);
+          proceed(pageCtx);
         }}
       >
         Log In
@@ -288,6 +293,7 @@ function RegisterSegment({
         onClick={async () => {
           await onClick();
           setDone(true);
+          proceed(pageCtx);
         }}
         enabled={enabled && !done}
       >
@@ -295,4 +301,12 @@ function RegisterSegment({
       </AsyncButton>
     </div>
   </>;
+}
+
+function proceed(pageCtx: EloPageContext) {
+  pageCtx.update({ needsAuth: false });
+
+  delay(250).then(() => {
+    pageCtx.update({ page: 'OverviewPage' });
+  });
 }

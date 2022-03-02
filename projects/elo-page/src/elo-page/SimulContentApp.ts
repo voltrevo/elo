@@ -6,8 +6,11 @@ import Registration from '../elo-types/Registration';
 import config from './config';
 import Protocol, { ConnectionEvent, PromisishApi } from './Protocol';
 import UiState from './UiState';
+import Storage from './storage/Storage';
 
 export default class SimulContentApp implements PromisishApi<Protocol> {
+  constructor(public storage: Storage) {}
+
   notifyGetUserMediaCalled(): void | Promise<void> {
     throw new Error('Method not implemented.');
   }
@@ -44,21 +47,37 @@ export default class SimulContentApp implements PromisishApi<Protocol> {
   async register(registration: Registration) {
     await delay(500);
 
+    let email: string;
+
     if ('email' in registration) {
-      return registration.email;
+      email = registration.email;
+    } else {
+      email = 'alice@example.com';
     }
 
-    return 'alice@example.com';
+    const storageRoot = await this.storage.readRoot();
+    storageRoot.email = email;
+    await this.storage.writeRoot(storageRoot);
+
+    return email;
   }
 
   async login(credentials: LoginCredentials) {
     await delay(500);
 
+    let email: string;
+
     if ('email' in credentials) {
-      return credentials.email;
+      email = credentials.email;
+    } else {
+      email = 'alice@example.com';
     }
 
-    return 'alice@example.com';
+    const storageRoot = await this.storage.readRoot();
+    storageRoot.email = email;
+    await this.storage.writeRoot(storageRoot);
+
+    return email;
   }
 
   async sendFeedback(feedback: Feedback) {
