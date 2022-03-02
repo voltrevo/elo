@@ -16,6 +16,7 @@ const WelcomePage: React.FunctionComponent = () => {
   const [authMethod, setAuthMethod] = React.useState<'service' | 'password'>();
   const [authChoice, setAuthChoice] = React.useState<'register' | 'login'>('register');
   const [serviceEmail, setServiceEmail] = React.useState<string>();
+  const [googleAccessToken, setGoogleAccessToken] = React.useState<string>('');
 
   return <Page>
     <h1>Welcome</h1>
@@ -36,11 +37,12 @@ const WelcomePage: React.FunctionComponent = () => {
 
               const authResult = await appCtx.googleAuth();
 
-              if (!authResult.verified_email) {
-                throw new Error(`Verified google account but its email address is unverified.`)
+              if (!authResult.detail.verified_email) {
+                throw new Error(`Verified google account but its email address is unverified.`);
               }
 
-              setServiceEmail(authResult.email);
+              setServiceEmail(authResult.detail.email);
+              setGoogleAccessToken(authResult.token);
             }}
           >
             Continue with Google
@@ -76,7 +78,7 @@ const WelcomePage: React.FunctionComponent = () => {
         {
           authMethod === 'service' &&
           serviceEmail !== undefined &&
-          <ServiceForm email={serviceEmail}/>
+          <ServiceForm email={serviceEmail} googleAccessToken={googleAccessToken}/>
         }
       </div>
     </div>
@@ -112,7 +114,7 @@ function LoginForm() {
       <AsyncButton
         enabled={Boolean(email && passwd)}
         onClick={async () => {
-          await appCtx.login(email, passwd);
+          await appCtx.login({ email, password: passwd });
         }}
       >
         Log In
@@ -238,7 +240,7 @@ function RegistrationForm() {
     </div>}
     {validSentEmail && <RegisterSegment
       onClick={async () => {
-        await appCtx.register(email, passwd, verificationCode);
+        await appCtx.register({ email, password: passwd, code: verificationCode });
       }}
       enabled={
         verificationCheck?.code === verificationCode &&
@@ -248,8 +250,8 @@ function RegistrationForm() {
   </>;
 }
 
-function ServiceForm({ email }: { email: string }) {
-  // const appCtx = React.useContext(ContentAppContext);
+function ServiceForm({ email, googleAccessToken }: { email: string, googleAccessToken: string }) {
+  const appCtx = React.useContext(ContentAppContext);
 
   return <div style={{ display: 'flex', flexDirection: 'column' }}>
     <div style={{ marginTop: '2em' }}>
@@ -257,8 +259,7 @@ function ServiceForm({ email }: { email: string }) {
       register one?
     </div>
     <RegisterSegment onClick={async () => {
-      // await appCtx.register(email, passwd, verificationCode);
-      throw new Error('Not implemented: register with service email');
+      await appCtx.register({ googleAccessToken });
     }}/>
   </div>;
 }

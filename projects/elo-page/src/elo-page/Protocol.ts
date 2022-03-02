@@ -1,14 +1,19 @@
 import * as io from 'io-ts';
 
 import { AnalysisFragment } from '../elo-types/Analysis';
+import Registration from '../elo-types/Registration';
+import LoginCredentials from '../elo-types/LoginCredentials';
 import Feedback from '../elo-types/Feedback';
 import UiState from './UiState';
 
 export const GoogleAuthResult = io.type({
-  issued_to: io.string,
-  expires_in: io.number,
-  email: io.string,
-  verified_email: io.boolean,
+  token: io.string,
+  detail: io.type({
+    issued_to: io.string,
+    expires_in: io.number,
+    email: io.string,
+    verified_email: io.boolean,
+  }),
 });
 
 export type GoogleAuthResult = io.TypeOf<typeof GoogleAuthResult>;
@@ -22,8 +27,8 @@ export type Protocol = {
   getSessionToken(): string | undefined;
   sendVerificationEmail(email: string): void;
   checkVerificationEmail(email: string, code: string): boolean;
-  register(email: string, password: string, code: string): void;
-  login(email: string, password: string): void;
+  register(registration: Registration): string;
+  login(credentials: LoginCredentials): string;
   sendFeedback(feedback: Feedback): string;
   googleAuth(): GoogleAuthResult;
   googleAuthLogout(): void;

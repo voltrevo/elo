@@ -1,6 +1,8 @@
 import delay from '../common-pure/delay';
 import { AnalysisFragment } from '../elo-types/Analysis';
 import Feedback from '../elo-types/Feedback';
+import LoginCredentials from '../elo-types/LoginCredentials';
+import Registration from '../elo-types/Registration';
 import config from './config';
 import Protocol, { ConnectionEvent, PromisishApi } from './Protocol';
 import UiState from './UiState';
@@ -39,12 +41,24 @@ export default class SimulContentApp implements PromisishApi<Protocol> {
     return code === '123456';
   }
 
-  register(email: string, password: string, code: string): void | Promise<void> {
-    throw new Error('Method not implemented.');
+  async register(registration: Registration) {
+    await delay(500);
+
+    if ('email' in registration) {
+      return registration.email;
+    }
+
+    return 'alice@example.com';
   }
 
-  login(email: string, password: string): void | Promise<void> {
-    throw new Error('Method not implemented.');
+  async login(credentials: LoginCredentials) {
+    await delay(500);
+
+    if ('email' in credentials) {
+      return credentials.email;
+    }
+
+    return 'alice@example.com';
   }
 
   async sendFeedback(feedback: Feedback) {
@@ -57,10 +71,13 @@ export default class SimulContentApp implements PromisishApi<Protocol> {
     await delay(500);
 
     return {
-      issued_to: config.googleOauthClientId,
-      expires_in: 3599,
-      email: "alice@example.com",
-      verified_email: true,
+      token: 'fake-token',
+      detail: {
+        issued_to: config.googleOauthClientId,
+        expires_in: 3599,
+        email: "alice@example.com",
+        verified_email: true,
+      },
     };
   }
 
