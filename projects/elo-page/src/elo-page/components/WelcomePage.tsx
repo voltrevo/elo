@@ -272,6 +272,7 @@ function RegisterSegment({
   enabled?: boolean;
 }) {
   const pageCtx = React.useContext(EloPageContext);
+  const [done, setDone] = React.useState(false);
 
   return <>
     <div className="tos-notice">
@@ -283,7 +284,13 @@ function RegisterSegment({
       </a>.
     </div>
     <div className="button-column" style={{ marginTop: '1em' }}>
-      <AsyncButton onClick={onClick} enabled={enabled}>
+      <AsyncButton
+        onClick={async () => {
+          await onClick();
+          setDone(true);
+        }}
+        enabled={enabled && !done}
+      >
         Register
       </AsyncButton>
     </div>
