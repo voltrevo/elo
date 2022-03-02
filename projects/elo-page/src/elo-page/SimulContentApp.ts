@@ -100,8 +100,16 @@ export default class SimulContentApp implements PromisishApi<Protocol> {
     };
   }
 
-  async googleAuthLogout(): Promise<never> {
+  async logout() {
     await delay(500);
-    throw new Error('Method not implemented.');
+    
+    const storageRoot = await this.storage.readRoot();
+    storageRoot.email = undefined;
+    await this.storage.writeRoot(storageRoot);
+  }
+
+  async getEmail() {
+    const storageRoot = await this.storage.readRoot();
+    return storageRoot.email;
   }
 }

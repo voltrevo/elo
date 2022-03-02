@@ -7,6 +7,7 @@ import FeedbackPage from './FeedbackPage';
 import Dialog from './Dialog';
 import Nav from './Nav';
 import ReportPrototype from './ReportPrototype';
+import AccountPage from './AccountPage';
 
 const EloPage: React.FunctionComponent = () => {
   const page = useEloPageContext(state => state.page);
@@ -23,6 +24,10 @@ const EloPage: React.FunctionComponent = () => {
 
     if (page === 'OverviewPage') {
       return <ReportPrototype />;
+    }
+
+    if (page === 'AccountPage') {
+      return <AccountPage />;
     }
 
     if (page === 'FeedbackPage') {

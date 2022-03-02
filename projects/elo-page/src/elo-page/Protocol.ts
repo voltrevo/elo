@@ -31,7 +31,10 @@ export type Protocol = {
   login(credentials: LoginCredentials): string;
   sendFeedback(feedback: Feedback): string;
   googleAuth(): GoogleAuthResult;
-  googleAuthLogout(): void;
+  logout(): void;
+
+  // TODO: This cannot be allowed on third party pages. (Probably others too.)
+  getEmail(): string | undefined;
 };
 
 export const protocolKeyMap: Record<keyof Protocol, true> = {
@@ -47,7 +50,8 @@ export const protocolKeyMap: Record<keyof Protocol, true> = {
   login: true,
   sendFeedback: true,
   googleAuth: true,
-  googleAuthLogout: true,
+  logout: true,
+  getEmail: true,
 };
 
 export type ConnectionEvent = (
