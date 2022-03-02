@@ -16,7 +16,6 @@ const FeedbackPage: React.FunctionComponent = () => {
   const [anonymous, setAnonymous] = React.useState(false);
   const [emailInterest, setEmailInterest] = React.useState(false);
   const [email, setEmail] = React.useState('');
-  const [submitState, setSubmitState] = React.useState<'not-started' | 'loading' | 'success' | Error>('not-started');
   const [autoReply, setAutoReply] = React.useState<string>();
 
   const emojis = ['😡', '🙁', '🤷', '🙂', '😀'];
