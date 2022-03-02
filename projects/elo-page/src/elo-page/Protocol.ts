@@ -33,8 +33,6 @@ export type Protocol = {
   sendFeedback(feedback: Feedback): string;
   googleAuth(): GoogleAuthResult;
   logout(): void;
-
-  // TODO: This cannot be allowed on third party pages. (Probably others too.)
   getEmail(): string | undefined;
 };
 
@@ -53,6 +51,19 @@ export const protocolKeyMap: Record<keyof Protocol, true> = {
   googleAuth: true,
   logout: true,
   getEmail: true,
+};
+
+export const protocolThirdPartyKeyMap = {
+  notifyGetUserMediaCalled: true,
+  addFragment: true,
+  addConnectionEvent: true,
+  getUiState: true,
+  getDashboardUrl: true,
+  getSessionToken: true,
+};
+
+export type ThirdPartyProtocol = {
+  [K in (keyof typeof protocolThirdPartyKeyMap)]: Protocol[K];
 };
 
 export type ConnectionEvent = (

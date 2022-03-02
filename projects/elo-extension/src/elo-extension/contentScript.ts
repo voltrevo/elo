@@ -1,6 +1,7 @@
 import Browser from 'webextension-polyfill';
 
 import PostMessageServer from '../elo-page/helpers/PostMessageServer';
+import { protocolThirdPartyKeyMap } from '../elo-page/Protocol';
 import ContentApp from './ContentApp';
 
 const eloExtension = document.createElement('div');
@@ -27,5 +28,11 @@ const contentApp = new ContentApp();
 
 new PostMessageServer(
   'elo',
-  ({ method, args }: any) => (contentApp as any)[method](...args),
+  ({ method, args }: any) => {
+    if (!(method in protocolThirdPartyKeyMap)) {
+      throw new Error(`Method not found: ${method}`);
+    }
+
+    (contentApp as any)[method](...args)
+  },
 );

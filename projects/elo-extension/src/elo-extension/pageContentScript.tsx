@@ -1,6 +1,6 @@
 import * as ReactDOM from 'react-dom';
-import ContentAppClient from '../elo-page/ContentAppClient';
-import ContentAppContext from '../elo-page/ContentAppContext';
+import { ThirdPartyExtensionAppClient } from '../elo-page/ExtensionAppClient';
+import { ThirdPartyExtensionAppContext } from '../elo-page/ExtensionAppContext';
 
 import PostMessageClient from '../elo-page/helpers/PostMessageClient';
 import analyzeStream from './analyzeStream';
@@ -13,12 +13,12 @@ const container = document.createElement('div');
 container.style.display = 'none';
 eloExtension.appendChild(container);
 
-const contentApp = ContentAppClient(new PostMessageClient('elo'));
+const contentApp = ThirdPartyExtensionAppClient(new PostMessageClient('elo'));
 
 ReactDOM.render(
-  <ContentAppContext.Provider value={contentApp}>
+  <ThirdPartyExtensionAppContext.Provider value={contentApp}>
     <App/>
-  </ContentAppContext.Provider>,
+  </ThirdPartyExtensionAppContext.Provider>,
   container,
 );
 

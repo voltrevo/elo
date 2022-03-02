@@ -1,14 +1,14 @@
 import clientConfig from './helpers/clientConfig';
 import never from '../common-pure/never';
 import { AnalysisFragment } from '../elo-types/Analysis';
-import ContentAppClient from '../elo-page/ContentAppClient';
+import { ThirdPartyExtensionAppClient } from '../elo-page/ExtensionAppClient';
 
 const maxLatency = 2; // seconds
 
 export default async function analyzeStream(
   sessionToken: string,
   stream: MediaStream,
-  contentApp: ReturnType<typeof ContentAppClient>,
+  extensionApp: ReturnType<typeof ThirdPartyExtensionAppClient>,
 ) {
   const wsProto = clientConfig.tls ? 'wss:' : 'ws:';
   const webSocket = new WebSocket(`${wsProto}//${clientConfig.hostAndPort}/analyze?sessionToken=${sessionToken}`);
@@ -20,7 +20,7 @@ export default async function analyzeStream(
 
   webSocket.onerror = null;
 
-  contentApp.addConnectionEvent('connected');
+  extensionApp.addConnectionEvent('connected');
 
   const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
 
@@ -97,17 +97,17 @@ export default async function analyzeStream(
       }
 
       case 'word': {
-        contentApp.addFragment(fragment);
+        extensionApp.addFragment(fragment);
         break;
       }
 
       case 'disfluent': {
-        contentApp.addFragment(fragment);
+        extensionApp.addFragment(fragment);
         break;
       }
 
       case 'progress': {
-        contentApp.addFragment(fragment);
+        extensionApp.addFragment(fragment);
 
         const duration = (Date.now() - startTime) / 1000;
         const latency = duration - fragment.value.duration;

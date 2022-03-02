@@ -3,7 +3,7 @@ import browser from 'webextension-polyfill';
 
 import clientConfig from './helpers/clientConfig';
 import EwmaCalculator from './helpers/EwmaCalculator';
-import Protocol, { ConnectionEvent, GoogleAuthResult, PromisishApi } from '../elo-page/Protocol';
+import Protocol, { ConnectionEvent, GoogleAuthResult } from '../elo-page/Protocol';
 import SessionStats from '../elo-types/SessionStats';
 import Storage, { RandomKey } from '../elo-page/storage/Storage';
 import UiState from '../elo-page/UiState';
@@ -12,6 +12,9 @@ import delay from '../common-pure/delay';
 import TaskQueue from '../common-pure/TaskQueue';
 import { AnalysisDisfluent, AnalysisFragment } from '../elo-types/Analysis';
 import Feedback from '../elo-types/Feedback';
+import { PromisishApi } from '../elo-page/helpers/protocolHelpers';
+import Registration from '../elo-types/Registration';
+import LoginCredentials from '../elo-types/LoginCredentials';
 
 const sessionKey = RandomKey();
 const apiBase = `${clientConfig.tls ? 'https:' : 'http:'}//${clientConfig.hostAndPort}`;
@@ -254,22 +257,34 @@ export default class ContentApp implements PromisishApi<Protocol> {
     return code === keccak_256(email).slice(0, 6);
   }
 
-  async register(email: string, password: string, _code: string) {
+  async register(registration: Registration) {
     this;
     await delay(500);
 
-    if (password !== 'test') {
+    if ('password' in registration && registration.password !== 'test') {
       throw new Error('password was not "test"');
     }
+
+    if ('email' in registration) {
+      return registration.email;
+    }
+
+    throw new Error('Not implemented: get email from token (in register)');
   }
 
-  async login(email: string, password: string) {
+  async login(credentials: LoginCredentials) {
     this;
     await delay(500);
 
-    if (password !== 'test') {
+    if ('password' in credentials && credentials.password !== 'test') {
       throw new Error('password was not "test"');
     }
+
+    if ('email' in credentials) {
+      return credentials.email;
+    }
+
+    throw new Error('Not implemented: get email from token (in register)');
   }
 
   async sendFeedback(feedback: Feedback) {
@@ -303,7 +318,7 @@ export default class ContentApp implements PromisishApi<Protocol> {
     return 'Thanks!';
   }
 
-  async googleAuth() {
+  async googleAuth(): Promise<GoogleAuthResult> {
     const authUrlObj = new URL('https://accounts.google.com/o/oauth2/auth');
     authUrlObj.searchParams.append('client_id', clientConfig.googleOauthClientId);
     authUrlObj.searchParams.append('redirect_uri', browser.identity.getRedirectURL("oauth2.html"));
@@ -331,24 +346,28 @@ export default class ContentApp implements PromisishApi<Protocol> {
       },
     }).then(res => res.json());
 
-    const decodeResult = GoogleAuthResult.decode(tokenInfoJson);
+    const decodeResult = GoogleAuthResult.props.detail.decode(tokenInfoJson);
 
     if ('left' in decodeResult) {
       // TODO: Use reporter
       throw new Error(decodeResult.left.map(e => e.message).join('\n'));
     }
 
-    const authResult = decodeResult.right;
+    const detail = decodeResult.right;
 
-    if (authResult.issued_to !== clientConfig.googleOauthClientId) {
+    if (detail.issued_to !== clientConfig.googleOauthClientId) {
       throw new Error('Client id mismatch');
     }
 
-    if (!authResult.verified_email) {
-      throw new Error(`Unverified email ${authResult.email}`);
+    if (!detail.verified_email) {
+      throw new Error(`Unverified email ${detail.email}`);
     }
 
-    return authResult;
+    return {
+      token: accessToken,
+      registered: false, // TODO: implement this
+      detail,
+    };
   }
 
   async googleAuthLogout(): Promise<void> {
@@ -377,5 +396,13 @@ export default class ContentApp implements PromisishApi<Protocol> {
     } catch {
       return;
     }
+  }
+
+  async logout(): Promise<never> {
+    throw new Error('Method not implemented.');
+  }
+
+  async getEmail(): Promise<never> {
+    throw new Error('Method not implemented.');
   }
 }

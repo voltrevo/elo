@@ -1,5 +1,5 @@
 import * as React from 'react';
-import ContentAppContext from '../../elo-page/ContentAppContext';
+import ExtensionAppContext from '../../elo-page/ExtensionAppContext';
 
 import UiState from '../../elo-page/UiState';
 import CollapseIcon from './CollapseIcon';
@@ -7,7 +7,7 @@ import ExpandIcon from './ExpandIcon';
 import PopoutIcon from './PopoutIcon';
 
 const App: React.FunctionComponent = () => {
-  const contentApp = React.useContext(ContentAppContext);
+  const contentApp = React.useContext(ExtensionAppContext);
 
   const dragData = React.useRef<{
     mouseDownPos: { x: number, y: number },

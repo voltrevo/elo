@@ -1,6 +1,6 @@
 import PostMessageClient from './helpers/PostMessageClient';
 import { PromisifyApi, PromisishApi } from './helpers/protocolHelpers';
-import Protocol, { protocolKeyMap } from './Protocol';
+import Protocol, { protocolKeyMap, protocolThirdPartyKeyMap, ThirdPartyProtocol } from './Protocol';
 
 export default function ExtensionAppClient(
   postMessageClient: PostMessageClient,
@@ -8,6 +8,18 @@ export default function ExtensionAppClient(
   const api = {} as any;
 
   for (const method of Object.keys(protocolKeyMap)) {
+    api[method] = (...args: unknown[]) => postMessageClient.post({ method, args });
+  }
+
+  return api;
+}
+
+export function ThirdPartyExtensionAppClient(
+  postMessageClient: PostMessageClient,
+): PromisifyApi<ThirdPartyProtocol> {
+  const api = {} as any;
+
+  for (const method of Object.keys(protocolThirdPartyKeyMap)) {
     api[method] = (...args: unknown[]) => postMessageClient.post({ method, args });
   }
 
