@@ -32,19 +32,14 @@ const Nav: react.FunctionComponent = () => {
       icon: <PresentationChart size={24}/>,
     },
     {
-      text: 'Settings',
-      page: 'SettingsPage',
-      icon: <Gear size={24}/>,
+      text: 'Feedback',
+      page: 'FeedbackPage',
+      icon: <Question size={24}/>,
     },
     {
       text: 'Account',
       page: 'AccountPage',
       icon: <User size={24}/>,
-    },
-    {
-      text: 'Feedback',
-      page: 'FeedbackPage',
-      icon: <Question size={24}/>,
     },
   ];
 
