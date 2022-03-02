@@ -4,9 +4,10 @@ import Feedback from '../elo-types/Feedback';
 import LoginCredentials from '../elo-types/LoginCredentials';
 import Registration from '../elo-types/Registration';
 import config from './config';
-import Protocol, { ConnectionEvent, PromisishApi } from './Protocol';
+import Protocol, { ConnectionEvent } from './Protocol';
 import UiState from './UiState';
 import Storage from './storage/Storage';
+import { PromisishApi } from './helpers/protocolHelpers';
 
 let shiftKey = false;
 

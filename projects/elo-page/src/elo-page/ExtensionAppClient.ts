@@ -1,5 +1,6 @@
 import PostMessageClient from './helpers/PostMessageClient';
-import Protocol, { PromisifyApi, PromisishApi, protocolKeyMap } from './Protocol';
+import { PromisifyApi, PromisishApi } from './helpers/protocolHelpers';
+import Protocol, { protocolKeyMap } from './Protocol';
 
 export default function ExtensionAppClient(
   postMessageClient: PostMessageClient,

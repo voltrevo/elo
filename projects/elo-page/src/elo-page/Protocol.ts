@@ -61,25 +61,4 @@ export type ConnectionEvent = (
   | 'connected'
 );
 
-type Promisify<T> = T extends Promise<unknown> ? T : Promise<T>;
-type Unwrap<T> = T extends { wrap: unknown } ? T['wrap'] : never;
-type PromisishImpl<T> = T extends { wrap: Promise<unknown> } ? T['wrap'] : Unwrap<T> | Promise<Unwrap<T>>;
-type Promisish<T> = PromisishImpl<{ wrap: T }>;
-
-type PromisifyMethod<M> = M extends (...args: infer Args) => infer Result
-  ? (...args: Args) => Promisify<Result>
-  : M;
-
-type PromisishMethod<M> = M extends (...args: infer Args) => infer Result
-  ? (...args: Args) => Promisish<Result>
-  : M;
-
-export type PromisifyApi<Api> = {
-  [K in keyof Api]: PromisifyMethod<Api[K]>;
-};
-
-export type PromisishApi<Api> = {
-  [K in keyof Api]: PromisishMethod<Api[K]>;
-};
-
 export default Protocol;
