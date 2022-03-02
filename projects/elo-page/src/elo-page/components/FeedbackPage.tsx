@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import delay from '../../common-pure/delay';
 import ContentAppContext from '../ContentAppContext';
-import EloPageContext from '../EloPageContext';
+import EloPageContext, { useEloPageContext } from '../EloPageContext';
 import AsyncButton from './AsyncButton';
 import BarSelector from './BarSelector';
 import Button from './Button';
@@ -18,6 +18,8 @@ const FeedbackPage: React.FunctionComponent = () => {
   const [email, setEmail] = React.useState('');
   const [autoReply, setAutoReply] = React.useState<string>();
 
+  const needsAuth = useEloPageContext(s => s.needsAuth);
+
   const emojis = ['😡', '🙁', '🤷', '🙂', '😀'];
   const positiveEmojis = ['🙂', '😀'];
   const negativeEmojis = ['😡', '🙁'];
@@ -29,17 +31,11 @@ const FeedbackPage: React.FunctionComponent = () => {
         <div className="footer">
           <Button
             onClick={() => {
-              const needsAuth = (
-                pageCtx.config.featureFlags.authEnabled &&
-                email === undefined
-              );
-
-              const page = (needsAuth
-                ? 'WelcomePage'
-                : 'OverviewPage'
-              );
-
-              pageCtx.update({ page });
+              pageCtx.update({
+                page: needsAuth
+                  ? 'WelcomePage'
+                  : 'OverviewPage'
+              });
             }}
           >
             Close
