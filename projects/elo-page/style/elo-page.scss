@@ -104,6 +104,18 @@ body {
     margin-right: auto;
   }
 
+  .sections {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5em;
+
+    .section {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+    }
+  }
+
   .form-page {
     display: flex;
     flex-direction: column;
@@ -276,15 +288,15 @@ body {
   }
 
   .card {
-    border-radius: 0.5em;
+    border-radius: 5px;
     padding: 1em;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 10px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
   }
 
-  .sections {
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
+  .chart {
+    border-radius: 5px;
+    padding: 1em;
+    border: none;
   }
 
   .heading {
@@ -427,6 +439,18 @@ body {
     > div {
       flex-grow: 1;
       flex-basis: 0;
+    }
+  }
+
+  .overview-stat-boxes {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    align-self: center;
+
+    > div {
+      width: 200px;
+      text-align: center;
     }
   }
 

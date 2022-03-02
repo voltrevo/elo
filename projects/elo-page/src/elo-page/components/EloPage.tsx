@@ -6,8 +6,11 @@ import WelcomePage from './WelcomePage';
 import FeedbackPage from './FeedbackPage';
 import Dialog from './Dialog';
 import Nav from './Nav';
-import ReportPrototype from './ReportPrototype';
 import AccountPage from './AccountPage';
+import Page from './Page';
+import Section from './Section';
+import Field from './Field';
+import OverviewPage from './OverviewPage';
 
 const EloPage: React.FunctionComponent = () => {
   const page = useEloPageContext(state => state.page);
@@ -23,7 +26,7 @@ const EloPage: React.FunctionComponent = () => {
     }
 
     if (page === 'OverviewPage') {
-      return <ReportPrototype />;
+      return <OverviewPage />;
     }
 
     if (page === 'AccountPage') {
@@ -34,7 +37,15 @@ const EloPage: React.FunctionComponent = () => {
       return <FeedbackPage />;
     }
 
-    return <>Page not found: "{page}"</>;
+    return <Page classes={['form-page']}>
+      <Section>
+        <h1>Not Found</h1>
+        <Field>
+          <div>page</div>
+          <div>{page}</div>
+        </Field>
+      </Section>
+    </Page>;
   })();
 
   return <div className="elo-page">
