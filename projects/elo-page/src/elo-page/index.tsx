@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 import EloPage from './components/EloPage';
 import config from './config';
 import { makeLocalExtensionAppClient } from './ExtensionAppClient';
-import ContentAppContext from './ContentAppContext';
+import ExtensionAppContext from './ExtensionAppContext';
 import EloPageContext, { initEloPageContext } from './EloPageContext';
 import SimulContentApp from './SimulContentApp';
 import IRawStorage from './storage/IRawStorage';
@@ -82,11 +82,11 @@ window.addEventListener('load', async () => {
   });
 
   ReactDOM.render(
-    <ContentAppContext.Provider value={eloClient}>
+    <ExtensionAppContext.Provider value={eloClient}>
       <EloPageContext.Provider value={pageCtx}>
         <EloPage/>
       </EloPageContext.Provider>
-    </ContentAppContext.Provider>,
+    </ExtensionAppContext.Provider>,
     appDiv,
   );
 });

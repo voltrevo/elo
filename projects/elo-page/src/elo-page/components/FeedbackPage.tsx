@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import delay from '../../common-pure/delay';
-import ContentAppContext from '../ContentAppContext';
+import ExtensionAppContext from '../ExtensionAppContext';
 import EloPageContext, { useEloPageContext } from '../EloPageContext';
 import AsyncButton from './AsyncButton';
 import BarSelector from './BarSelector';
@@ -10,7 +10,7 @@ import Page from './Page';
 import Section from './Section';
 
 const FeedbackPage: React.FunctionComponent = () => {
-  const appCtx = React.useContext(ContentAppContext);
+  const appCtx = React.useContext(ExtensionAppContext);
   const pageCtx = React.useContext(EloPageContext);
 
   const [sentiment, setSentiment] = React.useState<string>();

@@ -1,12 +1,12 @@
 import * as React from 'react';
 import SessionStats from '../../elo-types/SessionStats';
-import ContentAppContext from '../ContentAppContext';
+import ExtensionAppContext from '../ExtensionAppContext';
 
 import EloPageContext from '../EloPageContext';
 import SessionReport from './SessionReport';
 
 const ReportsPage: React.FunctionComponent = () => {
-  const eloClient = React.useContext(ContentAppContext);
+  const eloClient = React.useContext(ExtensionAppContext);
   const pageCtx = React.useContext(EloPageContext);
 
   const [lastSession, setLastSession] = React.useState<SessionStats>();

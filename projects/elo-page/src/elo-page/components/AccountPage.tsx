@@ -1,7 +1,7 @@
 import * as React from 'react';
 import delay from '../../common-pure/delay';
 
-import ContentAppContext from '../ContentAppContext';
+import ExtensionAppContext from '../ExtensionAppContext';
 import EloPageContext from '../EloPageContext';
 import AsyncButton from './AsyncButton';
 import AsyncContent from './AsyncContent';
@@ -10,7 +10,7 @@ import Page from './Page';
 import Section from './Section';
 
 const AccountPage: React.FunctionComponent = () => {
-  const appCtx = React.useContext(ContentAppContext);
+  const appCtx = React.useContext(ExtensionAppContext);
   const pageCtx = React.useContext(EloPageContext);
 
   return <Page classes={['form-page']}>

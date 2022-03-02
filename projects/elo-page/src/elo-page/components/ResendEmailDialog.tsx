@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import ContentAppContext from '../ContentAppContext';
+import ExtensionAppContext from '../ExtensionAppContext';
 import EloPageContext from '../EloPageContext';
 import AsyncButton from './AsyncButton';
 import Button from './Button';
@@ -10,7 +10,7 @@ export type ResendEmailProps = {
 };
 
 const ResendEmailDialog: React.FunctionComponent<ResendEmailProps> = (props) => {
-  const appCtx = React.useContext(ContentAppContext);
+  const appCtx = React.useContext(ExtensionAppContext);
   const pageCtx = React.useContext(EloPageContext);
 
   return <div className="resend-email-dialog">

@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import ContentAppContext from '../ContentAppContext';
+import ExtensionAppContext from '../ExtensionAppContext';
 import EloPageContext from '../EloPageContext';
 import AsyncButton from './AsyncButton';
 import Button from './Button';
@@ -16,7 +16,7 @@ import Field from './Field';
 
 const WelcomePage: React.FunctionComponent = () => {
   const pageCtx = React.useContext(EloPageContext);
-  const appCtx = React.useContext(ContentAppContext);
+  const appCtx = React.useContext(ExtensionAppContext);
 
   const [authMethod, setAuthMethod] = React.useState<'service' | 'password'>();
   const [authChoice, setAuthChoice] = React.useState<'register' | 'login'>('register');
@@ -101,7 +101,7 @@ const WelcomePage: React.FunctionComponent = () => {
 export default WelcomePage;
 
 function LoginForm() {
-  const appCtx = React.useContext(ContentAppContext);
+  const appCtx = React.useContext(ExtensionAppContext);
   const pageCtx = React.useContext(EloPageContext);
 
   const [email, setEmail] = React.useState('');
@@ -141,7 +141,7 @@ function LoginForm() {
 
 function RegistrationForm() {
   const pageCtx = React.useContext(EloPageContext);
-  const appCtx = React.useContext(ContentAppContext);
+  const appCtx = React.useContext(ExtensionAppContext);
 
   const [email, setEmail] = React.useState('');
   const [passwd, setPasswd] = React.useState('');
@@ -267,7 +267,7 @@ function RegistrationForm() {
 }
 
 function ServiceForm({ email, googleAccessToken }: { email: string, googleAccessToken: string }) {
-  const appCtx = React.useContext(ContentAppContext);
+  const appCtx = React.useContext(ExtensionAppContext);
 
   return <>
     <Section>
