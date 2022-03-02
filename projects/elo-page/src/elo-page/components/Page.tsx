@@ -1,7 +1,11 @@
 import * as react from 'react';
 
-const Page: react.FunctionComponent = (props) => {
-  return <div className="elo-page-container">{props.children}</div>
+type Props = {
+  classes?: string[];
+};
+
+const Page: react.FunctionComponent<Props> = ({ classes = [], children }) => {
+  return <div className={['elo-page-container', ...classes].join(' ')}>{children}</div>
 };
 
 export default Page;

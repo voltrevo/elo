@@ -19,7 +19,7 @@ const WelcomePage: React.FunctionComponent = () => {
   const [serviceEmail, setServiceEmail] = React.useState<string>();
   const [googleAccessToken, setGoogleAccessToken] = React.useState<string>('');
 
-  return <Page>
+  return <Page classes={['form-page']}>
     <h1>Welcome</h1>
 
     <div className="welcome-container">
