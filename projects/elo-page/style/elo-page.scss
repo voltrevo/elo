@@ -33,7 +33,7 @@ body {
   .nav {
     min-width: 220px;
     height: 100%;
-    border-right: 1px solid hsla(0, 0, 50, 0.2);
+    border-right: 1px solid $faint-line-color;
     display: flex;
     flex-direction: column;
 
@@ -59,8 +59,8 @@ body {
         cursor: pointer;
 
         background-color: $not-selected-bgcolor;
-        border-top: 1px solid hsla(0, 0, 50, 0.2);
-        border-bottom: 1px solid hsla(0, 0, 50, 0.2);
+        border-top: 1px solid $faint-line-color;
+        border-bottom: 1px solid $faint-line-color;
 
         .content {
           padding: 0.5em 0;
@@ -82,8 +82,8 @@ body {
         &.selected {
           background-color: $selected-bgcolor;
           color: black;
-          border-top: 1px solid hsla(0, 0, 50, 0.3);
-          border-bottom: 1px solid hsla(0, 0, 50, 0.3);
+          border-top: 1px solid $less-faint-line-color;
+          border-bottom: 1px solid $less-faint-line-color;
         }
 
         &:active {
@@ -125,8 +125,8 @@ body {
     margin-left: auto;
     margin-right: auto;
     text-align: left;
-    border-left: 1px solid hsla(0, 0, 50, 0.2);
-    border-right: 1px solid hsla(0, 0, 50, 0.2);
+    border-left: 1px solid $faint-line-color;
+    border-right: 1px solid $faint-line-color;
     background-color: white;
     min-height: 100%;
 
@@ -148,13 +148,13 @@ body {
       font-size: 1em;
       font-weight: 300;
 
-      border: 1px solid hsl(0, 0, 70);
+      border: 1px solid $less-faint-line-color;
 
       &:focus {
         border: 1px solid black;
       }
 
-      border-radius: 5px;
+      border-radius: $standard-border-radius;
     }
 
     textarea {
@@ -181,13 +181,13 @@ body {
         width: 100%;
         height: 100%;
         outline: none;
-        border: 1px solid hsl(0, 0, 70);
+        border: 1px solid $less-faint-line-color;
 
         &:focus {
           border: 1px solid black;
         }
 
-        border-radius: 5px;
+        border-radius: $standard-border-radius;
       }
 
       .field-text-wrapper {
@@ -245,8 +245,8 @@ body {
     background-color: hsl(0, 0, 98);
 
     > div {
-      border-left: 1px solid hsla(0, 0, 50, 0.2);
-      border-right: 1px solid hsla(0, 0, 50, 0.2);
+      border-left: 1px solid $faint-line-color;
+      border-right: 1px solid $faint-line-color;
       background-color: white;
       min-height: 100%;
     }
@@ -288,13 +288,13 @@ body {
   }
 
   .card {
-    border-radius: 5px;
+    border-radius: $standard-border-radius;
     padding: 1em;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 10px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
   }
 
   .chart {
-    border-radius: 5px;
+    border-radius: $standard-border-radius;
     padding: 1em;
     border: none;
   }
@@ -352,7 +352,7 @@ body {
     }
 
     padding: 0.5em 1em;
-    border-radius: 5px;
+    border-radius: $standard-border-radius;
     user-select: none;
     cursor: pointer;
     font-weight: bold;
@@ -402,7 +402,7 @@ body {
 
       .button-error {
         display: inline-block;
-        border-radius: 5px;
+        border-radius: $standard-border-radius;
         padding: 0.5em 1em;
         background-color: hsl(0, 0, 95);
       }
@@ -517,20 +517,20 @@ body {
       font-weight: bold;
 
       &:first-child {
-        border-top-left-radius: 5px;
-        border-bottom-left-radius: 5px;
+        border-top-left-radius: $standard-border-radius;
+        border-bottom-left-radius: $standard-border-radius;
       }
 
       &:last-child {
-        border-top-right-radius: 5px;
-        border-bottom-right-radius: 5px;
+        border-top-right-radius: $standard-border-radius;
+        border-bottom-right-radius: $standard-border-radius;
       }
     }
 
     border-collapse: collapse;
 
     .cell {
-      border: 1px solid hsla(0, 0, 50, 0.2);
+      border: 1px solid $less-faint-line-color;
 
       &:not(:last-child) {
         border-right: none;
@@ -585,7 +585,7 @@ body {
   .resend-email-dialog {
     background-color: white;
     width: 700px;
-    border-radius: 5px;
+    border-radius: $standard-border-radius;
     padding: 20px;
     font-size: 1em;
   }
@@ -593,7 +593,7 @@ body {
   .terms-and-conditions-dialog {
     background-color: white;
     width: 700px;
-    border-radius: 5px;
+    border-radius: $standard-border-radius;
     padding: 20px;
     font-size: 1em;
   }
