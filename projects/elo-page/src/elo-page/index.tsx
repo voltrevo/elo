@@ -16,7 +16,10 @@ window.addEventListener('load', async () => {
   const rawStorage = RawStorage();
   const storage = await Storage.Create(rawStorage, 'elo');
 
-  const eloClient = makeLocalExtensionAppClient(SimulExtensionApp(rawStorage));
+  const eloExtensionApp = SimulExtensionApp(storage);
+  (window as any).eloExtensionApp = eloExtensionApp;
+
+  const eloClient = makeLocalExtensionAppClient(eloExtensionApp);
   const pageCtx = initEloPageContext(storage, config);
 
   const { accountRoot } = await pageCtx.storage.readRoot();

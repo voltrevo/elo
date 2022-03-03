@@ -13,8 +13,7 @@ import Feedback from '../elo-types/Feedback';
 import { PromisishApi } from './protocolHelpers';
 import Registration from '../elo-types/Registration';
 import LoginCredentials from '../elo-types/LoginCredentials';
-import AccountRoot from './storage/AccountRoot';
-import IRawStorage from './storage/IRawStorage';
+import AccountRoot, { initAccountRoot } from './storage/AccountRoot';
 import IBackendApi from './IBackendApi';
 import IGoogleAuthApi from './IGoogleAuthApi';
 
@@ -27,17 +26,14 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   fillerSoundEwma = new EwmaCalculator(60, 60);
   fillerWordEwma = new EwmaCalculator(60, 60);
 
-  storage: Storage;
   sessionKey = RandomKey(); // FIXME
 
   constructor(
     public backendApi: IBackendApi,
     public googleAuthApi: IGoogleAuthApi,
     public dashboardUrl: string,
-    rawStorage: IRawStorage,
-  ) {
-    this.storage = new Storage(rawStorage, 'elo');
-  }
+    public storage: Storage,
+  ) {}
 
   async UserId() {
     const root = await this.storage.readRoot();
@@ -273,39 +269,56 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   async register(registration: Registration) {
-    this;
-    await delay(500);
+    const anonymousAccountRoot = await this.storage.read(AccountRoot, 'elo-user:anonymous');
 
-    if ('password' in registration && registration.password !== 'test') {
-      throw new Error('password was not "test"');
+    const { userId, email, googleAccount } = await this.backendApi.register({
+      ...registration,
+      userId: anonymousAccountRoot?.userId,
+    });
+
+    const accountRoot = anonymousAccountRoot ?? initAccountRoot();
+    accountRoot.userId = userId;
+    accountRoot.email = email;
+    accountRoot.googleAccount = googleAccount;
+
+    const accountRootKey = `elo-user:${accountRoot.userId}`;
+
+    await this.storage.write(AccountRoot, accountRootKey, accountRoot);
+
+    const root = await this.storage.readRoot();
+    root.accountRoot = accountRootKey;
+    await this.storage.writeRoot(root);
+
+    if (anonymousAccountRoot !== undefined) {
+      await this.storage.remove('elo-user:anonymous');
     }
 
-    if ('email' in registration) {
-      return registration.email;
-    }
-
-    registration;
-
-    const detail = await this.googleAuthApi.getTokenDetail(registration.googleAccessToken);
-
-    return detail.email;
+    return email;
   }
 
   async login(credentials: LoginCredentials) {
-    this;
-    await delay(500);
+    const anonymousAccountRoot = await this.storage.read(AccountRoot, 'elo-user:anonymous');
+    const accountRoot = anonymousAccountRoot ?? initAccountRoot();
 
-    if ('password' in credentials && credentials.password !== 'test') {
-      throw new Error('password was not "test"');
+    const { userId, email, googleAccount } = await this.backendApi.login(credentials);
+
+    accountRoot.userId = userId;
+    accountRoot.email = email;
+    accountRoot.googleAccount = googleAccount;
+
+    const accountRootKey = `elo-user:${accountRoot.userId}`;
+
+    await this.storage.write(AccountRoot, accountRootKey, accountRoot);
+
+    const root = await this.storage.readRoot();
+    root.accountRoot = accountRootKey;
+    await this.storage.writeRoot(root);
+
+    if (anonymousAccountRoot !== undefined) {
+      await this.storage.remove('elo-user:anonymous');
     }
 
-    if ('email' in credentials) {
-      return credentials.email;
-    }
-
-    const detail = await this.googleAuthApi.getTokenDetail(credentials.googleAccessToken);
-
-    return detail.email;
+    return email;
   }
 
   async sendFeedback(feedback: Feedback) {

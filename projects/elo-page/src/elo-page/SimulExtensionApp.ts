@@ -3,8 +3,10 @@ import Feedback from '../elo-types/Feedback';
 import config from './config';
 import ExtensionApp from '../elo-extension-app/ExtensionApp';
 import IGoogleAuthApi from '../elo-extension-app/IGoogleAuthApi';
-import IBackendApi from '../elo-extension-app/IBackendApi';
-import IRawStorage from '../elo-extension-app/storage/IRawStorage';
+import IBackendApi, { LoginResult } from '../elo-extension-app/IBackendApi';
+import Registration from '../elo-types/Registration';
+import LoginCredentials from '../elo-types/LoginCredentials';
+import Storage from '../elo-extension-app/storage/Storage';
 
 let shiftKey = false;
 
@@ -23,8 +25,11 @@ window.addEventListener('load', () => {
 });
 
 class SimulBackendApi implements IBackendApi {
-  generateId(): Promise<string> {
-    throw new Error('Method not implemented.');
+  googleAuthApi = new SimulGoogleAuthApi();
+
+  async generateId(): Promise<string> {
+    await delay(500);
+    return `fake-id-${Date.now()}`;
   }
 
   startSession(_body: { userId: string; }): Promise<string> {
@@ -33,6 +38,60 @@ class SimulBackendApi implements IBackendApi {
 
   async feedback(_body: { userId: string; feedback: Feedback }): Promise<void> {
     await delay(500);
+  }
+
+  async register(registration: Registration): Promise<LoginResult> {
+    await delay(500);
+
+    if (shiftKey && registration.userId) {
+      // Not super realistic - you'd need to manually reuse the anonymous
+      // userId with a different account in order to get this result.
+      throw new Error('Provided userId already associated with other account');
+    }
+
+    if ('password' in registration && registration.password !== 'test') {
+      throw new Error('password was not "test"');
+    }
+
+    const email = await (async () => {
+      if ('email' in registration) {
+        return registration.email;
+      }
+  
+      const detail = await this.googleAuthApi.getTokenDetail(registration.googleAccessToken);
+  
+      return detail.email;
+    })();
+
+    return {
+      userId: registration.userId ?? await this.generateId(),
+      email,
+      googleAccount: 'googleAccessToken' in registration ? email : undefined,
+    };
+  }
+
+  async login(credentials: LoginCredentials): Promise<LoginResult> {
+    await delay(500);
+
+    if ('password' in credentials && credentials.password !== 'test') {
+      throw new Error('password was not "test"');
+    }
+
+    const email = await (async () => {
+      if ('email' in credentials) {
+        return credentials.email;
+      }
+  
+      const detail = await this.googleAuthApi.getTokenDetail(credentials.googleAccessToken);
+  
+      return detail.email;
+    })();
+
+    return {
+      userId: await this.generateId(),
+      email,
+      googleAccount: 'googleAccessToken' in credentials ? email : undefined,
+    };
   }
 }
 
@@ -69,11 +128,11 @@ class SimulGoogleAuthApi implements IGoogleAuthApi {
   }
 }
 
-export default function SimulExtensionApp(rawStorage: IRawStorage): ExtensionApp {
+export default function SimulExtensionApp(storage: Storage): ExtensionApp {
   return new ExtensionApp(
     new SimulBackendApi(),
     new SimulGoogleAuthApi(),
     'dashboard.html',
-    rawStorage,
+    storage,
   );
 }
