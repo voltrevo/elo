@@ -314,12 +314,11 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   async login(credentials: LoginCredentials) {
-    debugger;
-    const anonymousAccountRoot = await this.storage.read(AccountRoot, anonymousAccountRootKey);
-    const accountRoot = anonymousAccountRoot ?? initAccountRoot();
-
     const { userId, email, googleAccount } = await this.backendApi.login(credentials);
+    const anonymousAccountRoot = await this.storage.read(AccountRoot, anonymousAccountRootKey);
+    const existingAccountRoot = await this.storage.read(AccountRoot, `elo-user:${userId}`);
 
+    const accountRoot = existingAccountRoot ?? anonymousAccountRoot ?? initAccountRoot();
     accountRoot.userId = userId;
     accountRoot.email = email;
     accountRoot.googleAccount = googleAccount;
@@ -332,7 +331,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     root.accountRoot = accountRootKey;
     await this.storage.writeRoot(root);
 
-    if (anonymousAccountRoot !== undefined) {
+    if (existingAccountRoot === undefined && anonymousAccountRoot !== undefined) {
       await this.storage.remove(anonymousAccountRootKey);
     }
 

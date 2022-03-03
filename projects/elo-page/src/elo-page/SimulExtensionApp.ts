@@ -26,6 +26,7 @@ window.addEventListener('load', () => {
 
 class SimulBackendApi implements IBackendApi {
   googleAuthApi = new SimulGoogleAuthApi();
+  knownUsers: Record<string, string> = {};
 
   async generateId(): Promise<string> {
     await delay(500);
@@ -63,11 +64,19 @@ class SimulBackendApi implements IBackendApi {
       return detail.email;
     })();
 
-    return {
+    if (email in this.knownUsers) {
+      throw new Error('Account already exists');
+    }
+
+    const result = {
       userId: registration.userId ?? await this.generateId(),
       email,
       googleAccount: 'googleAccessToken' in registration ? email : undefined,
     };
+
+    this.knownUsers[email] = result.userId;
+
+    return result;
   }
 
   async login(credentials: LoginCredentials): Promise<LoginResult> {
@@ -87,11 +96,15 @@ class SimulBackendApi implements IBackendApi {
       return detail.email;
     })();
 
-    return {
-      userId: await this.generateId(),
+    const result = {
+      userId: this.knownUsers[email] ?? await this.generateId(),
       email,
       googleAccount: 'googleAccessToken' in credentials ? email : undefined,
     };
+
+    this.knownUsers[email] = result.userId;
+
+    return result;
   }
 }
 
