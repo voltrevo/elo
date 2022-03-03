@@ -14,7 +14,7 @@ window.addEventListener('load', async () => {
   document.body.appendChild(appDiv);
 
   const rawStorage = RawStorage();
-  const storage = new Storage(rawStorage, 'elo');
+  const storage = await Storage.Create(rawStorage, 'elo');
 
   const eloClient = makeLocalExtensionAppClient(SimulExtensionApp(rawStorage));
   const pageCtx = initEloPageContext(storage, config);
