@@ -1,12 +1,11 @@
 import * as React from 'react';
+import AccountRoot from '../../elo-extension-app/storage/AccountRoot';
 import SessionStats from '../../elo-types/SessionStats';
-import ExtensionAppContext from '../ExtensionAppContext';
 
 import EloPageContext from '../EloPageContext';
 import SessionReport from './SessionReport';
 
 const ReportsPage: React.FunctionComponent = () => {
-  const eloClient = React.useContext(ExtensionAppContext);
   const pageCtx = React.useContext(EloPageContext);
 
   const [lastSession, setLastSession] = React.useState<SessionStats>();
@@ -14,7 +13,13 @@ const ReportsPage: React.FunctionComponent = () => {
 
   React.useEffect(() => {
     (async () => {
-      const { lastSessionKey } = await pageCtx.storage.readRoot();
+      const root = await pageCtx.storage.readRoot();
+      
+      if (root.accountRoot === undefined) {
+        return;
+      }
+
+      const { lastSessionKey } = await pageCtx.storage.read(AccountRoot, root.accountRoot) ?? {};
 
       if (lastSessionKey === undefined) {
         return;
