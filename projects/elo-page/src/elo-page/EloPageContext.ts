@@ -4,7 +4,7 @@ import * as React from 'react';
 import TypedEventEmitter from 'typed-emitter';
 import type { Config } from './config';
 
-import Storage from './storage/Storage';
+import Storage from '../elo-extension-app/storage/Storage';
 
 type EloPageContext = ReturnType<typeof initEloPageContext>;
 

@@ -1,4 +1,5 @@
 import * as io from 'io-ts';
+
 import optional from '../../elo-types/optional';
 
 const StorageRoot = io.type({

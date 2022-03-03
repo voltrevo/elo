@@ -45,6 +45,7 @@
     "fp-ts": "^2.11.8",
     "io-ts": "^2.2.16",
     "io-ts-reporters": "^2.0.1",
+    "js-sha3": "^0.8.0",
     "live-server": "^1.2.1",
     "phosphor-react": "^1.4.0",
     "react": "^17.0.2",

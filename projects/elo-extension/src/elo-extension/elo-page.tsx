@@ -1,17 +1,24 @@
 import * as ReactDOM from 'react-dom';
 import Browser from 'webextension-polyfill';
+
 import EloPage from '../elo-page/components/EloPage';
 import { makeLocalExtensionAppClient } from '../elo-page/ExtensionAppClient';
 import ExtensionAppContext from '../elo-page/ExtensionAppContext';
 import EloPageContext, { initEloPageContext } from '../elo-page/EloPageContext';
-import Storage from '../elo-page/storage/Storage';
-
-import ContentApp from './ContentApp';
-
 import clientConfig from './helpers/clientConfig';
+import ExtensionApp from '../elo-extension-app/ExtensionApp';
+import Storage from '../elo-extension-app/storage/Storage';
+import BackendApi from './BackendApi';
+import GoogleAuthApi from './GoogleAuthApi';
 
-const contentApp = makeLocalExtensionAppClient(new ContentApp());
-(window as any).contentApp = contentApp;
+const eloExtensionApp = makeLocalExtensionAppClient(new ExtensionApp(
+  new BackendApi(`${clientConfig.tls ? 'https:' : 'http:'}//${clientConfig.hostAndPort}`),
+  new GoogleAuthApi(clientConfig.googleOauthClientId),
+  Browser.runtime.getURL('elo-page.html'),
+  Browser.storage.local,
+));
+
+(window as any).eloExtensionApp = eloExtensionApp;
 
 window.addEventListener('load', async () => {
   const pageCtx = initEloPageContext(new Storage(Browser.storage.local, 'elo'), clientConfig);
@@ -25,7 +32,7 @@ window.addEventListener('load', async () => {
   });
 
   ReactDOM.render(
-    <ExtensionAppContext.Provider value={contentApp}>
+    <ExtensionAppContext.Provider value={eloExtensionApp}>
       <EloPageContext.Provider value={pageCtx}>
         <EloPage/>
       </EloPageContext.Provider>

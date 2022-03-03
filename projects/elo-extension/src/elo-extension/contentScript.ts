@@ -1,8 +1,11 @@
 import Browser from 'webextension-polyfill';
+import ExtensionApp from '../elo-extension-app/ExtensionApp';
+import { protocolThirdPartyKeyMap } from '../elo-extension-app/Protocol';
 
 import PostMessageServer from '../elo-page/helpers/PostMessageServer';
-import { protocolThirdPartyKeyMap } from '../elo-page/Protocol';
-import ContentApp from './ContentApp';
+import BackendApi from './BackendApi';
+import GoogleAuthApi from './GoogleAuthApi';
+import clientConfig from './helpers/clientConfig';
 
 const eloExtension = document.createElement('div');
 eloExtension.id = 'elo-extension';
@@ -24,7 +27,12 @@ iconTag.src = Browser.runtime.getURL('assets/icons/icon128.png');
 iconTag.style.display = 'none';
 eloExtension.appendChild(iconTag);
 
-const contentApp = new ContentApp();
+const extensionApp = new ExtensionApp(
+  new BackendApi(`${clientConfig.tls ? 'https:' : 'http:'}//${clientConfig.hostAndPort}`),
+  new GoogleAuthApi(clientConfig.googleOauthClientId),
+  Browser.runtime.getURL('elo-page.html'),
+  Browser.storage.local,
+);
 
 new PostMessageServer(
   'elo',
@@ -33,6 +41,6 @@ new PostMessageServer(
       throw new Error(`Method not found: ${method}`);
     }
 
-    (contentApp as any)[method](...args)
+    (extensionApp as any)[method](...args)
   },
 );

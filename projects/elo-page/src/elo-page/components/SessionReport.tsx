@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { Question } from 'phosphor-react';
 
-import Storage from '../storage/Storage';
+import Storage from '../../elo-extension-app/storage/Storage';
 import EloPageContext from '../EloPageContext';
 import SessionStats from '../../elo-types/SessionStats';
 

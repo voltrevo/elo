@@ -1,7 +1,7 @@
 import * as React from 'react';
 import ExtensionAppContext from '../../elo-page/ExtensionAppContext';
 
-import UiState from '../../elo-page/UiState';
+import UiState from '../../elo-extension-app/UiState';
 import CollapseIcon from './CollapseIcon';
 import ExpandIcon from './ExpandIcon';
 import PopoutIcon from './PopoutIcon';

@@ -1,26 +1,24 @@
 import { keccak_256 } from 'js-sha3';
-import browser from 'webextension-polyfill';
 
-import clientConfig from './helpers/clientConfig';
-import EwmaCalculator from './helpers/EwmaCalculator';
-import Protocol, { ConnectionEvent, GoogleAuthResult } from '../elo-page/Protocol';
+import EwmaCalculator from './EwmaCalculator';
+import Protocol, { ConnectionEvent } from './Protocol';
 import SessionStats, { initSessionStats } from '../elo-types/SessionStats';
-import Storage, { RandomKey } from '../elo-page/storage/Storage';
-import UiState from '../elo-page/UiState';
+import Storage, { RandomKey } from './storage/Storage';
+import UiState from './UiState';
 import never from '../common-pure/never';
 import delay from '../common-pure/delay';
 import TaskQueue from '../common-pure/TaskQueue';
 import { AnalysisDisfluent, AnalysisFragment } from '../elo-types/Analysis';
 import Feedback from '../elo-types/Feedback';
-import { PromisishApi } from '../elo-page/helpers/protocolHelpers';
+import { PromisishApi } from './protocolHelpers';
 import Registration from '../elo-types/Registration';
 import LoginCredentials from '../elo-types/LoginCredentials';
-import AccountRoot from '../elo-page/storage/AccountRoot';
+import AccountRoot from './storage/AccountRoot';
+import IRawStorage from './storage/IRawStorage';
+import IBackendApi from './IBackendApi';
+import IGoogleAuthApi from './IGoogleAuthApi';
 
-const sessionKey = RandomKey();
-const apiBase = `${clientConfig.tls ? 'https:' : 'http:'}//${clientConfig.hostAndPort}`;
-
-export default class ContentApp implements PromisishApi<Protocol> {
+export default class ExtensionApp implements PromisishApi<Protocol> {
   uiState = UiState();
   sessionStats = initSessionStats(document.title, Date.now());
   sessionToken?: string;
@@ -29,15 +27,24 @@ export default class ContentApp implements PromisishApi<Protocol> {
   fillerSoundEwma = new EwmaCalculator(60, 60);
   fillerWordEwma = new EwmaCalculator(60, 60);
 
-  storage = new Storage(browser.storage.local, 'elo');
+  storage: Storage;
+  sessionKey = RandomKey(); // FIXME
+
+  constructor(
+    public backendApi: IBackendApi,
+    public googleAuthApi: IGoogleAuthApi,
+    public dashboardUrl: string,
+    rawStorage: IRawStorage,
+  ) {
+    this.storage = new Storage(rawStorage, 'elo');
+  }
 
   async UserId() {
     const root = await this.storage.readRoot();
     let userId: string;
 
     if (root.userId === undefined) {
-      userId = await fetch(`${apiBase}/generateId`, { method: 'POST' })
-        .then(res => res.text());
+      userId = await this.backendApi.generateId();
 
       root.userId = userId;
       await this.storage.writeRoot(root);
@@ -59,28 +66,21 @@ export default class ContentApp implements PromisishApi<Protocol> {
   }
 
   async activate() {
-    (window as any).contentApp = this;
+    (globalThis as any).eloExtensionApp = this;
 
     const root = await this.storage.readRoot();
 
     if (root.userId === undefined) {
-      root.userId = await fetch(`${apiBase}/generateId`, { method: 'POST' })
-        .then(res => res.text());
+      root.userId = await this.backendApi.generateId();
     }
 
     this.sessionStats.lastSessionKey = root.lastSessionKey;
-    root.lastSessionKey = sessionKey;
+    root.lastSessionKey = this.sessionKey;
     await this.storage.writeRoot(root);
 
-    const startSessionResponse = await fetch(`${apiBase}/startSession`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-      body: JSON.stringify({
-        userId: root.userId,
-      }),
-    }).then(res => res.text());
+    const startSessionResponse = await this.backendApi.startSession({
+      userId: root.userId,
+    });
 
     let sessionToken: string;
 
@@ -205,7 +205,7 @@ export default class ContentApp implements PromisishApi<Protocol> {
 
   // eslint-disable-next-line class-methods-use-this
   getDashboardUrl() {
-    return browser.runtime.getURL('elo-page.html');
+    return this.dashboardUrl;
   }
 
   updateFeatureCount(disfluent: AnalysisDisfluent) {
@@ -242,7 +242,7 @@ export default class ContentApp implements PromisishApi<Protocol> {
     this.sessionStats.speakingTime += speakingTime;
     this.sessionStats.audioTime += audioTime;
 
-    this.storage.write(SessionStats, sessionKey, this.sessionStats);
+    this.storage.write(SessionStats, this.sessionKey, this.sessionStats);
   }
 
   async setMetricPreference(preference: string) {
@@ -268,6 +268,10 @@ export default class ContentApp implements PromisishApi<Protocol> {
     return code === keccak_256(email).slice(0, 6);
   }
 
+  async googleAuth() {
+    return await this.googleAuthApi.login();
+  }
+
   async register(registration: Registration) {
     this;
     await delay(500);
@@ -280,7 +284,9 @@ export default class ContentApp implements PromisishApi<Protocol> {
       return registration.email;
     }
 
-    const detail = await this.getGoogleTokenDetail(registration.googleAccessToken);
+    registration;
+
+    const detail = await this.googleAuthApi.getTokenDetail(registration.googleAccessToken);
 
     return detail.email;
   }
@@ -297,7 +303,7 @@ export default class ContentApp implements PromisishApi<Protocol> {
       return credentials.email;
     }
 
-    const detail = await this.getGoogleTokenDetail(credentials.googleAccessToken);
+    const detail = await this.googleAuthApi.getTokenDetail(credentials.googleAccessToken);
 
     return detail.email;
   }
@@ -307,20 +313,11 @@ export default class ContentApp implements PromisishApi<Protocol> {
       throw new Error('Please include an emoji or a message.');
     }
 
-    const feedbackResponse = await fetch(`${apiBase}/feedback`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-      body: JSON.stringify({
-        userId: await this.UserId(),
-        feedback,
-      }),
+    // TODO: Use response from server
+    await this.backendApi.feedback({
+      userId: await this.UserId(),
+      feedback,
     });
-
-    if (feedbackResponse.status !== 200) {
-      throw new Error(await feedbackResponse.text());
-    }
 
     if (feedback.positive) {
       return 'Thanks! We\'re so glad you\'re enjoying Elo.';
@@ -333,90 +330,6 @@ export default class ContentApp implements PromisishApi<Protocol> {
     return 'Thanks!';
   }
 
-  async googleAuth(): Promise<GoogleAuthResult> {
-    const authUrlObj = new URL('https://accounts.google.com/o/oauth2/auth');
-    authUrlObj.searchParams.append('client_id', clientConfig.googleOauthClientId);
-    authUrlObj.searchParams.append('redirect_uri', browser.identity.getRedirectURL("oauth2.html"));
-    authUrlObj.searchParams.append('response_type', 'token');
-    authUrlObj.searchParams.append('scope', 'email');
-
-    const responseUrl = await browser.identity.launchWebAuthFlow(
-      {
-        url: authUrlObj.toString(),
-        interactive: true,
-      },
-    );
-
-    const responseUrlHash = new URL(responseUrl).hash;
-    const accessToken = new URLSearchParams(responseUrlHash.slice(1)).get('access_token');
-
-    if (accessToken === null) {
-      throw new Error('Missing access_token');
-    }
-
-    const detail = await this.getGoogleTokenDetail(accessToken);
-
-    if (detail.issued_to !== clientConfig.googleOauthClientId) {
-      throw new Error('Client id mismatch');
-    }
-
-    if (!detail.verified_email) {
-      throw new Error(`Unverified email ${detail.email}`);
-    }
-
-    return {
-      token: accessToken,
-      registered: false, // TODO: implement this
-      detail,
-    };
-  }
-
-  async getGoogleTokenDetail(accessToken: string): Promise<GoogleAuthResult['detail']> {
-    // TODO: Server needs to do this too (maybe only on server?)
-    const tokenInfoJson = await fetch('https://www.googleapis.com/oauth2/v1/tokeninfo', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }).then(res => res.json());
-
-    const decodeResult = GoogleAuthResult.props.detail.decode(tokenInfoJson);
-
-    if ('left' in decodeResult) {
-      // TODO: Use reporter
-      throw new Error(decodeResult.left.map(e => e.message).join('\n'));
-    }
-
-    return decodeResult.right;
-  }
-
-  async googleAuthLogout(): Promise<void> {
-    try {
-      await browser.identity.launchWebAuthFlow({
-        url: 'https://accounts.google.com/logout',
-        interactive: false,
-      });
-    } catch {}
-
-    const authUrlObj = new URL('https://accounts.google.com/o/oauth2/auth');
-    authUrlObj.searchParams.append('client_id', clientConfig.googleOauthClientId);
-    authUrlObj.searchParams.append('redirect_uri', browser.identity.getRedirectURL('oauth2.html'));
-    authUrlObj.searchParams.append('response_type', 'token');
-    authUrlObj.searchParams.append('scope', 'email');
-
-    try {
-      await browser.identity.launchWebAuthFlow(
-        {
-          url: authUrlObj.toString(),
-          interactive: false,
-        },
-      );
-
-      throw new Error('Failed to log out');
-    } catch {
-      return;
-    }
-  }
-
   async logout() {
     const accountRoot = await this.readAccountRoot();
 
@@ -426,7 +339,7 @@ export default class ContentApp implements PromisishApi<Protocol> {
     }
 
     if (accountRoot?.googleAccount) {
-      await this.googleAuthLogout();
+      await this.googleAuthApi.logout();
     }
 
     if (accountRoot !== undefined) {

@@ -6,68 +6,17 @@ import { makeLocalExtensionAppClient } from './ExtensionAppClient';
 import ExtensionAppContext from './ExtensionAppContext';
 import EloPageContext, { initEloPageContext } from './EloPageContext';
 import SimulExtensionApp from './SimulExtensionApp';
-import IRawStorage from './storage/IRawStorage';
-import Storage from './storage/Storage';
-
-const { sampleStorage } = config;
-
-function isLocalKey(key: string) {
-  return localStorage.getItem(`isLocal:${key}`) !== null;
-}
-
-function addLocalKey(key: string) {
-  localStorage.setItem(`isLocal:${key}`, "true");
-}
-
-const rawStorage: IRawStorage = {
-  async get(key) {
-    if (!isLocalKey(key)) {
-      const sampleValue = sampleStorage[key];
-
-      if (sampleValue === undefined) {
-        return {};
-      }
-
-      return {
-        [key]: sampleValue,
-      };
-    }
-
-    const localValue = localStorage.getItem(key);
-
-    if (localValue === null) {
-      return {};
-    }
-
-    return {
-      [key]: JSON.parse(localValue),
-    };
-  },
-
-  async set(items) {
-    for (const key of Object.keys(items)) {
-      addLocalKey(key);
-      localStorage.setItem(key, JSON.stringify(items[key]));
-    }
-  },
-
-  async remove(key) {
-    addLocalKey(key);
-    localStorage.removeItem(key);
-  },
-
-  async clear() {
-    localStorage.clear();
-  }
-};
+import Storage from '../elo-extension-app/storage/Storage';
+import RawStorage from './RawStorage';
 
 window.addEventListener('load', async () => {
   const appDiv = document.createElement('div');
   document.body.appendChild(appDiv);
 
+  const rawStorage = RawStorage();
   const storage = new Storage(rawStorage, 'elo');
 
-  const eloClient = makeLocalExtensionAppClient(new SimulExtensionApp(storage));
+  const eloClient = makeLocalExtensionAppClient(SimulExtensionApp(rawStorage));
   const pageCtx = initEloPageContext(storage, config);
 
   const { accountRoot } = await pageCtx.storage.readRoot();

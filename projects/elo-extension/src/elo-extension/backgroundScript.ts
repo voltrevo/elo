@@ -1,6 +1,6 @@
 import Browser from 'webextension-polyfill';
 
-import Storage from '../elo-page/storage/Storage';
+import Storage from '../elo-extension-app/storage/Storage';
 import clientConfig from './helpers/clientConfig';
 
 Browser.runtime.onInstalled.addListener(async () => {
