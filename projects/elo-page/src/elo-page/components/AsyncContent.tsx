@@ -15,8 +15,10 @@ const AsyncContent: React.FunctionComponent<Props> = ({ load }) => {
   }, [load]);
 
   if (!content) {
-    return <div className="spinner">
-      <CircleNotch size={24}/>
+    return <div>
+      <div className="spinner" style={{ display: 'inline-block' }}>
+        <CircleNotch size={24}/>
+      </div>
     </div>;
   }
 

@@ -16,12 +16,28 @@ const AccountPage: React.FunctionComponent = () => {
   return <Page classes={['form-page']}>
     <Section>
       <h1>Account</h1>
-      <Field>
-        <div>Email</div>
-        <div>
-          <AsyncContent load={() => appCtx.getEmail()}/>
+      <AsyncContent load={async () => {
+        const email = await appCtx.getEmail();
+
+        if (email) {
+          return <Field>
+            <div>Email</div>
+            <div>{email}</div>
+          </Field>
+        }
+
+        return <div>
+          <p>
+            Hey, you've got an anonymous account! That means you've been
+            with us since our early days. Your support means so much to us.
+          </p>
+
+          <p>
+            It's safe to log out. We'll just associate your anonymous account
+            data with the next account you create or log in to.
+          </p>
         </div>
-      </Field>
+      }}/>
       <div className="button-column">
         <AsyncButton
           once={true}
