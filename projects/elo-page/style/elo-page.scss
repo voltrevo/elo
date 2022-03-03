@@ -58,7 +58,7 @@ body {
         user-select: none;
         cursor: pointer;
 
-        background-color: white;
+        background-color: $not-selected-bgcolor;
         border-top: 1px solid hsla(0, 0, 50, 0.2);
         border-bottom: 1px solid hsla(0, 0, 50, 0.2);
 
@@ -80,14 +80,14 @@ body {
         }
 
         &.selected {
-          background-color: $second-accent;
-          color: white;
-          border-top: 1px solid transparent;
-          border-bottom: 1px solid transparent;
+          background-color: $selected-bgcolor;
+          color: black;
+          border-top: 1px solid hsla(0, 0, 50, 0.3);
+          border-bottom: 1px solid hsla(0, 0, 50, 0.3);
         }
 
         &:active {
-          filter: brightness(95%);
+          filter: brightness(97%);
 
           &.selected {
             filter: none;
@@ -343,7 +343,7 @@ body {
     }
 
     border: 1px solid black;
-    background-color: white;
+    background-color: $not-selected-bgcolor;
 
     &.primary {
       background-color: $second-accent;
@@ -358,7 +358,7 @@ body {
     font-weight: bold;
 
     &:active {
-      filter: brightness(95%);
+      filter: brightness(97%);
 
       &.primary {
         filter: brightness(90%);
@@ -505,29 +505,6 @@ body {
     }
   }
 
-  .row-selector {
-    display: flex;
-    flex-direction: row;
-    margin: 10px;
-
-    > div {
-      flex-grow: 1;
-      text-align: center;
-      font-size: 2em;
-    }
-
-    .cell {
-      cursor: pointer;
-      border-radius: 5px;
-      padding: 5px;
-      user-select: none;
-
-      &.selected {
-        background-color: $first-accent;
-      }
-    }
-  }
-
   .bar-selector {
     display: flex;
     flex-direction: row;
@@ -562,16 +539,15 @@ body {
       cursor: pointer;
       padding: 0.5em 1em;
       user-select: none;
-      background-color: white;
+      background-color: $not-selected-bgcolor;
 
       &.selected {
-        background-color: $second-accent;
-
-        color: white;
+        background-color: $selected-bgcolor;
+        color: black;
       }
 
       &:active {
-        filter: brightness(95%);
+        filter: brightness(97%);
 
         &.selected {
           filter: none;
