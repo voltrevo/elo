@@ -3,7 +3,7 @@ import { keccak_256 } from 'js-sha3';
 import EwmaCalculator from './EwmaCalculator';
 import Protocol, { ConnectionEvent } from './Protocol';
 import SessionStats, { initSessionStats } from '../elo-types/SessionStats';
-import Storage, { RandomKey } from './storage/Storage';
+import Storage, { anonymousAccountRootKey, RandomKey } from './storage/Storage';
 import UiState from './UiState';
 import never from '../common-pure/never';
 import delay from '../common-pure/delay';
@@ -16,6 +16,7 @@ import LoginCredentials from '../elo-types/LoginCredentials';
 import AccountRoot, { initAccountRoot } from './storage/AccountRoot';
 import IBackendApi from './IBackendApi';
 import IGoogleAuthApi from './IGoogleAuthApi';
+import assert from '../common-pure/assert';
 
 export default class ExtensionApp implements PromisishApi<Protocol> {
   uiState = UiState();
@@ -36,29 +37,45 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   ) {}
 
   async UserId() {
-    const root = await this.storage.readRoot();
-    let userId: string;
+    const accountRoot = await this.readAccountRoot();
+    assert(accountRoot.userId !== undefined);
 
-    if (root.userId === undefined) {
-      userId = await this.backendApi.generateId();
-
-      root.userId = userId;
-      await this.storage.writeRoot(root);
-    } else {
-      userId = root.userId;
-    }
-
-    return userId;
+    return accountRoot.userId;
   }
 
   async readAccountRoot() {
     const root = await this.storage.readRoot();
 
     if (!root.accountRoot) {
-      return undefined;
+      // TODO: Eventually we won't allow creating anonymous accounts.
+      const accountRoot = initAccountRoot();
+      accountRoot.userId = await this.backendApi.generateId();
+      await this.storage.write(AccountRoot, anonymousAccountRootKey, accountRoot);
+      root.accountRoot = anonymousAccountRootKey;
+      await this.storage.writeRoot(root);
     }
 
-    return await this.storage.read(AccountRoot, root.accountRoot);
+    const accountRoot = await this.storage.read(AccountRoot, root.accountRoot);
+
+    if (accountRoot === undefined) {
+      throw new Error('Failed to read account root');
+    }
+
+    return accountRoot;
+  }
+
+  async writeAccountRoot(accountRoot: AccountRoot) {
+    const root = await this.storage.readRoot();
+
+    assert(root.accountRoot !== undefined);
+    assert(accountRoot.userId !== undefined);
+
+    assert(
+      root.accountRoot.includes(accountRoot.userId) ||
+      root.accountRoot.includes('anonymous')
+    );
+
+    await this.storage.write(AccountRoot, root.accountRoot, accountRoot);
   }
 
   async activate() {
@@ -269,7 +286,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   async register(registration: Registration) {
-    const anonymousAccountRoot = await this.storage.read(AccountRoot, 'elo-user:anonymous');
+    const anonymousAccountRoot = await this.storage.read(AccountRoot, anonymousAccountRootKey);
 
     const { userId, email, googleAccount } = await this.backendApi.register({
       ...registration,
@@ -290,14 +307,15 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     await this.storage.writeRoot(root);
 
     if (anonymousAccountRoot !== undefined) {
-      await this.storage.remove('elo-user:anonymous');
+      await this.storage.remove(anonymousAccountRootKey);
     }
 
     return email;
   }
 
   async login(credentials: LoginCredentials) {
-    const anonymousAccountRoot = await this.storage.read(AccountRoot, 'elo-user:anonymous');
+    debugger;
+    const anonymousAccountRoot = await this.storage.read(AccountRoot, anonymousAccountRootKey);
     const accountRoot = anonymousAccountRoot ?? initAccountRoot();
 
     const { userId, email, googleAccount } = await this.backendApi.login(credentials);
@@ -315,7 +333,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     await this.storage.writeRoot(root);
 
     if (anonymousAccountRoot !== undefined) {
-      await this.storage.remove('elo-user:anonymous');
+      await this.storage.remove(anonymousAccountRootKey);
     }
 
     return email;
