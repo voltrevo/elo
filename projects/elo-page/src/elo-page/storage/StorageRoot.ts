@@ -7,7 +7,6 @@ const StorageRoot = io.type({
   userId: optional(io.string),
   installTriggered: optional(io.literal(true)),
   accountRoot: optional(io.string),
-  anonymousAccountMigrated: optional(io.literal(true)),
 });
 
 type StorageRoot = io.TypeOf<typeof StorageRoot>;
@@ -19,7 +18,6 @@ export function initStorageRoot(): StorageRoot {
     userId: undefined,
     installTriggered: undefined,
     accountRoot: undefined,
-    anonymousAccountMigrated: undefined,
   };
 }
 
