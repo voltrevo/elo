@@ -16,10 +16,11 @@ const contentApp = makeLocalExtensionAppClient(new ContentApp());
 window.addEventListener('load', async () => {
   const pageCtx = initEloPageContext(new Storage(Browser.storage.local, 'elo'), clientConfig);
 
-  const { email } = await pageCtx.storage.readRoot();
-  const needsAuth = clientConfig.featureFlags.authEnabled && !email;
+  const { accountRoot } = await pageCtx.storage.readRoot();
+  const needsAuth = clientConfig.featureFlags.authEnabled && !accountRoot;
 
   pageCtx.update({
+    needsAuth,
     page: needsAuth ? 'WelcomePage' : 'OverviewPage',
   });
 

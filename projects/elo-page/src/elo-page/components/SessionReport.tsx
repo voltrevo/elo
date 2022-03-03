@@ -152,7 +152,7 @@ const SessionReport: React.FunctionComponent<Props> = (props: Props) => {
       return;
     }
 
-    const lastSession = await pageCtx.storage.read<SessionStats>(session.lastSessionKey);
+    const lastSession = await pageCtx.storage.read(SessionStats, session.lastSessionKey);
 
     if (lastSession === undefined) {
       return;

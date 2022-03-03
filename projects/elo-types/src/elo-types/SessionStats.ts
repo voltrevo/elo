@@ -1,16 +1,23 @@
-type SessionStats = {
-  lastSessionKey?: string;
-  sessionToken?: string;
-  title: string;
-  start: number;
-  end: number;
-  speakingTime: number;
-  audioTime: number;
-  featureCounts: Record<string, Record<string, number>>;
-};
+import * as io from 'io-ts';
+import optional from './optional';
 
-function SessionStats(title: string, time: number): SessionStats {
+const SessionStats = io.type({
+  lastSessionKey: optional(io.string),
+  sessionToken: optional(io.string),
+  title: io.string,
+  start: io.number,
+  end: io.number,
+  speakingTime: io.number,
+  audioTime: io.number,
+  featureCounts: io.record(io.string, io.record(io.string, io.number)),
+});
+
+type SessionStats = io.TypeOf<typeof SessionStats>;
+
+export function initSessionStats(title: string, time: number): SessionStats {
   return {
+    lastSessionKey: undefined,
+    sessionToken: undefined,
     title,
     start: time,
     end: time,

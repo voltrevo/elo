@@ -70,11 +70,11 @@ window.addEventListener('load', async () => {
   const eloClient = makeLocalExtensionAppClient(new SimulExtensionApp(storage));
   const pageCtx = initEloPageContext(storage, config);
 
-  const { email } = await pageCtx.storage.readRoot();
+  const { accountRoot } = await pageCtx.storage.readRoot();
 
   pageCtx.state.needsAuth = (
     pageCtx.config.featureFlags.authEnabled &&
-    email === undefined
+    accountRoot === undefined
   );
 
   pageCtx.update({

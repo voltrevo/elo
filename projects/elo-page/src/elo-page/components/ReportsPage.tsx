@@ -20,7 +20,7 @@ const ReportsPage: React.FunctionComponent = () => {
         return;
       }
 
-      setLastSession(await pageCtx.storage.read<SessionStats>(lastSessionKey));
+      setLastSession(await pageCtx.storage.read(SessionStats, lastSessionKey));
     })().then(() => {
       setLoading(false);
     });

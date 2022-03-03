@@ -4,7 +4,7 @@ import browser from 'webextension-polyfill';
 import clientConfig from './helpers/clientConfig';
 import EwmaCalculator from './helpers/EwmaCalculator';
 import Protocol, { ConnectionEvent, GoogleAuthResult } from '../elo-page/Protocol';
-import SessionStats from '../elo-types/SessionStats';
+import SessionStats, { initSessionStats } from '../elo-types/SessionStats';
 import Storage, { RandomKey } from '../elo-page/storage/Storage';
 import UiState from '../elo-page/UiState';
 import never from '../common-pure/never';
@@ -15,13 +15,14 @@ import Feedback from '../elo-types/Feedback';
 import { PromisishApi } from '../elo-page/helpers/protocolHelpers';
 import Registration from '../elo-types/Registration';
 import LoginCredentials from '../elo-types/LoginCredentials';
+import AccountRoot from '../elo-page/storage/AccountRoot';
 
 const sessionKey = RandomKey();
 const apiBase = `${clientConfig.tls ? 'https:' : 'http:'}//${clientConfig.hostAndPort}`;
 
 export default class ContentApp implements PromisishApi<Protocol> {
   uiState = UiState();
-  sessionStats = SessionStats(document.title, Date.now());
+  sessionStats = initSessionStats(document.title, Date.now());
   sessionToken?: string;
   uiStateRequests = new TaskQueue();
 
@@ -45,6 +46,16 @@ export default class ContentApp implements PromisishApi<Protocol> {
     }
 
     return userId;
+  }
+
+  async readAccountRoot() {
+    const root = await this.storage.readRoot();
+
+    if (!root.accountRoot) {
+      return undefined;
+    }
+
+    return await this.storage.read(AccountRoot, root.accountRoot);
   }
 
   async activate() {
@@ -231,7 +242,7 @@ export default class ContentApp implements PromisishApi<Protocol> {
     this.sessionStats.speakingTime += speakingTime;
     this.sessionStats.audioTime += audioTime;
 
-    this.storage.write<SessionStats>(sessionKey, this.sessionStats);
+    this.storage.write(SessionStats, sessionKey, this.sessionStats);
   }
 
   async setMetricPreference(preference: string) {
@@ -269,7 +280,9 @@ export default class ContentApp implements PromisishApi<Protocol> {
       return registration.email;
     }
 
-    throw new Error('Not implemented: get email from token (in register)');
+    const detail = await this.getGoogleTokenDetail(registration.googleAccessToken);
+
+    return detail.email;
   }
 
   async login(credentials: LoginCredentials) {
@@ -284,7 +297,9 @@ export default class ContentApp implements PromisishApi<Protocol> {
       return credentials.email;
     }
 
-    throw new Error('Not implemented: get email from token (in register)');
+    const detail = await this.getGoogleTokenDetail(credentials.googleAccessToken);
+
+    return detail.email;
   }
 
   async sendFeedback(feedback: Feedback) {
@@ -339,21 +354,7 @@ export default class ContentApp implements PromisishApi<Protocol> {
       throw new Error('Missing access_token');
     }
 
-    // TODO: Server needs to do this too (maybe only on server?)
-    const tokenInfoJson = await fetch('https://www.googleapis.com/oauth2/v1/tokeninfo', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }).then(res => res.json());
-
-    const decodeResult = GoogleAuthResult.props.detail.decode(tokenInfoJson);
-
-    if ('left' in decodeResult) {
-      // TODO: Use reporter
-      throw new Error(decodeResult.left.map(e => e.message).join('\n'));
-    }
-
-    const detail = decodeResult.right;
+    const detail = await this.getGoogleTokenDetail(accessToken);
 
     if (detail.issued_to !== clientConfig.googleOauthClientId) {
       throw new Error('Client id mismatch');
@@ -370,6 +371,24 @@ export default class ContentApp implements PromisishApi<Protocol> {
     };
   }
 
+  async getGoogleTokenDetail(accessToken: string): Promise<GoogleAuthResult['detail']> {
+    // TODO: Server needs to do this too (maybe only on server?)
+    const tokenInfoJson = await fetch('https://www.googleapis.com/oauth2/v1/tokeninfo', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }).then(res => res.json());
+
+    const decodeResult = GoogleAuthResult.props.detail.decode(tokenInfoJson);
+
+    if ('left' in decodeResult) {
+      // TODO: Use reporter
+      throw new Error(decodeResult.left.map(e => e.message).join('\n'));
+    }
+
+    return decodeResult.right;
+  }
+
   async googleAuthLogout(): Promise<void> {
     try {
       await browser.identity.launchWebAuthFlow({
@@ -380,7 +399,7 @@ export default class ContentApp implements PromisishApi<Protocol> {
 
     const authUrlObj = new URL('https://accounts.google.com/o/oauth2/auth');
     authUrlObj.searchParams.append('client_id', clientConfig.googleOauthClientId);
-    authUrlObj.searchParams.append('redirect_uri', browser.identity.getRedirectURL("oauth2.html"));
+    authUrlObj.searchParams.append('redirect_uri', browser.identity.getRedirectURL('oauth2.html'));
     authUrlObj.searchParams.append('response_type', 'token');
     authUrlObj.searchParams.append('scope', 'email');
 
@@ -398,11 +417,27 @@ export default class ContentApp implements PromisishApi<Protocol> {
     }
   }
 
-  async logout(): Promise<never> {
-    throw new Error('Method not implemented.');
+  async logout() {
+    const accountRoot = await this.readAccountRoot();
+
+    if (accountRoot === undefined) {
+      console.error('already logged out');
+      return;
+    }
+
+    if (accountRoot?.googleAccount) {
+      await this.googleAuthLogout();
+    }
+
+    if (accountRoot !== undefined) {
+      const root = await this.storage.readRoot();
+      root.accountRoot = undefined;
+      await this.storage.writeRoot(root);
+    }
   }
 
-  async getEmail(): Promise<never> {
-    throw new Error('Method not implemented.');
+  async getEmail() {
+    const accountRoot = await this.readAccountRoot();
+    return accountRoot?.email;
   }
 }

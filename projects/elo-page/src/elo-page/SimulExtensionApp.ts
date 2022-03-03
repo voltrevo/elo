@@ -8,6 +8,7 @@ import Protocol, { ConnectionEvent } from './Protocol';
 import UiState from './UiState';
 import Storage from './storage/Storage';
 import { PromisishApi } from './helpers/protocolHelpers';
+import AccountRoot, { initAccountRoot } from './storage/AccountRoot';
 
 let shiftKey = false;
 
@@ -61,6 +62,24 @@ export default class SimulExtensionApp implements PromisishApi<Protocol> {
     return code === '123456';
   }
 
+  async setupFakeUser(email: string, googleAccount?: string) {
+    const storageRoot = await this.storage.readRoot();
+
+    const userId = 'fake-user-id';
+
+    const accountRootKey = `elo-user:${userId}`;
+    const accountRoot = initAccountRoot();
+    accountRoot.userId = userId;
+    accountRoot.lastSessionKey = storageRoot.lastSessionKey;
+    accountRoot.metricPreference = storageRoot.metricPreference;
+    accountRoot.email = email;
+    accountRoot.googleAccount = googleAccount;
+
+    await this.storage.write(AccountRoot, accountRootKey, accountRoot);
+
+    return accountRootKey;
+  }
+
   async register(registration: Registration) {
     await delay(500);
 
@@ -73,7 +92,13 @@ export default class SimulExtensionApp implements PromisishApi<Protocol> {
     }
 
     const storageRoot = await this.storage.readRoot();
-    storageRoot.email = email;
+
+    const accountRootKey = await this.setupFakeUser(
+      email,
+      'googleAccessToken' in registration ? registration.googleAccessToken : undefined,
+    );
+
+    storageRoot.accountRoot = accountRootKey;
     await this.storage.writeRoot(storageRoot);
 
     return email;
@@ -91,7 +116,7 @@ export default class SimulExtensionApp implements PromisishApi<Protocol> {
     }
 
     const storageRoot = await this.storage.readRoot();
-    storageRoot.email = email;
+    storageRoot.accountRoot = await this.setupFakeUser(email);
     await this.storage.writeRoot(storageRoot);
 
     return email;
@@ -122,12 +147,17 @@ export default class SimulExtensionApp implements PromisishApi<Protocol> {
     await delay(500);
     
     const storageRoot = await this.storage.readRoot();
-    storageRoot.email = undefined;
+    storageRoot.accountRoot = undefined;
     await this.storage.writeRoot(storageRoot);
   }
 
   async getEmail() {
-    const storageRoot = await this.storage.readRoot();
-    return storageRoot.email;
+    const { accountRoot } = await this.storage.readRoot();
+
+    if (accountRoot === undefined) {
+      return undefined;
+    }
+
+    return (await this.storage.read(AccountRoot, accountRoot))?.email;
   }
 }
