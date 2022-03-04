@@ -11,6 +11,7 @@ export const ConfigType = io.type({
     })),
     userIdGenerationSecret: io.string,
     tokenEncryptionSecret: io.string,
+    googleOauthClientId: io.string,
   })),
   client: optional(io.type({
     tls: io.boolean,

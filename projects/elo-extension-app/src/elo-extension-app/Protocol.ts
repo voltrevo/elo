@@ -5,19 +5,7 @@ import Registration from '../elo-types/Registration';
 import LoginCredentials from '../elo-types/LoginCredentials';
 import Feedback from '../elo-types/Feedback';
 import UiState from './UiState';
-
-export const GoogleAuthResult = io.type({
-  token: io.string,
-  registered: io.boolean,
-  detail: io.type({
-    issued_to: io.string,
-    expires_in: io.number,
-    email: io.string,
-    verified_email: io.boolean,
-  }),
-});
-
-export type GoogleAuthResult = io.TypeOf<typeof GoogleAuthResult>;
+import { GoogleAuthResult } from '../elo-types/GoogleAuthResult';
 
 export type Protocol = {
   notifyGetUserMediaCalled(): void;
