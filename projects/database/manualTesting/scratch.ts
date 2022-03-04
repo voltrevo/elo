@@ -1,13 +1,14 @@
 import 'source-map-support/register';
 
 import DbClient from "../src/database/DbClient";
+import { insertUser, lookupUser } from '../src/database/queries/users';
 import config from "./config";
 
 (async () => {
-  const dbClient = new DbClient(config.pgConnString);
+  const db = new DbClient(config.pgConnString);
 
   try {
-    await dbClient.insertUser({
+    await insertUser(db, {
       id: 'fake-id3',
       email: 'email3',
       password_hash: 'hash',
@@ -15,8 +16,8 @@ import config from "./config";
       oauth_providers: [],
     });
   
-    console.log(await dbClient.lookupUser({ id: 'fake-id3' }));
+    console.log(await lookupUser(db, { id: 'fake-id3' }));
   } finally {
-    await dbClient.disconnect();
+    await db.disconnect();
   }
 })().catch(console.error);
