@@ -1,4 +1,4 @@
-import PgClient from './PgClient';
+import { Client as PgClient } from 'pg';
 
 export default class DbClient {
   private pgClientState?: {
