@@ -4,13 +4,13 @@ import Koa from 'koa';
 import websockify from 'koa-websocket';
 
 import config from './helpers/serverConfig';
-import DbClient from '../database/DbClient';
+import Database from '../database/Database';
 import StatsGatherer from './StatsGatherer';
 import AppComponents from './AppComponents';
 import SessionTokenBicoder from './SessionTokenBicoder';
 
 export default async function initAppComponents(): Promise<AppComponents> {
-  const db = new DbClient(config.pgConnString);
+  const db = new Database(config.pgConnString);
   const statsGatherer = new StatsGatherer({ db });
 
   const koaApp = config.https

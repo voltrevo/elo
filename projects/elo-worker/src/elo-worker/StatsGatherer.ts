@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 
+import { incSpeakersPct, incStreamsPct } from '../database/queries/stats';
 import { AnalysisFragment } from '../elo-types/Analysis';
 import AppComponents from './AppComponents';
 
@@ -28,12 +29,12 @@ export default class StatsGatherer {
       const promises: Promise<unknown>[] = [];
 
       while (this.streamSeconds >= reportingThreshold) {
-        promises.push(this.db.incStreamsPct());
+        promises.push(incStreamsPct(this.db));
         this.streamSeconds -= reportingThreshold;
       }
 
       while (this.speakingSeconds >= reportingThreshold) {
-        promises.push(this.db.incSpeakersPct());
+        promises.push(incSpeakersPct(this.db));
         this.speakingSeconds -= reportingThreshold;
       }
 

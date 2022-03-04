@@ -4,6 +4,7 @@ import route from 'koa-route';
 import reporter from 'io-ts-reporters';
 import AppComponents from '../AppComponents';
 import { validateUserId } from '../userIds';
+import { incSession, incUserSessionsStarted } from '../../database/queries/stats';
 
 const StartSessionBody = io.type({
   userId: io.union([io.undefined, io.string]),
@@ -19,7 +20,7 @@ export default function defineStartSession({ koaApp, db, sessionTokenBicoder }: 
       return;
     }
 
-    db.incSession();
+    incSession(db);
 
     const { userId } = decodeResult.right;
 
@@ -36,7 +37,7 @@ export default function defineStartSession({ koaApp, db, sessionTokenBicoder }: 
       return;
     }
 
-    db.incUserSessionsStarted(userId);
+    incUserSessionsStarted(db, userId);
     ctx.body = sessionTokenBicoder.encode({ userId });
   }));
 }
