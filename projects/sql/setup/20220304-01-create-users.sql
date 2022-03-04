@@ -1,8 +1,8 @@
 CREATE TABLE users (
   id TEXT NOT NULL PRIMARY KEY,
   email TEXT NOT NULL UNIQUE,
-  password_salt TEXT,
   password_hash TEXT,
+  password_salt TEXT,
   oauth_providers TEXT[] NOT NULL
 );
 
