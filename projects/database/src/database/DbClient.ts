@@ -19,9 +19,9 @@ export type HourlyStat = {
 const User = io.type({
   id: io.string,
   email: io.string,
-  passwordSalt: optional(io.string),
-  passwordHash: optional(io.string),
-  oauthProviders: io.array(io.string),
+  password_salt: optional(io.string),
+  password_hash: optional(io.string),
+  oauth_providers: io.array(io.string),
 });
 
 export type User = io.TypeOf<typeof User>;
@@ -190,9 +190,9 @@ export default class DbClient {
   async insertUser({
     id,
     email,
-    passwordSalt,
-    passwordHash,
-    oauthProviders,
+    password_salt,
+    password_hash,
+    oauth_providers,
   }: User) {
     const pgClient = await this.PgClient();
 
@@ -201,9 +201,9 @@ export default class DbClient {
         INSERT INTO users (
           id,
           email,
-          passwordSalt,
-          passwordHash,
-          oauthProviders
+          password_salt,
+          password_hash,
+          oauth_providers
         ) VALUES (
           $1,
           $2,
@@ -215,9 +215,9 @@ export default class DbClient {
       [
         id,
         email,
-        passwordSalt,
-        passwordHash,
-        oauthProviders,
+        password_salt,
+        password_hash,
+        oauth_providers,
       ],
     );
   }
