@@ -128,7 +128,10 @@ function LoginForm() {
           once={true}
           enabled={Boolean(email && passwd)}
           onClick={async () => {
-            await appCtx.login({ email, password: passwd });
+            await appCtx.login({
+              email,
+              password: passwd,
+            });
             proceed(pageCtx);
           }}
         >
@@ -256,7 +259,11 @@ function RegistrationForm() {
     </Section>}
     {validSentEmail && <RegisterSegment
       onClick={async () => {
-        await appCtx.register({ userId: undefined, email, password: passwd, code: verificationCode });
+        await appCtx.register({
+          email,
+          password: passwd,
+          code: verificationCode,
+        });
       }}
       enabled={
         verificationCheck?.code === verificationCode &&
@@ -277,7 +284,7 @@ function ServiceForm({ email, googleAccessToken }: { email: string, googleAccess
       </Field>
     </Section>
     <RegisterSegment onClick={async () => {
-      await appCtx.register({ userId: undefined, googleAccessToken });
+      await appCtx.register({ googleAccessToken });
     }}/>
   </>;
 }

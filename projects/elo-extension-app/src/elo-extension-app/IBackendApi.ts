@@ -20,6 +20,17 @@ type IBackendApi = {
     feedback: Feedback;
   }): Promise<void>;
 
+  passwordHardeningSalt(body: {
+    email: string,
+
+    // TODO: Make sure the ability to learn whether accounts exist or have changed from this api is
+    // limited.
+    userIdHint?: {
+      verificationCode: string,
+      userId: string,
+    },
+  }): Promise<string>;
+
   register(body: Registration): Promise<LoginResult>;
   login(body: LoginCredentials): Promise<LoginResult>;
 };

@@ -1,5 +1,5 @@
 type LoginCredentials = (
-  | { email: string; password: string }
+  | { email: string; hardenedPassword: string }
   | { googleAccessToken: string }
 );
 

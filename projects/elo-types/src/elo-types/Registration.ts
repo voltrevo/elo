@@ -5,7 +5,7 @@ const Registration = io.union([
   io.type({
     userId: optional(io.string),
     email: io.string,
-    password: io.string,
+    hardenedPassword: io.string,
     code: io.string,
   }),
   io.type({

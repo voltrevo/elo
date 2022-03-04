@@ -1,7 +1,7 @@
 import { keccak_256 } from 'js-sha3';
 
 import EwmaCalculator from './EwmaCalculator';
-import Protocol, { ConnectionEvent } from './Protocol';
+import Protocol, { ConnectionEvent, ProtocolLoginCredentials, ProtocolRegistration } from './Protocol';
 import SessionStats, { initSessionStats } from '../elo-types/SessionStats';
 import Storage, { anonymousAccountRootKey, RandomKey } from './storage/Storage';
 import UiState from './UiState';
@@ -285,7 +285,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     return await this.googleAuthApi.login();
   }
 
-  async register(registration: Registration) {
+  async register(registration: ProtocolRegistration) {
     const anonymousAccountRoot = await this.storage.read(AccountRoot, anonymousAccountRootKey);
 
     const { userId, email, googleAccount } = await this.backendApi.register({
@@ -313,7 +313,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     return email;
   }
 
-  async login(credentials: LoginCredentials) {
+  async login(credentials: ProtocolLoginCredentials) {
     const { userId, email, googleAccount } = await this.backendApi.login(credentials);
     const anonymousAccountRoot = await this.storage.read(AccountRoot, anonymousAccountRootKey);
     const existingAccountRoot = await this.storage.read(AccountRoot, `elo-user:${userId}`);

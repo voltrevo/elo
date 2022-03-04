@@ -1,26 +1,27 @@
 export default async function hardenPasswordViaWorker(
-  domain: string,
-  userId: string,
   password: string,
+  salt: string,
   iterations: number,
 ) {
   const worker = new Worker('/hardenPasswordWorker.bundle.js');
 
-  worker.postMessage([domain, userId, password, iterations]);
+  worker.postMessage([password, salt, iterations]);
 
-  const result = await new Promise((resolve, reject) => {
+  const result = await new Promise<string>((resolve, reject) => {
     worker.onmessage = (evt => {
       if ('error' in evt.data) {
         reject(evt.data.error);
         return;
       }
 
-      if (typeof evt.data.value !== 'string') {
+      const value = evt.data.value
+
+      if (typeof value !== 'string') {
         reject(new Error(`Unexpected reply from worker: ${evt.data}`));
         return;
       }
 
-      resolve(evt.data.value);
+      resolve(value);
     });
   });
 

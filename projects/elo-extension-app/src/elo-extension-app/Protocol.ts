@@ -1,11 +1,27 @@
 import * as io from 'io-ts';
 
 import { AnalysisFragment } from '../elo-types/Analysis';
-import Registration from '../elo-types/Registration';
-import LoginCredentials from '../elo-types/LoginCredentials';
 import Feedback from '../elo-types/Feedback';
 import UiState from './UiState';
 import { GoogleAuthResult } from '../elo-types/GoogleAuthResult';
+
+const ProtocolRegistration = io.union([
+  io.type({
+    email: io.string,
+    password: io.string,
+    code: io.string,
+  }),
+  io.type({
+    googleAccessToken: io.string,
+  }),
+]);
+
+export type ProtocolRegistration = io.TypeOf<typeof ProtocolRegistration>;
+
+export type ProtocolLoginCredentials = (
+  | { email: string; password: string }
+  | { googleAccessToken: string }
+);
 
 export type Protocol = {
   notifyGetUserMediaCalled(): void;
@@ -16,8 +32,8 @@ export type Protocol = {
   getSessionToken(): string | undefined;
   sendVerificationEmail(email: string): void;
   checkVerificationEmail(email: string, code: string): boolean;
-  register(registration: Registration): string;
-  login(credentials: LoginCredentials): string;
+  register(registration: ProtocolRegistration): string;
+  login(credentials: ProtocolLoginCredentials): string;
   sendFeedback(feedback: Feedback): string;
   googleAuth(): GoogleAuthResult;
   logout(): void;
