@@ -3,13 +3,14 @@ import optional from './optional';
 
 const Registration = io.union([
   io.type({
-    userId: optional(io.string),
+    // TODO: hint -> request
+    userIdHint: optional(io.string),
     email: io.string,
     hardenedPassword: io.string,
     code: io.string,
   }),
   io.type({
-    userId: optional(io.string),
+    userIdHint: optional(io.string),
     googleAccessToken: io.string,
   }),
 ]);

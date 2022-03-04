@@ -17,6 +17,7 @@ import AccountRoot, { initAccountRoot } from './storage/AccountRoot';
 import IBackendApi from './IBackendApi';
 import IGoogleAuthApi from './IGoogleAuthApi';
 import assert from '../common-pure/assert';
+import hardenPasswordViaWorker from '../elo-page/hardenPasswords/hardenPasswordViaWorker';
 
 export default class ExtensionApp implements PromisishApi<Protocol> {
   uiState = UiState();
@@ -285,13 +286,41 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     return await this.googleAuthApi.login();
   }
 
-  async register(registration: ProtocolRegistration) {
+  async register(protocolRegistration: ProtocolRegistration) {
     const anonymousAccountRoot = await this.storage.read(AccountRoot, anonymousAccountRootKey);
+    const userIdHint = anonymousAccountRoot?.userId;
 
-    const { userId, email, googleAccount } = await this.backendApi.register({
-      ...registration,
-      userId: anonymousAccountRoot?.userId,
-    });
+    let registration: Registration;
+
+    if ('password' in protocolRegistration) {
+      registration = {
+        userIdHint,
+        email: protocolRegistration.email,
+        hardenedPassword: await hardenPasswordViaWorker(
+          protocolRegistration.password,
+          await this.backendApi.passwordHardeningSalt({
+            email: protocolRegistration.email,
+            userIdHint: !userIdHint ? undefined : {
+              verificationCode: protocolRegistration.code,
+              userId: userIdHint,
+            },
+          }),
+          700000, // TODO: config
+        ),
+        code: protocolRegistration.code,
+      };
+    } else if ('googleAccessToken' in protocolRegistration) {
+      registration = {
+        userIdHint,
+        googleAccessToken: protocolRegistration.googleAccessToken,
+      };
+    } else {
+      never(protocolRegistration);
+    }
+
+    const { userId, email, googleAccount } = await this.backendApi.register(
+      registration,
+    );
 
     const accountRoot = anonymousAccountRoot ?? initAccountRoot();
     accountRoot.userId = userId;
@@ -313,7 +342,28 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     return email;
   }
 
-  async login(credentials: ProtocolLoginCredentials) {
+  async login(protocolCredentials: ProtocolLoginCredentials) {
+    let credentials: LoginCredentials;
+
+    if ('password' in protocolCredentials) {
+      credentials = {
+        email: protocolCredentials.email,
+        hardenedPassword: await hardenPasswordViaWorker(
+          protocolCredentials.password,
+          await this.backendApi.passwordHardeningSalt({
+            email: protocolCredentials.email,
+          }),
+          700000, // TODO: config
+        ),
+      };
+    } else if ('googleAccessToken' in protocolCredentials) {
+      credentials = {
+        googleAccessToken: protocolCredentials.googleAccessToken,
+      };
+    } else {
+      never(protocolCredentials);
+    }
+
     const { userId, email, googleAccount } = await this.backendApi.login(credentials);
     const anonymousAccountRoot = await this.storage.read(AccountRoot, anonymousAccountRootKey);
     const existingAccountRoot = await this.storage.read(AccountRoot, `elo-user:${userId}`);

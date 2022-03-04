@@ -25,6 +25,9 @@ window.addEventListener('load', () => {
 });
 
 class SimulBackendApi implements IBackendApi {
+  passwordHardeningSalt(body: { email: string; userIdHint?: { verificationCode: string; userId: string; } | undefined; }): Promise<string> {
+    throw new Error('Method not implemented.');
+  }
   googleAuthApi = new SimulGoogleAuthApi();
   knownUsers: Record<string, string> = {};
 
@@ -44,14 +47,14 @@ class SimulBackendApi implements IBackendApi {
   async register(registration: Registration): Promise<LoginResult> {
     await delay(500);
 
-    if (shiftKey && registration.userId) {
+    if (shiftKey && registration.userIdHint) {
       // Not super realistic - you'd need to manually reuse the anonymous
       // userId with a different account in order to get this result.
       throw new Error('Provided userId already associated with other account');
     }
 
-    if ('password' in registration && registration.password !== 'test') {
-      throw new Error('password was not "test"');
+    if ('email' in registration && registration.email.includes('error')) {
+      throw new Error('email contains "error"');
     }
 
     const email = await (async () => {
@@ -69,7 +72,7 @@ class SimulBackendApi implements IBackendApi {
     }
 
     const result = {
-      userId: registration.userId ?? await this.generateId(),
+      userId: registration.userIdHint ?? await this.generateId(),
       email,
       googleAccount: 'googleAccessToken' in registration ? email : undefined,
     };
@@ -82,8 +85,8 @@ class SimulBackendApi implements IBackendApi {
   async login(credentials: LoginCredentials): Promise<LoginResult> {
     await delay(500);
 
-    if ('password' in credentials && credentials.password !== 'test') {
-      throw new Error('password was not "test"');
+    if ('email' in credentials && credentials.email.includes('error')) {
+      throw new Error('email includes "error"');
     }
 
     const email = await (async () => {
