@@ -7,6 +7,7 @@
   "dependencies": {
     "@types/pg": "^8.6.4",
     "confusing-browser-globals": "^1.0.11",
+    "fp-ts": "^2.11.8",
     "io-ts": "^2.2.16",
     "io-ts-reporters": "^2.0.1",
     "pg": "^8.7.3",
