@@ -1,4 +1,4 @@
-import DbClient from "../DbClient";
+import Database from "../Database";
 
 export type HourlyStat = {
   hour: Date;
@@ -7,7 +7,7 @@ export type HourlyStat = {
   sessionsStarted: number;
 };
 
-export async function HourlyStats(db: DbClient, from: Date, to: Date): Promise<HourlyStat[]> {
+export async function HourlyStats(db: Database, from: Date, to: Date): Promise<HourlyStat[]> {
   const pgClient = await db.PgClient();
 
   const res = await pgClient.query(
@@ -57,7 +57,7 @@ export async function HourlyStats(db: DbClient, from: Date, to: Date): Promise<H
   }));
 }
 
-async function incField(db: DbClient, field: string, now: Date) {
+async function incField(db: Database, field: string, now: Date) {
   const pgClient = await db.PgClient();
 
   // Check field is from a fixed list to ensure there's no SQL injection opportunity.
@@ -80,19 +80,19 @@ async function incField(db: DbClient, field: string, now: Date) {
   );
 }
 
-export async function incStreamsPct(db: DbClient, now = new Date()) {
+export async function incStreamsPct(db: Database, now = new Date()) {
   await incField(db, 'streams_pct', now);
 }
 
-export async function incSpeakersPct(db: DbClient, now = new Date()) {
+export async function incSpeakersPct(db: Database, now = new Date()) {
   await incField(db, 'speakers_pct', now);
 }
 
-export async function incSession(db: DbClient, now = new Date()) {
+export async function incSession(db: Database, now = new Date()) {
   await incField(db, 'sessions_started', now);
 }
 
-async function incUserMonthlyField(db: DbClient, userId: string, field: string, now: Date) {
+async function incUserMonthlyField(db: Database, userId: string, field: string, now: Date) {
   const pgClient = await db.PgClient();
 
   // Check field is from a fixed list to ensure there's no SQL injection opportunity.
@@ -115,15 +115,15 @@ async function incUserMonthlyField(db: DbClient, userId: string, field: string, 
   );
 }
 
-export async function incUserStreamHoursPct(db: DbClient, userId: string, now = new Date()) {
+export async function incUserStreamHoursPct(db: Database, userId: string, now = new Date()) {
   await incUserMonthlyField(db, userId, 'stream_hours_pct', now);
 }
 
-export async function incUserSpeakingHoursPct(db: DbClient, userId: string, now = new Date()) {
+export async function incUserSpeakingHoursPct(db: Database, userId: string, now = new Date()) {
   await incUserMonthlyField(db, userId, 'speaking_hours_pct', now);
 }
 
-export async function incUserSessionsStarted(db: DbClient, userId: string, now = new Date()) {
+export async function incUserSessionsStarted(db: Database, userId: string, now = new Date()) {
   await incUserMonthlyField(db, userId, 'sessions_started', now);
 }
 

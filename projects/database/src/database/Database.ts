@@ -1,6 +1,6 @@
 import { Client as PgClient } from 'pg';
 
-export default class DbClient {
+export default class Database {
   private pgClientState?: {
     client: PgClient;
     connected: boolean;
@@ -13,7 +13,7 @@ export default class DbClient {
     if (this.pgClientState === undefined) {
       const client = new PgClient(this.pgConnString);
 
-      const state: DbClient['pgClientState'] = {
+      const state: Database['pgClientState'] = {
         client,
         connected: false,
         connectionPromise: client.connect(),

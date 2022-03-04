@@ -1,11 +1,11 @@
 import 'source-map-support/register';
 
-import DbClient from "../src/database/DbClient";
+import Database from "../src/database/Database";
 import { insertUser, lookupUser } from '../src/database/queries/users';
 import config from "./config";
 
 (async () => {
-  const db = new DbClient(config.pgConnString);
+  const db = new Database(config.pgConnString);
 
   try {
     await insertUser(db, {

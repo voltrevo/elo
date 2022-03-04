@@ -3,7 +3,7 @@ import * as io from 'io-ts';
 import never from '../../common-pure/never';
 import decode from '../../elo-types/decode';
 import optional from '../../elo-types/optional';
-import DbClient from "../DbClient";
+import Database from "../Database";
 
 const User = io.type({
   id: io.string,
@@ -15,7 +15,7 @@ const User = io.type({
 
 export type User = io.TypeOf<typeof User>;
 
-export async function insertUser(db: DbClient, {
+export async function insertUser(db: Database, {
   id,
   email,
   password_salt,
@@ -51,7 +51,7 @@ export async function insertUser(db: DbClient, {
 }
 
 export async function lookupUser(
-  db: DbClient,
+  db: Database,
   query: { id: string } | { email: string },
 ): Promise<User | undefined> {
   const pgClient = await db.PgClient();

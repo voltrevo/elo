@@ -1,8 +1,8 @@
 import Feedback from "../../elo-types/Feedback";
-import DbClient from "../DbClient";
+import Database from "../Database";
 
 export async function insertFeedback(
-  db: DbClient,
+  db: Database,
   userId: string | undefined,
   feedback: Feedback,
   now = new Date(),
