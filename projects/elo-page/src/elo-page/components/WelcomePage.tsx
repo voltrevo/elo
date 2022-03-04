@@ -256,7 +256,7 @@ function RegistrationForm() {
     </Section>}
     {validSentEmail && <RegisterSegment
       onClick={async () => {
-        await appCtx.register({ email, password: passwd, code: verificationCode });
+        await appCtx.register({ userId: undefined, email, password: passwd, code: verificationCode });
       }}
       enabled={
         verificationCheck?.code === verificationCode &&
@@ -277,7 +277,7 @@ function ServiceForm({ email, googleAccessToken }: { email: string, googleAccess
       </Field>
     </Section>
     <RegisterSegment onClick={async () => {
-      await appCtx.register({ googleAccessToken });
+      await appCtx.register({ userId: undefined, googleAccessToken });
     }}/>
   </>;
 }

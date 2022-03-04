@@ -1,4 +1,4 @@
-import { GoogleAuthResult } from "../elo-extension-app/Protocol";
+import { GoogleAuthResult } from "../elo-types/GoogleAuthResult";
 
 type IGoogleAuthApi = {
   login(): Promise<GoogleAuthResult>;

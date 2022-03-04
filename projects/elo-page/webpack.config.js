@@ -6,6 +6,7 @@ const webpackConfig = {
   common: {
     entry: {
       index: './build/js/src/elo-page/index.js',
+      hardenPasswordWorker: './build/js/src/elo-page/hardenPasswords/worker.js',
     },
     module: {
       rules: [
