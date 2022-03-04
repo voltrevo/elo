@@ -1,6 +1,11 @@
 /* eslint-disable camelcase */
 
+import * as io from 'io-ts';
+import never from '../common-pure/never';
+import decode from '../elo-types/decode';
+
 import Feedback from '../elo-types/Feedback';
+import optional from '../elo-types/optional';
 import PgClient from './PgClient';
 import ReconnectablePgClient from './ReconnectablePgClient';
 
@@ -10,6 +15,16 @@ export type HourlyStat = {
   speakers: number;
   sessionsStarted: number;
 };
+
+const User = io.type({
+  id: io.string,
+  email: io.string,
+  passwordSalt: optional(io.string),
+  passwordHash: optional(io.string),
+  oauthProviders: io.array(io.string),
+});
+
+export type User = io.TypeOf<typeof User>;
 
 export default class DbClient {
   reconnectablePgClient: ReconnectablePgClient;
@@ -170,6 +185,74 @@ export default class DbClient {
         feedback,
       ],
     );
+  }
+
+  async insertUser({
+    id,
+    email,
+    passwordSalt,
+    passwordHash,
+    oauthProviders,
+  }: User) {
+    const pgClient = await this.PgClient();
+
+    await pgClient.query(
+      `
+        INSERT INTO users (
+          id,
+          email,
+          passwordSalt,
+          passwordHash,
+          oauthProviders
+        ) VALUES (
+          $1,
+          $2,
+          $3,
+          $4,
+          $5
+        )
+      `,
+      [
+        id,
+        email,
+        passwordSalt,
+        passwordHash,
+        oauthProviders,
+      ],
+    );
+  }
+
+  async lookupUser(query: { id: string } | { email: string }): Promise<User | undefined> {
+    const pgClient = await this.PgClient();
+
+    let fieldName: 'id' | 'email';
+    let fieldValue: string;
+
+    if ('id' in query) {
+      fieldName = 'id';
+      fieldValue = query.id;
+    } else if ('email' in query) {
+      fieldName = 'email';
+      fieldValue = query.email;
+    } else {
+      never(query);
+    }
+
+    const res = await pgClient.query(
+      `
+        SELECT * FROM users
+        WHERE ${fieldName} = $1
+      `,
+      [fieldValue],
+    );
+
+    const result = res.rows[0];
+
+    if (result === undefined) {
+      return undefined;
+    }
+
+    return decode(User, result);
   }
 }
 
