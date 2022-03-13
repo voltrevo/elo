@@ -115,6 +115,8 @@ export default function defineRegister({
 
       if (existingUser) {
         ctx.status = 409;
+        // It's important to avoid revealing this publicly, but it's reasonable
+        // here because the user has authenticated their email.
         ctx.body = 'Account already exists';
         return;
       }
