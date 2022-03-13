@@ -15,8 +15,18 @@ function generateChecksum(data: Uint8Array) {
   return new Uint8Array(hash.arrayBuffer().slice(0, 4));
 }
 
-export function generateUserId(): string {
-  const randomData = crypto.randomBytes(16);
+export function generateUserId(seed?: string): string {
+  let randomData: Uint8Array;
+
+  if (seed !== undefined) {
+    const hash = keccak256.create();
+    hash.update('for randomData');
+    hash.update(config.userIdGenerationSecret);
+    hash.update(seed);
+    randomData = new Uint8Array(hash.arrayBuffer().slice(0, 16));
+  } else {
+    randomData = crypto.randomBytes(16);
+  }
 
   const userIdBuf = new Uint8Array(20);
   userIdBuf.set(randomData, 0);

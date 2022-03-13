@@ -1601,5 +1601,6 @@ module.exports = {
 
     'no-useless-return': 'off',
     'no-autofix/no-useless-return': 'warn',
+    camelcase: 'off',
   },
 };
