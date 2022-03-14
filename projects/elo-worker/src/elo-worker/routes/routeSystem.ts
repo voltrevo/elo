@@ -17,7 +17,7 @@ export type RouteDefinition<Path extends keyof Spec> = (
   body: io.TypeOf<Spec[Path]['Request']>,
 ) => Promise<RouteResult<io.TypeOf<Spec[Path]['Response']>>>;
 
-export function implementRoute<Path extends keyof Spec>(
+export function attachRoute<Path extends keyof Spec>(
   path: Path,
   appComponents: AppComponents,
   routeDefinition: RouteDefinition<Path>,

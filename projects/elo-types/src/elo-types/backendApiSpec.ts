@@ -20,7 +20,7 @@ const backendApiSpec = {
 
   startSession: {
     Request: io.type({
-      userId: io.string,
+      userId: optional(io.string),
     }),
     Response: io.string,
   },
