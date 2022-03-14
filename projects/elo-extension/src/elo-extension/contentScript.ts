@@ -43,7 +43,7 @@ eloExtension.appendChild(iconTag);
         throw new Error(`Method not found: ${method}`);
       }
   
-      (extensionApp as any)[method](...args)
+      return (extensionApp as any)[method](...args)
     },
   );
 })().catch(

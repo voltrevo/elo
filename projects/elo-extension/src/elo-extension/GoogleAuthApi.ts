@@ -38,7 +38,6 @@ export default class GoogleAuthApi implements IGoogleAuthApi {
 
     return {
       token: accessToken,
-      registered: false, // TODO: implement this
       detail,
     };
   }

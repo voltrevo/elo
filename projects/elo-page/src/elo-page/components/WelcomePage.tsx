@@ -47,11 +47,11 @@ const WelcomePage: React.FunctionComponent = () => {
             }
 
             setGoogleAccessToken(authResult.token);
-
-            if (authResult.registered) {
+            
+            try {
               await appCtx.login({ googleAccessToken: authResult.token });
               proceed(pageCtx);
-            } else {
+            } catch {
               setServiceEmail(authResult.detail.email);
             }
           }}
