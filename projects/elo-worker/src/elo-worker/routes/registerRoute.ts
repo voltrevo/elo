@@ -2,8 +2,8 @@ import crypto from 'crypto';
 
 import base58 from '../../common-pure/base58';
 import never from '../../common-pure/never';
-import { lookupEmailVerification } from '../../database/queries/emailVerification';
 import { insertUser, lookupUser } from '../../database/queries/users';
+import checkEmailVerification from '../checkEmailVerification';
 import fetchGoogleTokenInfo from '../fetchGoogleTokenInfo';
 import hashPassword from '../hashPassword';
 import { generateUserId, validateUserId } from '../userIds';
@@ -31,9 +31,11 @@ const registerRoute: RouteDefinition<'register'> = async (
 
   if ('code' in registration) {
     // Email verification
-    const row = await lookupEmailVerification(db, registration.email);
-
-    if (row === undefined || registration.code !== row.verification_code) {
+    if (!await checkEmailVerification(
+      db,
+      registration.email,
+      registration.code,
+    )) {
       return {
         status: 401,
         body: 'Invalid verification code',

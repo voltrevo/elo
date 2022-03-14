@@ -1,6 +1,6 @@
 import { keccak256 } from 'js-sha3';
-import { lookupEmailVerification } from '../../database/queries/emailVerification';
 import { lookupUser } from '../../database/queries/users';
+import checkEmailVerification from '../checkEmailVerification';
 import { generateUserId, validateUserId } from '../userIds';
 import { RouteDefinition } from './routeSystem';
 
@@ -16,9 +16,7 @@ const passwordHardeningSaltRoute: RouteDefinition<'passwordHardeningSalt'> = asy
       };
     }
 
-    const row = await lookupEmailVerification(db, email);
-
-    if (row === undefined || userIdHint.verificationCode !== row.verification_code) {
+    if (!await checkEmailVerification(db, email, userIdHint.verificationCode)) {
       return {
         status: 400,
         body: 'Invalid userIdHint',
