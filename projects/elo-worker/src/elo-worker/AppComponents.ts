@@ -4,7 +4,7 @@ import type Koa from 'koa';
 import type Database from '../database/Database';
 import type StatsGatherer from './StatsGatherer';
 import type SessionTokenBicoder from './SessionTokenBicoder';
-import type { Config } from './helpers/config';
+import type { Config } from './Config';
 
 type AppComponentMap = {
   config: Config;

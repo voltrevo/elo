@@ -22,7 +22,7 @@ export default function definePasswordHardeningSalt({
     const { email, userIdHint }: PasswordHardeningSaltRequest = decodeResult.right;
 
     if (userIdHint !== undefined) {
-      if (!validateUserId(userIdHint.userId)) {
+      if (!validateUserId(config.userIdGenerationSecret, userIdHint.userId)) {
         ctx.status = 400;
         ctx.body = 'Invalid userIdHint';
         return;
@@ -42,7 +42,7 @@ export default function definePasswordHardeningSalt({
     const userId = (
       existingUser?.id ??
       userIdHint?.userId ??
-      generateUserId(email)
+      generateUserId(config.userIdGenerationSecret, email)
     );
 
     // TODO: Add password hardening salt secret, generate it and return

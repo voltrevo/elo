@@ -3,13 +3,15 @@ import fs from 'fs/promises';
 import Koa from 'koa';
 import websockify from 'koa-websocket';
 
-import config from './helpers/config';
+import loadConfig from './loadConfig';
 import Database from '../database/Database';
 import StatsGatherer from './StatsGatherer';
 import AppComponents from './AppComponents';
 import SessionTokenBicoder from './SessionTokenBicoder';
 
 export default async function initAppComponents(): Promise<AppComponents> {
+  const config = await loadConfig();
+
   const db = new Database(config.pgConnString);
   const statsGatherer = new StatsGatherer({ db });
 

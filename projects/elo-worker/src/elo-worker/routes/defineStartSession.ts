@@ -10,7 +10,12 @@ const StartSessionBody = io.type({
   userId: io.union([io.undefined, io.string]),
 });
 
-export default function defineStartSession({ koaApp, db, sessionTokenBicoder }: AppComponents) {
+export default function defineStartSession({
+  koaApp,
+  db,
+  sessionTokenBicoder,
+  config,
+}: AppComponents) {
   koaApp.use(route.post('/startSession', async ctx => {
     const decodeResult = StartSessionBody.decode(ctx.request.body);
 
@@ -31,7 +36,7 @@ export default function defineStartSession({ koaApp, db, sessionTokenBicoder }: 
       return;
     }
 
-    if (!validateUserId(userId)) {
+    if (!validateUserId(config.userIdGenerationSecret, userId)) {
       ctx.status = 400;
       ctx.body = 'Invalid userId';
       return;

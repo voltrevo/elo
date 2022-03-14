@@ -9,13 +9,13 @@ import defineStartSession from './defineStartSession';
 import defineRegister from './defineRegister';
 
 export default function defineRoutes(appComponents: AppComponents) {
-  const { koaApp } = appComponents;
+  const { koaApp, config } = appComponents;
 
   defineAnalyze(appComponents);
   defineStartSession(appComponents);
   defineRegister(appComponents);
 
   koaApp.use(route.post('/generateId', async ctx => {
-    ctx.body = generateUserId();
+    ctx.body = generateUserId(config.userIdGenerationSecret, undefined);
   }));
 }

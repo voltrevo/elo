@@ -4,24 +4,27 @@ import { keccak256 } from 'js-sha3';
 
 import base58 from '../common-pure/base58';
 
-// TODO: Inject this
-import config from './helpers/config';
-
-function generateChecksum(data: Uint8Array) {
+function generateChecksum(
+  userIdGenerationSecret: string,
+  data: Uint8Array,
+) {
   const hash = keccak256.create();
-  hash.update(config.userIdGenerationSecret);
+  hash.update(userIdGenerationSecret);
   hash.update(data);
 
   return new Uint8Array(hash.arrayBuffer().slice(0, 4));
 }
 
-export function generateUserId(seed?: string): string {
+export function generateUserId(
+  userIdGenerationSecret: string,
+  seed: string | undefined,
+): string {
   let randomData: Uint8Array;
 
   if (seed !== undefined) {
     const hash = keccak256.create();
     hash.update('for randomData');
-    hash.update(config.userIdGenerationSecret);
+    hash.update(userIdGenerationSecret);
     hash.update(seed);
     randomData = new Uint8Array(hash.arrayBuffer().slice(0, 16));
   } else {
@@ -30,12 +33,15 @@ export function generateUserId(seed?: string): string {
 
   const userIdBuf = new Uint8Array(20);
   userIdBuf.set(randomData, 0);
-  userIdBuf.set(generateChecksum(randomData), 16);
+  userIdBuf.set(generateChecksum(userIdGenerationSecret, randomData), 16);
 
   return base58.encode(userIdBuf);
 }
 
-export function validateUserId(userId: string) {
+export function validateUserId(
+  userIdGenerationSecret: string,
+  userId: string,
+) {
   let userIdBuf: Uint8Array;
 
   try {
@@ -48,7 +54,10 @@ export function validateUserId(userId: string) {
     return false;
   }
 
-  const checksum = generateChecksum(userIdBuf.slice(0, 16));
+  const checksum = generateChecksum(
+    userIdGenerationSecret,
+    userIdBuf.slice(0, 16),
+  );
 
   if (checksum.some((byte, i) => userIdBuf[16 + i] !== byte)) {
     return false;

@@ -30,7 +30,10 @@ export default function defineRegister({
     const registration: Registration = decodeResult.right;
     const userIdHint = registration.userIdHint;
 
-    if (userIdHint !== undefined && !validateUserId(userIdHint)) {
+    if (
+      userIdHint !== undefined &&
+      !validateUserId(config.userIdGenerationSecret, userIdHint)
+    ) {
       ctx.status = 400;
       ctx.body = 'Invalid userId';
       return;
@@ -91,7 +94,10 @@ export default function defineRegister({
       never(registration);
     }
 
-    const userId = userIdHint ?? generateUserId(email);
+    const userId = (
+      userIdHint ??
+      generateUserId(config.userIdGenerationSecret, email)
+    );
 
     const password_salt = base58.encode(crypto.randomBytes(16));
 
