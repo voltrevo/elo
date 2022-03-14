@@ -1,4 +1,4 @@
-import clientConfig from './helpers/clientConfig';
+import config from './config';
 import never from '../common-pure/never';
 import { AnalysisFragment } from '../elo-types/Analysis';
 import { ThirdPartyExtensionAppClient } from '../elo-page/ExtensionAppClient';
@@ -10,8 +10,8 @@ export default async function analyzeStream(
   stream: MediaStream,
   extensionApp: ReturnType<typeof ThirdPartyExtensionAppClient>,
 ) {
-  const wsProto = clientConfig.tls ? 'wss:' : 'ws:';
-  const webSocket = new WebSocket(`${wsProto}//${clientConfig.hostAndPort}/analyze?sessionToken=${sessionToken}`);
+  const wsProto = config.tls ? 'wss:' : 'ws:';
+  const webSocket = new WebSocket(`${wsProto}//${config.hostAndPort}/analyze?sessionToken=${sessionToken}`);
 
   await new Promise((resolve, reject) => {
     webSocket.onopen = resolve;

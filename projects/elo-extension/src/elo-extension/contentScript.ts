@@ -5,7 +5,7 @@ import { protocolThirdPartyKeyMap } from '../elo-extension-app/Protocol';
 import PostMessageServer from '../elo-page/helpers/PostMessageServer';
 import BackendApi from './BackendApi';
 import GoogleAuthApi from './GoogleAuthApi';
-import clientConfig from './helpers/clientConfig';
+import config from './config';
 
 const eloExtension = document.createElement('div');
 eloExtension.id = 'elo-extension';
@@ -28,8 +28,8 @@ iconTag.style.display = 'none';
 eloExtension.appendChild(iconTag);
 
 const extensionApp = new ExtensionApp(
-  new BackendApi(`${clientConfig.tls ? 'https:' : 'http:'}//${clientConfig.hostAndPort}`),
-  new GoogleAuthApi(clientConfig.googleOauthClientId),
+  new BackendApi(`${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`),
+  new GoogleAuthApi(config.googleOauthClientId),
   Browser.runtime.getURL('elo-page.html'),
   Browser.storage.local,
 );

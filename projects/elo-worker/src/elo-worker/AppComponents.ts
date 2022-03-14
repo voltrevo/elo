@@ -4,10 +4,10 @@ import type Koa from 'koa';
 import type Database from '../database/Database';
 import type StatsGatherer from './StatsGatherer';
 import type SessionTokenBicoder from './SessionTokenBicoder';
-import type { ServerConfig } from './helpers/serverConfig';
+import type { Config } from './helpers/config';
 
 type AppComponentMap = {
-  config: ServerConfig;
+  config: Config;
   db: Database;
   statsGatherer: StatsGatherer;
   koaApp: KoaApp<Koa.DefaultState, Koa.DefaultContext>;

@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import Koa from 'koa';
 import websockify from 'koa-websocket';
 
-import config from './helpers/serverConfig';
+import config from './helpers/config';
 import Database from '../database/Database';
 import StatsGatherer from './StatsGatherer';
 import AppComponents from './AppComponents';

@@ -5,7 +5,7 @@ import { keccak256 } from 'js-sha3';
 import base58 from '../common-pure/base58';
 
 // TODO: Inject this
-import config from './helpers/serverConfig';
+import config from './helpers/config';
 
 function generateChecksum(data: Uint8Array) {
   const hash = keccak256.create();
