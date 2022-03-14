@@ -7,6 +7,7 @@ import PasswordHardeningSaltRequest from './PasswordHardeningSaltRequest';
 import Registration from './Registration';
 
 const LoginResult = io.type({
+  eloLoginToken: io.string,
   userId: io.string,
   email: io.string,
   googleAccount: optional(io.string),

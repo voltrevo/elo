@@ -9,6 +9,7 @@ import StatsGatherer from './StatsGatherer';
 import AppComponents from './AppComponents';
 import TokenBicoder from './TokenBicoder';
 import SessionTokenData from './SessionTokenData';
+import EloLoginTokenData from './EloLoginTokenData';
 
 export default async function initAppComponents(): Promise<AppComponents> {
   const config = await loadConfig();
@@ -28,6 +29,7 @@ export default async function initAppComponents(): Promise<AppComponents> {
     : websockify(new Koa());
 
   const sessionTokenBicoder = new TokenBicoder({ config }, SessionTokenData, 7 * 86400);
+  const loginTokenBicoder = new TokenBicoder({ config }, EloLoginTokenData, Infinity);
 
   return {
     config,
@@ -35,5 +37,6 @@ export default async function initAppComponents(): Promise<AppComponents> {
     statsGatherer,
     koaApp,
     sessionTokenBicoder,
+    loginTokenBicoder,
   };
 }

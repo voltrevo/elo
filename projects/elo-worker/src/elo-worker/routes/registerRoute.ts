@@ -10,7 +10,7 @@ import { generateUserId, validateUserId } from '../userIds';
 import { RouteDefinition } from './routeSystem';
 
 const registerRoute: RouteDefinition<'register'> = async (
-  { db, config },
+  { db, config, loginTokenBicoder },
   registration,
 ) => {
   const userIdHint = registration.userIdHint;
@@ -109,6 +109,10 @@ const registerRoute: RouteDefinition<'register'> = async (
 
   return {
     ok: {
+      eloLoginToken: loginTokenBicoder.encode({
+        type: 'elo-login',
+        userId,
+      }),
       userId,
       email,
       googleAccount: googleAccount ?? undefined,

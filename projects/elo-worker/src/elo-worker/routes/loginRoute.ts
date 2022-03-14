@@ -5,7 +5,7 @@ import hashPassword from '../hashPassword';
 import { RouteDefinition } from './routeSystem';
 
 const loginRoute: RouteDefinition<'login'> = async (
-  { db, config },
+  { db, config, loginTokenBicoder },
   loginCredentials,
 ) => {
   if ('email' in loginCredentials) {
@@ -32,6 +32,10 @@ const loginRoute: RouteDefinition<'login'> = async (
 
     return {
       ok: {
+        eloLoginToken: loginTokenBicoder.encode({
+          type: 'elo-login',
+          userId: existingUser.id,
+        }),
         userId: existingUser.id,
         email: loginCredentials.email,
         googleAccount: undefined,
@@ -58,10 +62,6 @@ const loginRoute: RouteDefinition<'login'> = async (
       };
     }
 
-    // email = tokenInfo.email;
-    // oauth_providers = ['google'];
-    // googleAccount = email;
-
     const existingUser = await lookupUser(db, { email: tokenInfo.email });
 
     if (!existingUser) {
@@ -76,6 +76,10 @@ const loginRoute: RouteDefinition<'login'> = async (
 
     return {
       ok: {
+        eloLoginToken: loginTokenBicoder.encode({
+          type: 'elo-login',
+          userId: existingUser.id,
+        }),
         userId: existingUser.id,
         email: tokenInfo.email,
         googleAccount: tokenInfo.email,

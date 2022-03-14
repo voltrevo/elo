@@ -4,6 +4,6 @@ const SessionTokenData = io.type({
   userId: io.string,
 });
 
-export type SessionTokenData = io.TypeOf<typeof SessionTokenData>;
+type SessionTokenData = io.TypeOf<typeof SessionTokenData>;
 
 export default SessionTokenData;

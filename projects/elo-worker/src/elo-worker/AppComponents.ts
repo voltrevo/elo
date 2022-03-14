@@ -5,7 +5,8 @@ import type Database from '../database/Database';
 import type StatsGatherer from './StatsGatherer';
 import type TokenBicoder from './TokenBicoder';
 import type { Config } from './Config';
-import { SessionTokenData } from './SessionTokenData';
+import SessionTokenData from './SessionTokenData';
+import EloLoginTokenData from './EloLoginTokenData';
 
 type AppComponentMap = {
   config: Config;
@@ -13,6 +14,7 @@ type AppComponentMap = {
   statsGatherer: StatsGatherer;
   koaApp: KoaApp<Koa.DefaultState, Koa.DefaultContext>;
   sessionTokenBicoder: TokenBicoder<SessionTokenData>;
+  loginTokenBicoder: TokenBicoder<EloLoginTokenData>;
 };
 
 type AppComponents<K extends keyof AppComponentMap = keyof AppComponentMap> =
