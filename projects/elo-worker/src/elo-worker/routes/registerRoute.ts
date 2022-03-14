@@ -29,6 +29,7 @@ const registerRoute: RouteDefinition<'register'> = async (
 
   let email: string;
   let oauth_providers: string[];
+  let googleAccount: string | null;
 
   if ('code' in registration) {
     // Email verification
@@ -43,6 +44,7 @@ const registerRoute: RouteDefinition<'register'> = async (
 
     email = registration.email;
     oauth_providers = [];
+    googleAccount = null;
   } else if ('googleAccessToken' in registration) {
     // Google verification
     const tokenInfoJson = await fetch('https://www.googleapis.com/oauth2/v1/tokeninfo', {
@@ -83,6 +85,7 @@ const registerRoute: RouteDefinition<'register'> = async (
 
     email = authDetail.email;
     oauth_providers = ['google'];
+    googleAccount = email;
   } else {
     never(registration);
   }
@@ -126,7 +129,11 @@ const registerRoute: RouteDefinition<'register'> = async (
   }
 
   return {
-    ok: {},
+    ok: {
+      userId,
+      email,
+      googleAccount: googleAccount ?? undefined,
+    },
   };
 };
 
