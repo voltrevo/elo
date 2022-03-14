@@ -1,5 +1,6 @@
 import backendApiSpec from '../../elo-types/backendApiSpec';
 import generateIdRoute from './generateIdRoute';
+import loginRoute from './loginRoute';
 import passwordHardeningSaltRoute from './passwordHardeningSaltRoute';
 import registerRoute from './registerRoute';
 import { RouteDefinition } from './routeSystem';
@@ -13,12 +14,10 @@ const allRouteDefinitions: {
   [Path in WorkerPaths]: RouteDefinition<Path>
 } = {
   generateId: generateIdRoute,
+  login: loginRoute,
   passwordHardeningSalt: passwordHardeningSaltRoute,
   register: registerRoute,
   startSession: startSessionRoute,
-
-  // TODO
-  login: () => { throw new Error('Not implemented'); },
 };
 
 export default allRouteDefinitions;

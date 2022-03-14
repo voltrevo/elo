@@ -8,7 +8,7 @@ import Database from "../Database";
 const User = io.type({
   id: io.string,
   email: io.string,
-  password_salt: optional(io.string),
+  password_salt: io.string,
   password_hash: optional(io.string),
   oauth_providers: io.array(io.string),
 });
