@@ -25,7 +25,7 @@ window.addEventListener('load', () => {
 });
 
 class SimulBackendApi implements IBackendApi {
-  passwordHardeningSalt(body: { email: string; userIdHint?: { verificationCode: string; userId: string; } | undefined; }): Promise<string> {
+  passwordHardeningSalt(body: { email: string; userIdHint?: { verificationCode: string; userId: string; } | undefined; }): never {
     throw new Error('Method not implemented.');
   }
   googleAuthApi = new SimulGoogleAuthApi();
@@ -40,8 +40,9 @@ class SimulBackendApi implements IBackendApi {
     throw new Error('Method not implemented.');
   }
 
-  async feedback(_body: { userId: string; feedback: Feedback }): Promise<void> {
+  async feedback(_body: { userId: string; feedback: Feedback }): Promise<undefined> {
     await delay(500);
+    return undefined;
   }
 
   async register(registration: Registration): Promise<LoginResult> {

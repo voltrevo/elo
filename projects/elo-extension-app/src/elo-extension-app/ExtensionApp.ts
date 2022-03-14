@@ -50,7 +50,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     if (!root.accountRoot) {
       // TODO: Eventually we won't allow creating anonymous accounts.
       const accountRoot = initAccountRoot();
-      accountRoot.userId = await this.backendApi.generateId();
+      accountRoot.userId = await this.backendApi.generateId({});
       await this.storage.write(AccountRoot, anonymousAccountRootKey, accountRoot);
       root.accountRoot = anonymousAccountRootKey;
       await this.storage.writeRoot(root);
@@ -85,7 +85,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     const root = await this.storage.readRoot();
 
     if (root.userId === undefined) {
-      root.userId = await this.backendApi.generateId();
+      root.userId = await this.backendApi.generateId({});
     }
 
     this.sessionStats.lastSessionKey = root.lastSessionKey;
@@ -298,13 +298,13 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
         email: protocolRegistration.email,
         hardenedPassword: await hardenPasswordViaWorker(
           protocolRegistration.password,
-          await this.backendApi.passwordHardeningSalt({
+          (await this.backendApi.passwordHardeningSalt({
             email: protocolRegistration.email,
             userIdHint: !userIdHint ? undefined : {
               verificationCode: protocolRegistration.code,
               userId: userIdHint,
             },
-          }),
+          })).passwordHardeningSalt,
           700000, // TODO: config
         ),
         code: protocolRegistration.code,
@@ -350,9 +350,10 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
         email: protocolCredentials.email,
         hardenedPassword: await hardenPasswordViaWorker(
           protocolCredentials.password,
-          await this.backendApi.passwordHardeningSalt({
+          (await this.backendApi.passwordHardeningSalt({
             email: protocolCredentials.email,
-          }),
+            userIdHint: undefined,
+          })).passwordHardeningSalt,
           700000, // TODO: config
         ),
       };

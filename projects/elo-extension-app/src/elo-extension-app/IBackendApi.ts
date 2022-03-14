@@ -1,30 +1,18 @@
-import Feedback from "../elo-types/Feedback";
-import LoginCredentials from "../elo-types/LoginCredentials";
-import PasswordHardeningSaltRequest from "../elo-types/PasswordHardeningSaltRequest";
-import Registration from "../elo-types/Registration";
+import * as io from 'io-ts';
 
-export type LoginResult = {
-  userId: string;
-  email: string;
-  googleAccount?: string;
-};
+import backendApiSpec from "../elo-types/backendApiSpec";
+
+type Spec = typeof backendApiSpec;
+
+const LoginResult = backendApiSpec.login.Response;
+type LoginResult = io.TypeOf<typeof LoginResult>;
+
+export { LoginResult };
 
 type IBackendApi = {
-  generateId(): Promise<string>;
-
-  startSession(body: {
-    userId: string;
-  }): Promise<string>;
-
-  feedback(body: {
-    userId: string;
-    feedback: Feedback;
-  }): Promise<void>;
-
-  passwordHardeningSalt(body: PasswordHardeningSaltRequest): Promise<string>;
-
-  register(body: Registration): Promise<LoginResult>;
-  login(body: LoginCredentials): Promise<LoginResult>;
+  [Path in keyof Spec]: (
+    body: io.TypeOf<Spec[Path]["Request"]>,
+  ) => Promise<io.TypeOf<Spec[Path]["Response"]>>
 };
 
 export default IBackendApi;
