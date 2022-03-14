@@ -9,6 +9,7 @@ const config = {
       contentScript: './build/js/src/elo-extension/contentScript.js',
       pageContentScript: './build/js/src/elo-extension/pageContentScript.js',
       backgroundScript: './build/js/src/elo-extension/backgroundScript.js',
+      hardenPasswordWorker: './build/js/src/elo-page/hardenPasswords/worker.js',
     },
     module: {
       rules: [
