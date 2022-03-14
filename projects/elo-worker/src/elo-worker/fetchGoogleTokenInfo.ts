@@ -1,3 +1,5 @@
+import fetch from 'isomorphic-fetch';
+
 import decode from '../elo-types/decode';
 import { GoogleAuthResult } from '../elo-types/GoogleAuthResult';
 

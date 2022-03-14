@@ -11,7 +11,7 @@ function getEnv(varName: string): string {
 }
 
 namespace dirs {
-  export const projectRoot = path.join(__dirname, '..', '..', '..');
+  export const projectRoot = path.join(__dirname, '..', '..', '..', '..');
   export const build = path.join(projectRoot, 'build');
 
   export const data = (() => {
@@ -21,7 +21,7 @@ namespace dirs {
       return '/data';
     }
 
-    return path.join(home, 'data', 'deepspeech-exp')
+    return path.join(home, 'data', 'deepspeech-exp');
   })();
 
   export const pythonAnalyzer = path.join(projectRoot, 'analyzer');

@@ -9,7 +9,7 @@ const User = io.type({
   id: io.string,
   email: io.string,
   password_salt: io.string,
-  password_hash: optional(io.string),
+  password_hash: io.union([io.string, io.null]),
   oauth_providers: io.array(io.string),
 });
 

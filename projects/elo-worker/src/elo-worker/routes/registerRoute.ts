@@ -78,7 +78,7 @@ const registerRoute: RouteDefinition<'register'> = async (
 
   const password_hash = 'hardenedPassword' in registration
     ? hashPassword(registration.hardenedPassword, password_salt)
-    : undefined;
+    : null;
 
   try {
     await insertUser(db, {
