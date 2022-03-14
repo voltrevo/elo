@@ -50,6 +50,16 @@ const backendApiSpec = {
     Request: LoginCredentials,
     Response: LoginResult,
   },
+
+  sendVerificationEmail: {
+    Request: io.type({ email: io.string }),
+    Response: io.type({}),
+  },
+
+  checkVerificationEmail: {
+    Request: io.type({ email: io.string, code: io.string }),
+    Response: io.type({ verified: io.boolean }),
+  },
 };
 
 export default backendApiSpec;

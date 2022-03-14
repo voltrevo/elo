@@ -31,7 +31,7 @@ export type Protocol = {
   getDashboardUrl(): string;
   getSessionToken(): string | undefined;
   sendVerificationEmail(email: string): void;
-  checkVerificationEmail(email: string, code: string): boolean;
+  checkVerificationEmail(email: string, code: string): { verified: boolean };
   register(registration: ProtocolRegistration): string;
   login(credentials: ProtocolLoginCredentials): string;
   sendFeedback(feedback: Feedback): string;

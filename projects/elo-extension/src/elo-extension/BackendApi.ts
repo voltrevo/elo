@@ -74,4 +74,12 @@ export default class BackendApi implements IBackendApi {
   login(body: io.TypeOf<Spec['login']['Request']>) {
     return this.genericCall('login', body);
   }
+
+  sendVerificationEmail(body: io.TypeOf<Spec['sendVerificationEmail']['Request']>) {
+    return this.genericCall('sendVerificationEmail', body);
+  }
+
+  checkVerificationEmail(body: io.TypeOf<Spec['checkVerificationEmail']['Request']>) {
+    return this.genericCall('checkVerificationEmail', body);
+  }
 }

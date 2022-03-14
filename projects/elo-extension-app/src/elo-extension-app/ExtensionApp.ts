@@ -270,16 +270,12 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     return 'success';
   }
 
-  sendVerificationEmail(email: string) {
-    this;
-    console.log(keccak_256(email).slice(0, 6));
+  async sendVerificationEmail(email: string) {
+    await this.backendApi.sendVerificationEmail({ email });
   }
 
   async checkVerificationEmail(email: string, code: string) {
-    this;
-    await delay(500);
-
-    return code === keccak_256(email).slice(0, 6);
+    return await this.backendApi.checkVerificationEmail({ email, code });
   }
 
   async googleAuth() {

@@ -7,6 +7,7 @@ import IBackendApi, { LoginResult } from '../elo-extension-app/IBackendApi';
 import Registration from '../elo-types/Registration';
 import LoginCredentials from '../elo-types/LoginCredentials';
 import Storage from '../elo-extension-app/storage/Storage';
+import { keccak_256 } from 'js-sha3';
 
 let shiftKey = false;
 
@@ -111,6 +112,19 @@ class SimulBackendApi implements IBackendApi {
     this.knownUsers[email] = result.userId;
 
     return result;
+  }
+
+  async sendVerificationEmail({ email }: { email: string }) {
+    await delay(500);
+    console.log(keccak_256(email).slice(0, 6));
+
+    return {};
+  }
+
+  async checkVerificationEmail({ email, code }: { email: string, code: string }) {
+    await delay(500);
+
+    return { verified: code === keccak_256(email).slice(0, 6) };
   }
 }
 

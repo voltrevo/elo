@@ -218,7 +218,7 @@ function RegistrationForm() {
               if (newCode.length === 6) {
                 const currentEmail = email;
                 const currentCode = newCode;
-                const correct = await appCtx.checkVerificationEmail(email, newCode);
+                const correct = (await appCtx.checkVerificationEmail(email, newCode)).verified;
 
                 setVerificationCheck({
                   email: currentEmail,
