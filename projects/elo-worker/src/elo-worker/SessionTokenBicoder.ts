@@ -16,7 +16,7 @@ export default class SessionTokenBicoder {
   private branca: Branca;
 
   constructor({ config }: AppComponents<'config'>) {
-    this.branca = createBranca(config.tokenEncryptionSecret);
+    this.branca = createBranca(config.secrets.tokenEncryption);
   }
 
   encode(tokenData: SessionTokenData) {

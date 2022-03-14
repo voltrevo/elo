@@ -16,6 +16,6 @@ export default function defineRoutes(appComponents: AppComponents) {
   defineRegister(appComponents);
 
   koaApp.use(route.post('/generateId', async ctx => {
-    ctx.body = generateUserId(config.userIdGenerationSecret, undefined);
+    ctx.body = generateUserId(config.secrets.userIdGeneration, undefined);
   }));
 }

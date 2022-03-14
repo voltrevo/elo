@@ -32,7 +32,7 @@ export default function defineRegister({
 
     if (
       userIdHint !== undefined &&
-      !validateUserId(config.userIdGenerationSecret, userIdHint)
+      !validateUserId(config.secrets.userIdGeneration, userIdHint)
     ) {
       ctx.status = 400;
       ctx.body = 'Invalid userId';
@@ -96,7 +96,7 @@ export default function defineRegister({
 
     const userId = (
       userIdHint ??
-      generateUserId(config.userIdGenerationSecret, email)
+      generateUserId(config.secrets.userIdGeneration, email)
     );
 
     const password_salt = base58.encode(crypto.randomBytes(16));

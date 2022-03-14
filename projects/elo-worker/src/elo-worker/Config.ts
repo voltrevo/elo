@@ -9,8 +9,11 @@ export const Config = io.type({
     key: io.string,
     cert: io.string,
   })),
-  userIdGenerationSecret: io.string,
-  tokenEncryptionSecret: io.string,
+  secrets: io.type({
+    userIdGeneration: io.string,
+    tokenEncryption: io.string,
+    passwordHardening: io.string,
+  }),
   googleOauthClientId: io.string,
 });
 

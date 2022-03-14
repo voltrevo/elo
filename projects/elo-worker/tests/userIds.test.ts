@@ -6,7 +6,7 @@ import base58 from '../src/common-pure/base58';
 
 import testConfig from './testConfig';
 
-const { userIdGenerationSecret } = testConfig;
+const userIdGenerationSecret = testConfig.secrets.userIdGeneration;
 
 describe('userIds', () => {
   it('generates user ids', () => {

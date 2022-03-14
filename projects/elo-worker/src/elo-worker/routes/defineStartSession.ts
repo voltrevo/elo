@@ -36,7 +36,7 @@ export default function defineStartSession({
       return;
     }
 
-    if (!validateUserId(config.userIdGenerationSecret, userId)) {
+    if (!validateUserId(config.secrets.userIdGeneration, userId)) {
       ctx.status = 400;
       ctx.body = 'Invalid userId';
       return;

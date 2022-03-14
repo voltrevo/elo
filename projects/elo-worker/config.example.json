@@ -1,12 +1,11 @@
 {
-  "server": {
-    "pgConnString": "postgres://postgres:elodev@localhost:5432/elo",
-    "host": "0.0.0.0",
-    "port": 36582,
-    "userIdEncryptionSecret": "secret"
+  "pgConnString": "postgres://postgres:elodev@localhost:5432/elo",
+  "host": "0.0.0.0",
+  "port": 36582,
+  "secrets": {
+    "userIdGeneration": "userIdGenerationSecret",
+    "tokenEncryption": "tokenEncryptionSecret",
+    "passwordHardening": "passwordHardeningSecret"
   },
-  "client": {
-    "tls": false,
-    "hostAndPort": "localhost:36582"
-  }
+  "googleOauthClientId": "googleOauthClientId"
 }
