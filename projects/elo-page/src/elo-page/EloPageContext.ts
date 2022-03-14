@@ -8,7 +8,7 @@ import Storage from '../elo-extension-app/storage/Storage';
 
 type EloPageContext = ReturnType<typeof initEloPageContext>;
 
-export function initEloPageContext(storage: Storage, config: Config) {
+export function initEloPageContext(storage: Storage, featureFlags: Config['featureFlags']) {
   const state = {
     page: '',
     dialog: undefined as (React.ReactNode | undefined),
@@ -22,7 +22,7 @@ export function initEloPageContext(storage: Storage, config: Config) {
     events,
     storage,
     state,
-    config,
+    featureFlags,
     update: (updates: Partial<typeof state>) => {
       for (const key of (Object.keys(updates) as (keyof typeof state)[])) {
         (state as any)[key] = updates[key];

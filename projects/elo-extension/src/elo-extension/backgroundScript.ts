@@ -5,7 +5,7 @@ import config from './config';
 
 Browser.runtime.onInstalled.addListener(async () => {
   if (config.featureFlags.authEnabled) {
-    const storage = new Storage(Browser.storage.local, 'elo');
+    const storage = await Storage.Create(Browser.storage.local, 'elo');
     const root = await storage.readRoot();
 
     if (!root.installTriggered) {

@@ -1,10 +1,8 @@
 {
-  "client": {
-    "tls": true,
-    "hostAndPort": "elo-dev.com",
-    "featureFlags": {
-      "authEnabled": false
-    },
-    "googleOauthClientId": "insert client id"
-  }
+  "tls": true,
+  "hostAndPort": "elo-dev.com",
+  "featureFlags": {
+    "authEnabled": false
+  },
+  "googleOauthClientId": "insert client id"
 }

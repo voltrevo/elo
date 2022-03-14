@@ -1,6 +1,6 @@
 import Browser from "webextension-polyfill";
 import IGoogleAuthApi from "../elo-extension-app/IGoogleAuthApi";
-import { GoogleAuthResult } from "../elo-extension-app/Protocol";
+import { GoogleAuthResult } from "../elo-types/GoogleAuthResult";
 
 export default class GoogleAuthApi implements IGoogleAuthApi {
   constructor(public clientId: string) {}

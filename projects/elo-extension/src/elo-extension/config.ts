@@ -7,7 +7,6 @@ const configJson = require("../../../../config.json");
 export const Config = io.type({
   tls: io.boolean,
   hostAndPort: io.string,
-  sampleStorage: io.record(io.string, io.unknown),
   featureFlags: ExtensionFeatureFlags,
   googleOauthClientId: io.string,
 });

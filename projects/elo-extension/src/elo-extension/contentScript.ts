@@ -6,6 +6,7 @@ import PostMessageServer from '../elo-page/helpers/PostMessageServer';
 import BackendApi from './BackendApi';
 import GoogleAuthApi from './GoogleAuthApi';
 import config from './config';
+import Storage from '../elo-extension-app/storage/Storage';
 
 const eloExtension = document.createElement('div');
 eloExtension.id = 'elo-extension';
@@ -27,20 +28,24 @@ iconTag.src = Browser.runtime.getURL('assets/icons/icon128.png');
 iconTag.style.display = 'none';
 eloExtension.appendChild(iconTag);
 
-const extensionApp = new ExtensionApp(
-  new BackendApi(`${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`),
-  new GoogleAuthApi(config.googleOauthClientId),
-  Browser.runtime.getURL('elo-page.html'),
-  Browser.storage.local,
-);
-
-new PostMessageServer(
-  'elo',
-  ({ method, args }: any) => {
-    if (!(method in protocolThirdPartyKeyMap)) {
-      throw new Error(`Method not found: ${method}`);
-    }
-
-    (extensionApp as any)[method](...args)
-  },
+(async () => {
+  const extensionApp = new ExtensionApp(
+    new BackendApi(`${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`),
+    new GoogleAuthApi(config.googleOauthClientId),
+    Browser.runtime.getURL('elo-page.html'),
+    await Storage.Create(Browser.storage.local, 'elo'),
+  );
+  
+  new PostMessageServer(
+    'elo',
+    ({ method, args }: any) => {
+      if (!(method in protocolThirdPartyKeyMap)) {
+        throw new Error(`Method not found: ${method}`);
+      }
+  
+      (extensionApp as any)[method](...args)
+    },
+  );
+})().catch(
+  console.error
 );

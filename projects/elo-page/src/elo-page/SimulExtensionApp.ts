@@ -36,7 +36,7 @@ class SimulBackendApi implements IBackendApi {
     return `fake-id-${Date.now()}`;
   }
 
-  startSession(_body: { userId: string; }): Promise<string> {
+  startSession(_body: { userId: string | undefined; }): Promise<string> {
     throw new Error('Method not implemented.');
   }
 
@@ -73,6 +73,7 @@ class SimulBackendApi implements IBackendApi {
     }
 
     const result = {
+      eloLoginToken: 'elo-login-token',
       userId: registration.userIdHint ?? await this.generateId(),
       email,
       googleAccount: 'googleAccessToken' in registration ? email : undefined,
@@ -101,6 +102,7 @@ class SimulBackendApi implements IBackendApi {
     })();
 
     const result = {
+      eloLoginToken: 'elo-login-token',
       userId: this.knownUsers[email] ?? await this.generateId(),
       email,
       googleAccount: 'googleAccessToken' in credentials ? email : undefined,

@@ -20,12 +20,12 @@ window.addEventListener('load', async () => {
   (window as any).eloExtensionApp = eloExtensionApp;
 
   const eloClient = makeLocalExtensionAppClient(eloExtensionApp);
-  const pageCtx = initEloPageContext(storage, config);
+  const pageCtx = initEloPageContext(storage, config.featureFlags);
 
   const { accountRoot } = await pageCtx.storage.readRoot();
 
   pageCtx.state.needsAuth = (
-    pageCtx.config.featureFlags.authEnabled &&
+    pageCtx.featureFlags.authEnabled &&
     accountRoot === undefined
   );
 

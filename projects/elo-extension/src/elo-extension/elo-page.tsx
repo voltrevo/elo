@@ -11,17 +11,19 @@ import Storage from '../elo-extension-app/storage/Storage';
 import BackendApi from './BackendApi';
 import GoogleAuthApi from './GoogleAuthApi';
 
-const eloExtensionApp = makeLocalExtensionAppClient(new ExtensionApp(
-  new BackendApi(`${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`),
-  new GoogleAuthApi(config.googleOauthClientId),
-  Browser.runtime.getURL('elo-page.html'),
-  Browser.storage.local,
-));
-
-(window as any).eloExtensionApp = eloExtensionApp;
-
 window.addEventListener('load', async () => {
-  const pageCtx = initEloPageContext(new Storage(Browser.storage.local, 'elo'), config);
+  const storage = await Storage.Create(Browser.storage.local, 'elo');
+
+  const eloExtensionApp = makeLocalExtensionAppClient(new ExtensionApp(
+    new BackendApi(`${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`),
+    new GoogleAuthApi(config.googleOauthClientId),
+    Browser.runtime.getURL('elo-page.html'),
+    storage,
+  ));
+
+  (window as any).eloExtensionApp = eloExtensionApp;
+
+  const pageCtx = initEloPageContext(storage, config.featureFlags);
 
   const { accountRoot } = await pageCtx.storage.readRoot();
   const needsAuth = config.featureFlags.authEnabled && !accountRoot;
