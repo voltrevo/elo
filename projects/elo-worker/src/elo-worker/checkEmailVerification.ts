@@ -15,5 +15,5 @@ export default async function checkEmailVerification(
     return false;
   }
 
-  return code === row.verification_code;
+  return code.toUpperCase() === row.verification_code.toUpperCase();
 }
