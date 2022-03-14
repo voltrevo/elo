@@ -14,7 +14,7 @@ export default class BackendApi implements IBackendApi {
     path: Path,
     body: io.TypeOf<Spec[Path]['Request']>,
   ): Promise<io.TypeOf<Spec[Path]['Response']>> {
-    const jsonResponse = await fetch(
+    const response = await fetch(
       `${this.apiBase}/${path}`,
       {
         method: 'POST',
@@ -23,9 +23,13 @@ export default class BackendApi implements IBackendApi {
         },
         body: JSON.stringify(body),
       },
-    ).then(res => res.json());
+    );
 
-    return decode(backendApiSpec[path].Response, jsonResponse);
+    if (response.status >= 400) {
+      throw new Error(await response.text());
+    }
+
+    return decode(backendApiSpec[path].Response, await response.json());
   }
 
   async generateId(): Promise<string> {
