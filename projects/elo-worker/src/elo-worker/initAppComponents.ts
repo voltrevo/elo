@@ -7,7 +7,8 @@ import loadConfig from './loadConfig';
 import Database from '../database/Database';
 import StatsGatherer from './StatsGatherer';
 import AppComponents from './AppComponents';
-import SessionTokenBicoder from './SessionTokenBicoder';
+import TokenBicoder from './TokenBicoder';
+import SessionTokenData from './SessionTokenData';
 
 export default async function initAppComponents(): Promise<AppComponents> {
   const config = await loadConfig();
@@ -26,7 +27,7 @@ export default async function initAppComponents(): Promise<AppComponents> {
     )
     : websockify(new Koa());
 
-  const sessionTokenBicoder = new SessionTokenBicoder({ config });
+  const sessionTokenBicoder = new TokenBicoder({ config }, SessionTokenData, 7 * 86400);
 
   return {
     config,

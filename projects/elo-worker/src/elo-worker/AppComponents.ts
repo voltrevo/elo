@@ -3,15 +3,16 @@ import type Koa from 'koa';
 
 import type Database from '../database/Database';
 import type StatsGatherer from './StatsGatherer';
-import type SessionTokenBicoder from './SessionTokenBicoder';
+import type TokenBicoder from './TokenBicoder';
 import type { Config } from './Config';
+import { SessionTokenData } from './SessionTokenData';
 
 type AppComponentMap = {
   config: Config;
   db: Database;
   statsGatherer: StatsGatherer;
   koaApp: KoaApp<Koa.DefaultState, Koa.DefaultContext>;
-  sessionTokenBicoder: SessionTokenBicoder;
+  sessionTokenBicoder: TokenBicoder<SessionTokenData>;
 };
 
 type AppComponents<K extends keyof AppComponentMap = keyof AppComponentMap> =

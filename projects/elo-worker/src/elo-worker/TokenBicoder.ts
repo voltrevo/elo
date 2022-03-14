@@ -6,24 +6,27 @@ import createBranca, { Branca } from './helpers/createBranca';
 import ErrorData from '../common-pure/ErrorData';
 import AppComponents from './AppComponents';
 
-const SessionTokenData = io.type({
-  userId: io.string,
-});
-
-export type SessionTokenData = io.TypeOf<typeof SessionTokenData>;
-
-export default class SessionTokenBicoder {
+export default class TokenBicoder<TokenData> {
   private branca: Branca;
+  public TokenData: io.Type<TokenData>;
+  public validDurationSeconds: number;
 
-  constructor({ config }: AppComponents<'config'>) {
+  constructor(
+    { config }: AppComponents<'config'>,
+    // eslint-disable-next-line no-shadow
+    TokenData: io.Type<TokenData>,
+    validDurationSeconds: number,
+  ) {
     this.branca = createBranca(config.secrets.tokenEncryption);
+    this.TokenData = TokenData;
+    this.validDurationSeconds = validDurationSeconds;
   }
 
-  encode(tokenData: SessionTokenData) {
+  encode(tokenData: TokenData) {
     return this.branca.encode(msgpack.encode(tokenData));
   }
 
-  decode(token: string): SessionTokenData | ErrorData<'unreadable' | 'expired' | 'internal'> {
+  decode(token: string): TokenData | ErrorData<'unreadable' | 'expired' | 'internal'> {
     let buf: Uint8Array;
 
     try {
@@ -35,7 +38,7 @@ export default class SessionTokenBicoder {
     const timestamp = this.branca.timestamp(token);
     const secondsElapsed = (Date.now() / 1000) - timestamp;
 
-    if (secondsElapsed > 7 * 86400) {
+    if (secondsElapsed > this.validDurationSeconds) {
       return new ErrorData('expired', null, []);
     }
 
@@ -47,7 +50,7 @@ export default class SessionTokenBicoder {
       return new ErrorData('internal', null, [error]);
     }
 
-    const ioDecodeResult = SessionTokenData.decode(data);
+    const ioDecodeResult = this.TokenData.decode(data);
 
     if ('left' in ioDecodeResult) {
       return new ErrorData('internal', reporter.report(ioDecodeResult), []);
