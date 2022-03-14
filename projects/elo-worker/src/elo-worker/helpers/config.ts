@@ -14,5 +14,7 @@ if ('left' in decodeResult) {
   throw new Error(reporter.report(decodeResult).join('\n'));
 }
 
+const result: ConfigType = decodeResult.right;
+
 // TODO: Export a function to load the config instead
-export default decodeResult.right;
+export default result;
