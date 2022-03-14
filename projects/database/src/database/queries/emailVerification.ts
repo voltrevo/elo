@@ -12,7 +12,7 @@ const EmailVerificationRow = io.type({
 
 export type EmailVerificationRow = io.TypeOf<typeof EmailVerificationRow>;
 
-export async function insertEmailVerification(db: Database, {
+export async function upsertEmailVerification(db: Database, {
   email,
   verification_code,
   expires,
@@ -30,6 +30,9 @@ export async function insertEmailVerification(db: Database, {
         $2,
         $3
       )
+      ON CONFLICT (email)
+      DO
+      UPDATE SET verification_code = $2, expires = $3
     `,
     [
       email,
