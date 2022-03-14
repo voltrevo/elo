@@ -1,5 +1,6 @@
 import Feedback from "../elo-types/Feedback";
 import LoginCredentials from "../elo-types/LoginCredentials";
+import PasswordHardeningSaltRequest from "../elo-types/PasswordHardeningSaltRequest";
 import Registration from "../elo-types/Registration";
 
 export type LoginResult = {
@@ -20,16 +21,7 @@ type IBackendApi = {
     feedback: Feedback;
   }): Promise<void>;
 
-  passwordHardeningSalt(body: {
-    email: string,
-
-    // TODO: Make sure the ability to learn whether accounts exist or have changed from this api is
-    // limited.
-    userIdHint?: {
-      verificationCode: string,
-      userId: string,
-    },
-  }): Promise<string>;
+  passwordHardeningSalt(body: PasswordHardeningSaltRequest): Promise<string>;
 
   register(body: Registration): Promise<LoginResult>;
   login(body: LoginCredentials): Promise<LoginResult>;
