@@ -1,5 +1,7 @@
 import route from 'koa-route';
 import reporter from 'io-ts-reporters';
+import { keccak256 } from 'js-sha3';
+
 import AppComponents from '../AppComponents';
 import { generateUserId, validateUserId } from '../userIds';
 import { lookupEmailVerification } from '../../database/queries/emailVerification';
@@ -45,8 +47,11 @@ export default function definePasswordHardeningSalt({
       generateUserId(config.secrets.userIdGeneration, email)
     );
 
-    // TODO: Add password hardening salt secret, generate it and return
-    ctx.status = 500;
-    ctx.body = 'Not implemented';
+    const passwordHardeningSalt = keccak256(
+      `${config.secrets.passwordHardening}:${userId}`,
+    );
+
+    ctx.status = 200;
+    ctx.body = { passwordHardeningSalt };
   }));
 }
