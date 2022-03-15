@@ -1,12 +1,9 @@
-import { keccak_256 } from 'js-sha3';
-
 import EwmaCalculator from './EwmaCalculator';
 import Protocol, { ConnectionEvent, ProtocolLoginCredentials, ProtocolRegistration } from './Protocol';
 import SessionStats, { initSessionStats } from '../elo-types/SessionStats';
 import Storage, { anonymousAccountRootKey, RandomKey } from './storage/Storage';
 import UiState from './UiState';
 import never from '../common-pure/never';
-import delay from '../common-pure/delay';
 import TaskQueue from '../common-pure/TaskQueue';
 import { AnalysisDisfluent, AnalysisFragment } from '../elo-types/Analysis';
 import Feedback from '../elo-types/Feedback';
@@ -82,18 +79,14 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   async activate() {
     (globalThis as any).eloExtensionApp = this;
 
-    const root = await this.storage.readRoot();
+    const accountRoot = await this.readAccountRoot();
 
-    if (root.userId === undefined) {
-      root.userId = await this.backendApi.generateId({});
-    }
-
-    this.sessionStats.lastSessionKey = root.lastSessionKey;
-    root.lastSessionKey = this.sessionKey;
-    await this.storage.writeRoot(root);
+    this.sessionStats.lastSessionKey = accountRoot.lastSessionKey;
+    accountRoot.lastSessionKey = this.sessionKey;
 
     const startSessionResponse = await this.backendApi.startSession({
-      userId: root.userId,
+      // TODO: use login token instead
+      userId: accountRoot.userId,
     });
 
     let sessionToken: string;
@@ -107,6 +100,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     this.sessionToken = sessionToken;
     this.sessionStats.sessionToken = sessionToken;
     await this.updateStats(0, 0);
+    await this.writeAccountRoot(accountRoot);
 
     return sessionToken;
   }
