@@ -20,9 +20,14 @@ const backendApiSpec = {
   },
 
   startSession: {
-    Request: io.type({
-      userId: optional(io.string),
-    }),
+    Request: io.union([
+      io.type({
+        userId: optional(io.string),
+      }),
+      io.type({
+        eloLoginToken: io.string,
+      }),
+    ]),
     Response: io.string,
   },
 
