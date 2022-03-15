@@ -8,6 +8,9 @@ const AccountRoot = io.type({
   email: optional(io.string),
   googleAccount: optional(io.string),
   eloLoginToken: optional(io.string),
+
+  // Warning: Please be mindful of the possible need to update mergeAccountRoots if the structure
+  // of AccountRoot is changed.
 });
 
 type AccountRoot = io.TypeOf<typeof AccountRoot>;
