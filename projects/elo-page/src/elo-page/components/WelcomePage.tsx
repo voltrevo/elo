@@ -13,6 +13,7 @@ import TermsAndConditionsDialog from './TermsAndConditionsDialog';
 import delay from '../../common-pure/delay';
 import Section from './Section';
 import Field from './Field';
+import errorHasTag from '../../common-pure/errorHasTag';
 
 const WelcomePage: React.FunctionComponent = () => {
   const pageCtx = React.useContext(EloPageContext);
@@ -51,7 +52,14 @@ const WelcomePage: React.FunctionComponent = () => {
             try {
               await appCtx.login({ googleAccessToken: authResult.token });
               proceed(pageCtx);
-            } catch {
+            } catch (error) {
+              if (errorHasTag(error, 'wrong-auth')) {
+                throw new Error([
+                  `It looks like you (${authResult.detail.email}) already have an account but`,
+                  `haven't authorized logging in via Google. Maybe try email?`
+                ].join(' '));
+              }
+
               setServiceEmail(authResult.detail.email);
             }
           }}
