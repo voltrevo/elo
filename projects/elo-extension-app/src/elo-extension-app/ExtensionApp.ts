@@ -86,13 +86,13 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
 
     const eloLoginToken = accountRoot.eloLoginToken;
 
-    if (eloLoginToken === undefined) {
-      throw new Error('Expected eloLoginToken');
-    }
+    const startSessionResponse = await this.backendApi.startSession(
+      eloLoginToken !== undefined
+        ? { eloLoginToken }
 
-    const startSessionResponse = await this.backendApi.startSession({
-      eloLoginToken,
-    });
+        // DEPRECATED: Using deprecated format to support missing eloLoginToken
+        : { userId: accountRoot.userId }
+    );
 
     let sessionToken: string;
 
