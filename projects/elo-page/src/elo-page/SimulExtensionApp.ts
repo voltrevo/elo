@@ -37,7 +37,7 @@ class SimulBackendApi implements IBackendApi {
     return `fake-id-${Date.now()}`;
   }
 
-  startSession(_body: { userId: string | undefined; }): Promise<string> {
+  startSession(_body: unknown): Promise<string> {
     throw new Error('Method not implemented.');
   }
 

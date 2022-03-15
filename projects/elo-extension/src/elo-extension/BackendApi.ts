@@ -37,7 +37,7 @@ export default class BackendApi implements IBackendApi {
         .then(res => res.text());
   }
 
-  async startSession(body: { userId: string | undefined; }): Promise<string> {
+  async startSession(body: io.TypeOf<Spec['startSession']['Request']>): Promise<string> {
     return await fetch(`${this.apiBase}/startSession`, {
       method: 'POST',
       headers: {
