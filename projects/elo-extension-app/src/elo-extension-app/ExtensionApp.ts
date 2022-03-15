@@ -45,10 +45,22 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     const root = await this.storage.readRoot();
 
     if (!root.accountRoot) {
-      // TODO: Eventually we won't allow creating anonymous accounts.
-      const accountRoot = initAccountRoot();
-      accountRoot.userId = await this.backendApi.generateId({});
-      await this.storage.write(AccountRoot, anonymousAccountRootKey, accountRoot);
+      const existingAnonymousAccountRoot = await this.storage.read(
+        AccountRoot,
+        anonymousAccountRootKey,
+      );
+
+      let accountRoot: AccountRoot;
+
+      if (existingAnonymousAccountRoot) {
+        accountRoot = existingAnonymousAccountRoot;
+      } else {
+        // TODO: Eventually we won't allow creating anonymous accounts.
+        accountRoot = initAccountRoot();
+        accountRoot.userId = await this.backendApi.generateId({});
+        await this.storage.write(AccountRoot, anonymousAccountRootKey, accountRoot);
+      }
+
       root.accountRoot = anonymousAccountRootKey;
       await this.storage.writeRoot(root);
     }
