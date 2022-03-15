@@ -20,39 +20,59 @@ const AccountPage: React.FunctionComponent = () => {
         const email = await appCtx.getEmail();
 
         if (email) {
-          return <Field>
-            <div>Email</div>
-            <div>{email}</div>
-          </Field>
+          return <>
+            <Field>
+              <div>Email</div>
+              <div>{email}</div>
+            </Field>
+            <div className="button-column">
+              <AsyncButton
+                once={true}
+                onClick={async () => {
+                  await appCtx.logout();
+                  pageCtx.update({ needsAuth: true });
+
+                  delay(250).then(() => {
+                    pageCtx.update({ page: 'WelcomePage' });
+                  });
+                }}
+              >
+                Log Out
+              </AsyncButton>
+            </div>
+          </>
         }
 
-        return <div>
-          <p>
-            Hey, you've got an anonymous account! That means you've been
-            with us since our early days. Your support means so much to us.
-          </p>
+        return <>
+          <div>
+            <p>
+              Hey, you've got an anonymous account! If you wish, you can stay
+              anonymous for now, but we encourage you to sign up for a real
+              account.
+            </p>
 
-          <p>
-            It's safe to log out. We'll just associate your anonymous account
-            data with the next account you create or log in to.
-          </p>
-        </div>
+            <p>
+              Your anonymous account data will be migrated to the next account
+              you register or log in to.
+            </p>
+          </div>
+          <div className="button-column">
+              <AsyncButton
+                once={true}
+                onClick={async () => {
+                  await appCtx.logout();
+                  pageCtx.update({ needsAuth: true });
+
+                  delay(250).then(() => {
+                    pageCtx.update({ page: 'WelcomePage' });
+                  });
+                }}
+              >
+                Create an Account
+              </AsyncButton>
+            </div>
+        </>
       }}/>
-      <div className="button-column">
-        <AsyncButton
-          once={true}
-          onClick={async () => {
-            await appCtx.logout();
-            pageCtx.update({ needsAuth: true });
-
-            delay(250).then(() => {
-              pageCtx.update({ page: 'WelcomePage' });
-            });
-          }}
-        >
-          Log Out
-        </AsyncButton>
-      </div>
     </Section>
   </Page>;
 };
