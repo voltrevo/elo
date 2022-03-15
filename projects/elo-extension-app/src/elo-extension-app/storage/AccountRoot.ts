@@ -7,6 +7,7 @@ const AccountRoot = io.type({
   userId: optional(io.string),
   email: optional(io.string),
   googleAccount: optional(io.string),
+  eloLoginToken: optional(io.string),
 });
 
 type AccountRoot = io.TypeOf<typeof AccountRoot>;
@@ -18,6 +19,7 @@ export function initAccountRoot(): AccountRoot {
     userId: undefined,
     email: undefined,
     googleAccount: undefined,
+    eloLoginToken: undefined,
   };
 }
 

@@ -308,11 +308,12 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
       never(protocolRegistration);
     }
 
-    const { userId, email, googleAccount } = await this.backendApi.register(
+    const { eloLoginToken, userId, email, googleAccount } = await this.backendApi.register(
       registration,
     );
 
     const accountRoot = anonymousAccountRoot ?? initAccountRoot();
+    accountRoot.eloLoginToken = eloLoginToken;
     accountRoot.userId = userId;
     accountRoot.email = email;
     accountRoot.googleAccount = googleAccount;
@@ -355,11 +356,12 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
       never(protocolCredentials);
     }
 
-    const { userId, email, googleAccount } = await this.backendApi.login(credentials);
+    const { eloLoginToken, userId, email, googleAccount } = await this.backendApi.login(credentials);
     const anonymousAccountRoot = await this.storage.read(AccountRoot, anonymousAccountRootKey);
     const existingAccountRoot = await this.storage.read(AccountRoot, `elo-user:${userId}`);
 
     const accountRoot = existingAccountRoot ?? anonymousAccountRoot ?? initAccountRoot();
+    accountRoot.eloLoginToken = eloLoginToken;
     accountRoot.userId = userId;
     accountRoot.email = email;
     accountRoot.googleAccount = googleAccount;
