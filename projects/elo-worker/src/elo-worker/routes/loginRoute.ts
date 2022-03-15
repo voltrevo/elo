@@ -74,6 +74,13 @@ const loginRoute: RouteDefinition<'login'> = async (
       };
     }
 
+    if (!existingUser.oauth_providers.includes('google')) {
+      return {
+        status: 401,
+        body: 'Account exists but does not allow google login',
+      };
+    }
+
     return {
       ok: {
         eloLoginToken: loginTokenBicoder.encode({
