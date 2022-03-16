@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-PROJECT="elo-worker"
+PROJECT="zoom-backend"
 TAG="git-$(git rev-parse HEAD | head -c7)-model-$(shasum -a 256 data/models.tflite | head -c7)"
 
 docker build . -t "$PROJECT":"$TAG"

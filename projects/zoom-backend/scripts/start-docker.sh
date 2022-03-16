@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-PROJECT="elo-worker"
+PROJECT="zoom-backend"
 # TAG=git-eff1a71-model-35d4164
 # PORT=36582
 
