@@ -1,0 +1,16 @@
+{
+  "deno.enable": false,
+  "editor.rulers": [80],
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.tabSize": 2,
+  "python.analysis.typeCheckingMode": "strict",
+  "python.pythonPath": "analyzer/venv/bin/python",
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/*/**": true
+  }
+}
