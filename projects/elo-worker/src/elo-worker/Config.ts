@@ -37,6 +37,7 @@ export const Config = io.type({
   outgoingEmail: io.type({
     notifications: OutgoingEmailConfig,
   }),
+  unsubscribeUrl: io.string,
 });
 
 export type Config = io.TypeOf<typeof Config>;

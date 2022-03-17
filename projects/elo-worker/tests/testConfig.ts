@@ -9,6 +9,7 @@ const testConfig: Config = {
     userIdGeneration: 'userIdGenerationSecret',
     tokenEncryption: 'tokenEncryptionSecret',
     passwordHardening: 'passwordHardeningSecret',
+    emailUnsubscribeCodes: 'emailUnsubscribeCodesSecret',
   },
   googleOauthClientId: 'googleOauthClientId',
   outgoingEmail: {
@@ -16,6 +17,7 @@ const testConfig: Config = {
       type: 'console',
     },
   },
+  unsubscribeUrl: 'unsubscribeUrl',
 };
 
 export default testConfig;

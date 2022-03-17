@@ -32,7 +32,7 @@ export default async function initAppComponents(): Promise<AppComponents> {
   const sessionTokenBicoder = new TokenBicoder({ config }, SessionTokenData, 7 * 86400);
   const loginTokenBicoder = new TokenBicoder({ config }, EloLoginTokenData, Infinity);
 
-  const emailService = new EmailService({ config });
+  const emailService = new EmailService({ config, db });
 
   return {
     config,
