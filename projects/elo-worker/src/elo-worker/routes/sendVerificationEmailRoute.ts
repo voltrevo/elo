@@ -3,7 +3,7 @@ import { upsertEmailVerification } from '../../database/queries/emailVerificatio
 import { lookupUser } from '../../database/queries/users';
 import { RouteDefinition } from './routeSystem';
 
-const verificationCodeAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+const verificationCodeAlphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
 const sendVerificationEmailRoute: RouteDefinition<'sendVerificationEmail'> = async (
   { db, emailService },
