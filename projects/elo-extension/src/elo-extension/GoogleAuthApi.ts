@@ -1,3 +1,5 @@
+import reporter from 'io-ts-reporters';
+
 import Browser from "webextension-polyfill";
 import IGoogleAuthApi from "../elo-extension-app/IGoogleAuthApi";
 import { GoogleAuthResult } from "../elo-types/GoogleAuthResult";
@@ -53,8 +55,7 @@ export default class GoogleAuthApi implements IGoogleAuthApi {
     const decodeResult = GoogleAuthResult.props.detail.decode(tokenInfoJson);
 
     if ('left' in decodeResult) {
-      // TODO: Use reporter
-      throw new Error(decodeResult.left.map(e => e.message).join('\n'));
+      throw new Error(reporter.report(decodeResult).join('\n'));
     }
 
     return decodeResult.right;
