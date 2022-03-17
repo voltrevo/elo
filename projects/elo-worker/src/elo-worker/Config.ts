@@ -31,6 +31,7 @@ export const Config = io.type({
     userIdGeneration: io.string,
     tokenEncryption: io.string,
     passwordHardening: io.string,
+    emailUnsubscribeCodes: io.string,
   }),
   googleOauthClientId: io.string,
   outgoingEmail: io.type({
