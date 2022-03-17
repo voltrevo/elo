@@ -10,6 +10,7 @@ import AppComponents from './AppComponents';
 import TokenBicoder from './TokenBicoder';
 import SessionTokenData from './SessionTokenData';
 import EloLoginTokenData from './EloLoginTokenData';
+import EmailService from './EmailService';
 
 export default async function initAppComponents(): Promise<AppComponents> {
   const config = await loadConfig();
@@ -31,6 +32,8 @@ export default async function initAppComponents(): Promise<AppComponents> {
   const sessionTokenBicoder = new TokenBicoder({ config }, SessionTokenData, 7 * 86400);
   const loginTokenBicoder = new TokenBicoder({ config }, EloLoginTokenData, Infinity);
 
+  const emailService = new EmailService({ config });
+
   return {
     config,
     db,
@@ -38,5 +41,6 @@ export default async function initAppComponents(): Promise<AppComponents> {
     koaApp,
     sessionTokenBicoder,
     loginTokenBicoder,
+    emailService,
   };
 }

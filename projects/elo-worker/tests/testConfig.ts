@@ -11,6 +11,11 @@ const testConfig: Config = {
     passwordHardening: 'passwordHardeningSecret',
   },
   googleOauthClientId: 'googleOauthClientId',
+  outgoingEmail: {
+    notifications: {
+      type: 'console',
+    },
+  },
 };
 
 export default testConfig;

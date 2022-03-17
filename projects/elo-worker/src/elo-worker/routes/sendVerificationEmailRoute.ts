@@ -1,22 +1,21 @@
 import Range from '../../common-pure/Range';
 import { upsertEmailVerification } from '../../database/queries/emailVerification';
 import { lookupUser } from '../../database/queries/users';
-import sendEmail from '../sendEmail';
 import { RouteDefinition } from './routeSystem';
 
 const verificationCodeAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
 const sendVerificationEmailRoute: RouteDefinition<'sendVerificationEmail'> = async (
-  { db },
+  { db, emailService },
   { email },
 ) => {
   const existingUser = await lookupUser(db, { email });
 
   if (existingUser) {
-    await sendEmail(
-      email,
-      'Elo Email Verification',
-      [
+    await emailService.send('notifications', {
+      recipient: email,
+      title: 'Elo Email Verification',
+      body: [
         'Hi',
         '',
         [
@@ -36,7 +35,7 @@ const sendVerificationEmailRoute: RouteDefinition<'sendVerificationEmail'> = asy
         'Sincerely,',
         'The Elo Team',
       ].join('\n'),
-    );
+    });
 
     return { ok: {} };
   }
@@ -53,10 +52,10 @@ const sendVerificationEmailRoute: RouteDefinition<'sendVerificationEmail'> = asy
     expires: new Date(Date.now() + 86_400_000),
   });
 
-  await sendEmail(
-    email,
-    'Elo Email Verification',
-    [
+  await emailService.send('notifications', {
+    recipient: email,
+    title: 'Elo Email Verification',
+    body: [
       'Welcome to Elo!',
       '',
       'Your verification code is:',
@@ -64,7 +63,7 @@ const sendVerificationEmailRoute: RouteDefinition<'sendVerificationEmail'> = asy
       '',
       'This code is valid for 24 hours.',
     ].join('\n'),
-  );
+  });
 
   return { ok: {} };
 };

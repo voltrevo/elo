@@ -7,6 +7,7 @@ import type TokenBicoder from './TokenBicoder';
 import type { Config } from './Config';
 import SessionTokenData from './SessionTokenData';
 import EloLoginTokenData from './EloLoginTokenData';
+import EmailService from './EmailService';
 
 type AppComponentMap = {
   config: Config;
@@ -15,6 +16,7 @@ type AppComponentMap = {
   koaApp: KoaApp<Koa.DefaultState, Koa.DefaultContext>;
   sessionTokenBicoder: TokenBicoder<SessionTokenData>;
   loginTokenBicoder: TokenBicoder<EloLoginTokenData>;
+  emailService: EmailService;
 };
 
 type AppComponents<K extends keyof AppComponentMap = keyof AppComponentMap> =
