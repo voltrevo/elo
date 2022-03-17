@@ -1,5 +1,7 @@
 import { createTransport as createNodemailerTransport } from 'nodemailer';
 import never from '../common-pure/never';
+import Database from '../database/Database';
+import { isUnsubscribedEmail } from '../database/queries/unsubscribedEmails';
 
 import AppComponents from './AppComponents';
 import { OutgoingEmailType } from './Config';
@@ -12,9 +14,11 @@ export type Email = {
 
 export default class EmailService {
   private transports: Record<OutgoingEmailType, (email: Email) => Promise<void>>;
+  private db: Database;
 
-  constructor({ config }: AppComponents<'config'>) {
+  constructor({ config, db }: AppComponents<'config' | 'db'>) {
     this.transports = {} as any;
+    this.db = db;
 
     for (const [k, emailConfig] of Object.entries(config.outgoingEmail)) {
       const key = k as OutgoingEmailType;
@@ -43,6 +47,16 @@ export default class EmailService {
   }
 
   async send(type: OutgoingEmailType, email: Email) {
+    const isUnsubscribed = await isUnsubscribedEmail(this.db, email.recipient);
+
+    if (isUnsubscribed) {
+      console.warn(
+        'Refusing to send email to',
+        email.recipient,
+        'because they have unsubscribed',
+      );
+    }
+
     await this.transports[type](email);
   }
 }

@@ -2,7 +2,6 @@ import * as io from 'io-ts';
 
 import never from '../../common-pure/never';
 import decode from '../../elo-types/decode';
-import optional from '../../elo-types/optional';
 import Database from "../Database";
 
 const User = io.type({
