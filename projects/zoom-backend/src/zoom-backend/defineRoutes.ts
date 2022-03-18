@@ -11,8 +11,7 @@ export default function defineRoutes(appComponents: AppComponents) {
     console.log('POST /zoom-webhook-test', {
       ip: ctx.ip,
       headers: ctx.request.headers,
-      body: ctx.request.body,
-    });
+    }, JSON.stringify(ctx.request.body, null, 2));
 
     ctx.status = 200;
   }));
