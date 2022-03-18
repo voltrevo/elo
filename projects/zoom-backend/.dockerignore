@@ -1,2 +1,5 @@
 build/*.tar.gz
 config.json
+
+adhocTesting
+build/js/adhocTesting
