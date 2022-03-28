@@ -451,4 +451,18 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     const accountRoot = await this.readAccountRoot();
     return accountRoot?.email;
   }
+
+  async ZoomInterceptUrl(currentUrl: string): Promise<string | undefined> {
+    const parsedUrl = new URL(currentUrl);
+    const isZoom = parsedUrl.host === 'zoom.us' || parsedUrl.host.endsWith('.zoom.us');
+    
+    if (isZoom && parsedUrl.pathname.startsWith('/j/')) {
+      const meetingId = parsedUrl.pathname.replace('/j/', '');
+      const interceptUrl = new URL(currentUrl);
+      interceptUrl.pathname = `/wc/join/${meetingId}`;
+      return interceptUrl.toString();
+    }
+
+    return undefined;
+  }
 }

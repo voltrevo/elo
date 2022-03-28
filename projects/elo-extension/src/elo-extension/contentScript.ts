@@ -46,6 +46,12 @@ eloExtension.appendChild(iconTag);
       return (extensionApp as any)[method](...args)
     },
   );
+
+  const zoomInterceptUrl = await extensionApp.ZoomInterceptUrl(location.href);
+
+  if (zoomInterceptUrl !== undefined) {
+    location.href = zoomInterceptUrl;
+  }
 })().catch(
   console.error
 );
