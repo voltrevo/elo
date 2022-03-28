@@ -61,21 +61,35 @@ export default async function handleZoomRedirects(extensionApp: ExtensionApp) {
       messagingContainer = floatingContainer;
     }
 
+    const messageRow = document.createElement('div');
+    messageRow.classList.add('form-group');
+    messageRow.style.display = 'flex';
+    messageRow.style.flexDirection = 'row';
+
+    const logoContainer = document.createElement('div');
+    logoContainer.style.background = `center no-repeat url('${Browser.runtime.getURL('/assets/icons/icon128.png')}')`;
+    logoContainer.style.backgroundSize = 'contain';
+    logoContainer.style.minWidth = '3em';
+    logoContainer.style.minHeight = '3em';
+    messageRow.append(logoContainer);
+
     const messageDiv = document.createElement('div');
-    messageDiv.classList.add('form-group');
+    messageRow.append(messageDiv);
+    messageDiv.style.flexGrow = '1';
+    messageDiv.style.paddingLeft = '1em';
 
     const desktopUrl = new URL(location.href);
     desktopUrl.pathname = `/j/${meetingId}`;
     desktopUrl.searchParams.set('disableEloRedirect', 'true');
 
     messageDiv.innerHTML = [
-      '<b>Elo</b>: We\'ve redirected you to Zoom\'s web client because we don\'t support the ',
+      'We\'ve redirected you to Zoom\'s web client because we don\'t support the ',
       `<a href="${desktopUrl.href}">desktop client</a>`,
       '. You can change this behavior in ',
       `<a href="${Browser.runtime.getURL('/elo-page.html#settings')}">settings</a>.`,
     ].join('');
 
-    messagingContainer.append(messageDiv);
+    messagingContainer.append(messageRow);
 
     if (messagingContainer !== joinFormContainer) {
       const okBtnDiv = document.createElement('div');

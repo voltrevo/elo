@@ -2,7 +2,8 @@
   "tls": true,
   "hostAndPort": "elo-dev.com",
   "featureFlags": {
-    "authEnabled": false
+    "authEnabled": false,
+    "zoomRedirects": false
   },
   "googleOauthClientId": "insert client id"
 }

@@ -48,7 +48,9 @@ eloExtension.appendChild(iconTag);
     },
   );
 
-  await handleZoomRedirects(extensionApp);
+  if (config.featureFlags.zoomRedirects) {
+    await handleZoomRedirects(extensionApp);
+  }
 })().catch(
   console.error
 );
