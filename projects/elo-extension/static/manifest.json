@@ -19,6 +19,7 @@
     "pageContentScript.bundle.js",
     "css/*",
     "elo-page.html",
+    "zoom-holding-page.html",
     "assets/*"
   ],
 
