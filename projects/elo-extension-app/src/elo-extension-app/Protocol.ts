@@ -38,7 +38,6 @@ export type Protocol = {
   googleAuth(): GoogleAuthResult;
   logout(): void;
   getEmail(): string | undefined;
-  ZoomInterceptUrl(currentUrl: string): string | undefined;
 };
 
 export const protocolKeyMap: Record<keyof Protocol, true> = {
@@ -56,7 +55,6 @@ export const protocolKeyMap: Record<keyof Protocol, true> = {
   googleAuth: true,
   logout: true,
   getEmail: true,
-  ZoomInterceptUrl: true,
 };
 
 export const protocolThirdPartyKeyMap = {

@@ -8,6 +8,9 @@ const AccountRoot = io.type({
   email: optional(io.string),
   googleAccount: optional(io.string),
   eloLoginToken: optional(io.string),
+  zoom: optional(io.type({
+    redirectToWebClient: io.boolean,
+  })),
 
   // Warning: Please be mindful of the possible need to update mergeAccountRoots if the structure
   // of AccountRoot is changed.
@@ -23,6 +26,7 @@ export function initAccountRoot(): AccountRoot {
     email: undefined,
     googleAccount: undefined,
     eloLoginToken: undefined,
+    zoom: undefined,
   };
 }
 

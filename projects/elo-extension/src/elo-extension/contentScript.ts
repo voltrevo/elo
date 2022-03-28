@@ -7,6 +7,7 @@ import BackendApi from './BackendApi';
 import GoogleAuthApi from './GoogleAuthApi';
 import config from './config';
 import Storage from '../elo-extension-app/storage/Storage';
+import handleZoomRedirects from './handleZoomRedirects';
 
 const eloExtension = document.createElement('div');
 eloExtension.id = 'elo-extension';
@@ -47,11 +48,7 @@ eloExtension.appendChild(iconTag);
     },
   );
 
-  const zoomInterceptUrl = await extensionApp.ZoomInterceptUrl(location.href);
-
-  if (zoomInterceptUrl !== undefined) {
-    location.href = zoomInterceptUrl;
-  }
+  await handleZoomRedirects(extensionApp);
 })().catch(
   console.error
 );
