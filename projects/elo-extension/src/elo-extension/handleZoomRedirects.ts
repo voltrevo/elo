@@ -49,6 +49,7 @@ export default async function handleZoomRedirects(extensionApp: ExtensionApp) {
 
     if (messagingContainer === null) {
       const floatingContainer = document.createElement('div');
+      document.body.append(floatingContainer);
 
       floatingContainer.style.position = 'absolute';
       floatingContainer.style.left = '1em';
