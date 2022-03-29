@@ -53,7 +53,7 @@ eloExtension.appendChild(iconTag);
     await handleZoomRedirects(extensionApp);
   }
 
-  if (config.featureFlags.zoomExternalRecording) {
+  if (config.featureFlags.zoomExternalCapture) {
     await handleZoomExternalCapture(extensionApp);
   }
 })().catch(

@@ -7,6 +7,7 @@ const config = {
     entry: {
       'elo-page': './build/js/src/elo-extension/elo-page.js',
       'zoom-holding-page': './build/js/src/elo-extension/zoom-holding-page.js',
+      'zoom-external-capture': './build/js/src/elo-extension/zoom-external-capture.js',
       contentScript: './build/js/src/elo-extension/contentScript.js',
       pageContentScript: './build/js/src/elo-extension/pageContentScript.js',
       backgroundScript: './build/js/src/elo-extension/backgroundScript.js',
