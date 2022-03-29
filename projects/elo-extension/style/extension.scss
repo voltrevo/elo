@@ -8,11 +8,20 @@
     &.active {
       opacity: 0.85;
     }
+
+    left: 2em;
+    top: 4em;
+    font-size: 1.1em;
   }
 }
 
 #zoom-external-capture-container {
   font-size: 18px;
+
+  .app {
+    left: calc(50vw - 6.8em);
+    top: 0.5em;
+  }
 }
 
 #elo-extension, #zoom-external-capture-container {
@@ -28,12 +37,9 @@
     transition: opacity 0.2s;
 
     font-family: 'Source Sans Pro', sans-serif;
-    font-size: 1.1em;
 
     z-index: 100;
     position: fixed;
-    left: 2em;
-    top: 4em;
     background-color: white;
     border: 1px solid rgba(230, 230, 230, 1);
     border-radius: 3px;

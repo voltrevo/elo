@@ -30,7 +30,15 @@ export function makeLocalExtensionAppClient(extensionApp: PromisishApi<Protocol>
   const api = {} as any;
 
   for (const method of Object.keys(protocolKeyMap)) {
-    api[method] = async (...args: unknown[]) => (extensionApp as any)[method](...args);
+    api[method] = async (...args: unknown[]) => {
+      const res = await (extensionApp as any)[method](...args);
+
+      if (res === undefined) {
+        return undefined;
+      }
+
+      return JSON.parse(JSON.stringify(res));
+    };
   }
 
   return api;
