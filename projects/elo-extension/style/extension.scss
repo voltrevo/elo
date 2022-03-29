@@ -3,14 +3,22 @@
 
 #elo-extension {
   .app {
-    * {
-      box-sizing: border-box;
-    }
-
     opacity: 0;
 
     &.active {
       opacity: 0.85;
+    }
+  }
+}
+
+#zoom-external-capture-container {
+  font-size: 18px;
+}
+
+#elo-extension, #zoom-external-capture-container {
+  .app {
+    * {
+      box-sizing: border-box;
     }
 
     &:hover {

@@ -15,9 +15,9 @@ export default function handleZoomExternalCapture(extensionApp: ExtensionApp) {
     Browser.runtime.getURL('/zoom-external-capture.html'),
     undefined,
     [
-      'width=300',
-      'height=100',
-      `left=${screen.availWidth - 400}`,
+      'width=450',
+      'height=140',
+      `left=${screen.availWidth - 550}`,
       'top=100',
     ].join(',')
   );

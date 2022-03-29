@@ -597,4 +597,14 @@ body {
     padding: 20px;
     font-size: 1em;
   }
+
+  &.zoom-external-capture {
+    padding: 1em;
+    box-sizing: border-box;
+
+    .question {
+      text-align: center;
+      padding-bottom: 1em;
+    }
+  }
 }
