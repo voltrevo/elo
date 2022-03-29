@@ -133,8 +133,8 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
       return;
     }
 
-    await this.activate();
     this.uiState.active = true;
+    await this.activate();
     this.updateUi();
   }
 

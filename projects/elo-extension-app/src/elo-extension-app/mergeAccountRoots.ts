@@ -49,9 +49,11 @@ async function findLastSession(
 ) {
   let length = 0;
   let session: SessionStats | undefined;
+  const seenSessionKeys = new Set<string>();
 
   while (true) {
     session = await storage.read(SessionStats, sessionKey);
+    seenSessionKeys.add(sessionKey);
 
     if (session === undefined) {
       throw new Error(`Failed to find session: ${sessionKey}`);
@@ -59,7 +61,10 @@ async function findLastSession(
 
     length++;
 
-    if (session.lastSessionKey === undefined) {
+    if (
+      session.lastSessionKey === undefined ||
+      seenSessionKeys.has(session.lastSessionKey)
+    ) {
       return {
         session,
         sessionKey,
