@@ -3,7 +3,8 @@
   "hostAndPort": "elo-dev.com",
   "featureFlags": {
     "authEnabled": false,
-    "zoomRedirects": false
+    "zoomRedirects": false,
+    "zoomExternalCapture": false
   },
   "googleOauthClientId": "insert client id"
 }

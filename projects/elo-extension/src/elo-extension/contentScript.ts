@@ -8,6 +8,7 @@ import GoogleAuthApi from './GoogleAuthApi';
 import config from './config';
 import Storage from '../elo-extension-app/storage/Storage';
 import handleZoomRedirects from './handleZoomRedirects';
+import handleZoomExternalCapture from './handleZoomExternalCapture';
 
 const eloExtension = document.createElement('div');
 eloExtension.id = 'elo-extension';
@@ -50,6 +51,10 @@ eloExtension.appendChild(iconTag);
 
   if (config.featureFlags.zoomRedirects) {
     await handleZoomRedirects(extensionApp);
+  }
+
+  if (config.featureFlags.zoomExternalRecording) {
+    await handleZoomExternalCapture(extensionApp);
   }
 })().catch(
   console.error
