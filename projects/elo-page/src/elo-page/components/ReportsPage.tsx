@@ -82,9 +82,35 @@ const ReportsPage: React.FunctionComponent = () => {
       </div>;
     })()}
     <div className="pagination-footer">
-      <div className="pagination-link disabled">Newer</div>
+      <div
+        className={`pagination-link ${!pageKeys.current[page - 1] && 'disabled'}`}
+        onClick={async () => {
+          const key = pageKeys.current[page - 1];
+
+          if (key === undefined) {
+            return;
+          }
+
+          setSessions(await loadSessionsFrom(key));
+          setPage(page - 1);
+        }}
+      >Newer</div>
       <div>{page + 1}</div>
-      <div className="pagination-link disabled">Older</div>
+      <div
+        className={`pagination-link ${(!sessions || sessions[sessions.length - 1].lastSessionKey === undefined) && 'disabled'}`}
+        onClick={async () => {
+          const lastSessionKey = sessions?.[sessions.length - 1]?.lastSessionKey;
+
+          if (lastSessionKey === undefined) {
+            return;
+          }
+
+          const newSessions = await loadSessionsFrom(lastSessionKey);
+          pageKeys.current[page + 1] = lastSessionKey;
+          setSessions(newSessions);
+          setPage(page + 1);
+        }}
+      >Older</div>
     </div>
   </Page>;
 };
