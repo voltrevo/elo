@@ -3,6 +3,7 @@ import SessionStats from '../../elo-types/SessionStats';
 
 import EloPageContext from '../EloPageContext';
 import ExtensionAppContext from '../ExtensionAppContext';
+import SessionDateTime from './helpers/SessionDateTime';
 import Page from './Page';
 
 const pageSize = 50;
@@ -47,8 +48,44 @@ const ReportsPage: React.FunctionComponent = () => {
 
     {!sessions && <>Loading...</>}
 
-    {sessions && <pre>{JSON.stringify(sessions, null, 2)}</pre>}
+    {sessions && (() => {
+      const list: React.ReactElement[] = [];
+
+      let month: string | undefined = undefined;
+
+      for (const session of sessions) {
+        const sessionMonth = renderMonth(new Date(session.start));
+
+        if (sessionMonth !== month) {
+          month = sessionMonth;
+          list.push(<div className="month">{month}</div>);
+        }
+
+        list.push(<div className="session-item">{SessionDateTime(session)} | {session.title}</div>)
+      }
+
+      return list;
+    })()}
   </Page>;
 };
+
+function renderMonth(t: Date) {
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  return `${months[t.getMonth()]} ${t.getFullYear()}`;
+}
 
 export default ReportsPage;
