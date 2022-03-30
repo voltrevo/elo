@@ -84,7 +84,7 @@ const ReportsPage: React.FunctionComponent = () => {
     <div className="pagination-footer">
       <div
         className={`pagination-link ${!pageKeys.current[page - 1] && 'disabled'}`}
-        onClick={async () => {
+        onClick={async (evt) => {
           const key = pageKeys.current[page - 1];
 
           if (key === undefined) {
@@ -93,12 +93,16 @@ const ReportsPage: React.FunctionComponent = () => {
 
           setSessions(await loadSessionsFrom(key));
           setPage(page - 1);
+
+          setTimeout(() => {
+            (evt.target as HTMLDivElement).scrollIntoView();
+          });
         }}
       >Newer</div>
       <div>{page + 1}</div>
       <div
         className={`pagination-link ${(!sessions || sessions[sessions.length - 1].lastSessionKey === undefined) && 'disabled'}`}
-        onClick={async () => {
+        onClick={async (evt) => {
           const lastSessionKey = sessions?.[sessions.length - 1]?.lastSessionKey;
 
           if (lastSessionKey === undefined) {
@@ -109,6 +113,10 @@ const ReportsPage: React.FunctionComponent = () => {
           pageKeys.current[page + 1] = lastSessionKey;
           setSessions(newSessions);
           setPage(page + 1);
+
+          setTimeout(() => {
+            (evt.target as HTMLDivElement).scrollIntoView();
+          });
         }}
       >Older</div>
     </div>
