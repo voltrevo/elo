@@ -10,6 +10,7 @@ import ExtensionApp from '../elo-extension-app/ExtensionApp';
 import Storage from '../elo-extension-app/storage/Storage';
 import BackendApi from './BackendApi';
 import GoogleAuthApi from './GoogleAuthApi';
+import syncPageAndHash from '../elo-page/syncPageAndHash';
 
 window.addEventListener('load', async () => {
   const storage = await Storage.Create(Browser.storage.local, 'elo');
@@ -23,15 +24,18 @@ window.addEventListener('load', async () => {
 
   (window as any).eloExtensionApp = eloExtensionApp;
 
-  const pageCtx = initEloPageContext(storage, config.featureFlags);
+  const pageCtx = initEloPageContext(storage, config.featureFlags, location.hash.slice(1));
+  syncPageAndHash(pageCtx);
 
   const { accountRoot } = await pageCtx.storage.readRoot();
   const needsAuth = config.featureFlags.authEnabled && !accountRoot;
 
-  pageCtx.update({
-    needsAuth,
-    page: needsAuth ? 'WelcomePage' : 'OverviewPage',
-  });
+  if (pageCtx.state.page === '') {
+    pageCtx.update({
+      needsAuth,
+      page: needsAuth ? 'WelcomePage' : 'OverviewPage',
+    });
+  }
 
   ReactDOM.render(
     <ExtensionAppContext.Provider value={eloExtensionApp}>

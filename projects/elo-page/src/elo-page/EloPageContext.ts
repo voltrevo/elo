@@ -9,9 +9,13 @@ import SessionStats from '../elo-types/SessionStats';
 
 type EloPageContext = ReturnType<typeof initEloPageContext>;
 
-export function initEloPageContext(storage: Storage, featureFlags: Config['featureFlags']) {
+export function initEloPageContext(
+  storage: Storage,
+  featureFlags: Config['featureFlags'],
+  initialPage: string,
+) {
   const state = {
-    page: '',
+    page: initialPage,
     dialog: undefined as (React.ReactNode | undefined),
     test: 37,
     needsAuth: false,
