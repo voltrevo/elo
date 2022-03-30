@@ -61,7 +61,13 @@ const ReportsPage: React.FunctionComponent = () => {
           list.push(<div className="month">{month}</div>);
         }
 
-        list.push(<div className="session-item card">
+        list.push(<div
+          className="session-item card"
+          onClick={() => pageCtx.update({
+            page: 'SessionReportPage',
+            session,
+          })}
+        >
           <div className="title">
             {session.title}
           </div>

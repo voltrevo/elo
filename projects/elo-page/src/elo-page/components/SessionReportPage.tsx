@@ -1,26 +1,20 @@
 import * as React from 'react';
 
-import Storage from '../../elo-extension-app/storage/Storage';
-import EloPageContext from '../EloPageContext';
-import SessionStats from '../../elo-types/SessionStats';
+import { useEloPageContext } from '../EloPageContext';
 import SessionDateTime from './helpers/SessionDateTime';
 
-type Props = {
-  lastSession: SessionStats;
-  storage: Storage;
-};
+const SessionReportPage: React.FunctionComponent = () => {
+  const maybeSession = useEloPageContext(s => s.session);
 
-const SessionReport: React.FunctionComponent<Props> = (props: Props) => {
-  const pageCtx = React.useContext(EloPageContext);
+  if (maybeSession === undefined) {
+    return <>Missing session</>;
+  }
 
-  const [session, setSession] = React.useState(props.lastSession);
+  const session = maybeSession;
 
   function render() {
     return <div className="elo-page-container">
       <div className="sections">
-        <div/>
-        <div/>
-        {renderPreviousLink()}
         <div className="heading">
           <div>
             <div className="your-weekly-report">Session Report</div>
@@ -133,32 +127,6 @@ const SessionReport: React.FunctionComponent<Props> = (props: Props) => {
         </div>
       </div>
     </div>;
-  }
-
-  function renderPreviousLink() {
-    if (session.lastSessionKey === undefined) {
-      return <></>;
-    }
-
-    return <div>
-      <a href="#" onClick={() => loadPreviousSession()}>
-        ⬅ Previous
-      </a>
-    </div>;
-  }
-
-  async function loadPreviousSession() {
-    if (session.lastSessionKey === undefined) {
-      return;
-    }
-
-    const lastSession = await pageCtx.storage.read(SessionStats, session.lastSessionKey);
-
-    if (lastSession === undefined) {
-      return;
-    }
-
-    setSession(lastSession);
   }
 
   function TotalDisfluentsPerMinute() {
@@ -280,4 +248,4 @@ const SessionReport: React.FunctionComponent<Props> = (props: Props) => {
   return render();
 };
 
-export default SessionReport;
+export default SessionReportPage;

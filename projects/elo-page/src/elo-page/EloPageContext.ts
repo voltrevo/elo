@@ -5,6 +5,7 @@ import TypedEventEmitter from 'typed-emitter';
 import type { Config } from './config';
 
 import Storage from '../elo-extension-app/storage/Storage';
+import SessionStats from '../elo-types/SessionStats';
 
 type EloPageContext = ReturnType<typeof initEloPageContext>;
 
@@ -14,6 +15,7 @@ export function initEloPageContext(storage: Storage, featureFlags: Config['featu
     dialog: undefined as (React.ReactNode | undefined),
     test: 37,
     needsAuth: false,
+    session: undefined as (SessionStats | undefined),
   };
 
   const events = new EventEmitter() as TypedEventEmitter<{ update(): void }>;
