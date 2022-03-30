@@ -6,7 +6,7 @@ import ExtensionAppContext from '../ExtensionAppContext';
 import SessionDateTime from './helpers/SessionDateTime';
 import Page from './Page';
 
-const pageSize = 50;
+const pageSize = 15;
 
 const ReportsPage: React.FunctionComponent = () => {
   const pageCtx = React.useContext(EloPageContext);
@@ -43,7 +43,7 @@ const ReportsPage: React.FunctionComponent = () => {
     return newSessions;
   }
 
-  return <Page>
+  return <Page classes={['reports-page']}>
     <h1>Reports</h1>
 
     {!sessions && <>Loading...</>}
@@ -61,10 +61,19 @@ const ReportsPage: React.FunctionComponent = () => {
           list.push(<div className="month">{month}</div>);
         }
 
-        list.push(<div className="session-item">{SessionDateTime(session)} | {session.title}</div>)
+        list.push(<div className="session-item card">
+          <div className="title">
+            {session.title}
+          </div>
+          <div>
+            {SessionDateTime(session)}
+          </div>
+        </div>);
       }
 
-      return list;
+      return <div className="list-container">
+        {list}
+      </div>;
     })()}
   </Page>;
 };

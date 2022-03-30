@@ -607,4 +607,25 @@ body {
       padding-bottom: 1em;
     }
   }
+
+  .reports-page {
+    .month {
+      font-size: 1.5em;
+    }
+
+    .list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+
+      .session-item {
+        display: flex;
+        flex-direction: row;
+
+        .title {
+          flex-grow: 1;
+        }
+      }
+    }
+  }
 }
