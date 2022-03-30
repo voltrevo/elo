@@ -81,6 +81,11 @@ const ReportsPage: React.FunctionComponent = () => {
         {list}
       </div>;
     })()}
+    <div className="pagination-footer">
+      <div className="pagination-link disabled">Newer</div>
+      <div>{page + 1}</div>
+      <div className="pagination-link disabled">Older</div>
+    </div>
   </Page>;
 };
 

@@ -629,5 +629,23 @@ body {
         }
       }
     }
+
+    .pagination-footer {
+      margin-top: 2em;
+      display: flex;
+      flex-direction: row;
+      gap: 1em;
+      justify-content: center;
+
+      .pagination-link {
+        font-weight: 600;
+        cursor: pointer;
+        color: $second-accent;
+
+        &.disabled {
+          color: grey;
+        }
+      }
+    }
   }
 }
