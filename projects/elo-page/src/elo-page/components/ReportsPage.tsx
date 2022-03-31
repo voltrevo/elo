@@ -13,6 +13,7 @@ const ReportsPage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ExtensionAppContext);
   const [sessions, setSessions] = React.useState<SessionStats[]>();
   const [page, setPage] = React.useState(0);
+  const [pageCount, setPageCount] = React.useState<number>();
   const pageKeys = React.useRef<(string | undefined)[]>([]);
 
   React.useEffect(() => {
@@ -23,6 +24,9 @@ const ReportsPage: React.FunctionComponent = () => {
       pageKeys.current[0] = lastSessionKey;
 
       setSessions(await loadSessionsFrom(lastSessionKey));
+
+      const aggStats = await appCtx.getAggregateStats();
+      setPageCount(Math.ceil(aggStats.sessionCount / pageSize));
     })();
   }, []);
 
@@ -98,8 +102,8 @@ const ReportsPage: React.FunctionComponent = () => {
             (evt.target as HTMLDivElement).scrollIntoView();
           });
         }}
-      >Newer</div>
-      <div>{page + 1}</div>
+      >&lt;</div>
+      <div>{page + 1}/{pageCount}</div>
       <div
         className={`pagination-link ${(!sessions || sessions[sessions.length - 1].lastSessionKey === undefined) && 'disabled'}`}
         onClick={async (evt) => {
@@ -118,7 +122,7 @@ const ReportsPage: React.FunctionComponent = () => {
             (evt.target as HTMLDivElement).scrollIntoView();
           });
         }}
-      >Older</div>
+      >&gt;</div>
     </div>
   </Page>;
 };
