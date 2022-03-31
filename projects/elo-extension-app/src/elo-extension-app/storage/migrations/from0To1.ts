@@ -1,13 +1,15 @@
 import assert from '../../../common-pure/assert';
+import base58 from '../../../common-pure/base58';
 import IRawStorage from '../IRawStorage';
 
 export default async function from0To1(rawStorage: IRawStorage) {
   const root = await rawStorage.get('elo');
   const userId = root.userId;
-  assert(root.storageVersion ?? 0 === 0);
+  assert(root.storageVersion === undefined);
 
   const allItems = await rawStorage.get();
   const newItems: Record<string, any> = {};
+  const keysToRemove: string[] = [];
 
   root.storageVersion = 1;
   newItems['elo'] = root;
@@ -19,7 +21,9 @@ export default async function from0To1(rawStorage: IRawStorage) {
 
     if (isSession(value) && value.userId === undefined) {
       value.userId = userId;
-      newItems[k] = value;
+      const newKey = RandomKey();
+      newItems[newKey] = value;
+      keysToRemove.push(k);
       allSessions.push([k, value]);
     }
   }
@@ -34,6 +38,10 @@ export default async function from0To1(rawStorage: IRawStorage) {
   }
 
   await rawStorage.set(newItems);
+
+  for (const k of keysToRemove) {
+    await rawStorage.remove(k);
+  }
 }
 
 function isSession(value: any) {
@@ -45,4 +53,10 @@ function isSession(value: any) {
   ];
 
   return keys.every(k => k in value);
+}
+
+function RandomKey() {
+  const buf = new Uint8Array(32);
+  crypto.getRandomValues(buf);
+  return base58.encode(buf);
 }

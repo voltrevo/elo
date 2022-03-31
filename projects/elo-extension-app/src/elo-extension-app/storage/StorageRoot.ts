@@ -1,6 +1,7 @@
 import * as io from 'io-ts';
 
 import optional from '../../elo-types/optional';
+import storageVersion from './storageVersion';
 
 const StorageRoot = io.type({
   lastSessionKey: optional(io.string),
@@ -20,7 +21,7 @@ export function initStorageRoot(): StorageRoot {
     userId: undefined,
     installTriggered: undefined,
     accountRoot: undefined,
-    storageVersion: 1,
+    storageVersion,
   };
 }
 

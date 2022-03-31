@@ -1,6 +1,6 @@
 import * as io from 'io-ts';
 
-import Range from '../../common-pure/Range';
+import base58 from '../../common-pure/base58';
 import AccountRoot, { initAccountRoot } from './AccountRoot';
 import IRawStorage from './IRawStorage';
 import StorageRoot, { initStorageRoot } from './StorageRoot';
@@ -8,7 +8,9 @@ import StorageRoot, { initStorageRoot } from './StorageRoot';
 export const anonymousAccountRootKey = 'elo-user:anonymous';
 
 export function RandomKey() {
-  return Range(64).map(() => Math.floor(16 * Math.random()).toString(16)).join('');
+  const buf = new Uint8Array(32);
+  crypto.getRandomValues(buf);
+  return base58.encode(buf);
 }
 
 export default class Storage {
