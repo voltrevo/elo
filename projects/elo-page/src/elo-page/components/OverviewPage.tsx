@@ -31,6 +31,7 @@ import Page from './Page';
 import Section from './Section';
 import ExtensionAppContext from '../ExtensionAppContext';
 import addCommas from './helpers/addCommas';
+import AggregateStats from '../../elo-types/AggregateStats';
 
 Chart.register(
   ArcElement,
@@ -63,15 +64,17 @@ const OverviewPage: React.FunctionComponent = () => {
 
   const [sessionCount, setSessionCount] = React.useState<number>();
   const [hoursSpoken, setHoursSpoken] = React.useState<number>();
+  const [feature, setFeature] = React.useState<{ name: string, count: number }>();
 
   React.useEffect(() => {
     (async () => {
-      const accountRoot = await appCtx.readAccountRoot();
+      const aggregateStats = await appCtx.getAggregateStats();
 
-      setSessionCount(accountRoot.aggregateStats.sessionCount);
-      setHoursSpoken(Math.floor(accountRoot.aggregateStats.speakingTime / 3600));
+      setSessionCount(aggregateStats.sessionCount);
+      setHoursSpoken(Math.floor(aggregateStats.speakingTime / 3600));
+      setFeature(pickFeature(aggregateStats));
     })();
-  });
+  }, []);
 
   return <Page classes={['sections', 'overview-page']}>
     <Section>
@@ -90,6 +93,12 @@ const OverviewPage: React.FunctionComponent = () => {
           <div>
             <div className="bold">Hours Spoken</div>
             <div className="very-prominent-number other-disfluent-fgcolor">{hoursSpoken && addCommas(hoursSpoken.toFixed(1))}</div>
+          </div>
+        </div>
+        <div className="card">
+          <div>
+            <div className="bold">"{feature && feature.name}"</div>
+            <div className="very-prominent-number other-disfluent-fgcolor">{feature && addCommas(feature.count.toString())}</div>
           </div>
         </div>
       </div>
@@ -201,5 +210,28 @@ function renderByTypeChart(byTypeChartRef: HTMLCanvasElement) {
   } else {
     chart.data = chartConfig.data;
     chart.update();
+  }
+}
+
+function pickFeature(aggregateStats: AggregateStats) {
+  let sum = 0;
+
+  for (const category of Object.values(aggregateStats.featureCounts)) {
+    for (const count of Object.values(category)) {
+      sum += count;
+    }
+  }
+
+  let chosenIndex = Math.floor(Math.random() * sum);
+  let sum2 = 0;
+
+  for (const category of Object.values(aggregateStats.featureCounts)) {
+    for (const [name, count] of Object.entries(category)) {
+      sum2 += count;
+
+      if (sum2 >= chosenIndex) {
+        return { name, count };
+      }
+    }
   }
 }
