@@ -19,7 +19,7 @@ import mergeAccountRoots from './mergeAccountRoots';
 
 export default class ExtensionApp implements PromisishApi<Protocol> {
   uiState = UiState();
-  sessionStats = initSessionStats(document.title, Date.now());
+  sessionStats?: SessionStats;
   sessionToken?: string;
   uiStateRequests = new TaskQueue();
 
@@ -57,8 +57,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
         accountRoot = existingAnonymousAccountRoot;
       } else {
         // TODO: Eventually we won't allow creating anonymous accounts.
-        accountRoot = initAccountRoot();
-        accountRoot.userId = await this.backendApi.generateId({});
+        accountRoot = initAccountRoot(await this.backendApi.generateId({}));
         await this.storage.write(AccountRoot, anonymousAccountRootKey, accountRoot);
       }
 
@@ -89,12 +88,21 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     await this.storage.write(AccountRoot, root.accountRoot, accountRoot);
   }
 
+  getSessionStats(userId: string) {
+    if (this.sessionStats === undefined) {
+      this.sessionStats = initSessionStats(userId, document.title, Date.now());
+    }
+
+    return this.sessionStats;
+  }
+
   async activate() {
     (globalThis as any).eloExtensionApp = this;
 
     const accountRoot = await this.readAccountRoot();
 
-    this.sessionStats.lastSessionKey = accountRoot.lastSessionKey;
+    const sessionStats = this.getSessionStats(accountRoot.userId);
+    sessionStats.lastSessionKey = accountRoot.lastSessionKey;
     accountRoot.lastSessionKey = this.sessionKey;
 
     const eloLoginToken = accountRoot.eloLoginToken;
@@ -116,8 +124,8 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     }
 
     this.sessionToken = sessionToken;
-    this.sessionStats.sessionToken = sessionToken;
-    this.sessionStats.userId = accountRoot.userId;
+    sessionStats.sessionToken = sessionToken;
+    sessionStats.userId = accountRoot.userId;
     await this.updateStats(0, 0);
     await this.writeAccountRoot(accountRoot);
 
@@ -236,6 +244,10 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   updateFeatureCount(disfluent: AnalysisDisfluent) {
+    if (this.sessionStats === undefined) {
+      return;
+    }
+
     let category = this.sessionStats.featureCounts[disfluent.category];
 
     if (category === undefined) {
@@ -264,6 +276,10 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   async updateStats(speakingTime: number, audioTime: number) {
+    if (this.sessionStats === undefined) {
+      return;
+    }
+
     this.sessionStats.title = document.title;
     this.sessionStats.end = Date.now();
     this.sessionStats.speakingTime += speakingTime;
@@ -331,7 +347,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
       registration,
     );
 
-    const accountRoot = anonymousAccountRoot ?? initAccountRoot();
+    const accountRoot = anonymousAccountRoot ?? initAccountRoot(userId);
     accountRoot.eloLoginToken = eloLoginToken;
     accountRoot.userId = userId;
     accountRoot.email = email;
@@ -346,7 +362,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     await this.storage.writeRoot(root);
 
     if (anonymousAccountRoot !== undefined) {
-      await this.storage.remove(anonymousAccountRootKey);
+      await this.storage.remove([anonymousAccountRootKey]);
     }
 
     return email;
@@ -384,7 +400,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     if (existingAccountRoot && anonymousAccountRoot) {
       accountRoot = await mergeAccountRoots(this.storage, existingAccountRoot, anonymousAccountRoot);
     } else {
-      accountRoot = existingAccountRoot ?? anonymousAccountRoot ?? initAccountRoot();
+      accountRoot = existingAccountRoot ?? anonymousAccountRoot ?? initAccountRoot(userId);
     }
 
     accountRoot.eloLoginToken = eloLoginToken;
@@ -401,7 +417,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     await this.storage.writeRoot(root);
 
     if (anonymousAccountRoot !== undefined) {
-      await this.storage.remove(anonymousAccountRootKey);
+      await this.storage.remove([anonymousAccountRootKey]);
     }
 
     return email;

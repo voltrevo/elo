@@ -3,6 +3,7 @@ import * as io from 'io-ts';
 import base58 from '../../common-pure/base58';
 import AccountRoot, { initAccountRoot } from './AccountRoot';
 import IRawStorage from './IRawStorage';
+import runMigrations from './migrations/runMigrations';
 import StorageRoot, { initStorageRoot } from './StorageRoot';
 
 export const anonymousAccountRootKey = 'elo-user:anonymous';
@@ -17,26 +18,27 @@ export default class Storage {
   private constructor(public rawStorage: IRawStorage, public rootKey: string) {}
 
   static async Create(rawStorage: IRawStorage, rootKey: string) {
+    await runMigrations(rawStorage)
     const storage = new Storage(rawStorage, rootKey);
 
     const root = await storage.readRoot();
 
     if (root.lastSessionKey || root.metricPreference || root.userId) {
-      const anonymousAccount = initAccountRoot();
+      // const anonymousAccount = initAccountRoot();
 
-      const accountRootKey = anonymousAccountRootKey;
-      anonymousAccount.lastSessionKey = root.lastSessionKey;
-      anonymousAccount.metricPreference = root.metricPreference;
-      anonymousAccount.userId = root.userId;
+      // const accountRootKey = anonymousAccountRootKey;
+      // anonymousAccount.lastSessionKey = root.lastSessionKey;
+      // anonymousAccount.metricPreference = root.metricPreference;
+      // anonymousAccount.userId = root.userId;
 
-      await storage.write(AccountRoot, accountRootKey, anonymousAccount);
+      // await storage.write(AccountRoot, accountRootKey, anonymousAccount);
 
-      root.lastSessionKey = undefined;
-      root.metricPreference = undefined;
-      root.userId = undefined;
-      root.accountRoot = accountRootKey;
+      // root.lastSessionKey = undefined;
+      // root.metricPreference = undefined;
+      // root.userId = undefined;
+      // root.accountRoot = accountRootKey;
 
-      await storage.writeRoot(root);
+      // await storage.writeRoot(root);
     }
 
     return storage;
@@ -70,7 +72,7 @@ export default class Storage {
     await this.write(StorageRoot, this.rootKey, root);
   }
 
-  async remove(key: string): Promise<void> {
-    await this.rawStorage.remove(key);
+  async remove(keys: string[]): Promise<void> {
+    await this.rawStorage.remove(keys);
   }
 }

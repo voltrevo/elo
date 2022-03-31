@@ -57,9 +57,11 @@ export default function RawStorage(): IRawStorage {
       }
     },
   
-    async remove(key) {
-      addLocalKey(key);
-      localStorage.removeItem(key);
+    async remove(keys) {
+      for (const k of keys) {
+        addLocalKey(k);
+        localStorage.removeItem(k);
+      }
     },
   
     async clear() {
