@@ -19,6 +19,7 @@ export function initSessionStats(title: string, time: number): SessionStats {
   return {
     lastSessionKey: undefined,
     sessionToken: undefined,
+    userId: undefined,
     title,
     start: time,
     end: time,
