@@ -117,6 +117,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
 
     this.sessionToken = sessionToken;
     this.sessionStats.sessionToken = sessionToken;
+    this.sessionStats.userId = accountRoot.userId;
     await this.updateStats(0, 0);
     await this.writeAccountRoot(accountRoot);
 
@@ -262,13 +263,13 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     }
   }
 
-  updateStats(speakingTime: number, audioTime: number) {
+  async updateStats(speakingTime: number, audioTime: number) {
     this.sessionStats.title = document.title;
     this.sessionStats.end = Date.now();
     this.sessionStats.speakingTime += speakingTime;
     this.sessionStats.audioTime += audioTime;
 
-    this.storage.write(SessionStats, this.sessionKey, this.sessionStats);
+    await this.storage.write(SessionStats, this.sessionKey, this.sessionStats);
   }
 
   async setMetricPreference(preference: string) {
