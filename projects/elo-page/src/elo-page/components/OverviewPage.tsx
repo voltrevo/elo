@@ -29,6 +29,7 @@ import {
 } from 'chart.js';
 import Page from './Page';
 import Section from './Section';
+import ExtensionAppContext from '../ExtensionAppContext';
 
 Chart.register(
   ArcElement,
@@ -57,6 +58,18 @@ Chart.register(
 );
 
 const OverviewPage: React.FunctionComponent = () => {
+  const appCtx = React.useContext(ExtensionAppContext);
+
+  const [sessionCount, setSessionCount] = React.useState<number>();
+
+  React.useEffect(() => {
+    (async () => {
+      const accountRoot = await appCtx.readAccountRoot();
+
+      setSessionCount(accountRoot.aggregateStats.sessionCount);
+    })();
+  });
+
   return <Page classes={['sections', 'overview-page']}>
     <Section>
       <h1>Overview</h1>
@@ -67,7 +80,7 @@ const OverviewPage: React.FunctionComponent = () => {
         <div className="card">
           <div>
             <div className="bold">Sessions</div>
-            <div className="very-prominent-number other-disfluent-fgcolor">16</div>
+            <div className="very-prominent-number other-disfluent-fgcolor">{sessionCount}</div>
           </div>
         </div>
         <div className="card">
@@ -92,6 +105,8 @@ const OverviewPage: React.FunctionComponent = () => {
 };
 
 export default OverviewPage;
+
+const charts = new WeakMap<HTMLCanvasElement, Chart>();
 
 function renderTotalChart(totalChartRef: HTMLCanvasElement) {
   const chartConfig: ChartConfiguration<'line'> = {
@@ -124,7 +139,15 @@ function renderTotalChart(totalChartRef: HTMLCanvasElement) {
     },
   };
 
-  new Chart(totalChartRef.getContext('2d')!, chartConfig);
+  let chart = charts.get(totalChartRef);
+
+  if (chart === undefined) {
+    chart = new Chart(totalChartRef.getContext('2d')!, chartConfig);
+    charts.set(totalChartRef, chart);
+  } else {
+    chart.data = chartConfig.data;
+    chart.update();
+  }
 }
 
 function renderByTypeChart(byTypeChartRef: HTMLCanvasElement) {
@@ -167,5 +190,13 @@ function renderByTypeChart(byTypeChartRef: HTMLCanvasElement) {
     },
   };
 
-  new Chart(byTypeChartRef.getContext('2d')!, chartConfig);
+  let chart = charts.get(byTypeChartRef);
+
+  if (chart === undefined) {
+    chart = new Chart(byTypeChartRef.getContext('2d')!, chartConfig);
+    charts.set(byTypeChartRef, chart);
+  } else {
+    chart.data = chartConfig.data;
+    chart.update();
+  }
 }
