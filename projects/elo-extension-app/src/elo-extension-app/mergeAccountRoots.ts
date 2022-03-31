@@ -9,6 +9,7 @@ export default async function mergeAccountRoots(
 ) {
   const result = { ...preferredAccountRoot };
 
+  // TODO: Do a full sort instead, also add aggregate stats merge
   result.lastSessionKey = await joinSessionHistories(
     storage,
     preferredAccountRoot.lastSessionKey,

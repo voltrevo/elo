@@ -1,4 +1,5 @@
 import * as io from 'io-ts';
+import AggregateStats, { initAggregateStats } from '../../elo-types/AggregateStats';
 import optional from '../../elo-types/optional';
 
 const AccountRoot = io.type({
@@ -11,6 +12,7 @@ const AccountRoot = io.type({
   zoom: optional(io.type({
     redirectToWebClient: io.boolean,
   })),
+  aggregateStats: AggregateStats,
 
   // Warning: Please be mindful of the possible need to update mergeAccountRoots if the structure
   // of AccountRoot is changed.
@@ -27,6 +29,7 @@ export function initAccountRoot(userId: string): AccountRoot {
     googleAccount: undefined,
     eloLoginToken: undefined,
     zoom: undefined,
+    aggregateStats: initAggregateStats(),
   };
 }
 

@@ -18,6 +18,12 @@ export default async function from0To1(rawStorage: IRawStorage) {
 
   root.storageVersion = 1;
 
+  const aggregateStats = {
+    speakingTime: 0,
+    audioTime: 0,
+    featureCounts: {},
+  };
+
   {
     // Move to anonymous account root
 
@@ -25,6 +31,7 @@ export default async function from0To1(rawStorage: IRawStorage) {
       lastSessionKey: root.lastSessionKey,
       metricPreference: root.metricPreference,
       userId,
+      aggregateStats,
     };
 
     root.lastSessionKey = undefined;
@@ -34,7 +41,7 @@ export default async function from0To1(rawStorage: IRawStorage) {
   }
 
   {
-    // Use base58 session keys, add userId, rewrite links
+    // Use base58 session keys, add userId, rewrite links, aggregate stats
 
     const allSessions: [string, any][] = [];
 
@@ -60,6 +67,10 @@ export default async function from0To1(rawStorage: IRawStorage) {
 
       session.lastSessionKey = lastSessionKey;
     }
+
+    for (let i = 1; i < allSessions.length; i++) {
+      accumulateStats(aggregateStats, allSessions[i][1]);
+    }
   }
 
   await rawStorage.set(newItems);
@@ -81,4 +92,18 @@ function RandomKey() {
   const buf = new Uint8Array(32);
   crypto.getRandomValues(buf);
   return base58.encode(buf);
+}
+
+function accumulateStats(aggregateStats: any, sessionStats: any) {
+  aggregateStats.audioTime += sessionStats.audioTime;
+  aggregateStats.speakingTime += sessionStats.speakingTime;
+  
+  for (const category of Object.keys(sessionStats.featureCounts)) {
+    aggregateStats.featureCounts[category] = aggregateStats.featureCounts[category] ?? {};
+    const aggCategory = aggregateStats.featureCounts[category];
+
+    for (const name of Object.keys(sessionStats.featureCounts[category])) {
+      aggCategory[name] = (aggCategory[name] ?? 0) + sessionStats.featureCounts[category][name];
+    }
+  }
 }

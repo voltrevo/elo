@@ -1,6 +1,7 @@
 import EwmaCalculator from './EwmaCalculator';
 import Protocol, { ConnectionEvent, ProtocolLoginCredentials, ProtocolRegistration } from './Protocol';
 import SessionStats, { initSessionStats } from '../elo-types/SessionStats';
+import AggregateStats, { initAggregateStats } from '../elo-types/AggregateStats';
 import Storage, { anonymousAccountRootKey, RandomKey } from './storage/Storage';
 import UiState from './UiState';
 import never from '../common-pure/never';
@@ -16,6 +17,7 @@ import IGoogleAuthApi from './IGoogleAuthApi';
 import assert from '../common-pure/assert';
 import hardenPasswordViaWorker from '../elo-page/hardenPasswords/hardenPasswordViaWorker';
 import mergeAccountRoots from './mergeAccountRoots';
+import accumulateStats from './accumulateStats';
 
 export default class ExtensionApp implements PromisishApi<Protocol> {
   uiState = UiState();
@@ -127,6 +129,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     sessionStats.sessionToken = sessionToken;
     sessionStats.userId = accountRoot.userId;
     await this.updateStats(0, 0);
+    await this.updateAggregateStats(sessionStats.lastSessionKey);
     await this.writeAccountRoot(accountRoot);
 
     return sessionToken;
@@ -286,6 +289,42 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     this.sessionStats.audioTime += audioTime;
 
     await this.storage.write(SessionStats, this.sessionKey, this.sessionStats);
+  }
+
+  // The aggregateStats on the account root do not include the most recent session.
+  // (This way as the session evolves the account root doesn't need to be constantly
+  // updated.)
+  async getAggregateStats() {
+    const accountRoot = await this.readAccountRoot();
+    const aggregateStats = (await this.readAccountRoot()).aggregateStats;
+
+    if (accountRoot.lastSessionKey === undefined) {
+      return aggregateStats;
+    }
+
+    const lastSession = await this.storage.read(SessionStats, accountRoot.lastSessionKey);
+
+    if (lastSession !== undefined) {
+      accumulateStats(aggregateStats, lastSession);
+    }
+
+    return aggregateStats;
+  }
+
+  async updateAggregateStats(lastSessionKey?: string) {
+    if (lastSessionKey === undefined) {
+      return;
+    }
+
+    const lastSession = await this.storage.read(SessionStats, lastSessionKey);
+
+    if (lastSession === undefined) {
+      return;
+    }
+
+    const accountRoot = await this.readAccountRoot();
+    accumulateStats(accountRoot.aggregateStats, lastSession);
+    await this.writeAccountRoot(accountRoot);
   }
 
   async setMetricPreference(preference: string) {
