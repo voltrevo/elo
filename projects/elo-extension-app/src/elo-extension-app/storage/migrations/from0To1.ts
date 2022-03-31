@@ -5,7 +5,7 @@ import IRawStorage from '../IRawStorage';
 const anonymousAccountRootKey = 'elo-user:anonymous';
 
 export default async function from0To1(rawStorage: IRawStorage) {
-  const root = await rawStorage.get('elo');
+  const root = (await rawStorage.get('elo'))['elo'];
   const userId = root.userId;
   assert(typeof userId === 'string');
   assert(root.storageVersion === undefined);
@@ -46,7 +46,7 @@ export default async function from0To1(rawStorage: IRawStorage) {
         const newKey = RandomKey();
         newItems[newKey] = value;
         keysToRemove.push(k);
-        allSessions.push([k, value]);
+        allSessions.push([newKey, value]);
       }
     }
 

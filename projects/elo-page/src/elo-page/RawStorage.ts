@@ -20,7 +20,14 @@ export default function RawStorage(): IRawStorage {
         for (const k of Object.keys(localStorage)) {
           if (k.startsWith('isLocal:')) {
             const localKey = k.slice('isLocal:'.length);
-            result[localKey] = JSON.parse(localStorage.getItem(localKey)!);
+
+            const localValue = JSON.parse(localStorage.getItem(localKey)!);
+
+            if (localValue === null) {
+              delete result[localKey];
+            } else {
+              result[localKey] = JSON.parse(localStorage.getItem(localKey)!);
+            }
           }
         }
 

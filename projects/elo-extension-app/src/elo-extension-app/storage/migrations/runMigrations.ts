@@ -10,7 +10,7 @@ const migrations = [
 assert(migrations.length === storageVersion);
 
 export default async function runMigrations(rawStorage: IRawStorage) {
-  const root = await rawStorage.get('elo');
+  const root = (await rawStorage.get('elo'))['elo'];
 
   if (Object.keys(root).length === 0) {
     // No need to migrate if nothing has been written yet
@@ -20,7 +20,7 @@ export default async function runMigrations(rawStorage: IRawStorage) {
   let currentVersion = root.storageVersion ?? 0;
 
   while (currentVersion < storageVersion) {
-    await migrations[currentVersion];
+    await migrations[currentVersion](rawStorage);
     currentVersion++;
   }
 }
