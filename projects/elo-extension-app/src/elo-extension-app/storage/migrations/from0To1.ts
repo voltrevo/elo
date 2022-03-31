@@ -95,6 +95,7 @@ function RandomKey() {
 }
 
 function accumulateStats(aggregateStats: any, sessionStats: any) {
+  aggregateStats.sessionCount += 1;
   aggregateStats.audioTime += sessionStats.audioTime;
   aggregateStats.speakingTime += sessionStats.speakingTime;
   

@@ -2,6 +2,7 @@ import AggregateStats from '../elo-types/AggregateStats';
 import SessionStats from '../elo-types/SessionStats';
 
 export default function accumulateStats(aggregateStats: AggregateStats, sessionStats: SessionStats) {
+  aggregateStats.sessionCount += 1;
   aggregateStats.audioTime += sessionStats.audioTime;
   aggregateStats.speakingTime += sessionStats.speakingTime;
   
