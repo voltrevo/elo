@@ -1,3 +1,4 @@
+import { keccak256 } from 'js-sha3';
 import assert from '../../../common-pure/assert';
 import base58 from '../../../common-pure/base58';
 import IRawStorage from '../IRawStorage';
@@ -5,6 +6,7 @@ import IRawStorage from '../IRawStorage';
 export default async function from0To1(rawStorage: IRawStorage) {
   const root = await rawStorage.get('elo');
   const userId = root.userId;
+  assert(typeof userId === 'string');
   assert(root.storageVersion === undefined);
 
   const allItems = await rawStorage.get();
@@ -37,6 +39,15 @@ export default async function from0To1(rawStorage: IRawStorage) {
     session.lastSessionKey = lastSessionKey;
   }
 
+  for (let i = 0; i < allSessions.length; i++) {
+    const [k, session] = allSessions[i];
+    session.index = i;
+
+    if (i % 8 === 0) {
+      newItems[keySequence(userId, 'session-checkpoints', i)] = { key: k };
+    }
+  }
+
   await rawStorage.set(newItems);
 
   for (const k of keysToRemove) {
@@ -58,5 +69,15 @@ function isSession(value: any) {
 function RandomKey() {
   const buf = new Uint8Array(32);
   crypto.getRandomValues(buf);
+  return base58.encode(buf);
+}
+
+function keySequence(userId: string, sequenceName: string, index: number) {
+  const hashInput = JSON.stringify([userId, sequenceName, index]);
+  
+  const buf = new Uint8Array(
+    keccak256.update(hashInput).arrayBuffer()
+  );
+  
   return base58.encode(buf);
 }
