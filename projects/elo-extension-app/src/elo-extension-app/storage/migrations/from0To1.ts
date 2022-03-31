@@ -19,6 +19,7 @@ export default async function from0To1(rawStorage: IRawStorage) {
   root.storageVersion = 1;
 
   const aggregateStats = {
+    sessionCount: 0,
     speakingTime: 0,
     audioTime: 0,
     featureCounts: {},
