@@ -4,6 +4,7 @@ import optional from './optional';
 const SessionStats = io.type({
   lastSessionKey: optional(io.string),
   sessionToken: optional(io.string),
+  userId: optional(io.string),
   title: io.string,
   start: io.number,
   end: io.number,

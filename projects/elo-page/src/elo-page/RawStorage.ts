@@ -14,6 +14,19 @@ function addLocalKey(key: string) {
 export default function RawStorage(): IRawStorage {
   return {
     async get(key) {
+      if (key === undefined) {
+        const result = JSON.parse(JSON.stringify(sampleStorage));
+
+        for (const k of Object.keys(localStorage)) {
+          if (k.startsWith('isLocal:')) {
+            const localKey = k.slice('isLocal:'.length);
+            result[localKey] = JSON.parse(localStorage.getItem(localKey)!);
+          }
+        }
+
+        return result;
+      }
+
       if (!isLocalKey(key)) {
         const sampleValue = sampleStorage[key];
   
@@ -22,7 +35,7 @@ export default function RawStorage(): IRawStorage {
         }
   
         return {
-          [key]: sampleValue,
+          [key]: JSON.parse(JSON.stringify(sampleValue)),
         };
       }
   
