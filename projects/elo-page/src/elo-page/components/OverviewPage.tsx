@@ -30,6 +30,7 @@ import {
 import Page from './Page';
 import Section from './Section';
 import ExtensionAppContext from '../ExtensionAppContext';
+import addCommas from './helpers/addCommas';
 
 Chart.register(
   ArcElement,
@@ -61,12 +62,14 @@ const OverviewPage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ExtensionAppContext);
 
   const [sessionCount, setSessionCount] = React.useState<number>();
+  const [hoursSpoken, setHoursSpoken] = React.useState<number>();
 
   React.useEffect(() => {
     (async () => {
       const accountRoot = await appCtx.readAccountRoot();
 
       setSessionCount(accountRoot.aggregateStats.sessionCount);
+      setHoursSpoken(Math.floor(accountRoot.aggregateStats.speakingTime / 3600));
     })();
   });
 
@@ -80,13 +83,13 @@ const OverviewPage: React.FunctionComponent = () => {
         <div className="card">
           <div>
             <div className="bold">Sessions</div>
-            <div className="very-prominent-number other-disfluent-fgcolor">{sessionCount}</div>
+            <div className="very-prominent-number other-disfluent-fgcolor">{sessionCount && addCommas(sessionCount.toString())}</div>
           </div>
         </div>
         <div className="card">
           <div>
-            <div className="bold">Minutes Spoken</div>
-            <div className="very-prominent-number other-disfluent-fgcolor">251</div>
+            <div className="bold">Hours Spoken</div>
+            <div className="very-prominent-number other-disfluent-fgcolor">{hoursSpoken && addCommas(hoursSpoken.toFixed(1))}</div>
           </div>
         </div>
       </div>
