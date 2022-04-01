@@ -32,6 +32,10 @@ import Section from './Section';
 import ExtensionAppContext from '../ExtensionAppContext';
 import addCommas from './helpers/addCommas';
 import AggregateStats from '../../elo-types/AggregateStats';
+import EloPageContext from '../EloPageContext';
+import Storage from '../../elo-extension-app/storage/Storage';
+import AccountRoot from '../../elo-extension-app/storage/AccountRoot';
+import SessionStats from '../../elo-types/SessionStats';
 
 Chart.register(
   ArcElement,
@@ -61,18 +65,22 @@ Chart.register(
 
 const OverviewPage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ExtensionAppContext);
+  const pageCtx = React.useContext(EloPageContext);
 
   const [sessionCount, setSessionCount] = React.useState<number>();
   const [hoursSpoken, setHoursSpoken] = React.useState<number>();
   const [feature, setFeature] = React.useState<{ name: string, count: number }>();
+  const [weeklyStats, setWeeklyStats] = React.useState<WeeklyStats>();
 
   React.useEffect(() => {
     (async () => {
       const aggregateStats = await appCtx.getAggregateStats();
+      const accountRoot = await appCtx.readAccountRoot();
 
       setSessionCount(aggregateStats.sessionCount);
       setHoursSpoken(Math.floor(aggregateStats.speakingTime / 3600));
       setFeature(pickFeature(aggregateStats));
+      setWeeklyStats(await getWeeklyStats(accountRoot.lastSessionKey, pageCtx.storage));
     })();
   }, []);
 
@@ -106,11 +114,11 @@ const OverviewPage: React.FunctionComponent = () => {
 
     <Section>
       <div className="chart">
-        <canvas ref={r => r && renderTotalChart(r)} style={{ height: '400px' }}></canvas>
+        <canvas ref={r => r && weeklyStats && renderTotalChart(r, weeklyStats)} style={{ height: '400px' }}></canvas>
       </div>
 
       <div className="chart">
-        <canvas ref={r => r && renderByTypeChart(r)} style={{ height: '400px' }}></canvas>
+        <canvas ref={r => r && weeklyStats && renderByTypeChart(r, weeklyStats)} style={{ height: '400px' }}></canvas>
       </div>
     </Section>
   </Page>;
@@ -120,7 +128,7 @@ export default OverviewPage;
 
 const charts = new WeakMap<HTMLCanvasElement, Chart>();
 
-function renderTotalChart(totalChartRef: HTMLCanvasElement) {
+function renderTotalChart(totalChartRef: HTMLCanvasElement, weeklyStats: WeeklyStats) {
   const chartConfig: ChartConfiguration<'line'> = {
     type: 'line' as const,
     data: {
@@ -134,7 +142,7 @@ function renderTotalChart(totalChartRef: HTMLCanvasElement) {
       ],
       datasets: [{
         label: 'Total Per Minute Speaking',
-        data: [6.5, 6.3, 5.8, 6.1, 5.4, 4.8],
+        data: weeklyStats.map((stat) => (stat.fillersHedges + stat.umsUhs) / (stat.speakingTime / 60)),
         fill: false,
         borderColor: 'rgb(0, 223, 223)',
         tension: 0.1,
@@ -162,7 +170,7 @@ function renderTotalChart(totalChartRef: HTMLCanvasElement) {
   }
 }
 
-function renderByTypeChart(byTypeChartRef: HTMLCanvasElement) {
+function renderByTypeChart(byTypeChartRef: HTMLCanvasElement, weeklyStats: WeeklyStats) {
   const chartConfig: ChartConfiguration<'line'> = {
     type: 'line' as const,
     data: {
@@ -177,14 +185,14 @@ function renderByTypeChart(byTypeChartRef: HTMLCanvasElement) {
       datasets: [
         {
           label: 'Ums & Uhs',
-          data: [3.5, 3.4, 3.4, 3.3, 2.5, 2.1],
+          data: weeklyStats.map((stat) => (stat.umsUhs) / (stat.speakingTime / 60)),
           fill: false,
           borderColor: 'rgb(0, 200, 255)',
           tension: 0.1,
         },
         {
           label: 'Filler & Hedge Words',
-          data: [3, 2.9, 2.4, 2.8, 2.9, 2.7],
+          data: weeklyStats.map((stat) => (stat.fillersHedges) / (stat.speakingTime / 60)),
           fill: false,
           borderColor: 'rgb(179, 0, 255)',
           tension: 0.1,
@@ -234,4 +242,85 @@ function pickFeature(aggregateStats: AggregateStats) {
       }
     }
   }
+}
+
+type WeeklyStats = {
+  speakingTime: number,
+  umsUhs: number,
+  fillersHedges: number,
+}[];
+
+async function getWeeklyStats(sessionKey: string | undefined, storage: Storage): Promise<WeeklyStats> {
+  debugger;
+  const now = Date.now();
+  const thisWeek = getWeekNumber(now);
+
+  function getRelativeWeekIndex(t: number) {
+    const week = getWeekNumber(t);
+    return thisWeek - week;
+  }
+
+  function initWeekStats(): WeeklyStats[number] {
+    return {
+      speakingTime: 0,
+      umsUhs: 0,
+      fillersHedges: 0,
+    };
+  }
+
+  const result: WeeklyStats = [];
+
+  const seenSessionKeys = new Set<string>();
+
+  while (sessionKey !== undefined && !seenSessionKeys.has(sessionKey)) {
+    seenSessionKeys.add(sessionKey);
+
+    const session = await storage.read(SessionStats, sessionKey);
+
+    if (session === undefined) {
+      break;
+    }
+
+    const relativeWeek = getRelativeWeekIndex(session.start);
+
+    if (relativeWeek === 6) {
+      break;
+    }
+
+    result[relativeWeek] = result[relativeWeek] ?? initWeekStats();
+
+    result[relativeWeek].speakingTime += session.speakingTime;
+    result[relativeWeek].umsUhs += countUmsUhs(session);
+    result[relativeWeek].fillersHedges += countFillersHedges(session);
+
+    sessionKey = session.lastSessionKey;
+  }
+
+  return result;
+}
+
+function getWeekNumber(t: number) {
+  return Math.ceil((t + 4 * 86400000) / (7 * 86400000));
+}
+
+function countUmsUhs(session: SessionStats) {
+  return sum(Object.values(session.featureCounts.filler ?? {}));
+}
+
+function countFillersHedges(session: SessionStats) {
+  let total = 0;
+
+  for (const [categoryName, category] of Object.entries(session.featureCounts)) {
+    if (categoryName === 'filler') {
+      continue;
+    }
+
+    total += sum(Object.values(category));
+  }
+
+  return total;
+}
+
+function sum(values: number[]) {
+  return values.reduce((a, b) => a + b, 0);
 }
