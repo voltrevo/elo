@@ -18,6 +18,7 @@ import assert from '../common-pure/assert';
 import hardenPasswordViaWorker from '../elo-page/hardenPasswords/hardenPasswordViaWorker';
 import mergeAccountRoots from './mergeAccountRoots';
 import accumulateStats from './accumulateStats';
+import StorageView from './storage/StorageView';
 
 export default class ExtensionApp implements PromisishApi<Protocol> {
   uiState = UiState();
@@ -409,6 +410,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
 
   async login(protocolCredentials: ProtocolLoginCredentials) {
     let credentials: LoginCredentials;
+    const storageView = new StorageView(this.storage);
 
     if ('password' in protocolCredentials) {
       credentials = {
@@ -431,13 +433,13 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     }
 
     const { eloLoginToken, userId, email, googleAccount } = await this.backendApi.login(credentials);
-    const anonymousAccountRoot = await this.storage.read(AccountRoot, anonymousAccountRootKey);
-    const existingAccountRoot = await this.storage.read(AccountRoot, `elo-user:${userId}`);
+    const anonymousAccountRoot = await storageView.read(AccountRoot, anonymousAccountRootKey);
+    const existingAccountRoot = await storageView.read(AccountRoot, `elo-user:${userId}`);
 
     let accountRoot: AccountRoot;
 
     if (existingAccountRoot && anonymousAccountRoot) {
-      accountRoot = await mergeAccountRoots(this.storage, existingAccountRoot, anonymousAccountRoot);
+      accountRoot = await mergeAccountRoots(storageView, existingAccountRoot, anonymousAccountRoot);
     } else {
       accountRoot = existingAccountRoot ?? anonymousAccountRoot ?? initAccountRoot(userId);
     }
@@ -449,15 +451,17 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
 
     const accountRootKey = `elo-user:${accountRoot.userId}`;
 
-    await this.storage.write(AccountRoot, accountRootKey, accountRoot);
+    storageView.write(AccountRoot, accountRootKey, accountRoot);
 
-    const root = await this.storage.readRoot();
+    const root = await storageView.readRoot();
     root.accountRoot = accountRootKey;
-    await this.storage.writeRoot(root);
+    storageView.writeRoot(root);
 
     if (anonymousAccountRoot !== undefined) {
-      await this.storage.remove([anonymousAccountRootKey]);
+      storageView.remove([anonymousAccountRootKey]);
     }
+
+    await storageView.commit();
 
     return email;
   }

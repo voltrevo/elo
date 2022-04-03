@@ -41,6 +41,10 @@ export default class StorageView {
     this.write(StorageRoot, this.rootKey, root);
   }
 
+  remove(keys: string[]): void {
+    this.rawStorageView.remove(keys);
+  }
+
   async commit() {
     await this.rawStorageView.commit();
   }
