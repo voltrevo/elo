@@ -1,5 +1,7 @@
+import { initAggregateStats } from '../elo-types/AggregateStats';
 import decode from '../elo-types/decode';
 import SessionStats from '../elo-types/SessionStats';
+import accumulateStats from './accumulateStats';
 import AccountRoot from './storage/AccountRoot';
 import StorageView from './storage/StorageView';
 
@@ -10,12 +12,14 @@ export default async function mergeAccountRoots(
 ) {
   const result = { ...preferredAccountRoot };
 
-  // TODO: Add aggregate stats merge
-  result.lastSessionKey = await mergeSessionHistories(
+  const { lastSessionKey, aggregateStats } = await mergeSessionHistories(
     storageView,
     preferredAccountRoot,
     secondaryAccountRoot,
   );
+
+  result.lastSessionKey = lastSessionKey;
+  result.aggregateStats = aggregateStats;
 
   return result;
 }
@@ -24,7 +28,7 @@ async function mergeSessionHistories(
   storageView: StorageView,
   preferredAccountRoot: AccountRoot,
   secondaryAccountRoot: AccountRoot,
-): Promise<string | undefined> {
+) {
   const allSessions: [string, SessionStats][] = [];
 
   const data = await storageView.rawStorageView.get();
@@ -57,7 +61,15 @@ async function mergeSessionHistories(
     }
   }
 
-  return allSessions[0]?.[0];
+  const lastSessionKey = allSessions[0]?.[0];
+
+  const aggregateStats = initAggregateStats();
+
+  for (let i = 1; i < allSessions.length; i++) {
+    accumulateStats(aggregateStats, allSessions[i][1]);
+  }
+
+  return { lastSessionKey, aggregateStats };
 }
 
 function isSession(value: any) {
