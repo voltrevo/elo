@@ -1,7 +1,6 @@
 import * as io from 'io-ts';
 
 import base58 from '../../common-pure/base58';
-import AccountRoot, { initAccountRoot } from './AccountRoot';
 import IRawStorage from './IRawStorage';
 import runMigrations from './migrations/runMigrations';
 import StorageRoot, { initStorageRoot } from './StorageRoot';
@@ -19,29 +18,7 @@ export default class Storage {
 
   static async Create(rawStorage: IRawStorage, rootKey: string) {
     await runMigrations(rawStorage)
-    const storage = new Storage(rawStorage, rootKey);
-
-    const root = await storage.readRoot();
-
-    if (root.lastSessionKey || root.metricPreference || root.userId) {
-      // const anonymousAccount = initAccountRoot();
-
-      // const accountRootKey = anonymousAccountRootKey;
-      // anonymousAccount.lastSessionKey = root.lastSessionKey;
-      // anonymousAccount.metricPreference = root.metricPreference;
-      // anonymousAccount.userId = root.userId;
-
-      // await storage.write(AccountRoot, accountRootKey, anonymousAccount);
-
-      // root.lastSessionKey = undefined;
-      // root.metricPreference = undefined;
-      // root.userId = undefined;
-      // root.accountRoot = accountRootKey;
-
-      // await storage.writeRoot(root);
-    }
-
-    return storage;
+    return new Storage(rawStorage, rootKey);
   }
 
   async read<T extends io.Mixed>(type: T, key: string): Promise<io.TypeOf<T> | undefined> {
