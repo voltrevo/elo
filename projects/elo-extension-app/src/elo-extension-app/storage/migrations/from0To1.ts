@@ -90,7 +90,7 @@ function isSession(value: any) {
 }
 
 function RandomKey() {
-  const buf = new Uint8Array(32);
+  const buf = new Uint8Array(24);
   crypto.getRandomValues(buf);
   return base58.encode(buf);
 }

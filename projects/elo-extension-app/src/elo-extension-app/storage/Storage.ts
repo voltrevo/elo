@@ -9,7 +9,7 @@ import StorageRoot, { initStorageRoot } from './StorageRoot';
 export const anonymousAccountRootKey = 'elo-user:anonymous';
 
 export function RandomKey() {
-  const buf = new Uint8Array(32);
+  const buf = new Uint8Array(24);
   crypto.getRandomValues(buf);
   return base58.encode(buf);
 }
