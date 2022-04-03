@@ -1,3 +1,4 @@
+import decode from '../elo-types/decode';
 import SessionStats from '../elo-types/SessionStats';
 import AccountRoot from './storage/AccountRoot';
 import StorageView from './storage/StorageView';
@@ -9,65 +10,63 @@ export default async function mergeAccountRoots(
 ) {
   const result = { ...preferredAccountRoot };
 
-  // TODO: Do a full sort instead, also add aggregate stats merge
-  result.lastSessionKey = await joinSessionHistories(
+  // TODO: Add aggregate stats merge
+  result.lastSessionKey = await mergeSessionHistories(
     storageView,
-    preferredAccountRoot.lastSessionKey,
-    secondaryAccountRoot.lastSessionKey,
+    preferredAccountRoot,
+    secondaryAccountRoot,
   );
 
   return result;
 }
 
-async function joinSessionHistories(
+async function mergeSessionHistories(
   storageView: StorageView,
-  sessionKeyA: string | undefined,
-  sessionKeyB: string | undefined,
-) {
-  if (sessionKeyA === undefined || sessionKeyB === undefined) {
-    return sessionKeyA ?? sessionKeyB;
+  preferredAccountRoot: AccountRoot,
+  secondaryAccountRoot: AccountRoot,
+): Promise<string | undefined> {
+  const allSessions: [string, SessionStats][] = [];
+
+  const data = await storageView.rawStorageView.get();
+
+  for (const key of Object.keys(data)) {
+    if (!isSession(data[key])) {
+      continue;
+    }
+
+    const session = decode(SessionStats, data[key]);
+
+    if (
+      session.userId === preferredAccountRoot.userId ||
+      session.userId === secondaryAccountRoot.userId
+    ) {
+      allSessions.push([key, session]);
+    }
   }
 
-  const lastA = await findLastSession(storageView, sessionKeyA);
-  const lastB = await findLastSession(storageView, sessionKeyB);
+  // Sort by start time descending (recently started first)
+  allSessions.sort((a, b) => b[1].start - a[1].start);
 
-  // Put the shorter history in front
-  const [frontKey, frontHistory, backHistoryKey] = (
-    lastB.length <= lastA.length
-      ? [sessionKeyB, lastB, sessionKeyA]
-      : [sessionKeyA, lastA, sessionKeyB]
-  );
+  for (let i = 0; i < allSessions.length; i++) {
+    const [key, session] = allSessions[i];
+    const lastSessionKey = allSessions[i + 1]?.[0];
 
-  frontHistory.session.lastSessionKey = backHistoryKey;
-  storageView.write(SessionStats, frontHistory.sessionKey, frontHistory.session);
+    if (session.lastSessionKey !== lastSessionKey) {
+      session.lastSessionKey = lastSessionKey;
+      storageView.write(SessionStats, key, session);
+    }
+  }
 
-  return frontKey;
+  return allSessions[0]?.[0];
 }
 
-async function findLastSession(
-  storageView: StorageView,
-  sessionKey: string,
-) {
-  let length = 0;
-  let session: SessionStats | undefined;
+function isSession(value: any) {
+  const keys = [
+    'title',
+    'start',
+    'end',
+    'speakingTime',
+  ];
 
-  while (true) {
-    session = await storageView.read(SessionStats, sessionKey);
-
-    if (session === undefined) {
-      throw new Error(`Failed to find session: ${sessionKey}`);
-    }
-
-    length++;
-
-    if (session.lastSessionKey === undefined) {
-      return {
-        session,
-        sessionKey,
-        length,
-      };
-    }
-
-    sessionKey = session.lastSessionKey;
-  }
+  return keys.every(k => k in value);
 }
