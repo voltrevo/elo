@@ -1,4 +1,4 @@
-import { ChartLine, Gear, PresentationChart, Question, Star, User } from 'phosphor-react';
+import { ChartLine, Gear, GearSix, PresentationChart, Question, Star, User } from 'phosphor-react';
 import * as react from 'react';
 import EloPageContext, { useEloPageContext } from '../EloPageContext';
 
@@ -30,6 +30,11 @@ const Nav: react.FunctionComponent = () => {
       text: 'Reports',
       page: 'ReportsPage',
       icon: <PresentationChart size={24}/>,
+    },
+    {
+      text: 'Settings',
+      page: 'SettingsPage',
+      icon: <GearSix size={24}/>,
     },
     {
       text: 'Feedback',

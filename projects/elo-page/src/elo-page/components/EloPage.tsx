@@ -12,6 +12,7 @@ import Section from './Section';
 import Field from './Field';
 import OverviewPage from './OverviewPage';
 import SessionReportPage from './SessionReportPage';
+import SettingsPage from './SettingsPage';
 
 const EloPage: React.FunctionComponent = () => {
   const page = useEloPageContext(state => state.page);
@@ -32,6 +33,10 @@ const EloPage: React.FunctionComponent = () => {
 
     if (page === 'AccountPage') {
       return <AccountPage />;
+    }
+
+    if (page === 'SettingsPage') {
+      return <SettingsPage />;
     }
 
     if (page === 'FeedbackPage') {

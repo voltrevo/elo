@@ -232,6 +232,31 @@ body {
     }
   }
 
+  .settings-page {
+    max-width: 700px;
+
+    .field {
+      font-size: 1em;
+
+      > *:first-child {
+        font-size: 1.5em;
+        line-height: 1.5em;
+      }
+
+      > * {
+        > div {
+          padding: 0 1em;
+        }
+      }
+    }
+
+    .bar-selector {
+      > div {
+        flex-basis: auto;
+      }
+    }
+  }
+
   .welcome-page {
     .welcome-error {
       text-align: center;

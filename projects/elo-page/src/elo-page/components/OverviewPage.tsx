@@ -251,7 +251,6 @@ type WeeklyStats = {
 }[];
 
 async function getWeeklyStats(sessionKey: string | undefined, storage: Storage): Promise<WeeklyStats> {
-  debugger;
   const now = Date.now();
   const thisWeek = getWeekNumber(now);
 
