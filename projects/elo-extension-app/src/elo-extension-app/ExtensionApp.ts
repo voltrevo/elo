@@ -18,6 +18,7 @@ import hardenPasswordViaWorker from '../elo-page/hardenPasswords/hardenPasswordV
 import mergeAccountRoots from './mergeAccountRoots';
 import accumulateStats from './accumulateStats';
 import StorageView from './storage/StorageView';
+import setAccountRootUserId from './setAccountRootUserId';
 
 export default class ExtensionApp implements PromisishApi<Protocol> {
   uiState = UiState();
@@ -341,7 +342,8 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   async register(protocolRegistration: ProtocolRegistration) {
-    const anonymousAccountRoot = await this.storage.read(AccountRoot, anonymousAccountRootKey);
+    const storageView = new StorageView(this.storage);
+    const anonymousAccountRoot = await storageView.read(AccountRoot, anonymousAccountRootKey);
     const userIdHint = anonymousAccountRoot?.userId;
 
     let registration: Registration;
@@ -376,23 +378,25 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
       registration,
     );
 
-    const accountRoot = anonymousAccountRoot ?? initAccountRoot(userId);
+    let accountRoot = anonymousAccountRoot ?? initAccountRoot(userId);
     accountRoot.eloLoginToken = eloLoginToken;
-    accountRoot.userId = userId;
+    await setAccountRootUserId(storageView, accountRoot, userId);
     accountRoot.email = email;
     accountRoot.googleAccount = googleAccount;
 
     const accountRootKey = `elo-user:${accountRoot.userId}`;
 
-    await this.storage.write(AccountRoot, accountRootKey, accountRoot);
+    storageView.write(AccountRoot, accountRootKey, accountRoot);
 
-    const root = await this.storage.readRoot();
+    const root = await storageView.readRoot();
     root.accountRoot = accountRootKey;
-    await this.storage.writeRoot(root);
+    storageView.writeRoot(root);
 
     if (anonymousAccountRoot !== undefined) {
-      await this.storage.remove([anonymousAccountRootKey]);
+      storageView.remove([anonymousAccountRootKey]);
     }
+
+    await storageView.commit();
 
     return email;
   }
@@ -425,18 +429,14 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     const anonymousAccountRoot = await storageView.read(AccountRoot, anonymousAccountRootKey);
     const existingAccountRoot = await storageView.read(AccountRoot, `elo-user:${userId}`);
 
-    let accountRoot: AccountRoot;
-
-    if (existingAccountRoot && anonymousAccountRoot) {
-      accountRoot = await mergeAccountRoots(storageView, existingAccountRoot, anonymousAccountRoot);
-    } else {
-      accountRoot = existingAccountRoot ?? anonymousAccountRoot ?? initAccountRoot(userId);
-    }
-
+    let accountRoot = existingAccountRoot ?? anonymousAccountRoot ?? initAccountRoot(userId);
     accountRoot.eloLoginToken = eloLoginToken;
-    accountRoot.userId = userId;
     accountRoot.email = email;
     accountRoot.googleAccount = googleAccount;
+
+    if (anonymousAccountRoot && accountRoot !== anonymousAccountRoot) {
+      accountRoot = await mergeAccountRoots(storageView, accountRoot, anonymousAccountRoot);
+    }
 
     const accountRootKey = `elo-user:${accountRoot.userId}`;
 

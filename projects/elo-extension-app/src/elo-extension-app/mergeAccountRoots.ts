@@ -44,6 +44,7 @@ async function mergeSessionHistories(
       session.userId === preferredAccountRoot.userId ||
       session.userId === secondaryAccountRoot.userId
     ) {
+      session.userId = preferredAccountRoot.userId;
       allSessions.push([key, session]);
     }
   }
