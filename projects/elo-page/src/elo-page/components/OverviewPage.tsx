@@ -63,6 +63,15 @@ Chart.register(
   Tooltip,
 );
 
+const weekLabels = [
+  'five weeks ago',
+  'four weeks ago',
+  '3 weeks ago',
+  '2 weeks ago',
+  'last week',
+  'this week',
+];
+
 const OverviewPage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ExtensionAppContext);
   const pageCtx = React.useContext(EloPageContext);
@@ -132,14 +141,7 @@ function renderTotalChart(totalChartRef: HTMLCanvasElement, weeklyStats: WeeklyS
   const chartConfig: ChartConfiguration<'line'> = {
     type: 'line' as const,
     data: {
-      labels: [
-        'five weeks ago',
-        'four weeks ago',
-        '3 weeks ago',
-        '2 weeks ago',
-        'last week',
-        'this week',
-      ],
+      labels: weekLabels,
       datasets: [{
         label: 'Total Per Minute Speaking',
         data: weeklyStats
@@ -176,14 +178,7 @@ function renderByTypeChart(byTypeChartRef: HTMLCanvasElement, weeklyStats: Weekl
   const chartConfig: ChartConfiguration<'line'> = {
     type: 'line' as const,
     data: {
-      labels: [
-        'five weeks ago',
-        'four weeks ago',
-        '3 weeks ago',
-        '2 weeks ago',
-        'last week',
-        'this week',
-      ],
+      labels: weekLabels,
       datasets: [
         {
           label: 'Ums & Uhs',
@@ -288,7 +283,7 @@ async function getWeeklyStats(sessionKey: string | undefined, storage: Storage):
 
     const relativeWeek = getRelativeWeekIndex(session.start);
 
-    if (relativeWeek === 6) {
+    if (relativeWeek === weekLabels.length) {
       break;
     }
 
@@ -299,6 +294,10 @@ async function getWeeklyStats(sessionKey: string | undefined, storage: Storage):
     result[relativeWeek].fillersHedges += countFillersHedges(session);
 
     sessionKey = session.lastSessionKey;
+  }
+
+  while (result.length < weekLabels.length) {
+    result.push(initWeekStats());
   }
 
   return result;

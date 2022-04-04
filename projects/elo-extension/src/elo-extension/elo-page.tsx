@@ -29,6 +29,7 @@ window.addEventListener('load', async () => {
 
   const { accountRoot } = await pageCtx.storage.readRoot();
   const needsAuth = config.featureFlags.authEnabled && !accountRoot;
+  pageCtx.state.needsAuth = needsAuth;
 
   if (pageCtx.state.page === '') {
     pageCtx.update({

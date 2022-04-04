@@ -26,7 +26,7 @@ const ReportsPage: React.FunctionComponent = () => {
       setSessions(await loadSessionsFrom(lastSessionKey));
 
       const aggStats = await appCtx.getAggregateStats();
-      setPageCount(Math.ceil(aggStats.sessionCount / pageSize));
+      setPageCount(Math.max(1, Math.ceil(aggStats.sessionCount / pageSize)));
     })();
   }, []);
 
@@ -105,7 +105,7 @@ const ReportsPage: React.FunctionComponent = () => {
       >&lt;</div>
       <div>{page + 1}/{pageCount}</div>
       <div
-        className={`pagination-link ${(!sessions || sessions[sessions.length - 1].lastSessionKey === undefined) && 'disabled'}`}
+        className={`pagination-link ${(sessions?.[sessions.length - 1]?.lastSessionKey === undefined) && 'disabled'}`}
         onClick={async (evt) => {
           const lastSessionKey = sessions?.[sessions.length - 1]?.lastSessionKey;
 

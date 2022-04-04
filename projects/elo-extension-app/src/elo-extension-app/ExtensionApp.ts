@@ -129,7 +129,16 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     sessionStats.sessionToken = sessionToken;
     sessionStats.userId = accountRoot.userId;
     await this.updateStats(0, 0);
-    await this.updateAggregateStats(sessionStats.lastSessionKey);
+
+    const lastSession = (
+      sessionStats.lastSessionKey !== undefined &&
+      await this.storage.read(SessionStats, sessionStats.lastSessionKey)
+    );
+
+    if (lastSession) {
+      accumulateStats(accountRoot.aggregateStats, lastSession);
+    }
+
     await this.writeAccountRoot(accountRoot);
 
     return sessionToken;
@@ -296,7 +305,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   // updated.)
   async getAggregateStats() {
     const accountRoot = await this.readAccountRoot();
-    const aggregateStats = (await this.readAccountRoot()).aggregateStats;
+    const aggregateStats = accountRoot.aggregateStats;
 
     if (accountRoot.lastSessionKey === undefined) {
       return aggregateStats;
@@ -309,22 +318,6 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     }
 
     return aggregateStats;
-  }
-
-  async updateAggregateStats(lastSessionKey?: string) {
-    if (lastSessionKey === undefined) {
-      return;
-    }
-
-    const lastSession = await this.storage.read(SessionStats, lastSessionKey);
-
-    if (lastSession === undefined) {
-      return;
-    }
-
-    const accountRoot = await this.readAccountRoot();
-    accumulateStats(accountRoot.aggregateStats, lastSession);
-    await this.writeAccountRoot(accountRoot);
   }
 
   async setMetricPreference(preference: string) {
