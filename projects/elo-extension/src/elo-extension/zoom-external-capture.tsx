@@ -24,7 +24,7 @@ window.addEventListener('load', async () => {
 
   (window as any).eloExtensionApp = eloExtensionApp;
 
-  const pageCtx = initEloPageContext(storage, config.featureFlags);
+  const pageCtx = initEloPageContext(storage, config.featureFlags, '');
   const container = document.querySelector('#zoom-external-capture-container') as HTMLDivElement;
 
   ReactDOM.render(

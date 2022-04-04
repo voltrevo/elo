@@ -5,15 +5,21 @@ import TypedEventEmitter from 'typed-emitter';
 import type { Config } from './config';
 
 import Storage from '../elo-extension-app/storage/Storage';
+import SessionStats from '../elo-types/SessionStats';
 
 type EloPageContext = ReturnType<typeof initEloPageContext>;
 
-export function initEloPageContext(storage: Storage, featureFlags: Config['featureFlags']) {
+export function initEloPageContext(
+  storage: Storage,
+  featureFlags: Config['featureFlags'],
+  initialPage: string,
+) {
   const state = {
-    page: '',
+    page: initialPage,
     dialog: undefined as (React.ReactNode | undefined),
     test: 37,
     needsAuth: false,
+    session: undefined as (SessionStats | undefined),
   };
 
   const events = new EventEmitter() as TypedEventEmitter<{ update(): void }>;

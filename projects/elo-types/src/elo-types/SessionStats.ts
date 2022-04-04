@@ -4,6 +4,7 @@ import optional from './optional';
 const SessionStats = io.type({
   lastSessionKey: optional(io.string),
   sessionToken: optional(io.string),
+  userId: io.string,
   title: io.string,
   start: io.number,
   end: io.number,
@@ -14,10 +15,11 @@ const SessionStats = io.type({
 
 type SessionStats = io.TypeOf<typeof SessionStats>;
 
-export function initSessionStats(title: string, time: number): SessionStats {
+export function initSessionStats(userId: string, title: string, time: number): SessionStats {
   return {
     lastSessionKey: undefined,
     sessionToken: undefined,
+    userId,
     title,
     start: time,
     end: time,

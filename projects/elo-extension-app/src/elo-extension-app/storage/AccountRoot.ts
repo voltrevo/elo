@@ -1,16 +1,20 @@
 import * as io from 'io-ts';
+
+import AggregateStats, { initAggregateStats } from '../../elo-types/AggregateStats';
 import optional from '../../elo-types/optional';
 
 const AccountRoot = io.type({
-  lastSessionKey: optional(io.string),
-  metricPreference: optional(io.string),
-  userId: optional(io.string),
+  userId: io.string,
   email: optional(io.string),
   googleAccount: optional(io.string),
   eloLoginToken: optional(io.string),
-  zoom: optional(io.type({
-    redirectToWebClient: io.boolean,
-  })),
+  settings: io.type({
+    liveStatsMode: io.string,
+    experimentalZoomSupport: optional(io.literal(true)),
+    zoomRedirectToWebClient: optional(io.boolean),
+  }),
+  aggregateStats: AggregateStats,
+  lastSessionKey: optional(io.string),
 
   // Warning: Please be mindful of the possible need to update mergeAccountRoots if the structure
   // of AccountRoot is changed.
@@ -18,15 +22,19 @@ const AccountRoot = io.type({
 
 type AccountRoot = io.TypeOf<typeof AccountRoot>;
 
-export function initAccountRoot(): AccountRoot {
+export function initAccountRoot(userId: string): AccountRoot {
   return {
-    lastSessionKey: undefined,
-    metricPreference: undefined,
-    userId: undefined,
+    userId,
     email: undefined,
     googleAccount: undefined,
     eloLoginToken: undefined,
-    zoom: undefined,
+    settings: {
+      liveStatsMode: 'count',
+      experimentalZoomSupport: undefined,
+      zoomRedirectToWebClient: undefined,
+    },
+    aggregateStats: initAggregateStats(),
+    lastSessionKey: undefined,
   };
 }
 

@@ -1,6 +1,7 @@
 import EwmaCalculator from './EwmaCalculator';
 import Protocol, { ConnectionEvent, ProtocolLoginCredentials, ProtocolRegistration } from './Protocol';
 import SessionStats, { initSessionStats } from '../elo-types/SessionStats';
+import AggregateStats, { initAggregateStats } from '../elo-types/AggregateStats';
 import Storage, { anonymousAccountRootKey, RandomKey } from './storage/Storage';
 import UiState from './UiState';
 import never from '../common-pure/never';
@@ -16,10 +17,12 @@ import IGoogleAuthApi from './IGoogleAuthApi';
 import assert from '../common-pure/assert';
 import hardenPasswordViaWorker from '../elo-page/hardenPasswords/hardenPasswordViaWorker';
 import mergeAccountRoots from './mergeAccountRoots';
+import accumulateStats from './accumulateStats';
+import StorageView from './storage/StorageView';
 
 export default class ExtensionApp implements PromisishApi<Protocol> {
   uiState = UiState();
-  sessionStats = initSessionStats(document.title, Date.now());
+  sessionStats?: SessionStats;
   sessionToken?: string;
   uiStateRequests = new TaskQueue();
 
@@ -57,8 +60,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
         accountRoot = existingAnonymousAccountRoot;
       } else {
         // TODO: Eventually we won't allow creating anonymous accounts.
-        accountRoot = initAccountRoot();
-        accountRoot.userId = await this.backendApi.generateId({});
+        accountRoot = initAccountRoot(await this.backendApi.generateId({}));
         await this.storage.write(AccountRoot, anonymousAccountRootKey, accountRoot);
       }
 
@@ -89,12 +91,21 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     await this.storage.write(AccountRoot, root.accountRoot, accountRoot);
   }
 
+  getSessionStats(userId: string) {
+    if (this.sessionStats === undefined) {
+      this.sessionStats = initSessionStats(userId, document.title, Date.now());
+    }
+
+    return this.sessionStats;
+  }
+
   async activate() {
     (globalThis as any).eloExtensionApp = this;
 
     const accountRoot = await this.readAccountRoot();
 
-    this.sessionStats.lastSessionKey = accountRoot.lastSessionKey;
+    const sessionStats = this.getSessionStats(accountRoot.userId);
+    sessionStats.lastSessionKey = accountRoot.lastSessionKey;
     accountRoot.lastSessionKey = this.sessionKey;
 
     const eloLoginToken = accountRoot.eloLoginToken;
@@ -116,8 +127,10 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     }
 
     this.sessionToken = sessionToken;
-    this.sessionStats.sessionToken = sessionToken;
+    sessionStats.sessionToken = sessionToken;
+    sessionStats.userId = accountRoot.userId;
     await this.updateStats(0, 0);
+    await this.updateAggregateStats(sessionStats.lastSessionKey);
     await this.writeAccountRoot(accountRoot);
 
     return sessionToken;
@@ -235,6 +248,10 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   updateFeatureCount(disfluent: AnalysisDisfluent) {
+    if (this.sessionStats === undefined) {
+      return;
+    }
+
     let category = this.sessionStats.featureCounts[disfluent.category];
 
     if (category === undefined) {
@@ -246,10 +263,10 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   async updateMetrics() {
-    const { metricPreference } = (await this.storage.readRoot());
+    const { settings: { liveStatsMode } } = await this.readAccountRoot();
 
-    const fillerSoundMetric = this.fillerSoundEwma.render(metricPreference);
-    const fillerWordMetric = this.fillerWordEwma.render(metricPreference);
+    const fillerSoundMetric = this.fillerSoundEwma.render(liveStatsMode);
+    const fillerWordMetric = this.fillerWordEwma.render(liveStatsMode);
 
     if (
       this.uiState.fillerSoundBox.metric !== fillerSoundMetric ||
@@ -262,22 +279,59 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     }
   }
 
-  updateStats(speakingTime: number, audioTime: number) {
+  async updateStats(speakingTime: number, audioTime: number) {
+    if (this.sessionStats === undefined) {
+      return;
+    }
+
     this.sessionStats.title = document.title;
     this.sessionStats.end = Date.now();
     this.sessionStats.speakingTime += speakingTime;
     this.sessionStats.audioTime += audioTime;
 
-    this.storage.write(SessionStats, this.sessionKey, this.sessionStats);
+    await this.storage.write(SessionStats, this.sessionKey, this.sessionStats);
+  }
+
+  // The aggregateStats on the account root do not include the most recent session.
+  // (This way as the session evolves the account root doesn't need to be constantly
+  // updated.)
+  async getAggregateStats() {
+    const accountRoot = await this.readAccountRoot();
+    const aggregateStats = (await this.readAccountRoot()).aggregateStats;
+
+    if (accountRoot.lastSessionKey === undefined) {
+      return aggregateStats;
+    }
+
+    const lastSession = await this.storage.read(SessionStats, accountRoot.lastSessionKey);
+
+    if (lastSession !== undefined) {
+      accumulateStats(aggregateStats, lastSession);
+    }
+
+    return aggregateStats;
+  }
+
+  async updateAggregateStats(lastSessionKey?: string) {
+    if (lastSessionKey === undefined) {
+      return;
+    }
+
+    const lastSession = await this.storage.read(SessionStats, lastSessionKey);
+
+    if (lastSession === undefined) {
+      return;
+    }
+
+    const accountRoot = await this.readAccountRoot();
+    accumulateStats(accountRoot.aggregateStats, lastSession);
+    await this.writeAccountRoot(accountRoot);
   }
 
   async setMetricPreference(preference: string) {
-    const root = await this.storage.readRoot();
-
-    // TODO: Check string? Need to add typing to storage.
-    root.metricPreference = preference;
-
-    await this.storage.writeRoot(root);
+    const accountRoot = await this.readAccountRoot();
+    accountRoot.settings.liveStatsMode = preference;
+    await this.writeAccountRoot(accountRoot);
 
     return 'success';
   }
@@ -330,7 +384,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
       registration,
     );
 
-    const accountRoot = anonymousAccountRoot ?? initAccountRoot();
+    const accountRoot = anonymousAccountRoot ?? initAccountRoot(userId);
     accountRoot.eloLoginToken = eloLoginToken;
     accountRoot.userId = userId;
     accountRoot.email = email;
@@ -345,7 +399,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     await this.storage.writeRoot(root);
 
     if (anonymousAccountRoot !== undefined) {
-      await this.storage.remove(anonymousAccountRootKey);
+      await this.storage.remove([anonymousAccountRootKey]);
     }
 
     return email;
@@ -353,6 +407,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
 
   async login(protocolCredentials: ProtocolLoginCredentials) {
     let credentials: LoginCredentials;
+    const storageView = new StorageView(this.storage);
 
     if ('password' in protocolCredentials) {
       credentials = {
@@ -375,15 +430,15 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     }
 
     const { eloLoginToken, userId, email, googleAccount } = await this.backendApi.login(credentials);
-    const anonymousAccountRoot = await this.storage.read(AccountRoot, anonymousAccountRootKey);
-    const existingAccountRoot = await this.storage.read(AccountRoot, `elo-user:${userId}`);
+    const anonymousAccountRoot = await storageView.read(AccountRoot, anonymousAccountRootKey);
+    const existingAccountRoot = await storageView.read(AccountRoot, `elo-user:${userId}`);
 
     let accountRoot: AccountRoot;
 
     if (existingAccountRoot && anonymousAccountRoot) {
-      accountRoot = await mergeAccountRoots(this.storage, existingAccountRoot, anonymousAccountRoot);
+      accountRoot = await mergeAccountRoots(storageView, existingAccountRoot, anonymousAccountRoot);
     } else {
-      accountRoot = existingAccountRoot ?? anonymousAccountRoot ?? initAccountRoot();
+      accountRoot = existingAccountRoot ?? anonymousAccountRoot ?? initAccountRoot(userId);
     }
 
     accountRoot.eloLoginToken = eloLoginToken;
@@ -393,15 +448,17 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
 
     const accountRootKey = `elo-user:${accountRoot.userId}`;
 
-    await this.storage.write(AccountRoot, accountRootKey, accountRoot);
+    storageView.write(AccountRoot, accountRootKey, accountRoot);
 
-    const root = await this.storage.readRoot();
+    const root = await storageView.readRoot();
     root.accountRoot = accountRootKey;
-    await this.storage.writeRoot(root);
+    storageView.writeRoot(root);
 
     if (anonymousAccountRoot !== undefined) {
-      await this.storage.remove(anonymousAccountRootKey);
+      storageView.remove([anonymousAccountRootKey]);
     }
+
+    await storageView.commit();
 
     return email;
   }

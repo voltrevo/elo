@@ -1,30 +1,25 @@
 import * as React from 'react';
 
-import Storage from '../../elo-extension-app/storage/Storage';
-import EloPageContext from '../EloPageContext';
-import SessionStats from '../../elo-types/SessionStats';
+import { useEloPageContext } from '../EloPageContext';
+import SessionDateTime from './helpers/SessionDateTime';
 
-type Props = {
-  lastSession: SessionStats;
-  storage: Storage;
-};
+const SessionReportPage: React.FunctionComponent = () => {
+  const maybeSession = useEloPageContext(s => s.session);
 
-const SessionReport: React.FunctionComponent<Props> = (props: Props) => {
-  const pageCtx = React.useContext(EloPageContext);
+  if (maybeSession === undefined) {
+    return <>Missing session</>;
+  }
 
-  const [session, setSession] = React.useState(props.lastSession);
+  const session = maybeSession;
 
   function render() {
     return <div className="elo-page-container">
       <div className="sections">
-        <div/>
-        <div/>
-        {renderPreviousLink()}
         <div className="heading">
           <div>
             <div className="your-weekly-report">Session Report</div>
             <div>{session.title}</div>
-            <div>{SessionDateTime()}</div>
+            <div>{SessionDateTime(session)}</div>
             <div className="stats">
               <table>
                 <thead></thead>
@@ -132,42 +127,6 @@ const SessionReport: React.FunctionComponent<Props> = (props: Props) => {
         </div>
       </div>
     </div>;
-  }
-
-  function renderPreviousLink() {
-    if (session.lastSessionKey === undefined) {
-      return <></>;
-    }
-
-    return <div>
-      <a href="#" onClick={() => loadPreviousSession()}>
-        ⬅ Previous
-      </a>
-    </div>;
-  }
-
-  async function loadPreviousSession() {
-    if (session.lastSessionKey === undefined) {
-      return;
-    }
-
-    const lastSession = await pageCtx.storage.read(SessionStats, session.lastSessionKey);
-
-    if (lastSession === undefined) {
-      return;
-    }
-
-    setSession(lastSession);
-  }
-
-  function SessionDateTime() {
-    const daysDiff = LocalDaysDifference(session.end, session.start);
-
-    return [
-      `${new Date(session.start).toDateString()},`,
-      `${TimeOfDayStr(session.start)} - ${TimeOfDayStr(session.end)}`,
-      ...(daysDiff > 0 ? [`(+${daysDiff}d)`] : []),
-    ].join(' ');
   }
 
   function TotalDisfluentsPerMinute() {
@@ -289,28 +248,4 @@ const SessionReport: React.FunctionComponent<Props> = (props: Props) => {
   return render();
 };
 
-export default SessionReport;
-
-function TimeOfDayStr(unixTimeMs: number) {
-  const date = new Date(unixTimeMs);
-
-  const amPm = date.getHours() < 12 ? 'am' : 'pm';
-
-  let displayHour = date.getHours() % 12;
-
-  if (displayHour === 0) {
-    displayHour = 12;
-  }
-
-  return `${displayHour}:${date.getMinutes().toString().padStart(2, '0')}${amPm}`;
-}
-
-function LocalDaysDifference(a: number, b: number) {
-  const aDate = new Date(a);
-  const bDate = new Date(b);
-
-  aDate.setHours(0);
-  bDate.setHours(0);
-
-  return Math.round((aDate.getTime() - bDate.getTime()) / 86_400_000);
-}
+export default SessionReportPage;

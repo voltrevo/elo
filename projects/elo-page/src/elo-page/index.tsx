@@ -8,6 +8,7 @@ import EloPageContext, { initEloPageContext } from './EloPageContext';
 import SimulExtensionApp from './SimulExtensionApp';
 import Storage from '../elo-extension-app/storage/Storage';
 import RawStorage from './RawStorage';
+import syncPageAndHash from './syncPageAndHash';
 
 window.addEventListener('load', async () => {
   const appDiv = document.createElement('div');
@@ -20,7 +21,8 @@ window.addEventListener('load', async () => {
   (window as any).eloExtensionApp = eloExtensionApp;
 
   const eloClient = makeLocalExtensionAppClient(eloExtensionApp);
-  const pageCtx = initEloPageContext(storage, config.featureFlags);
+  const pageCtx = initEloPageContext(storage, config.featureFlags, location.hash.slice(1));
+  syncPageAndHash(pageCtx);
 
   const { accountRoot } = await pageCtx.storage.readRoot();
 
@@ -29,9 +31,11 @@ window.addEventListener('load', async () => {
     accountRoot === undefined
   );
 
-  pageCtx.update({
-    page: pageCtx.state.needsAuth ? 'WelcomePage' : 'OverviewPage',
-  });
+  if (pageCtx.state.page === '') {
+    pageCtx.update({
+      page: pageCtx.state.needsAuth ? 'WelcomePage' : 'OverviewPage',
+    });
+  }
 
   ReactDOM.render(
     <ExtensionAppContext.Provider value={eloClient}>

@@ -4,6 +4,8 @@ import { AnalysisFragment } from '../elo-types/Analysis';
 import Feedback from '../elo-types/Feedback';
 import UiState from './UiState';
 import { GoogleAuthResult } from '../elo-types/GoogleAuthResult';
+import AccountRoot from './storage/AccountRoot';
+import AggregateStats from '../elo-types/AggregateStats';
 
 const ProtocolRegistration = io.union([
   io.type({
@@ -38,6 +40,9 @@ export type Protocol = {
   googleAuth(): GoogleAuthResult;
   logout(): void;
   getEmail(): string | undefined;
+  readAccountRoot(): AccountRoot;
+  writeAccountRoot(newAccountRoot: AccountRoot): void;
+  getAggregateStats(): AggregateStats;
 };
 
 export const protocolKeyMap: Record<keyof Protocol, true> = {
@@ -55,6 +60,9 @@ export const protocolKeyMap: Record<keyof Protocol, true> = {
   googleAuth: true,
   logout: true,
   getEmail: true,
+  readAccountRoot: true,
+  writeAccountRoot: true,
+  getAggregateStats: true,
 };
 
 export const protocolThirdPartyKeyMap = {

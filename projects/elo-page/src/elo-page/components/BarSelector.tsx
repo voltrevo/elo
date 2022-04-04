@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import FunctionalBarSelector from './FunctionalBarSelector';
+
 type Props = {
   classes?: string[];
   options: string[];
@@ -31,20 +33,17 @@ const BarSelector: React.FunctionComponent<Props> = (
     doSelect(selection);
   }, []);
 
-  return <div className={['bar-selector', ...classes].join(' ')}>
-    {options.map(option => (
-      <div
-        className={`cell ${option === selection && 'selected'}`}
-        onClick={() => doSelect(
-          default_?.allowNoSelection !== false && option === selection
-            ? undefined
-            : option,
-        )}
-      >
-        {displayMap[option] ?? option}
-      </div>
-    ))}
-  </div>;
+  return <FunctionalBarSelector
+    classes={classes}
+    options={options}
+    displayMap={displayMap}
+    selection={selection}
+    onSelect={(newSelection) => doSelect(
+      default_?.allowNoSelection !== false && newSelection === selection
+        ? undefined
+        : newSelection,
+    )}
+  />;
 };
 
 export default BarSelector;
