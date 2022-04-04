@@ -88,12 +88,14 @@ export default class EmailService {
       return;
     }
 
-    const fullUnsubscribeUrl = [
-      this.unsubscribeUrl,
-      '?',
-      `email=${email.recipient}&`,
-      `code=${UnsubscribeCode(this.unsubscribeSecret, email.recipient)}`,
-    ].join('');
+    const fullUnsubscribeUrl = new URL(this.unsubscribeUrl);
+
+    fullUnsubscribeUrl.searchParams.set('email', email.recipient);
+    
+    fullUnsubscribeUrl.searchParams.set(
+      'code',
+      UnsubscribeCode(this.unsubscribeSecret, email.recipient)
+    );
 
     await this.transports[type]({
       recipient: email.recipient,
@@ -101,7 +103,7 @@ export default class EmailService {
       html: [
         `<pre style="font-family: sans-serif;">${email.body}</pre>`,
         '<br>',
-        `<a href="${fullUnsubscribeUrl}">Unsubscribe</a>`,
+        `<a href="${fullUnsubscribeUrl.toString()}">Unsubscribe</a>`,
       ].join('\n'),
     });
   }
