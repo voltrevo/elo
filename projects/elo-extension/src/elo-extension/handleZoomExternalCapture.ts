@@ -1,7 +1,13 @@
 import Browser from "webextension-polyfill";
 import ExtensionApp from "../elo-extension-app/ExtensionApp";
 
-export default function handleZoomExternalCapture(extensionApp: ExtensionApp) {
+export default async function handleZoomExternalCapture(extensionApp: ExtensionApp) {
+  const accountRoot = await extensionApp.readAccountRoot();
+
+  if (accountRoot.settings.experimentalZoomSupport !== true) {
+    return;
+  }
+
   const isZoomDesktopLauncher = (
     (location.host === 'zoom.us' || location.host.endsWith('.zoom.us')) &&
     location.pathname.startsWith('/j/')
