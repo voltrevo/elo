@@ -263,7 +263,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   async updateMetrics() {
-    const { metricPreference } = (await this.storage.readRoot());
+    const { metricPreference } = await this.readAccountRoot();
 
     const fillerSoundMetric = this.fillerSoundEwma.render(metricPreference);
     const fillerWordMetric = this.fillerWordEwma.render(metricPreference);
@@ -329,12 +329,12 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   async setMetricPreference(preference: string) {
-    const root = await this.storage.readRoot();
+    const accountRoot = await this.readAccountRoot();
 
     // TODO: Check string? Need to add typing to storage.
-    root.metricPreference = preference;
+    accountRoot.metricPreference = preference;
 
-    await this.storage.writeRoot(root);
+    await this.writeAccountRoot(accountRoot);
 
     return 'success';
   }
