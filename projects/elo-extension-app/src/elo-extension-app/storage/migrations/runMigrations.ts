@@ -12,7 +12,7 @@ assert(migrations.length === storageVersion);
 export default async function runMigrations(rawStorage: IRawStorage) {
   const root = (await rawStorage.get('elo'))['elo'];
 
-  if (Object.keys(root).length === 0) {
+  if (root === undefined) {
     // No need to migrate if nothing has been written yet
     return;
   }
