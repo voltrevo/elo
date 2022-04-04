@@ -91,10 +91,10 @@ export default class EmailService {
     const fullUnsubscribeUrl = new URL(this.unsubscribeUrl);
 
     fullUnsubscribeUrl.searchParams.set('email', email.recipient);
-    
+
     fullUnsubscribeUrl.searchParams.set(
       'code',
-      UnsubscribeCode(this.unsubscribeSecret, email.recipient)
+      UnsubscribeCode(this.unsubscribeSecret, email.recipient),
     );
 
     await this.transports[type]({
