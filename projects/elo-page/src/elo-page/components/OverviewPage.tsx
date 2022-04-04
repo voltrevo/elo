@@ -156,7 +156,6 @@ function renderTotalChart(totalChartRef: HTMLCanvasElement, weeklyStats: WeeklyS
       scales: {
         y: {
           min: 0,
-          max: 8,
         },
       },
       maintainAspectRatio: false,
@@ -204,7 +203,6 @@ function renderByTypeChart(byTypeChartRef: HTMLCanvasElement, weeklyStats: Weekl
       scales: {
         y: {
           min: 0,
-          max: 4,
         },
       },
       maintainAspectRatio: false,
