@@ -233,7 +233,7 @@ body {
   }
 
   .settings-page {
-    max-width: 700px;
+    max-width: 1000px;
 
     .field {
       font-size: 1em;
@@ -247,12 +247,6 @@ body {
         > div {
           padding: 0 1em;
         }
-      }
-    }
-
-    .bar-selector {
-      > div {
-        flex-basis: auto;
       }
     }
   }

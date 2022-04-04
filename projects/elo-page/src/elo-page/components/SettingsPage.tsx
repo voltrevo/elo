@@ -28,28 +28,57 @@ const SettingsPage: React.FunctionComponent = () => {
 
       {settings && <>
         <Field>
-        <div>
-          Live Stats Mode
-        </div>
-        <FunctionalBarSelector
-          options={['count', 'recentAverage']}
-          displayMap={{
-            count: 'Count',
-            recentAverage: 'Recent Average',
-          }}
-          selection={settings.liveStatsMode}
-          onSelect={async (selection) => {
-            if (selection === undefined) {
-              return;
-            }
+          <div>
+            Live Stats Mode
+          </div>
+          <FunctionalBarSelector
+            options={['count', 'recentAverage']}
+            displayMap={{
+              count: 'Count',
+              recentAverage: 'Recent Average',
+            }}
+            selection={settings.liveStatsMode}
+            onSelect={async (selection) => {
+              if (selection === undefined) {
+                return;
+              }
 
-            const accountRoot = await appCtx.readAccountRoot();
-            accountRoot.settings.liveStatsMode = selection;
-            await appCtx.writeAccountRoot(accountRoot);
+              const accountRoot = await appCtx.readAccountRoot();
+              accountRoot.settings.liveStatsMode = selection;
+              await appCtx.writeAccountRoot(accountRoot);
 
-            await setSettingsFromStorage();
-          }}
-        />
+              await setSettingsFromStorage();
+            }}
+          />
+        </Field>
+        <Field>
+          <div>
+            Experimental Zoom Support
+          </div>
+          <FunctionalBarSelector
+            options={['off', 'on']}
+            displayMap={{
+              off: 'Off',
+              on: 'On',
+            }}
+            selection={settings.experimentalZoomSupport ? 'on' : 'off'}
+            onSelect={async (selection) => {
+              if (selection === undefined) {
+                return;
+              }
+
+              const accountRoot = await appCtx.readAccountRoot();
+
+              accountRoot.settings.experimentalZoomSupport = (selection === 'on'
+                ? true
+                : undefined
+              );
+
+              await appCtx.writeAccountRoot(accountRoot);
+
+              await setSettingsFromStorage();
+            }}
+          />
         </Field>
       </>}
     </Section>
