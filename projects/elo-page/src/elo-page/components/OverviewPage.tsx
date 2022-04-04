@@ -142,7 +142,9 @@ function renderTotalChart(totalChartRef: HTMLCanvasElement, weeklyStats: WeeklyS
       ],
       datasets: [{
         label: 'Total Per Minute Speaking',
-        data: weeklyStats.map((stat) => (stat.fillersHedges + stat.umsUhs) / (stat.speakingTime / 60)),
+        data: weeklyStats
+          .map((stat) => (stat.fillersHedges + stat.umsUhs) / (stat.speakingTime / 60))
+          .reverse(),
         fill: false,
         borderColor: 'rgb(0, 223, 223)',
         tension: 0.1,
@@ -185,14 +187,18 @@ function renderByTypeChart(byTypeChartRef: HTMLCanvasElement, weeklyStats: Weekl
       datasets: [
         {
           label: 'Ums & Uhs',
-          data: weeklyStats.map((stat) => (stat.umsUhs) / (stat.speakingTime / 60)),
+          data: weeklyStats
+            .map((stat) => (stat.umsUhs) / (stat.speakingTime / 60))
+            .reverse(),
           fill: false,
           borderColor: 'rgb(0, 200, 255)',
           tension: 0.1,
         },
         {
           label: 'Filler & Hedge Words',
-          data: weeklyStats.map((stat) => (stat.fillersHedges) / (stat.speakingTime / 60)),
+          data: weeklyStats
+            .map((stat) => (stat.fillersHedges) / (stat.speakingTime / 60))
+            .reverse(),
           fill: false,
           borderColor: 'rgb(179, 0, 255)',
           tension: 0.1,
