@@ -41,6 +41,7 @@ export type Protocol = {
   logout(): void;
   getEmail(): string | undefined;
   readAccountRoot(): AccountRoot;
+  writeAccountRoot(newAccountRoot: AccountRoot): void;
   getAggregateStats(): AggregateStats;
 };
 
@@ -60,6 +61,7 @@ export const protocolKeyMap: Record<keyof Protocol, true> = {
   logout: true,
   getEmail: true,
   readAccountRoot: true,
+  writeAccountRoot: true,
   getAggregateStats: true,
 };
 

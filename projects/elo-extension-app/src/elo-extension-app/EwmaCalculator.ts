@@ -18,7 +18,7 @@ export default class EwmaCalculator {
   }
 
   render(metricPreference?: string) {
-    if (metricPreference === 'ewma') {
+    if (metricPreference === 'recentAverage') {
       return this.value.toFixed(1);
     }
 

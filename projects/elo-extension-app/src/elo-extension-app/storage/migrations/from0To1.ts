@@ -31,7 +31,7 @@ export default async function from0To1(rawStorage: IRawStorage) {
     newItems[anonymousAccountRootKey] = {
       userId,
       settings: {
-        liveStatsMode: root.metricPreference ?? 'count',
+        liveStatsMode: root.metricPreference === 'ewma' ? 'recentAverage' : 'count',
       },
       aggregateStats,
       lastSessionKey: root.lastSessionKey,
