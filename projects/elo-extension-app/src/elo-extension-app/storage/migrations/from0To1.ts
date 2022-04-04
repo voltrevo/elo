@@ -29,10 +29,12 @@ export default async function from0To1(rawStorage: IRawStorage) {
     // Move to anonymous account root
 
     newItems[anonymousAccountRootKey] = {
-      lastSessionKey: root.lastSessionKey,
-      metricPreference: root.metricPreference,
       userId,
+      settings: {
+        liveStatsMode: root.metricPreference ?? 'count',
+      },
       aggregateStats,
+      lastSessionKey: root.lastSessionKey,
     };
 
     root.lastSessionKey = undefined;

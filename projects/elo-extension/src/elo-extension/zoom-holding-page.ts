@@ -15,12 +15,10 @@ import GoogleAuthApi from "./GoogleAuthApi";
 
   const accountRoot = await extensionApp.readAccountRoot();
 
-  const zoomData = accountRoot.zoom;
-
   const parsedLocation = new URL(location.href);
   const inviteUrl = new URL(parsedLocation.searchParams.get('inviteUrl') ?? '');
 
-  if (zoomData?.redirectToWebClient === false) {
+  if (accountRoot.settings.zoomRedirectToWebClient === false) {
     inviteUrl.searchParams.set('disableEloRedirect', 'true');
     location.href = inviteUrl.href;
     return;
