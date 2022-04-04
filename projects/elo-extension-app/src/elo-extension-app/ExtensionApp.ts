@@ -1,7 +1,6 @@
 import EwmaCalculator from './EwmaCalculator';
 import Protocol, { ConnectionEvent, ProtocolLoginCredentials, ProtocolRegistration } from './Protocol';
 import SessionStats, { initSessionStats } from '../elo-types/SessionStats';
-import AggregateStats, { initAggregateStats } from '../elo-types/AggregateStats';
 import Storage, { anonymousAccountRootKey, RandomKey } from './storage/Storage';
 import UiState from './UiState';
 import never from '../common-pure/never';
