@@ -431,6 +431,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
 
     let accountRoot = existingAccountRoot ?? anonymousAccountRoot ?? initAccountRoot(userId);
     accountRoot.eloLoginToken = eloLoginToken;
+    await setAccountRootUserId(storageView, accountRoot, userId);
     accountRoot.email = email;
     accountRoot.googleAccount = googleAccount;
 
