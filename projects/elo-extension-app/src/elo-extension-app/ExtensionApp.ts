@@ -7,7 +7,7 @@ import never from '../common-pure/never';
 import TaskQueue from '../common-pure/TaskQueue';
 import { AnalysisDisfluent, AnalysisFragment } from '../elo-types/Analysis';
 import Feedback from '../elo-types/Feedback';
-import { PromisishApi } from './protocolHelpers';
+import { PromisishApi } from '../common-pure/protocolHelpers';
 import Registration from '../elo-types/Registration';
 import LoginCredentials from '../elo-types/LoginCredentials';
 import AccountRoot, { initAccountRoot } from './storage/AccountRoot';
