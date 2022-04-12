@@ -1,0 +1,12 @@
+{
+  "name": "storage-client",
+  "version": "0.0.0",
+  "main": "dist/src/index.js",
+  "author": "Andrew Morris",
+  "private": true,
+  "dependencies": {
+    "confusing-browser-globals": "^1.0.11",
+    "js-sha3": "^0.8.0",
+    "typescript": "^4.6.3"
+  }
+}
