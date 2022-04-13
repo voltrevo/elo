@@ -14,8 +14,12 @@ export default class StorageClient {
     public keyCalculator: StorageKeyCalculator,
   ) {}
 
-  async get<T extends io.Mixed>(type: T, id: string): Promise<T | nil> {
-    const encryptedBuf = await this.rpcClient.get('key-value', id);
+  Element<T extends io.Mixed>(type: T, elementId: string) {
+    return new StorageElement(this, type, 'key-value', elementId);
+  }
+
+  async fullGet<T extends io.Mixed>(type: T, collectionId: string, elementId: string): Promise<T | nil> {
+    const encryptedBuf = await this.rpcClient.get(collectionId, elementId);
 
     if (encryptedBuf === nil) {
       return nil;
@@ -30,19 +34,37 @@ export default class StorageClient {
     const value = decode(type, untypedValue);
 
     if (!buffersEqual(key, this.keyCalculator.latestKey)) {
-      await this.set(type, id, value);
+      await this.fullSet(type, collectionId, elementId, value);
     }
 
     return value;
   }
 
-  async set<T extends io.Mixed>(type: T, id: string, value: T | nil) {
+  async fullSet<T extends io.Mixed>(_type: T, collectionId: string, elementId: string, value: T | nil) {
     if (value === nil) {
-      await this.rpcClient.set('key-value', id, nil);
+      await this.rpcClient.set(collectionId, elementId, nil);
       return;
     }
 
     const encryptedBuf = encryptWithKeyHash(this.keyCalculator.latestKey, msgpack.encode(value));
-    await this.rpcClient.set('key-value', id, encryptedBuf);
+    await this.rpcClient.set(collectionId, elementId, encryptedBuf);
+  }
+}
+
+export class StorageElement<T extends io.Mixed> {
+  constructor(
+    public client: StorageClient,
+    public type: T,
+    public collectionId: string,
+    public elementId: string,
+  ) {}
+
+  async get(): Promise<T | nil> {
+    const value = await this.client.fullGet(this.type, this.collectionId, this.elementId);
+    return value;
+  }
+
+  async set(value: T | nil): Promise<void> {
+    await this.client.fullSet(this.type, this.collectionId, this.elementId, value);
   }
 }
