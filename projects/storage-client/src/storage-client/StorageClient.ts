@@ -18,6 +18,10 @@ export default class StorageClient {
     return new StorageElement(this, type, 'key-value', elementId);
   }
 
+  Collection<T extends io.Mixed>(elementType: T, collectionId: string) {
+    return new StorageCollection(this, elementType, collectionId);
+  }
+
   async fullGet<T extends io.Mixed>(type: T, collectionId: string, elementId: string): Promise<T | nil> {
     const encryptedBuf = await this.rpcClient.get(collectionId, elementId);
 
@@ -66,5 +70,17 @@ export class StorageElement<T extends io.Mixed> {
 
   async set(value: T | nil): Promise<void> {
     await this.client.fullSet(this.type, this.collectionId, this.elementId, value);
+  }
+}
+
+export class StorageCollection<T extends io.Mixed> {
+  constructor(
+    public client: StorageClient,
+    public elementType: T,
+    public collectionId: string,
+  ) {}
+
+  Element(elementId: string): StorageElement<T> {
+    return new StorageElement(this.client, this.elementType, this.collectionId, elementId);
   }
 }
