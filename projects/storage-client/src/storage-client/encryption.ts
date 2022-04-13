@@ -1,6 +1,10 @@
 import aes from 'aes-js';
+import { keccak256 } from 'js-sha3';
+import assert from '../common-pure/assert';
+import buffersEqual from '../common-pure/buffersEqual';
 
 const blockSize = 16;
+const hashSize = 32;
 
 export function encrypt(key: Uint8Array, plaintext: Uint8Array) {
   const iv = crypto.getRandomValues(new Uint8Array(blockSize));
@@ -41,4 +45,29 @@ export function decrypt(key: Uint8Array, ciphertext: Uint8Array) {
   }
 
   return expandedPlaintext.subarray(16, expandedPlaintext.length - ignoreLen);
+}
+
+export function encryptWithKeyHash(key: Uint8Array, plaintext: Uint8Array) {
+  const ciphertext = encrypt(key, plaintext);
+
+  const keyHash = bufferHash(key);
+  const keyHashAndCiphertext = new Uint8Array(hashSize + ciphertext.length);
+  keyHashAndCiphertext.set(keyHash, 0);
+  keyHashAndCiphertext.set(ciphertext, hashSize);
+
+  return keyHashAndCiphertext;
+}
+
+export function getKeyHash(keyHashAndCiphertext: Uint8Array) {
+  return keyHashAndCiphertext.subarray(0, hashSize);
+}
+
+export function decryptWithKeyHash(key: Uint8Array, keyHashAndCiphertext: Uint8Array) {
+  assert(buffersEqual(bufferHash(key), getKeyHash(keyHashAndCiphertext)));
+
+  return decrypt(key, keyHashAndCiphertext.subarray(hashSize));
+}
+
+export function bufferHash(buf: Uint8Array) {
+  return new Uint8Array(keccak256.arrayBuffer(buf));
 }

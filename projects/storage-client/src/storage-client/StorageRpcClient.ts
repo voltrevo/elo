@@ -32,7 +32,17 @@ export default class StorageRpcClient implements PromisifyApi<StorageProtocol> {
   }
 
   async set(collectionId: string, elementId: string, value: Uint8Array | nil): Promise<void> {
-    await this.fetchRpc('set', [collectionId, elementId, value])
+    await this.fetchRpc('set', [collectionId, elementId, value]);
+  }
+
+  async setMulti(
+    setCommands: [
+      collectionId: string,
+      elementId: string,
+      value: Uint8Array | undefined,
+    ][],
+  ): Promise<void> {
+    await this.fetchRpc('setMulti', [setCommands]);
   }
 
   async getRange(collectionId: string, minElementId: string, maxElementId: string): Promise<[string, Uint8Array][]> {
