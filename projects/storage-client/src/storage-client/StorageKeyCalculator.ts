@@ -3,16 +3,16 @@ import base58 from "../common-pure/base58";
 import buffersEqual from "../common-pure/buffersEqual";
 import nil from "../common-pure/nil";
 import { bufferHash, decryptWithKeyHash, encryptWithKeyHash, getKeyHash } from "./encryption";
-import StorageRpcClient from "./StorageRpcClient";
+import type { IStorageRpcClient } from "./StorageRpcClient";
 
 export default class StorageKeyCalculator {
   private constructor(
-    public rpcClient: StorageRpcClient,
+    public rpcClient: IStorageRpcClient,
     public latestKey: Uint8Array,
   ) {}
 
   async Create(
-    rpcClient: StorageRpcClient,
+    rpcClient: IStorageRpcClient,
     passwordKey: Uint8Array | nil,
   ) {
     const latestKeyHash = await rpcClient.get('StorageKeyCalculator', 'latestKeyHash');

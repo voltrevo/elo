@@ -10,7 +10,9 @@ import decode from '../elo-types/decode';
 const GetRangeResult = io.array(io.tuple([io.string, ioBuffer]));
 type GetRangeResult = io.TypeOf<typeof GetRangeResult>;
 
-export default class StorageRpcClient implements PromisifyApi<StorageProtocol> {
+export type IStorageRpcClient = PromisifyApi<StorageProtocol>;
+
+export default class StorageRpcClient implements IStorageRpcClient {
   constructor(
     public rpcUrl: string,
     public eloLoginToken: string,

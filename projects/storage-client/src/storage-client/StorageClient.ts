@@ -1,7 +1,7 @@
 import * as io from 'io-ts';
 import msgpack from '@msgpack/msgpack';
 
-import StorageRpcClient from "./StorageRpcClient";
+import type { IStorageRpcClient } from "./StorageRpcClient";
 import nil from '../common-pure/nil';
 import { decryptWithKeyHash, encryptWithKeyHash, getKeyHash } from './encryption';
 import StorageKeyCalculator from './StorageKeyCalculator';
@@ -12,7 +12,7 @@ import ObfuscatedTimeId from './ObfuscatedTimeId';
 
 export default class StorageClient {
   constructor(
-    public rpcClient: StorageRpcClient,
+    public rpcClient: IStorageRpcClient,
     public keyCalculator: StorageKeyCalculator,
   ) {}
 
