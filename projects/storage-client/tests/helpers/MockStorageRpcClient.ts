@@ -1,15 +1,38 @@
+import base58 from "../../src/common-pure/base58";
+import delay from "../../src/common-pure/delay";
+import nil from "../../src/common-pure/nil";
 import { IStorageRpcClient } from "../../src/storage-client/StorageRpcClient";
 
 export default class MockStorageRpcClient implements IStorageRpcClient {
-  get(collectionId: string, elementId: string): Promise<Uint8Array | undefined> {
-    throw new Error("Method not implemented.");
+  data: Record<string, Record<string, string>> = {};
+
+  async get(collectionId: string, elementId: string): Promise<Uint8Array | nil> {
+    await delay(0);
+
+    const value = this.data[collectionId]?.[elementId];
+
+    if (value === nil) {
+      return nil;
+    }
+
+    return new Uint8Array(base58.decode(value));
   }
 
-  set(collectionId: string, elementId: string, value: Uint8Array | undefined): Promise<void> {
-    throw new Error("Method not implemented.");
+  async set(collectionId: string, elementId: string, value: Uint8Array | nil): Promise<void> {
+    await delay(0);
+
+    this.data[collectionId] = this.data[collectionId] ?? {};
+
+    const collection = this.data[collectionId];
+
+    if (value === nil) {
+      delete collection[elementId];
+    } else {
+      collection[elementId] = base58.encode(value);
+    }
   }
 
-  setMulti(setCommands: [collectionId: string, elementId: string, value: Uint8Array | undefined][]): Promise<void> {
+  setMulti(setCommands: [collectionId: string, elementId: string, value: Uint8Array | nil][]): Promise<void> {
     throw new Error("Method not implemented.");
   }
 
