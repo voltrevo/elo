@@ -44,6 +44,35 @@ export default class StorageClient {
     return value;
   }
 
+  async fullGetRange<T extends io.Mixed>(
+    type: T,
+    collectionId: string,
+    minElementId: string,
+    maxElementId: string,
+  ): Promise<[string, T][]> {
+    const encryptedResults = await this.rpcClient.getRange(collectionId, minElementId, maxElementId);
+
+    let results: [string, T][] = [];
+
+    for (const [id, encryptedBuf] of encryptedResults) {
+      const keyHash = getKeyHash(encryptedBuf);
+      const key = await this.keyCalculator.calculateKey(keyHash);
+      const buf = decryptWithKeyHash(key, encryptedBuf);
+  
+      const untypedValue = msgpack.decode(buf);
+  
+      const element = decode(type, untypedValue);
+  
+      if (!buffersEqual(key, this.keyCalculator.latestKey)) {
+        await this.fullSet(type, collectionId, id, element);
+      }
+
+      results.push([id, element]);
+    }
+
+    return results;
+  }
+
   async fullSet<T extends io.Mixed>(_type: T, collectionId: string, elementId: string, value: T | nil) {
     if (value === nil) {
       await this.rpcClient.set(collectionId, elementId, nil);
@@ -82,5 +111,19 @@ export class StorageCollection<T extends io.Mixed> {
 
   Element(elementId: string): StorageElement<T> {
     return new StorageElement(this.client, this.elementType, this.collectionId, elementId);
+  }
+
+  async RangeEntries(minElementId: string, maxElementId: string): Promise<[string, T][]> {
+    return await this.client.fullGetRange(
+      this.elementType,
+      this.collectionId,
+      minElementId,
+      maxElementId,
+    );
+  }
+
+  async Range(minElementId: string, maxElementId: string): Promise<T[]> {
+    const entries = await this.RangeEntries(minElementId, maxElementId);
+    return entries.map(([, element]) => element);
   }
 }
