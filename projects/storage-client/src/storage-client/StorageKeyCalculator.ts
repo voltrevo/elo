@@ -4,6 +4,8 @@ import nil from "../common-pure/nil";
 import { bufferHash, decryptWithKeyHash, encryptWithKeyHash, getKeyHash } from "./encryption";
 import StorageRpcClient from "./StorageRpcClient";
 
+// TODO: Fix buffer comparison (use buffersEqual not ===)
+
 export default class StorageKeyCalculator {
   private constructor(
     public rpcClient: StorageRpcClient,
