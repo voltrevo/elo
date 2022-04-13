@@ -30,8 +30,6 @@ export function decrypt(key: Uint8Array, ciphertext: Uint8Array) {
   const cipher = new aes.ModeOfOperation.cbc(key, iv);
   const expandedPlaintext = cipher.decrypt(ciphertext.subarray(blockSize));
 
-  console.log({ expandedPlaintext });
-
   const ignoreLen = expandedPlaintext[0];
 
   if (ignoreLen > 15) {
