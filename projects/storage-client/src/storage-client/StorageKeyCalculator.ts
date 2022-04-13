@@ -11,7 +11,7 @@ export default class StorageKeyCalculator {
     public latestKey: Uint8Array,
   ) {}
 
-  async Create(
+  static async Create(
     rpcClient: IStorageRpcClient,
     passwordKey: Uint8Array | nil,
   ) {
@@ -56,7 +56,7 @@ export default class StorageKeyCalculator {
       throw new Error(`Failed to calculate latestKey from ${base58.encode(latestKeyHash)}`);
     }
 
-    return keyData;
+    return new StorageKeyCalculator(rpcClient, keyData);
   }
 
   async enablePasswordTransition(passwordKey: Uint8Array) {

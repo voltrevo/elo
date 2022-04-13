@@ -4,6 +4,9 @@
   "main": "dist/src/index.js",
   "author": "Andrew Morris",
   "private": true,
+  "scripts": {
+    "test": "mocha build/js/tests/**/*.test.js"
+  },
   "dependencies": {
     "@msgpack/msgpack": "^2.7.2",
     "@types/aes-js": "^3.1.1",
@@ -14,5 +17,9 @@
     "io-ts-reporters": "^2.0.1",
     "js-sha3": "^0.8.0",
     "typescript": "^4.6.3"
+  },
+  "devDependencies": {
+    "@types/mocha": "^9.1.0",
+    "mocha": "^9.2.2"
   }
 }
