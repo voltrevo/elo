@@ -1,10 +1,9 @@
 import assert from "../common-pure/assert";
 import base58 from "../common-pure/base58";
+import buffersEqual from "../common-pure/buffersEqual";
 import nil from "../common-pure/nil";
 import { bufferHash, decryptWithKeyHash, encryptWithKeyHash, getKeyHash } from "./encryption";
 import StorageRpcClient from "./StorageRpcClient";
-
-// TODO: Fix buffer comparison (use buffersEqual not ===)
 
 export default class StorageKeyCalculator {
   private constructor(
@@ -31,16 +30,19 @@ export default class StorageKeyCalculator {
     }
 
     if (passwordKey !== nil) {
-      if (latestKeyHash === bufferHash(passwordKey)) {
+      if (buffersEqual(latestKeyHash, bufferHash(passwordKey))) {
         return new StorageKeyCalculator(rpcClient, passwordKey);
       }
 
       const passwordTransitionKeyData = await rpcClient.get('StorageKeyCalculator', 'passwordTransitionKeyData');
 
-      if (passwordTransitionKeyData !== nil && getKeyHash(passwordTransitionKeyData) === bufferHash(passwordKey)) {
+      if (
+        passwordTransitionKeyData !== nil &&
+        buffersEqual(getKeyHash(passwordTransitionKeyData), bufferHash(passwordKey))
+      ) {
         const passwordTransitionKey = decryptWithKeyHash(passwordKey, passwordTransitionKeyData);
 
-        if (latestKeyHash === bufferHash(passwordTransitionKey)) {
+        if (buffersEqual(latestKeyHash, bufferHash(passwordTransitionKey))) {
           const skc = new StorageKeyCalculator(rpcClient, passwordTransitionKey);
           await skc.enableLocalEncryption(passwordKey);
           return skc;
@@ -103,7 +105,7 @@ export default class StorageKeyCalculator {
   }
 
   async calculateKey(keyHash: Uint8Array): Promise<Uint8Array> {
-    if (bufferHash(this.latestKey) === keyHash) {
+    if (buffersEqual(bufferHash(this.latestKey), keyHash)) {
       return this.latestKey;
     }
 
