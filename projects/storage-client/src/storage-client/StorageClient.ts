@@ -1,5 +1,5 @@
 import * as io from 'io-ts';
-import msgpack from '@msgpack/msgpack';
+import * as msgpack from '@msgpack/msgpack';
 
 import type { IStorageRpcClient } from "./StorageRpcClient";
 import nil from '../common-pure/nil';

@@ -1,3 +1,5 @@
+import 'source-map-support/register';
+
 import * as io from 'io-ts';
 
 import './helpers/polyfills';
