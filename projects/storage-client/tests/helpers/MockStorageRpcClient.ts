@@ -18,9 +18,7 @@ export default class MockStorageRpcClient implements IStorageRpcClient {
     return new Uint8Array(base58.decode(value));
   }
 
-  async set(collectionId: string, elementId: string, value: Uint8Array | nil): Promise<void> {
-    await delay(0);
-
+  _set(collectionId: string, elementId: string, value: Uint8Array | nil) {
     this.data[collectionId] = this.data[collectionId] ?? {};
 
     const collection = this.data[collectionId];
@@ -32,8 +30,17 @@ export default class MockStorageRpcClient implements IStorageRpcClient {
     }
   }
 
-  setMulti(setCommands: [collectionId: string, elementId: string, value: Uint8Array | nil][]): Promise<void> {
-    throw new Error("Method not implemented.");
+  async set(collectionId: string, elementId: string, value: Uint8Array | nil): Promise<void> {
+    await delay(0);
+    this._set(collectionId, elementId, value);
+  }
+
+  async setMulti(setCommands: [collectionId: string, elementId: string, value: Uint8Array | nil][]): Promise<void> {
+    await delay(0);
+
+    for (const setCommand of setCommands) {
+      this._set(...setCommand);
+    }
   }
 
   getRange(collectionId: string, minElementId: string, maxElementId: string): Promise<[string, Uint8Array][]> {

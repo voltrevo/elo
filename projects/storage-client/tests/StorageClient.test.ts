@@ -1,5 +1,6 @@
 import * as io from 'io-ts';
 
+import './helpers/polyfills';
 import assert from '../src/common-pure/assert';
 import nil from '../src/common-pure/nil';
 import StorageClient from "../src/storage-client/StorageClient";
