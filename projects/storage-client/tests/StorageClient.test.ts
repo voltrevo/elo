@@ -139,4 +139,44 @@ describe("StorageClient", () => {
     // outdatedClient can no longer read it
     assertThrow(() => outdatedClient.Element(io.string, 'old key').get());
   }));
+
+  it("Data written by outdatedClient can be read by primaryClient that has enabled local encryption", FixtureTest(async fx => {
+    const outdatedClient = await fx.connect();
+    const primaryClient = await fx.connect();
+
+    await primaryClient.keyCalculator.enableLocalEncryption(fx.PasswordKey());
+
+    // outdatedClient doesn't know about the encryption update but continues working
+    await outdatedClient.Element(io.string, 'test').set('foo');
+    assert(await outdatedClient.Element(io.string, 'test').get() === 'foo');
+
+    // primaryClient can read that data even though it's using updated encryption
+    assert(await primaryClient.Element(io.string, 'test').get() === 'foo');
+
+    // outdatedClient has lost the ability to read 'test' because primaryClient updated its encryption by accessing it
+    assertThrow(() => outdatedClient.Element(io.string, 'test').get());
+  }));
+
+  it("Can disable local encryption, data becomes accessible without passwordKey", FixtureTest(async fx => {
+    const passwordKey = fx.PasswordKey();
+
+    {
+      // Enable local encryption and set some data
+      const sc = await fx.connect();
+      await sc.keyCalculator.enableLocalEncryption(passwordKey);
+      await sc.Element(io.string, 'test').set('foo');
+    }
+
+    {
+      // Disable local encryption
+      const sc = await fx.connect(passwordKey);
+      await sc.keyCalculator.disableLocalEncryption();
+    }
+
+    {
+      // Access data without passwordKey
+      const sc = await fx.connect();
+      assert(await sc.Element(io.string, 'test').get() === 'foo');
+    }
+  }));
 });

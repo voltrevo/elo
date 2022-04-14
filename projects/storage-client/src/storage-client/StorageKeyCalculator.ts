@@ -121,7 +121,7 @@ export default class StorageKeyCalculator {
     const keyData = await this.rpcClient.get('keys', base58.encode(keyHash));
 
     if (keyData === nil) {
-      throw new Error(`Failed to calculate key from ${keyHash}`);
+      throw new Error(`Failed to calculate key from ${base58.encode(keyHash)}`);
     }
 
     if (keyData.length === 32) {
