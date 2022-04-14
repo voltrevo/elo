@@ -29,7 +29,7 @@ export default class StorageClient {
   }
 
   async fullGet<T extends io.Mixed>(type: T, collectionId: string, elementId: string): Promise<io.TypeOf<T> | nil> {
-    const encryptedBuf = await this.rpcClient.get(collectionId, elementId);
+    const { element: encryptedBuf } = await this.rpcClient.get({ collectionId, elementId });
 
     if (encryptedBuf === nil) {
       return nil;
@@ -39,28 +39,29 @@ export default class StorageClient {
     const key = await this.keyCalculator.calculateKey(keyHash);
     const buf = decryptWithKeyHash(key, encryptedBuf);
 
-    const untypedValue = msgpack.decode(buf);
+    const untypedElement = msgpack.decode(buf);
 
-    const value = decode(type, untypedValue);
+    const element = decode(type, untypedElement);
 
     if (!buffersEqual(key, this.keyCalculator.latestKey)) {
-      await this.fullSet(type, collectionId, elementId, value);
+      await this.fullSet(type, collectionId, elementId, element);
     }
 
-    return value;
+    return element;
   }
 
   async fullGetRange<T extends io.Mixed>(
     type: T,
     collectionId: string,
-    minElementId: string,
-    maxElementId: string,
+    minElementId?: string,
+    maxElementId?: string,
   ): Promise<[string, io.TypeOf<T>][]> {
-    const encryptedResults = await this.rpcClient.getRange(collectionId, minElementId, maxElementId);
+    // TODO: Use nextElementId (implement pagination)
+    const { entries: encryptedEntries, nextElementId } = await this.rpcClient.getRange({ collectionId, minElementId, maxElementId });
 
     let results: [string, T][] = [];
 
-    for (const [id, encryptedBuf] of encryptedResults) {
+    for (const [id, encryptedBuf] of encryptedEntries) {
       const keyHash = getKeyHash(encryptedBuf);
       const key = await this.keyCalculator.calculateKey(keyHash);
       const buf = decryptWithKeyHash(key, encryptedBuf);
@@ -79,14 +80,14 @@ export default class StorageClient {
     return results;
   }
 
-  async fullSet<T extends io.Mixed>(_type: T, collectionId: string, elementId: string, value: io.TypeOf<T> | nil) {
-    if (value === nil) {
-      await this.rpcClient.set(collectionId, elementId, nil);
+  async fullSet<T extends io.Mixed>(_type: T, collectionId: string, elementId: string, element: io.TypeOf<T> | nil) {
+    if (element === nil) {
+      await this.rpcClient.set({ collectionId, elementId, element });
       return;
     }
 
-    const encryptedBuf = encryptWithKeyHash(this.keyCalculator.latestKey, msgpack.encode(value));
-    await this.rpcClient.set(collectionId, elementId, encryptedBuf);
+    const encryptedBuf = encryptWithKeyHash(this.keyCalculator.latestKey, msgpack.encode(element));
+    await this.rpcClient.set({ collectionId, elementId, element: encryptedBuf });
   }
 }
 

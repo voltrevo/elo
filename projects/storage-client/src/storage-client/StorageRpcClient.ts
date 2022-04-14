@@ -1,14 +1,8 @@
-import * as io from 'io-ts';
 import msgpack from '@msgpack/msgpack';
 
-import StorageProtocol from "../elo-types/StorageProtocol";
+import StorageProtocol, { StorageProtocolInput, StorageProtocolOutput, StorageProtocolTypeMap } from "../elo-types/StorageProtocol";
 import { PromisifyApi } from "../common-pure/protocolHelpers";
-import ioBuffer from "../common-pure/ioBuffer";
-import nil from '../common-pure/nil';
 import decode from '../elo-types/decode';
-
-const GetRangeResult = io.array(io.tuple([io.string, ioBuffer]));
-type GetRangeResult = io.TypeOf<typeof GetRangeResult>;
 
 export type IStorageRpcClient = PromisifyApi<StorageProtocol>;
 
@@ -18,52 +12,31 @@ export default class StorageRpcClient implements IStorageRpcClient {
     public eloLoginToken: string,
   ) {}
 
-  async get(collectionId: string, elementId: string): Promise<Uint8Array | nil> {
-    const rpcResult = await this.fetchRpc('get', [collectionId, elementId]);
+  get = this.createMethod('get');
+  set = this.createMethod('set');
+  setMulti = this.createMethod('setMulti');
+  getRange = this.createMethod('getRange');
+  count = this.createMethod('count');
+  UsageInfo = this.createMethod('UsageInfo');
 
-    if (rpcResult instanceof Uint8Array) {
-      return rpcResult;
-    }
-
-    // null because msgpack doesn't support undefined
-    if (rpcResult === null) {
-      return nil;
-    }
-
-    throw new Error(`Unexpected rpcResult: ${rpcResult}`);
+  private createMethod<M extends keyof typeof StorageProtocolTypeMap>(method: M) {
+    return async (input: StorageProtocolInput<M>): Promise<StorageProtocolOutput<M>> => {
+      const rpcResult = await this.fetchRpc(method, input);
+      return decode(StorageProtocolTypeMap[method].output, rpcResult);
+    };
   }
 
-  async set(collectionId: string, elementId: string, value: Uint8Array | nil): Promise<void> {
-    await this.fetchRpc('set', [collectionId, elementId, value]);
-  }
-
-  async setMulti(
-    setCommands: [
-      collectionId: string,
-      elementId: string,
-      value: Uint8Array | undefined,
-    ][],
-  ): Promise<void> {
-    await this.fetchRpc('setMulti', [setCommands]);
-  }
-
-  async getRange(collectionId: string, minElementId: string, maxElementId: string): Promise<[string, Uint8Array][]> {
-    const rpcResult = await this.fetchRpc('getRange', [collectionId, minElementId, maxElementId]);
-
-    return decode(GetRangeResult, rpcResult);
-  }
-
-  private async fetchRpc(method: string, args: unknown): Promise<unknown> {
+  private async fetchRpc(method: string, input: unknown): Promise<unknown> {
     const response = await fetch(this.rpcUrl, {
       method: 'POST',
       body: msgpack.encode({
         eloLoginToken: this.eloLoginToken,
         method,
-        args,
+        input,
       }),
     });
 
-    if (response.status !== 200) {
+    if (response.status >= 400) {
       throw new Error(await response.text());
     }
 

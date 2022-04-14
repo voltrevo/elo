@@ -15,16 +15,26 @@ export default class StorageKeyCalculator {
     rpcClient: IStorageRpcClient,
     passwordKey: Uint8Array | nil,
   ) {
-    const latestKeyHash = await rpcClient.get('StorageKeyCalculator', 'latestKeyHash');
+    const { element: latestKeyHash } = await rpcClient.get({ collectionId: 'StorageKeyCalculator', elementId: 'latestKeyHash' });
 
     if (latestKeyHash === nil) {
       const latestKey = crypto.getRandomValues(new Uint8Array(32));
       const newLatestKeyHash = bufferHash(latestKey);
 
-      await rpcClient.setMulti([
-        ['keys', base58.encode(newLatestKeyHash), latestKey],
-        ['StorageKeyCalculator', 'latestKeyHash', newLatestKeyHash],
-      ]);
+      await rpcClient.setMulti({
+        commands: [
+          {
+            collectionId: 'keys',
+            elementId: base58.encode(newLatestKeyHash),
+            element: latestKey,
+          },
+          {
+            collectionId: 'StorageKeyCalculator',
+            elementId: 'latestKeyHash',
+            element: newLatestKeyHash,
+          },
+        ],
+      });
 
       return new StorageKeyCalculator(rpcClient, latestKey);
     }
@@ -34,7 +44,10 @@ export default class StorageKeyCalculator {
         return new StorageKeyCalculator(rpcClient, passwordKey);
       }
 
-      const passwordTransitionKeyData = await rpcClient.get('StorageKeyCalculator', 'passwordTransitionKeyData');
+      const { element: passwordTransitionKeyData } = await rpcClient.get({
+        collectionId: 'StorageKeyCalculator',
+        elementId: 'passwordTransitionKeyData',
+      });
 
       if (
         passwordTransitionKeyData !== nil &&
@@ -50,7 +63,10 @@ export default class StorageKeyCalculator {
       }
     }
 
-    const keyData = await rpcClient.get('keys', base58.encode(latestKeyHash));
+    const { element: keyData } = await rpcClient.get({
+      collectionId: 'keys',
+      elementId: base58.encode(latestKeyHash),
+    });
 
     if (keyData === nil || keyData.length !== 32) {
       throw new Error(`Failed to calculate latestKey from ${base58.encode(latestKeyHash)}`);
@@ -60,13 +76,20 @@ export default class StorageKeyCalculator {
   }
 
   async enablePasswordTransition(passwordKey: Uint8Array) {
-    const latestKeyHash = await this.rpcClient.get('StorageKeyCalculator', 'latestKeyHash');
+    const { element: latestKeyHash } = await this.rpcClient.get({
+      collectionId: 'StorageKeyCalculator',
+      elementId: 'latestKeyHash',
+    });
 
     if (latestKeyHash === nil) {
       return;
     }
 
-    const latestKeyData = await this.rpcClient.get('keys', base58.encode(latestKeyHash));
+    const { element: latestKeyData } = await this.rpcClient.get({
+      collectionId: 'keys',
+      elementId: base58.encode(latestKeyHash),
+    });
+
     assert(latestKeyData !== nil);
 
     if (latestKeyData.length === 32) {
@@ -76,41 +99,77 @@ export default class StorageKeyCalculator {
 
     const latestKey = await this.calculateKey(latestKeyHash);
 
-    await this.rpcClient.set(
-      'StorageKeyCalculator',
-      'passwordTransitionKeyData',
-      encryptWithKeyHash(passwordKey, latestKey),
-    );
+    await this.rpcClient.set({
+      collectionId: 'StorageKeyCalculator',
+      elementId: 'passwordTransitionKeyData',
+      element: encryptWithKeyHash(passwordKey, latestKey),
+    });
   }
 
   async usesLocalEncryption(): Promise<boolean> {
-    const latestKeyHash = await this.rpcClient.get('StorageKeyCalculator', 'latestKeyHash');
+    const { element: latestKeyHash } = await this.rpcClient.get({
+      collectionId: 'StorageKeyCalculator',
+      elementId: 'latestKeyHash',
+    });
+
     assert(latestKeyHash !== nil);
-    const keyData = await this.rpcClient.get('keys', base58.encode(latestKeyHash));
+
+    const { element: keyData } = await this.rpcClient.get({
+      collectionId: 'keys',
+      elementId: base58.encode(latestKeyHash),
+    });
+
     assert(keyData !== nil);
 
     return keyData.length > 32;
   }
 
   async enableLocalEncryption(passwordKey: Uint8Array) {
-    const previousKeyHash = await this.rpcClient.get('StorageKeyCalculator', 'latestKeyHash');
+    const { element: previousKeyHash } = await this.rpcClient.get({
+      collectionId: 'StorageKeyCalculator',
+      elementId: 'latestKeyHash',
+    });
+
     assert(previousKeyHash !== nil);
     const previousKey = await this.calculateKey(previousKeyHash);
 
-    await this.rpcClient.setMulti([
-      ['keys', base58.encode(previousKeyHash), encryptWithKeyHash(passwordKey, previousKey)],
-      ['StorageKeyCalculator', 'latestKeyHash', bufferHash(passwordKey)],
-      ['StorageKeyCalculator', 'passwordTransitionKeyData', nil],
-    ]);
+    await this.rpcClient.setMulti({
+      commands: [
+        {
+          collectionId: 'keys',
+          elementId: base58.encode(previousKeyHash),
+          element: encryptWithKeyHash(passwordKey, previousKey),
+        },
+        {
+          collectionId: 'StorageKeyCalculator',
+          elementId: 'latestKeyHash',
+          element: bufferHash(passwordKey),
+        },
+        {
+          collectionId: 'StorageKeyCalculator',
+          elementId: 'passwordTransitionKeyData',
+          element: nil,
+        },
+      ],
+    });
 
     this.latestKey = passwordKey;
   }
 
   async disableLocalEncryption() {
-    const latestKeyHash = await this.rpcClient.get('StorageKeyCalculator', 'latestKeyHash');
+    const { element: latestKeyHash } = await this.rpcClient.get({
+      collectionId: 'StorageKeyCalculator',
+      elementId: 'latestKeyHash',
+    });
+
     assert(latestKeyHash !== nil);
     const latestKey = await this.calculateKey(latestKeyHash);
-    await this.rpcClient.set('keys', base58.encode(latestKeyHash), latestKey);
+
+    await this.rpcClient.set({
+      collectionId: 'keys',
+      elementId: base58.encode(latestKeyHash),
+      element: latestKey,
+    });
   }
 
   async calculateKey(keyHash: Uint8Array): Promise<Uint8Array> {
@@ -118,7 +177,10 @@ export default class StorageKeyCalculator {
       return this.latestKey;
     }
 
-    const keyData = await this.rpcClient.get('keys', base58.encode(keyHash));
+    const { element: keyData } = await this.rpcClient.get({
+      collectionId: 'keys',
+      elementId: base58.encode(keyHash),
+    });
 
     if (keyData === nil) {
       throw new Error(`Failed to calculate key from ${base58.encode(keyHash)}`);
@@ -135,7 +197,11 @@ export default class StorageKeyCalculator {
 
     if (!buffersEqual(keyDataKeyHash, bufferHash(this.latestKey))) {
       // Always update old key to be encrypted with latest key if it isn't already
-      await this.rpcClient.set('keys', base58.encode(keyHash), encryptWithKeyHash(this.latestKey, key));
+      await this.rpcClient.set({
+        collectionId: 'keys',
+        elementId: base58.encode(keyHash),
+        element: encryptWithKeyHash(this.latestKey, key),
+      });
     }
 
     return key;
