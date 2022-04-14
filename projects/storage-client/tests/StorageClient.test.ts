@@ -4,11 +4,13 @@ import * as io from 'io-ts';
 
 import './helpers/polyfills';
 import assert from '../src/common-pure/assert';
+import shuffle from '../src/common-pure/shuffle';
 import nil from '../src/common-pure/nil';
 import StorageClient from "../src/storage-client/StorageClient";
 import StorageKeyCalculator from "../src/storage-client/StorageKeyCalculator";
 import MockStorageRpcClient from "./helpers/MockStorageRpcClient";
 import assertThrow from './helpers/assertThrow';
+import Range from '../src/common-pure/Range';
 
 type Fixture = {
   connect: (passwordKey?: Uint8Array) => Promise<StorageClient>;
@@ -177,6 +179,23 @@ describe("StorageClient", () => {
       // Access data without passwordKey
       const sc = await fx.connect();
       assert(await sc.Element(io.string, 'test').get() === 'foo');
+    }
+  }));
+
+  it("Can set data across many key upgrades and still read everything", FixtureTest(async fx => {
+    let passwordKey = fx.PasswordKey();
+
+    for (let i = 0; i < 20; i++) {
+      const sc = await fx.connect(passwordKey);
+      passwordKey = fx.PasswordKey();
+      await sc.keyCalculator.enableLocalEncryption(passwordKey);
+      await sc.Element(io.string, `test${i}`).set(`foo${i}`);
+    }
+
+    const sc = await fx.connect(passwordKey);
+
+    for (const i of shuffle(Range(20))) {
+      assert(await sc.Element(io.string, `test${i}`).get() === `foo${i}`);
     }
   }));
 });
