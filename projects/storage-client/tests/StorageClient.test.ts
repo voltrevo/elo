@@ -198,4 +198,31 @@ describe("StorageClient", () => {
       assert(await sc.Element(io.string, `test${i}`).get() === `foo${i}`);
     }
   }));
+
+  it("Can read through large collection", FixtureTest(async fx => {
+    const sc = await fx.connect();
+
+    const Widget = io.type({
+      label: io.string,
+      serial: io.number,
+    });
+
+    const widgets = sc.TimedCollection(Widget, 'widgets');
+
+    for (let i = 0; i < 20; i++) {
+      await widgets.add({
+        label: `widget${i}`,
+        serial: i,
+      });
+    }
+
+    let i = 0;
+
+    for await (const widget of widgets.Range()) {
+      console.log(i, widget);
+      assert(widget.label === `widget${i}`);
+      assert(widget.serial === i);
+      i++;
+    }
+  }));
 });

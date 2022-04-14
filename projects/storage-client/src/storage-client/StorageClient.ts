@@ -8,7 +8,7 @@ import StorageKeyCalculator from './StorageKeyCalculator';
 import decode from '../elo-types/decode';
 import buffersEqual from '../common-pure/buffersEqual';
 import base58 from '../common-pure/base58';
-import ObfuscatedTimeId from './ObfuscatedTimeId';
+import ObfuscatedTimeId, { TrailValue } from './ObfuscatedTimeId';
 
 export default class StorageClient {
   constructor(
@@ -70,9 +70,9 @@ export default class StorageClient {
         const key = await this.keyCalculator.calculateKey(keyHash);
         const buf = decryptWithKeyHash(key, encryptedBuf);
     
-        const untypedValue = msgpack.decode(buf);
+        const untypedElement = msgpack.decode(buf);
     
-        const element = decode(type, untypedValue);
+        const element = decode(type, untypedElement);
     
         if (!buffersEqual(key, this.keyCalculator.latestKey)) {
           await this.fullSet(type, collectionId, id, element);
@@ -109,12 +109,12 @@ export class StorageElement<T extends io.Mixed> {
   ) {}
 
   async get(): Promise<io.TypeOf<T> | nil> {
-    const value = await this.client.fullGet(this.type, this.collectionId, this.elementId);
-    return value;
+    const element = await this.client.fullGet(this.type, this.collectionId, this.elementId);
+    return element;
   }
 
-  async set(value: io.TypeOf<T> | nil): Promise<void> {
-    await this.client.fullSet(this.type, this.collectionId, this.elementId, value);
+  async set(element: io.TypeOf<T> | nil): Promise<void> {
+    await this.client.fullSet(this.type, this.collectionId, this.elementId, element);
   }
 }
 
@@ -147,11 +147,22 @@ export class StorageCollection<T extends io.Mixed> {
 
 export class StorageTimedCollection<T extends io.Mixed> {
   _obfuscationSeed?: string;
+  lastGeneratedTrail?: { time: number, trailValue: bigint };
 
   constructor(public collection: StorageCollection<T>) {}
 
+  async ElementId(t = Date.now(), trailValue?: bigint) {
+    return ObfuscatedTimeId(await this.ObfuscationSeed(), t, trailValue ?? this.TrailValue(t));
+  }
+
   Element(elementId: string) {
     return this.collection.Element(elementId);
+  }
+
+  async add(element: io.TypeOf<T>, t = Date.now(), trailValue?: bigint): Promise<string> {
+    const id = await this.ElementId(t, trailValue);
+    await this.Element(id).set(element);
+    return id;
   }
 
   async* RangeEntries(minTime?: number, maxTime?: number): AsyncGenerator<[string, io.TypeOf<T>]> {
@@ -189,5 +200,21 @@ export class StorageTimedCollection<T extends io.Mixed> {
     }
 
     return this._obfuscationSeed;
+  }
+
+  private TrailValue(t: number) {
+    t = Math.floor(t);
+
+    if (this.lastGeneratedTrail?.time === t) {
+      // If we repeat the time, increment trailValue so that the ids are in sequence
+      this.lastGeneratedTrail.trailValue++;
+    } else {
+      this.lastGeneratedTrail = {
+        time: t,
+        trailValue: TrailValue(),
+      }
+    }
+
+    return this.lastGeneratedTrail.trailValue;
   }
 }

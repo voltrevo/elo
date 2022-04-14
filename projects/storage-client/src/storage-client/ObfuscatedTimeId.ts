@@ -3,10 +3,14 @@ import { keccak256 } from "js-sha3";
 import obfuscateTime from "./obfuscateTime";
 import Range from "../common-pure/Range";
 
+export function TrailValue() {
+  return BigInt(`0x${keccak256(Range(5).map(() => Math.random()).join(''))}`);
+}
+
 export default function ObfuscatedTimeId(
   seed: string,
   t: number,
-  trailValue = BigInt(`0x${keccak256(Range(5).map(() => Math.random()).join(''))}`),
+  trailValue = TrailValue(),
 ) {
   const alphabet = '23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwzyz';
 
