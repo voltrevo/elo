@@ -1,0 +1,4 @@
+{
+  "port": 39661,
+  "pgConnString": "(add postgres connection string here)"
+}
