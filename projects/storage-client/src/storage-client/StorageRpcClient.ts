@@ -29,6 +29,9 @@ export default class StorageRpcClient implements IStorageRpcClient {
   private async fetchRpc(method: string, input: unknown): Promise<unknown> {
     const response = await fetch(this.rpcUrl, {
       method: 'POST',
+      headers: {
+        'content-type': 'application/octet-stream',
+      },
       body: msgpack.encode({
         eloLoginToken: this.eloLoginToken,
         method,
