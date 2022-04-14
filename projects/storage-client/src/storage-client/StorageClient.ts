@@ -50,34 +50,43 @@ export default class StorageClient {
     return element;
   }
 
-  async fullGetRange<T extends io.Mixed>(
+  async* fullGetRange<T extends io.Mixed>(
     type: T,
     collectionId: string,
     minElementId?: string,
     maxElementId?: string,
-  ): Promise<[string, io.TypeOf<T>][]> {
-    // TODO: Use nextElementId (implement pagination)
-    const { entries: encryptedEntries, nextElementId } = await this.rpcClient.getRange({ collectionId, minElementId, maxElementId });
+  ): AsyncGenerator<[string, io.TypeOf<T>]> {
+    let min = minElementId;
 
-    let results: [string, T][] = [];
+    while (true) {
+      const { entries: encryptedEntries, nextElementId } = await this.rpcClient.getRange({
+        collectionId,
+        minElementId: min,
+        maxElementId,
+      });
 
-    for (const [id, encryptedBuf] of encryptedEntries) {
-      const keyHash = getKeyHash(encryptedBuf);
-      const key = await this.keyCalculator.calculateKey(keyHash);
-      const buf = decryptWithKeyHash(key, encryptedBuf);
+      for (const [id, encryptedBuf] of encryptedEntries) {
+        const keyHash = getKeyHash(encryptedBuf);
+        const key = await this.keyCalculator.calculateKey(keyHash);
+        const buf = decryptWithKeyHash(key, encryptedBuf);
+    
+        const untypedValue = msgpack.decode(buf);
+    
+        const element = decode(type, untypedValue);
+    
+        if (!buffersEqual(key, this.keyCalculator.latestKey)) {
+          await this.fullSet(type, collectionId, id, element);
+        }
   
-      const untypedValue = msgpack.decode(buf);
-  
-      const element = decode(type, untypedValue);
-  
-      if (!buffersEqual(key, this.keyCalculator.latestKey)) {
-        await this.fullSet(type, collectionId, id, element);
+        yield [id, element];
       }
 
-      results.push([id, element]);
-    }
+      if (nextElementId === nil) {
+        break;
+      }
 
-    return results;
+      min = nextElementId;
+    }
   }
 
   async fullSet<T extends io.Mixed>(_type: T, collectionId: string, elementId: string, element: io.TypeOf<T> | nil) {
@@ -120,8 +129,8 @@ export class StorageCollection<T extends io.Mixed> {
     return new StorageElement(this.client, this.elementType, this.collectionId, elementId);
   }
 
-  async RangeEntries(minElementId: string, maxElementId: string): Promise<[string, io.TypeOf<T>][]> {
-    return await this.client.fullGetRange(
+  RangeEntries(minElementId?: string, maxElementId?: string): AsyncGenerator<[string, io.TypeOf<T>]> {
+    return this.client.fullGetRange(
       this.elementType,
       this.collectionId,
       minElementId,
@@ -129,9 +138,10 @@ export class StorageCollection<T extends io.Mixed> {
     );
   }
 
-  async Range(minElementId: string, maxElementId: string): Promise<io.TypeOf<T>[]> {
-    const entries = await this.RangeEntries(minElementId, maxElementId);
-    return entries.map(([, element]) => element);
+  async* Range(minElementId?: string, maxElementId?: string): AsyncGenerator<io.TypeOf<T>> {
+    for await (const [, element] of this.RangeEntries(minElementId, maxElementId)) {
+      yield element;
+    }
   }
 }
 
@@ -144,18 +154,21 @@ export class StorageTimedCollection<T extends io.Mixed> {
     return this.collection.Element(elementId);
   }
 
-  async RangeEntries(minTime: number, maxTime: number) {
+  async* RangeEntries(minTime?: number, maxTime?: number): AsyncGenerator<[string, io.TypeOf<T>]> {
     const obfuscationSeed = await this.ObfuscationSeed();
 
-    return await this.collection.RangeEntries(
-      ObfuscatedTimeId(obfuscationSeed, minTime, 0n),
-      ObfuscatedTimeId(obfuscationSeed, maxTime, 0n),
-    );
+    for await (const entry of this.collection.RangeEntries(
+      minTime === nil ? nil : ObfuscatedTimeId(obfuscationSeed, minTime, 0n),
+      maxTime === nil ? nil : ObfuscatedTimeId(obfuscationSeed, maxTime, 0n),
+    )) {
+      yield entry;
+    }
   }
 
-  async Range(minTime: number, maxTime: number) {
-    const entries = await this.RangeEntries(minTime, maxTime);
-    return entries.map(([, element]) => element);
+  async* Range(minTime?: number, maxTime?: number): AsyncGenerator<io.TypeOf<T>> {
+    for await (const [, element] of this.RangeEntries(minTime, maxTime)) {
+      yield element;
+    }
   }
 
   private async ObfuscationSeed() {
