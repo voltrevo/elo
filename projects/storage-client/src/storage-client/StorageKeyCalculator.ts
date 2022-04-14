@@ -83,6 +83,15 @@ export default class StorageKeyCalculator {
     );
   }
 
+  async usesLocalEncryption(): Promise<boolean> {
+    const latestKeyHash = await this.rpcClient.get('StorageKeyCalculator', 'latestKeyHash');
+    assert(latestKeyHash !== nil);
+    const keyData = await this.rpcClient.get('keys', base58.encode(latestKeyHash));
+    assert(keyData !== nil);
+
+    return keyData.length > 32;
+  }
+
   async enableLocalEncryption(passwordKey: Uint8Array) {
     const previousKeyHash = await this.rpcClient.get('StorageKeyCalculator', 'latestKeyHash');
     assert(previousKeyHash !== nil);
