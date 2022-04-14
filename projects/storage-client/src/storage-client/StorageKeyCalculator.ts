@@ -133,9 +133,9 @@ export default class StorageKeyCalculator {
 
     const key = decryptWithKeyHash(keyDataKey, keyData);
 
-    if (keyDataKeyHash !== bufferHash(this.latestKey)) {
+    if (!buffersEqual(keyDataKeyHash, bufferHash(this.latestKey))) {
       // Always update old key to be encrypted with latest key if it isn't already
-      await this.rpcClient.set('keys', base58.encode(keyHash), encryptWithKeyHash(bufferHash(this.latestKey), key));
+      await this.rpcClient.set('keys', base58.encode(keyHash), encryptWithKeyHash(this.latestKey, key));
     }
 
     return key;

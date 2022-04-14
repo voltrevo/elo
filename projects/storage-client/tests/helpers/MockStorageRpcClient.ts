@@ -43,7 +43,19 @@ export default class MockStorageRpcClient implements IStorageRpcClient {
     }
   }
 
-  getRange(collectionId: string, minElementId: string, maxElementId: string): Promise<[string, Uint8Array][]> {
-    throw new Error("Method not implemented.");
+  async getRange(collectionId: string, minElementId: string, maxElementId: string): Promise<[string, Uint8Array][]> {
+    await delay(0);
+
+    this.data[collectionId] = this.data[collectionId] ?? {};
+    const collection = this.data[collectionId];
+
+    return Object.entries(collection)
+      .filter(([key]) => {
+        return minElementId <= key && key < maxElementId;
+      })
+      .map(([key, value]) => {
+        return [key, new Uint8Array(base58.decode(value))];
+      })
+    ;
   }  
 }
