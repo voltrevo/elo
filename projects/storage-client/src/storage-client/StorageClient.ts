@@ -147,7 +147,10 @@ export class StorageCollection<T extends io.Mixed> {
 
 export class StorageTimedCollection<T extends io.Mixed> {
   _obfuscationSeed?: string;
-  lastGeneratedTrail?: { time: number, trailValue: bigint };
+  lastGeneratedTrail = {
+    time: -Infinity, 
+    trailValue: TrailValue(),
+  };
 
   constructor(public collection: StorageCollection<T>) {}
 
@@ -203,11 +206,11 @@ export class StorageTimedCollection<T extends io.Mixed> {
   }
 
   private TrailValue(t: number) {
-    t = Math.floor(t);
+    const dt = t - this.lastGeneratedTrail.time;
 
-    if (this.lastGeneratedTrail?.time === t) {
-      // If we repeat the time, increment trailValue so that the ids are in sequence
-      this.lastGeneratedTrail.trailValue++;
+    if (0 <= dt && dt < 3000) {
+      this.lastGeneratedTrail.time = t;
+      this.lastGeneratedTrail.trailValue += 1n + BigInt(Math.floor(100000 * Math.random()));
     } else {
       this.lastGeneratedTrail = {
         time: t,

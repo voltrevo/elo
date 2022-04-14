@@ -199,6 +199,19 @@ describe("StorageClient", () => {
     }
   }));
 
+  it("Generates sequential ids", FixtureTest(async fx => {
+    const sc = await fx.connect();
+    const collection = sc.TimedCollection(io.string, 'test');
+
+    let lastId = '';
+
+    for (let i = 0; i < 20; i++) {
+      const id = await collection.ElementId();
+      assert(lastId < id);
+      lastId = id;
+    }
+  }));
+
   it("Can read through large collection", FixtureTest(async fx => {
     const sc = await fx.connect();
 
@@ -219,7 +232,6 @@ describe("StorageClient", () => {
     let i = 0;
 
     for await (const widget of widgets.Range()) {
-      console.log(i, widget);
       assert(widget.label === `widget${i}`);
       assert(widget.serial === i);
       i++;

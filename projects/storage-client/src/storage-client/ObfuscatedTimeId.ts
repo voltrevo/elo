@@ -12,7 +12,7 @@ export default function ObfuscatedTimeId(
   t: number,
   trailValue = TrailValue(),
 ) {
-  const alphabet = '23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwzyz';
+  const alphabet = '23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
   const expander = 2n ** 139n;
 

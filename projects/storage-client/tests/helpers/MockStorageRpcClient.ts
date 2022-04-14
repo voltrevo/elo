@@ -51,6 +51,8 @@ export default class MockStorageRpcClient implements IStorageRpcClient {
   async getRange({ collectionId, minElementId, maxElementId }: StorageProtocolInput<'getRange'>): Promise<StorageProtocolOutput<'getRange'>> {
     await delay(0);
 
+    debugger;
+
     this.data[collectionId] = this.data[collectionId] ?? {};
     const collection = this.data[collectionId];
 
