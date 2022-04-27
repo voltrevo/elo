@@ -9,6 +9,8 @@ import decode from '../elo-types/decode';
 import TokenBicoder from '../common-backend/TokenBicoder';
 import EloLoginTokenData from '../common-backend/EloLoginTokenData';
 import ErrorData from '../common-pure/ErrorData';
+import StorageProtocolImpl from './StorageProtocolImpl';
+import { StorageProtocolTypeMap } from '../elo-types/StorageProtocol';
 
 type Handler = Parameters<typeof route.post>[1];
 
@@ -21,6 +23,7 @@ const RpcBody = io.type({
 export default function StorageRpcHandler(
   database: Database,
   loginTokenBicoder: TokenBicoder<EloLoginTokenData>,
+  userRowLimit: number,
 ): Handler {
   return async (ctx) => {
     const rawBody: unknown = await getRawBody(ctx.req, {
@@ -40,20 +43,34 @@ export default function StorageRpcHandler(
     const loginDecodeResult = loginTokenBicoder.decode(body.eloLoginToken);
 
     if (loginDecodeResult instanceof ErrorData) {
-      console.log('eloLoginToken decode failed:', loginDecodeResult.detail);
-
       if (loginDecodeResult.type === 'internal') {
+        console.error('eloLoginToken decode failed:', loginDecodeResult.detail);
         ctx.status = 500;
         return;
       }
+
+      console.log('eloLoginToken decode failed:', loginDecodeResult.detail);
 
       ctx.status = 401;
       ctx.body = 'Unauthorized';
       return;
     }
 
-    const userId = loginDecodeResult.userId;
+    if (!Object.keys(StorageProtocolTypeMap).includes(body.method)) {
+      ctx.status = 404;
+      ctx.body = `Method not found: ${body.method}`;
+      return;
+    }
 
-    throw new Error('Not implemented');
+    const method = body.method as keyof typeof StorageProtocolTypeMap;
+    const input = decode(StorageProtocolTypeMap[method].input, body.input);
+
+    const userId = loginDecodeResult.userId;
+    const storage = StorageProtocolImpl(database, userId, userRowLimit);
+
+    const output = await storage[method](input as any);
+
+    ctx.status = 200;
+    ctx.body = msgpack.encode(output);
   };
 }
