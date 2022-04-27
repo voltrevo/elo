@@ -145,6 +145,35 @@ const generalUserData = {
       return { elementId, data };
     });
   },
+
+  count: async (
+    db: Database,
+    userId: string,
+    collectionId: string,
+  ): Promise<number> =>  {
+    const pgClient = await db.PgClient();
+
+    const res = await pgClient.query(
+      `
+        SELECT COUNT(*) FROM general_user_data
+        WHERE
+          user_id = $1 AND
+          collection_id = $2
+      `,
+      [
+        userId,
+        collectionId,
+      ],
+    );
+
+    const count = res.rows[0].count;
+
+    if (typeof count !== 'number') {
+      throw new Error('Unexpected format in generalUserData.count');
+    }
+
+    return count;
+  },
 };
 
 export default generalUserData;
