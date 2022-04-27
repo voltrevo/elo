@@ -1,14 +1,18 @@
+import { Client as PgClient } from 'pg';
+
 import nil from "../../common-pure/nil";
-import Database from "../Database";
+import Database from '../Database';
 
 const generalUserData = {
   get: async (
-    db: Database,
+    dbOrClient: Database | PgClient,
     userId: string,
     collectionId: string,
     elementId: string,
   ): Promise<Uint8Array | nil> => {
-    const pgClient = await db.PgClient();
+    const pgClient = dbOrClient instanceof Database
+      ? await dbOrClient.PgClient()
+      : dbOrClient;
 
     const res = await pgClient.query(
       `
@@ -39,13 +43,15 @@ const generalUserData = {
   },
 
   set: async (
-    db: Database,
+    dbOrClient: Database | PgClient,
     userId: string,
     collectionId: string,
     elementId: string,
     data: Uint8Array | nil,
   ) => {
-    const pgClient = await db.PgClient();
+    const pgClient = dbOrClient instanceof Database
+      ? await dbOrClient.PgClient()
+      : dbOrClient;
 
     if (data instanceof Uint8Array) {
       await pgClient.query(
@@ -91,14 +97,16 @@ const generalUserData = {
   },
 
   getRange: async (
-    db: Database,
+    dbOrClient: Database | PgClient,
     userId: string,
     collectionId: string,
     minElementId: string | nil,
     maxElementId: string | nil,
     limit: number,
   ): Promise<{ elementId: string, data: Uint8Array }[]> => {
-    const pgClient = await db.PgClient();
+    const pgClient = dbOrClient instanceof Database
+      ? await dbOrClient.PgClient()
+      : dbOrClient;
 
     let minMaxArgs: string[] = [];
     let minSql = '';
@@ -146,11 +154,13 @@ const generalUserData = {
   },
 
   count: async (
-    db: Database,
+    dbOrClient: Database | PgClient,
     userId: string,
     collectionId: string,
   ): Promise<number> =>  {
-    const pgClient = await db.PgClient();
+    const pgClient = dbOrClient instanceof Database
+      ? await dbOrClient.PgClient()
+      : dbOrClient;
 
     const res = await pgClient.query(
       `

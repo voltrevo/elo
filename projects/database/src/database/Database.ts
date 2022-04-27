@@ -9,6 +9,39 @@ export default class Database {
 
   constructor(private pgConnString: string) {}
 
+  async begin() {
+    const pgClient = new PgClient(this.pgConnString);
+
+    pgClient.on('error', (error) => {
+      // eslint-disable-next-line no-console
+      console.error(error);
+    });
+
+    await pgClient.connect();
+
+    // TODO: Improve protection against forgetting to commit/rollback
+
+    return {
+      pgClient,
+      commit: async () => {
+        try {
+          await pgClient.query('COMMIT');
+        } finally {
+          await pgClient.end();
+          closed = true;
+        }
+      },
+      rollback: async () => {
+        try {
+          await pgClient.query('ROLLBACK');
+        } finally {
+          await pgClient.end();
+          closed = true;
+        }
+      },
+    };
+  }
+
   async PgClient(): Promise<PgClient> {
     if (this.pgClientState === undefined) {
       const client = new PgClient(this.pgConnString);
