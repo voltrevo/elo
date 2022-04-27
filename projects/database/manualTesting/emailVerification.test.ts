@@ -1,14 +1,14 @@
 import 'source-map-support/register';
 
 import Database from "../src/database/Database";
-import { insertEmailVerification, lookupEmailVerification } from '../src/database/queries/emailVerification';
+import { upsertEmailVerification, lookupEmailVerification } from '../src/database/queries/emailVerification';
 import config from "./config";
 
 (async () => {
   const db = new Database(config.pgConnString);
 
   try {
-    await insertEmailVerification(db, {
+    await upsertEmailVerification(db, {
       email: 'email',
       verification_code: 'asdf123',
       expires: new Date(),
