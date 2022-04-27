@@ -1,4 +1,3 @@
-import { boolean } from 'fp-ts';
 import * as react from 'react';
 
 type Props = {

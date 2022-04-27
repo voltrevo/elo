@@ -1,5 +1,5 @@
 import Protocol, { protocolKeyMap, protocolThirdPartyKeyMap, ThirdPartyProtocol } from '../elo-extension-app/Protocol';
-import { PromisifyApi, PromisishApi } from '../elo-extension-app/protocolHelpers';
+import { PromisifyApi, PromisishApi } from '../common-pure/protocolHelpers';
 import PostMessageClient from './helpers/PostMessageClient';
 
 export default function ExtensionAppClient(
