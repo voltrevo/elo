@@ -1,3 +1,4 @@
+import { number } from "fp-ts";
 import nil from "../../common-pure/nil";
 import Database from "../Database";
 
@@ -88,6 +89,61 @@ const generalUserData = {
         ]
       );
     }
+  },
+
+  getRange: async (
+    db: Database,
+    userId: string,
+    collectionId: string,
+    minElementId: string | nil,
+    maxElementId: string | nil,
+    limit: number,
+  ): Promise<{ elementId: string, data: Uint8Array }[]> => {
+    const pgClient = await db.PgClient();
+
+    let minMaxArgs: string[] = [];
+    let minSql = '';
+    let maxSql = '';
+    let nextArgId = 3;
+
+    if (minElementId !== nil) {
+      minMaxArgs.push(minElementId);
+      minSql = `AND $${nextArgId++} <= element_id`;
+    }
+
+    if (maxElementId !== nil) {
+      minMaxArgs.push(maxElementId);
+      maxSql = `AND element_id < $${nextArgId++}`;
+    }
+
+    const res = await pgClient.query(
+      `
+        SELECT element_id, data FROM general_user_data
+        WHERE
+          user_id = $1 AND
+          collection_id = $2
+          ${minSql}
+          ${maxSql}
+        LIMIT $${nextArgId++}
+      `,
+      [
+        userId,
+        collectionId,
+        ...minMaxArgs,
+        limit,
+      ],
+    );
+
+    return res.rows.map(r => {
+      const elementId = r.element_id;
+      const data = r.data;
+
+      if (typeof elementId !== 'string' || !(data instanceof Uint8Array)) {
+        throw new Error('Unexpected format in generalUserData.getRange');
+      }
+
+      return { elementId, data };
+    });
   },
 };
 
