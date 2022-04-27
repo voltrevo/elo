@@ -18,7 +18,7 @@ app.use(cors());
 const db = new Database(config.pgConnString);
 const loginTokenBicoder = new TokenBicoder(config.secrets.tokenEncryption, EloLoginTokenData, Infinity);
 
-app.use(route.post('/storage/rpc', StorageRpcHandler(db, loginTokenBicoder)));
+app.use(route.post('/storage/rpc', StorageRpcHandler(db, loginTokenBicoder, config.userRowLimit)));
 
 (async () => {
   await new Promise(resolve => app.listen(config.port, '0.0.0.0', () => { resolve(null); }));
