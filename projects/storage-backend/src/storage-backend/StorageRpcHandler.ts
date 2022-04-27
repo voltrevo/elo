@@ -21,7 +21,7 @@ export default function StorageRpcHandler(database: Database): Handler {
     }
 
     console.log(rawBody);
-    
+
     throw new Error('Not implemented');
   };
 }

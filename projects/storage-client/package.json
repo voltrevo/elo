@@ -5,6 +5,8 @@
   "author": "Andrew Morris",
   "private": true,
   "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
     "test": "mocha build/js/tests/**/*.test.js"
   },
   "dependencies": {
