@@ -1,4 +1,3 @@
-import { number } from "fp-ts";
 import nil from "../../common-pure/nil";
 import Database from "../Database";
 
