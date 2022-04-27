@@ -28,7 +28,6 @@ export default class Database {
           await pgClient.query('COMMIT');
         } finally {
           await pgClient.end();
-          closed = true;
         }
       },
       rollback: async () => {
@@ -36,7 +35,6 @@ export default class Database {
           await pgClient.query('ROLLBACK');
         } finally {
           await pgClient.end();
-          closed = true;
         }
       },
     };

@@ -1,6 +1,6 @@
 import * as io from 'io-ts';
 import route from 'koa-route';
-import msgpack from '@msgpack/msgpack';
+import * as msgpack from '@msgpack/msgpack';
 import { parse as parseContentType } from 'content-type';
 import getRawBody from 'raw-body';
 
@@ -71,6 +71,6 @@ export default function StorageRpcHandler(
     const output = await storage[method](input as any);
 
     ctx.status = 200;
-    ctx.body = msgpack.encode(output);
+    ctx.body = Buffer.from(msgpack.encode(output));
   };
 }
