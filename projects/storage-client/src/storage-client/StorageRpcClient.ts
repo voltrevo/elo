@@ -1,4 +1,4 @@
-import msgpack from '@msgpack/msgpack';
+import * as msgpack from '@msgpack/msgpack';
 
 import StorageProtocol, { StorageProtocolInput, StorageProtocolOutput, StorageProtocolTypeMap } from "../elo-types/StorageProtocol";
 import { PromisifyApi } from "../common-pure/protocolHelpers";
