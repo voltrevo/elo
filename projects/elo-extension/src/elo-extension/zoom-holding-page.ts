@@ -4,13 +4,17 @@ import Storage from '../elo-extension-app/storage/Storage';
 import BackendApi from "./BackendApi";
 import config from "./config";
 import GoogleAuthApi from "./GoogleAuthApi";
+import makeStorageClient from "./makeStorageClient";
 
 (async () => {
+  const apiBase = `${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`;
+
   const extensionApp = new ExtensionApp(
     new BackendApi(`${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`),
     new GoogleAuthApi(config.googleOauthClientId),
     Browser.runtime.getURL('elo-page.html'),
     await Storage.Create(Browser.storage.local, 'elo'),
+    (eloLoginToken) => makeStorageClient(apiBase, eloLoginToken),
   );
 
   const accountRoot = await extensionApp.readAccountRoot();

@@ -9,6 +9,7 @@ import config from './config';
 import Storage from '../elo-extension-app/storage/Storage';
 import handleZoomRedirects from './handleZoomRedirects';
 import handleZoomExternalCapture from './handleZoomExternalCapture';
+import makeStorageClient from './makeStorageClient';
 
 const eloExtension = document.createElement('div');
 eloExtension.id = 'elo-extension';
@@ -31,11 +32,14 @@ iconTag.style.display = 'none';
 eloExtension.appendChild(iconTag);
 
 (async () => {
+  const apiBase = `${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`;
+
   const extensionApp = new ExtensionApp(
     new BackendApi(`${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`),
     new GoogleAuthApi(config.googleOauthClientId),
     Browser.runtime.getURL('elo-page.html'),
     await Storage.Create(Browser.storage.local, 'elo'),
+    (eloLoginToken) => makeStorageClient(apiBase, eloLoginToken),
   );
   
   new PostMessageServer(

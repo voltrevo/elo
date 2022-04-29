@@ -19,6 +19,7 @@ import mergeAccountRoots from './mergeAccountRoots';
 import accumulateStats from './accumulateStats';
 import StorageView from './storage/StorageView';
 import setAccountRootUserId from './setAccountRootUserId';
+import StorageClient from '../storage-client/StorageClient';
 
 export default class ExtensionApp implements PromisishApi<Protocol> {
   uiState = UiState();
@@ -36,6 +37,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     public googleAuthApi: IGoogleAuthApi,
     public dashboardUrl: string,
     public storage: Storage,
+    public makeStorageClient: (eloLoginToken: string) => Promise<StorageClient>,
   ) {}
 
   async UserId() {

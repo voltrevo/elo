@@ -36,9 +36,12 @@
   "dependencies": {
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
+    "@msgpack/msgpack": "^2.7.2",
     "@mui/material": "^5.4.2",
+    "@types/aes-js": "^3.1.1",
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.11",
+    "aes-js": "^3.1.2",
     "chart.js": "^3.7.1",
     "concurrently": "^7.0.0",
     "copy-webpack-plugin": "^10.2.4",

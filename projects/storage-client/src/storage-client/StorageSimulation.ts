@@ -3,8 +3,23 @@ import delay from "../../src/common-pure/delay";
 import nil from "../../src/common-pure/nil";
 import { StorageProtocolInput, StorageProtocolOutput } from "../../src/elo-types/StorageProtocol";
 import { IStorageRpcClient } from "../../src/storage-client/StorageRpcClient";
+import StorageClient from "./StorageClient";
+import StorageKeyCalculator from "./StorageKeyCalculator";
 
-export default class MockStorageRpcClient implements IStorageRpcClient {
+export default class StorageSimulation {
+  rpcClient = new SimulatedRpcClient();
+
+  async connect(passwordKey?: Uint8Array): Promise<StorageClient> {
+    const storageClient = new StorageClient(
+      this.rpcClient,
+      await StorageKeyCalculator.Create(this.rpcClient, passwordKey),
+    );
+
+    return storageClient;
+  }
+}
+
+class SimulatedRpcClient implements IStorageRpcClient {
   data: Record<string, Record<string, string>> = {};
   queryLimit = 5;
 
@@ -50,8 +65,6 @@ export default class MockStorageRpcClient implements IStorageRpcClient {
 
   async getRange({ collectionId, minElementId, maxElementId }: StorageProtocolInput<'getRange'>): Promise<StorageProtocolOutput<'getRange'>> {
     await delay(0);
-
-    debugger;
 
     this.data[collectionId] = this.data[collectionId] ?? {};
     const collection = this.data[collectionId];

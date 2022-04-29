@@ -11,15 +11,19 @@ import Storage from '../elo-extension-app/storage/Storage';
 import BackendApi from './BackendApi';
 import GoogleAuthApi from './GoogleAuthApi';
 import syncPageAndHash from '../elo-page/syncPageAndHash';
+import makeStorageClient from './makeStorageClient';
 
 window.addEventListener('load', async () => {
   const storage = await Storage.Create(Browser.storage.local, 'elo');
 
+  const apiBase = `${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`;
+
   const eloExtensionApp = makeLocalExtensionAppClient(new ExtensionApp(
-    new BackendApi(`${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`),
+    new BackendApi(apiBase),
     new GoogleAuthApi(config.googleOauthClientId),
     Browser.runtime.getURL('elo-page.html'),
     storage,
+    (eloLoginToken) => makeStorageClient(apiBase, eloLoginToken),
   ));
 
   (window as any).eloExtensionApp = eloExtensionApp;

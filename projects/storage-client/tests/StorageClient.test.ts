@@ -7,10 +7,9 @@ import assert from '../src/common-pure/assert';
 import shuffle from '../src/common-pure/shuffle';
 import nil from '../src/common-pure/nil';
 import StorageClient from "../src/storage-client/StorageClient";
-import StorageKeyCalculator from "../src/storage-client/StorageKeyCalculator";
-import MockStorageRpcClient from "./helpers/MockStorageRpcClient";
 import assertThrow from './helpers/assertThrow';
 import Range from '../src/common-pure/Range';
+import StorageSimulation from '../src/storage-client/StorageSimulation';
 
 type Fixture = {
   connect: (passwordKey?: Uint8Array) => Promise<StorageClient>;
@@ -19,17 +18,10 @@ type Fixture = {
 
 function FixtureTest(run: (fx: Fixture) => Promise<void>) {
   return async () => {
-    const rpcClient = new MockStorageRpcClient();
+    const simulation = new StorageSimulation();
 
     const fx: Fixture = {
-      connect: async (passwordKey) => {
-        const storageClient = new StorageClient(
-          rpcClient,
-          await StorageKeyCalculator.Create(rpcClient, passwordKey),
-        );
-
-        return storageClient;
-      },
+      connect: (passwordKey) => simulation.connect(passwordKey),
       PasswordKey: () => {
         return crypto.getRandomValues(new Uint8Array(32));
       },

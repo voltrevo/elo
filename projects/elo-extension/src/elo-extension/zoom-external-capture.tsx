@@ -11,15 +11,19 @@ import BackendApi from './BackendApi';
 import GoogleAuthApi from './GoogleAuthApi';
 import ZoomExternalCapture from './components/ZoomExternalCapture';
 import connectGetUserMedia from './connectGetUserMedia';
+import makeStorageClient from './makeStorageClient';
 
 window.addEventListener('load', async () => {
   const storage = await Storage.Create(Browser.storage.local, 'elo');
+
+  const apiBase = `${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`;
 
   const eloExtensionApp = makeLocalExtensionAppClient(new ExtensionApp(
     new BackendApi(`${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`),
     new GoogleAuthApi(config.googleOauthClientId),
     Browser.runtime.getURL('elo-page.html'),
     storage,
+    (eloLoginToken) => makeStorageClient(apiBase, eloLoginToken),
   ));
 
   (window as any).eloExtensionApp = eloExtensionApp;
