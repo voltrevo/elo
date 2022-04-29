@@ -20,6 +20,8 @@ import accumulateStats from './accumulateStats';
 import StorageView from './storage/StorageView';
 import setAccountRootUserId from './setAccountRootUserId';
 import StorageClient from '../storage-client/StorageClient';
+import nil from '../common-pure/nil';
+import AggregateStats, { initAggregateStats } from '../elo-types/AggregateStats';
 
 export default class ExtensionApp implements PromisishApi<Protocol> {
   uiState = UiState();
@@ -42,7 +44,12 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
 
   async UserId() {
     const accountRoot = await this.readAccountRoot();
-    assert(accountRoot.userId !== undefined);
+
+    if (accountRoot === nil) {
+      return nil;
+    }
+
+    assert(accountRoot.userId !== nil);
 
     return accountRoot.userId;
   }
@@ -61,9 +68,11 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
       if (existingAnonymousAccountRoot) {
         accountRoot = existingAnonymousAccountRoot;
       } else {
-        // TODO: Eventually we won't allow creating anonymous accounts.
-        accountRoot = initAccountRoot(await this.backendApi.generateId({}));
-        await this.storage.write(AccountRoot, anonymousAccountRootKey, accountRoot);
+        // This is where anonymous accounts used to be generated. We don't do
+        // that anymore. This is the meaning of readAccountRoot returning nil -
+        // the user doesn't have an account, and the app might need to prompt
+        // the user to create one.
+        return nil;
       }
 
       root.accountRoot = anonymousAccountRootKey;
@@ -72,7 +81,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
 
     const accountRoot = await this.storage.read(AccountRoot, root.accountRoot);
 
-    if (accountRoot === undefined) {
+    if (accountRoot === nil) {
       throw new Error('Failed to read account root');
     }
 
@@ -82,8 +91,8 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   async writeAccountRoot(accountRoot: AccountRoot) {
     const root = await this.storage.readRoot();
 
-    assert(root.accountRoot !== undefined);
-    assert(accountRoot.userId !== undefined);
+    assert(root.accountRoot !== nil);
+    assert(accountRoot.userId !== nil);
 
     assert(
       root.accountRoot.includes(accountRoot.userId) ||
@@ -94,17 +103,15 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   getSessionStats(userId: string) {
-    if (this.sessionStats === undefined) {
+    if (this.sessionStats === nil) {
       this.sessionStats = initSessionStats(userId, document.title, Date.now());
     }
 
     return this.sessionStats;
   }
 
-  async activate() {
+  async activate(accountRoot: AccountRoot) {
     (globalThis as any).eloExtensionApp = this;
-
-    const accountRoot = await this.readAccountRoot();
 
     const sessionStats = this.getSessionStats(accountRoot.userId);
     sessionStats.lastSessionKey = accountRoot.lastSessionKey;
@@ -113,7 +120,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     const eloLoginToken = accountRoot.eloLoginToken;
 
     const startSessionResponse = await this.backendApi.startSession(
-      eloLoginToken !== undefined
+      eloLoginToken !== nil
         ? { eloLoginToken }
 
         // DEPRECATED: Using deprecated format to support missing eloLoginToken
@@ -134,7 +141,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     await this.updateStats(0, 0);
 
     const lastSession = (
-      sessionStats.lastSessionKey !== undefined &&
+      sessionStats.lastSessionKey !== nil &&
       await this.storage.read(SessionStats, sessionStats.lastSessionKey)
     );
 
@@ -157,8 +164,14 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
       return;
     }
 
+    const accountRoot = await this.readAccountRoot();
+
+    if (accountRoot === nil) {
+      return;
+    }
+
     this.uiState.active = true;
-    await this.activate();
+    await this.activate(accountRoot);
     this.updateUi();
   }
 
@@ -259,13 +272,13 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   updateFeatureCount(disfluent: AnalysisDisfluent) {
-    if (this.sessionStats === undefined) {
+    if (this.sessionStats === nil) {
       return;
     }
 
     let category = this.sessionStats.featureCounts[disfluent.category];
 
-    if (category === undefined) {
+    if (category === nil) {
       category = {};
       this.sessionStats.featureCounts[disfluent.category] = category;
     }
@@ -274,7 +287,8 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   async updateMetrics() {
-    const { settings: { liveStatsMode } } = await this.readAccountRoot();
+    const accountRoot = await this.readAccountRoot();
+    let liveStatsMode = accountRoot?.settings?.liveStatsMode ?? 'count';
 
     const fillerSoundMetric = this.fillerSoundEwma.render(liveStatsMode);
     const fillerWordMetric = this.fillerWordEwma.render(liveStatsMode);
@@ -291,7 +305,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   async updateStats(speakingTime: number, audioTime: number) {
-    if (this.sessionStats === undefined) {
+    if (this.sessionStats === nil) {
       return;
     }
 
@@ -308,15 +322,20 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   // updated.)
   async getAggregateStats() {
     const accountRoot = await this.readAccountRoot();
+    
+    if (accountRoot === nil) {
+      return initAggregateStats();
+    }
+
     const aggregateStats = accountRoot.aggregateStats;
 
-    if (accountRoot.lastSessionKey === undefined) {
+    if (accountRoot.lastSessionKey === nil) {
       return aggregateStats;
     }
 
     const lastSession = await this.storage.read(SessionStats, accountRoot.lastSessionKey);
 
-    if (lastSession !== undefined) {
+    if (lastSession !== nil) {
       accumulateStats(aggregateStats, lastSession);
     }
 
@@ -325,6 +344,11 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
 
   async setMetricPreference(preference: string) {
     const accountRoot = await this.readAccountRoot();
+    
+    if (accountRoot === nil) {
+      throw new Error('Can\'t set metric preference without account');
+    }
+
     accountRoot.settings.liveStatsMode = preference;
     await this.writeAccountRoot(accountRoot);
 
@@ -358,7 +382,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
           protocolRegistration.password,
           (await this.backendApi.passwordHardeningSalt({
             email: protocolRegistration.email,
-            userIdHint: !userIdHint ? undefined : {
+            userIdHint: !userIdHint ? nil : {
               verificationCode: protocolRegistration.code,
               userId: userIdHint,
             },
@@ -394,7 +418,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     root.accountRoot = accountRootKey;
     storageView.writeRoot(root);
 
-    if (anonymousAccountRoot !== undefined) {
+    if (anonymousAccountRoot !== nil) {
       storageView.remove([anonymousAccountRootKey]);
     }
 
@@ -414,7 +438,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
           protocolCredentials.password,
           (await this.backendApi.passwordHardeningSalt({
             email: protocolCredentials.email,
-            userIdHint: undefined,
+            userIdHint: nil,
           })).passwordHardeningSalt,
           700000, // TODO: config
         ),
@@ -449,7 +473,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     root.accountRoot = accountRootKey;
     storageView.writeRoot(root);
 
-    if (anonymousAccountRoot !== undefined) {
+    if (anonymousAccountRoot !== nil) {
       storageView.remove([anonymousAccountRootKey]);
     }
 
@@ -459,13 +483,13 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   async sendFeedback(feedback: Feedback) {
-    if (feedback.sentiment === undefined && feedback.message === undefined) {
+    if (feedback.sentiment === nil && feedback.message === nil) {
       throw new Error('Please include an emoji or a message.');
     }
 
     // TODO: Use response from server
     await this.backendApi.feedback({
-      userId: await this.UserId(),
+      userId: await this.UserId() ?? '(not logged in)',
       feedback,
     });
 
@@ -483,7 +507,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   async logout() {
     const accountRoot = await this.readAccountRoot();
 
-    if (accountRoot === undefined) {
+    if (accountRoot === nil) {
       console.error('already logged out');
       return;
     }
@@ -492,9 +516,9 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
       await this.googleAuthApi.logout();
     }
 
-    if (accountRoot !== undefined) {
+    if (accountRoot !== nil) {
       const root = await this.storage.readRoot();
-      root.accountRoot = undefined;
+      root.accountRoot = nil;
       await this.storage.writeRoot(root);
     }
   }

@@ -32,11 +32,6 @@ export default class BackendApi implements IBackendApi {
     return decode(backendApiSpec[path].Response, await response.json());
   }
 
-  async generateId(): Promise<string> {
-    return await fetch(`${this.apiBase}/generateId`, { method: 'POST' })
-        .then(res => res.text());
-  }
-
   async startSession(body: io.TypeOf<Spec['startSession']['Request']>): Promise<string> {
     return await fetch(`${this.apiBase}/startSession`, {
       method: 'POST',

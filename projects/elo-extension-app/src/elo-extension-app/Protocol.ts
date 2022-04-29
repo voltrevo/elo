@@ -6,6 +6,7 @@ import UiState from './UiState';
 import { GoogleAuthResult } from '../elo-types/GoogleAuthResult';
 import AccountRoot from './storage/AccountRoot';
 import AggregateStats from '../elo-types/AggregateStats';
+import nil from '../common-pure/nil';
 
 const ProtocolRegistration = io.union([
   io.type({
@@ -31,7 +32,7 @@ export type Protocol = {
   addConnectionEvent(evt: ConnectionEvent): void;
   getUiState(afterIndex: number): UiState;
   getDashboardUrl(): string;
-  getSessionToken(): string | undefined;
+  getSessionToken(): string | nil;
   sendVerificationEmail(email: string): void;
   checkVerificationEmail(email: string, code: string): { verified: boolean };
   register(registration: ProtocolRegistration): string;
@@ -39,8 +40,8 @@ export type Protocol = {
   sendFeedback(feedback: Feedback): string;
   googleAuth(): GoogleAuthResult;
   logout(): void;
-  getEmail(): string | undefined;
-  readAccountRoot(): AccountRoot;
+  getEmail(): string | nil;
+  readAccountRoot(): AccountRoot | nil;
   writeAccountRoot(newAccountRoot: AccountRoot): void;
   getAggregateStats(): AggregateStats;
 };

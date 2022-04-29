@@ -14,11 +14,6 @@ const LoginResult = io.type({
 });
 
 const backendApiSpec = {
-  generateId: {
-    Request: io.unknown,
-    Response: io.string,
-  },
-
   startSession: {
     Request: io.union([
       io.type({
