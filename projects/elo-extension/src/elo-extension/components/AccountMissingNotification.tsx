@@ -7,8 +7,12 @@ type Props = {
 
 const AccountMissingNotification: React.FunctionComponent<Props> = (props) => {
   return <div className="account-missing-notification" onClick={props.onAction}>
-    <div style={{ fontSize: '1px' }}><Info size={22}/></div>
-    <div>Please register or log in</div>
+    <div>
+      <div>
+        <div style={{ fontSize: '1px' }}><Info size={22}/></div>
+        <div>Please register or log in</div>
+      </div>
+    </div>
   </div>;
 };
 
