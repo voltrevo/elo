@@ -89,7 +89,10 @@ const OverviewPage: React.FunctionComponent = () => {
       setSessionCount(aggregateStats.sessionCount);
       setHoursSpoken(Math.floor(aggregateStats.speakingTime / 3600));
       setFeature(pickFeature(aggregateStats));
-      setWeeklyStats(await getWeeklyStats(accountRoot.lastSessionKey, pageCtx.storage));
+
+      if (accountRoot) {
+        setWeeklyStats(await getWeeklyStats(accountRoot.lastSessionKey, pageCtx.storage));
+      }
     })();
   }, []);
 

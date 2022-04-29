@@ -5,7 +5,7 @@
   .app {
     opacity: 0;
 
-    &.active {
+    &.active, &.missing-account {
       opacity: 0.85;
     }
 
@@ -158,6 +158,19 @@
       to {
         transform: rotate(360deg);
       }
+    }
+
+    .account-missing-notification {
+      display: flex;
+      flex-direction: row;
+      gap: 0.3em;
+      position: absolute;
+      bottom: calc(-3em);
+      left: -1px;
+      background-color: rgb(255, 255, 176);
+      padding: 0.5em;
+      padding-right: 0.7em;
+      border-radius: 3px;
     }
   }
 

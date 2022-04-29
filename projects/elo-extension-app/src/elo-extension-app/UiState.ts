@@ -2,6 +2,7 @@ type UiState = {
   index: number;
 
   active: boolean;
+  notifyMissingAccount: boolean;
   loading: boolean;
   word?: string;
 
@@ -20,6 +21,7 @@ function UiState(): UiState {
     index: 0,
 
     active: false,
+    notifyMissingAccount: false,
     loading: false,
 
     fillerSoundBox: {

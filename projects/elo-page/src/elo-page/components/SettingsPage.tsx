@@ -6,6 +6,7 @@ import Field from './Field';
 import ExtensionAppContext from '../ExtensionAppContext';
 import AccountRoot from '../../elo-extension-app/storage/AccountRoot';
 import FunctionalBarSelector from './FunctionalBarSelector';
+import nil from '../../common-pure/nil';
 
 const SettingsPage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ExtensionAppContext);
@@ -13,7 +14,13 @@ const SettingsPage: React.FunctionComponent = () => {
   const [settings, setSettings] = React.useState<AccountRoot['settings']>();
 
   async function setSettingsFromStorage() {
-    setSettings((await appCtx.readAccountRoot()).settings);
+    const accountRoot = await appCtx.readAccountRoot();
+
+    if (accountRoot === nil) {
+      return;
+    }
+
+    setSettings(accountRoot.settings);
   }
 
   React.useEffect(() => {
@@ -44,6 +51,11 @@ const SettingsPage: React.FunctionComponent = () => {
               }
 
               const accountRoot = await appCtx.readAccountRoot();
+
+              if (accountRoot === nil) {
+                throw new Error('Expected account');
+              }
+
               accountRoot.settings.liveStatsMode = selection;
               await appCtx.writeAccountRoot(accountRoot);
 
@@ -68,6 +80,10 @@ const SettingsPage: React.FunctionComponent = () => {
               }
 
               const accountRoot = await appCtx.readAccountRoot();
+
+              if (accountRoot === nil) {
+                throw new Error('Expected account');
+              }
 
               accountRoot.settings.experimentalZoomSupport = (selection === 'on'
                 ? true

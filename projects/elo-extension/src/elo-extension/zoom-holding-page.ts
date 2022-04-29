@@ -1,4 +1,5 @@
 import Browser from "webextension-polyfill";
+import nil from "../common-pure/nil";
 import ExtensionApp from "../elo-extension-app/ExtensionApp";
 import Storage from '../elo-extension-app/storage/Storage';
 import BackendApi from "./BackendApi";
@@ -21,6 +22,11 @@ import makeStorageClient from "./makeStorageClient";
 
   const parsedLocation = new URL(location.href);
   const inviteUrl = new URL(parsedLocation.searchParams.get('inviteUrl') ?? '');
+
+  if (accountRoot === nil) {
+    console.error('Account root missing');
+    return;
+  }
 
   if (accountRoot.settings.zoomRedirectToWebClient === false) {
     inviteUrl.searchParams.set('disableEloRedirect', 'true');

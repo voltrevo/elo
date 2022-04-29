@@ -21,7 +21,7 @@ import StorageView from './storage/StorageView';
 import setAccountRootUserId from './setAccountRootUserId';
 import StorageClient from '../storage-client/StorageClient';
 import nil from '../common-pure/nil';
-import AggregateStats, { initAggregateStats } from '../elo-types/AggregateStats';
+import { initAggregateStats } from '../elo-types/AggregateStats';
 
 export default class ExtensionApp implements PromisishApi<Protocol> {
   uiState = UiState();
@@ -167,6 +167,8 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     const accountRoot = await this.readAccountRoot();
 
     if (accountRoot === nil) {
+      this.uiState.notifyMissingAccount = true;
+      this.updateUi();
       return;
     }
 

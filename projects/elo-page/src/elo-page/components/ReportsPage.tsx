@@ -1,4 +1,5 @@
 import * as React from 'react';
+import nil from '../../common-pure/nil';
 import SessionStats from '../../elo-types/SessionStats';
 
 import EloPageContext from '../EloPageContext';
@@ -19,6 +20,10 @@ const ReportsPage: React.FunctionComponent = () => {
   React.useEffect(() => {
     (async () => {
       const accountRoot = await appCtx.readAccountRoot();
+
+      if (accountRoot === nil) {
+        return;
+      }
 
       const lastSessionKey = accountRoot.lastSessionKey;
       pageKeys.current[0] = lastSessionKey;

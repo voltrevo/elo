@@ -1,8 +1,13 @@
 import Browser from "webextension-polyfill";
+import nil from "../common-pure/nil";
 import ExtensionApp from "../elo-extension-app/ExtensionApp";
 
 export default async function handleZoomExternalCapture(extensionApp: ExtensionApp) {
   const accountRoot = await extensionApp.readAccountRoot();
+
+  if (accountRoot === nil) {
+    return;
+  }
 
   if (accountRoot.settings.experimentalZoomSupport !== true) {
     return;
