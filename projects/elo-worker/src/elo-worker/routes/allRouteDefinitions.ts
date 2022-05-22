@@ -1,6 +1,5 @@
 import backendApiSpec from '../../elo-types/backendApiSpec';
 import checkVerificationEmailRoute from './checkVerificationEmailRoute';
-import generateIdRoute from './generateIdRoute';
 import loginRoute from './loginRoute';
 import passwordHardeningSaltRoute from './passwordHardeningSaltRoute';
 import registerRoute from './registerRoute';
@@ -15,7 +14,6 @@ type WorkerPaths = Exclude<keyof Spec, 'feedback'>;
 const allRouteDefinitions: {
   [Path in WorkerPaths]: RouteDefinition<Path>
 } = {
-  generateId: generateIdRoute,
   login: loginRoute,
   passwordHardeningSalt: passwordHardeningSaltRoute,
   register: registerRoute,
