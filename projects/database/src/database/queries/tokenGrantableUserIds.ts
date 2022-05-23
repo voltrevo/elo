@@ -6,7 +6,7 @@ import decode from '../../elo-types/decode';
 import Database from '../Database';
 
 const TokenGrantableUserId = io.type({
-  userId: io.string,
+  user_id: io.string,
   granted: io.boolean,
 });
 
@@ -21,7 +21,7 @@ const tokenGrantableUserIds = {
 
     const res = await pgClient.query(
       `
-        SELECT data FROM token_grantable_user_ids
+        SELECT * FROM token_grantable_user_ids
         WHERE
           user_id = $1
       `,
