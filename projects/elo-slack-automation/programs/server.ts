@@ -7,14 +7,14 @@ import route from 'koa-route';
 
 import config from '../src/elo-slack-automation/config';
 import FeedbackHandler from '../src/elo-slack-automation/FeedbackHandler';
-import DbClient from '../src/database/DbClient';
+import Database from '../src/database/Database';
 
 const app = new Koa();
 app.use(cors());
 app.use(bodyParser());
 
-const dbClient = new DbClient(config.pgConnString);
+const db = new Database(config.pgConnString);
 
-app.use(route.post('/feedback', FeedbackHandler(dbClient)));
+app.use(route.post('/feedback', FeedbackHandler(db)));
 
 app.listen(config.port);
