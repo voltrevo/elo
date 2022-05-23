@@ -98,6 +98,10 @@ export default class StorageClient {
     const encryptedBuf = encryptWithKeyHash(this.keyCalculator.latestKey, msgpack.encode(element));
     await this.rpcClient.set({ collectionId, elementId, element: encryptedBuf });
   }
+
+  async UsageInfo() {
+    return await this.rpcClient.UsageInfo({});
+  }
 }
 
 export class StorageElement<T extends io.Mixed> {
