@@ -5,17 +5,20 @@ import * as slack from 'slack';
 
 import config from './config';
 import validateUserId from './validateUserId';
-import type DbClient from '../database/DbClient';
+import type Database from '../database/Database';
 import Feedback from '../elo-types/Feedback';
+import optional from '../elo-types/optional';
+import { insertFeedback } from '../database/queries/feedback';
+import nil from '../common-pure/nil';
 
 type Handler = Parameters<typeof route.post>[1];
 
 const FeedbackBody = io.type({
-  userId: io.string,
+  userId: optional(io.string),
   feedback: Feedback,
 });
 
-export default function FeedbackHandler(dbClient: DbClient): Handler {
+export default function FeedbackHandler(db: Database): Handler {
   return async (ctx) => {
     const decodeResult = FeedbackBody.decode(ctx.request.body);
 
@@ -27,12 +30,13 @@ export default function FeedbackHandler(dbClient: DbClient): Handler {
 
     const { userId, feedback } = decodeResult.right;
 
-    if (!validateUserId(userId)) {
+    if (userId !== nil && !validateUserId(userId)) {
       ctx.status = 403;
       return;
     }
 
-    await dbClient.insertFeedback(
+    await insertFeedback(
+      db,
       feedback.anonymous ? undefined : userId,
       feedback,
     );
@@ -47,7 +51,7 @@ export default function FeedbackHandler(dbClient: DbClient): Handler {
   };
 }
 
-function renderFeedbackMessage(userId: string, feedback: Feedback): string {
+function renderFeedbackMessage(userId: string | nil, feedback: Feedback): string {
   if (feedback.anonymous) {
     return [
       'Anonymous feedback received',
@@ -58,7 +62,7 @@ function renderFeedbackMessage(userId: string, feedback: Feedback): string {
 
   return [
     'Feedback received',
-    `- from: ${userId}`,
+    userId && `- from: ${userId}`,
     feedback.sentiment && `- emoji: ${feedback.sentiment}`,
     feedback.message && `- message: ${feedback.message}`,
     feedback.emailInterest && (
