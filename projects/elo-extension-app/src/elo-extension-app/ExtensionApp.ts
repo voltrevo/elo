@@ -23,6 +23,8 @@ import StorageClient from '../storage-client/StorageClient';
 import nil from '../common-pure/nil';
 import { initAggregateStats } from '../elo-types/AggregateStats';
 
+type AccountRootWithToken = AccountRoot & { eloLoginToken: string };
+
 export default class ExtensionApp implements PromisishApi<Protocol> {
   uiState = UiState();
   sessionStats?: SessionStats;
@@ -54,7 +56,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     return accountRoot.userId;
   }
 
-  async readAccountRoot() {
+  async readAccountRoot(): Promise<AccountRootWithToken | nil> {
     const root = await this.storage.readRoot();
 
     if (!root.accountRoot) {
@@ -63,11 +65,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
         anonymousAccountRootKey,
       );
 
-      let accountRoot: AccountRoot;
-
-      if (existingAnonymousAccountRoot) {
-        accountRoot = existingAnonymousAccountRoot;
-      } else {
+      if (!existingAnonymousAccountRoot) {
         // This is where anonymous accounts used to be generated. We don't do
         // that anymore. This is the meaning of readAccountRoot returning nil -
         // the user doesn't have an account, and the app might need to prompt
@@ -85,7 +83,22 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
       throw new Error('Failed to read account root');
     }
 
-    return accountRoot;
+    if (accountRoot.eloLoginToken === nil) {
+      const grant = await this.backendApi.grantTokenForAnonymousUserId({
+        userId: accountRoot.userId,
+      });
+
+      accountRoot.eloLoginToken = grant.eloLoginToken;
+      await this.writeAccountRoot(accountRoot);
+
+      await this.backendApi.acceptTokenForAnonymousUserId({
+        eloLoginToken: grant.eloLoginToken,
+      });
+    }
+
+    // This does nothing at runtime, but TypeScript is just not quite able to infer correctly
+    // without specifying eloLoginToken again here.
+    return { ...accountRoot, eloLoginToken: accountRoot.eloLoginToken };
   }
 
   async writeAccountRoot(accountRoot: AccountRoot) {
@@ -110,7 +123,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     return this.sessionStats;
   }
 
-  async activate(accountRoot: AccountRoot) {
+  async activate(accountRoot: AccountRootWithToken) {
     (globalThis as any).eloExtensionApp = this;
 
     const sessionStats = this.getSessionStats(accountRoot.userId);
@@ -119,13 +132,9 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
 
     const eloLoginToken = accountRoot.eloLoginToken;
 
-    const startSessionResponse = await this.backendApi.startSession(
-      eloLoginToken !== nil
-        ? { eloLoginToken }
-
-        // DEPRECATED: Using deprecated format to support missing eloLoginToken
-        : { userId: accountRoot.userId }
-    );
+    const startSessionResponse = await this.backendApi.startSession({
+      eloLoginToken,
+    });
 
     let sessionToken: string;
 
@@ -491,7 +500,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
 
     // TODO: Use response from server
     await this.backendApi.feedback({
-      userId: await this.UserId() ?? '(not logged in)',
+      userId: await this.UserId(),
       feedback,
     });
 

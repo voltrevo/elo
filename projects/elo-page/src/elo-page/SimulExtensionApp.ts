@@ -1,3 +1,5 @@
+import * as io from 'io-ts';
+
 import delay from '../common-pure/delay';
 import Feedback from '../elo-types/Feedback';
 import config from './config';
@@ -9,6 +11,10 @@ import LoginCredentials from '../elo-types/LoginCredentials';
 import Storage from '../elo-extension-app/storage/Storage';
 import { keccak_256 } from 'js-sha3';
 import StorageSimulation from '../storage-client/StorageSimulation';
+import backendApiSpec from '../elo-types/backendApiSpec';
+import nil from '../common-pure/nil';
+
+type Spec = typeof backendApiSpec;
 
 let shiftKey = false;
 
@@ -42,7 +48,7 @@ class SimulBackendApi implements IBackendApi {
     throw new Error('Method not implemented.');
   }
 
-  async feedback(_body: { userId: string; feedback: Feedback }): Promise<undefined> {
+  async feedback(_body: { userId: string | nil; feedback: Feedback }): Promise<undefined> {
     await delay(500);
     return undefined;
   }
@@ -126,6 +132,18 @@ class SimulBackendApi implements IBackendApi {
     await delay(500);
 
     return { verified: code === keccak_256(email).slice(0, 6) };
+  }
+
+  grantTokenForAnonymousUserId(
+    _body: io.TypeOf<Spec['grantTokenForAnonymousUserId']['Request']>,
+  ): never {
+    throw new Error('Not implemented');
+  }
+
+  acceptTokenForAnonymousUserId(
+    _body: io.TypeOf<Spec['acceptTokenForAnonymousUserId']['Request']>,
+  ): never {
+    throw new Error('Not implemented');
   }
 }
 

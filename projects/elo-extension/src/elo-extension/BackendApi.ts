@@ -4,6 +4,7 @@ import IBackendApi from '../elo-extension-app/IBackendApi';
 import Feedback from '../elo-types/Feedback';
 import backendApiSpec from '../elo-types/backendApiSpec';
 import decode from '../elo-types/decode';
+import nil from '../common-pure/nil';
 
 type Spec = typeof backendApiSpec;
 
@@ -42,7 +43,7 @@ export default class BackendApi implements IBackendApi {
     }).then(res => res.text());
   }
 
-  async feedback(body: { userId: string; feedback: Feedback }): Promise<undefined> {
+  async feedback(body: { userId: string | nil; feedback: Feedback }): Promise<undefined> {
     const feedbackResponse = await fetch(`${this.apiBase}/feedback`, {
       method: 'POST',
       headers: {
@@ -76,5 +77,13 @@ export default class BackendApi implements IBackendApi {
 
   checkVerificationEmail(body: io.TypeOf<Spec['checkVerificationEmail']['Request']>) {
     return this.genericCall('checkVerificationEmail', body);
+  }
+
+  grantTokenForAnonymousUserId(body: io.TypeOf<Spec['grantTokenForAnonymousUserId']['Request']>) {
+    return this.genericCall('grantTokenForAnonymousUserId', body);
+  }
+
+  acceptTokenForAnonymousUserId(body: io.TypeOf<Spec['acceptTokenForAnonymousUserId']['Request']>) {
+    return this.genericCall('acceptTokenForAnonymousUserId', body);
   }
 }

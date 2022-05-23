@@ -28,7 +28,7 @@ const backendApiSpec = {
 
   feedback: {
     Request: io.type({
-      userId: io.string,
+      userId: optional(io.string),
       feedback: Feedback,
     }),
     Response: io.undefined,
