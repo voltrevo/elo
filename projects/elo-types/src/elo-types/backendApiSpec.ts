@@ -60,6 +60,16 @@ const backendApiSpec = {
     Request: io.type({ email: io.string, code: io.string }),
     Response: io.type({ verified: io.boolean }),
   },
+
+  grantTokenForAnonymousUserId: {
+    Request: io.type({ userId: io.string }),
+    Response: io.type({ eloLoginToken: io.string }),
+  },
+
+  acceptTokenForAnonymousUserId: {
+    Request: io.type({ eloLoginToken: io.string }),
+    Response: io.type({}),
+  },
 };
 
 export default backendApiSpec;

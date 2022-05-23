@@ -1,5 +1,7 @@
 import backendApiSpec from '../../elo-types/backendApiSpec';
+import acceptTokenForAnonymousUserIdRoute from './acceptTokenForAnonymousUserIdRoute';
 import checkVerificationEmailRoute from './checkVerificationEmailRoute';
+import grantTokenForAnonymousUserIdRoute from './grantTokenForAnonymousUserIdRoute';
 import loginRoute from './loginRoute';
 import passwordHardeningSaltRoute from './passwordHardeningSaltRoute';
 import registerRoute from './registerRoute';
@@ -20,6 +22,8 @@ const allRouteDefinitions: {
   startSession: startSessionRoute,
   sendVerificationEmail: sendVerificationEmailRoute,
   checkVerificationEmail: checkVerificationEmailRoute,
+  grantTokenForAnonymousUserId: grantTokenForAnonymousUserIdRoute,
+  acceptTokenForAnonymousUserId: acceptTokenForAnonymousUserIdRoute,
 };
 
 export default allRouteDefinitions;
