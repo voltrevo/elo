@@ -9,7 +9,7 @@ export default class Database {
 
   constructor(private pgConnString: string) {}
 
-  async begin() {
+  private async begin() {
     const pgClient = new PgClient(this.pgConnString);
 
     pgClient.on('error', (error) => {
@@ -18,8 +18,6 @@ export default class Database {
     });
 
     await pgClient.connect();
-
-    // TODO: Improve protection against forgetting to commit/rollback
 
     return {
       pgClient,
@@ -38,6 +36,19 @@ export default class Database {
         }
       },
     };
+  }
+
+  async transaction(body: (pgClient: PgClient) => unknown) {
+    const tx = await this.begin();
+
+    try {
+      await body(tx.pgClient);
+    } catch (error) {
+      await tx.rollback();
+      throw error;
+    }
+
+    await tx.commit();
   }
 
   async PgClient(): Promise<PgClient> {

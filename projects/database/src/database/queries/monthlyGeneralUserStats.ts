@@ -1,14 +1,18 @@
+import { Client as PgClient } from 'pg';
+
 import nil from "../../common-pure/nil";
 import Database from "../Database";
 
 const monthlyGeneralUserStats = {
   get: async (
-    db: Database,
+    dbOrClient: Database | PgClient,
     userId: string,
     month: string,
     stat: string,
   ): Promise<number> => {
-    const pgClient = await db.PgClient();
+    const pgClient = dbOrClient instanceof Database
+      ? await dbOrClient.PgClient()
+      : dbOrClient;
 
     const res = await pgClient.query(
       `
@@ -17,7 +21,7 @@ const monthlyGeneralUserStats = {
         FROM
           monthly_general_user_stats
         WHERE
-          userId = $1 AND
+          user_id = $1 AND
           month = $2 AND
           stat = $3
       `,
@@ -34,23 +38,19 @@ const monthlyGeneralUserStats = {
       return 0;
     }
 
-    const value = row.value;
-
-    if (typeof value !== 'number') {
-      throw new Error('Unexpected format in monthlyGeneralUserStats.get');
-    }
-
-    return value;
+    return Number(row.value);
   },
 
   add: async (
-    db: Database,
+    dbOrClient: Database | PgClient,
     userId: string,
     month: string,
     stat: string,
     dValue: number,
   ) => {
-    const pgClient = await db.PgClient();
+    const pgClient = dbOrClient instanceof Database
+      ? await dbOrClient.PgClient()
+      : dbOrClient;
 
     await pgClient.query(
       `

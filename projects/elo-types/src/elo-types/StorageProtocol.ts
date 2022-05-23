@@ -6,6 +6,14 @@ import ioBuffer from '../common-pure/ioBuffer';
 // decoding the msgpack output
 import permissiveOptional from './permissiveOptional';
 
+export const SetCommand = io.type({
+  collectionId: io.string,
+  elementId: io.string,
+  element: permissiveOptional(ioBuffer),
+});
+
+export type SetCommand = io.TypeOf<typeof SetCommand>;
+
 export const StorageProtocolTypeMap = {
   get: {
     input: io.type({
@@ -17,20 +25,12 @@ export const StorageProtocolTypeMap = {
     }),
   },
   set: {
-    input: io.type({
-      collectionId: io.string,
-      elementId: io.string,
-      element: permissiveOptional(ioBuffer),
-    }),
+    input: SetCommand,
     output: io.type({}),
   },
   setMulti: {
     input: io.type({
-      commands: io.array(io.type({
-        collectionId: io.string,
-        elementId: io.string,
-        element: permissiveOptional(ioBuffer),
-      })),
+      commands: io.array(SetCommand),
     }),
     output: io.type({}),
   },

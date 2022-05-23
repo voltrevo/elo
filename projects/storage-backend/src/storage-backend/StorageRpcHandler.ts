@@ -11,6 +11,7 @@ import EloLoginTokenData from '../common-backend/EloLoginTokenData';
 import ErrorData from '../common-pure/ErrorData';
 import StorageProtocolImpl from './StorageProtocolImpl';
 import { StorageProtocolTypeMap } from '../elo-types/StorageProtocol';
+import errorHasTag from '../common-pure/errorHasTag';
 
 type Handler = Parameters<typeof route.post>[1];
 
@@ -68,7 +69,19 @@ export default function StorageRpcHandler(
     const userId = loginDecodeResult.userId;
     const storage = StorageProtocolImpl(database, userId, userRowLimit);
 
-    const output = await storage[method](input as any);
+    let output;
+
+    try {
+      output = await storage[method](input as any);
+    } catch (error) {
+      if (errorHasTag(error, 'write-limit')) {
+        ctx.status = 400;
+        ctx.body = (error as Error).message;
+        return;
+      }
+
+      throw error;
+    }
 
     ctx.status = 200;
     ctx.body = Buffer.from(msgpack.encode(output));
