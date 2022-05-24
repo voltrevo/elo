@@ -579,6 +579,41 @@ body {
     }
   }
 
+  .bar-selector-wrapper {
+    position: relative;
+
+    .progress-state {
+      position: absolute;
+      right: -15px;
+      top: 9.5px;
+
+      .bar-error-wrapper {
+        display: none;
+        color: red;
+        font-weight: 300;
+        text-align: right;
+  
+        position: absolute;
+        right: 0;
+        bottom: calc(100% + 1em);
+        width: 700px;
+  
+        .bar-error {
+          display: inline-block;
+          border-radius: $standard-border-radius;
+          padding: 0.5em 1em;
+          background-color: hsl(0, 0, 95);
+        }
+      }
+
+      &:hover {
+        .bar-error-wrapper {
+          display: block;
+        }
+      }
+    }
+  }
+
   .feedback-page {
     .question {
       margin-bottom: 0.3em;
