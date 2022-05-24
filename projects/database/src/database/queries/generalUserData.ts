@@ -114,14 +114,20 @@ const generalUserData = {
     let maxSql = '';
     let nextArgId = 3;
 
+    let [minCmp, maxCmp] = (
+      direction === 'ascending'
+        ? ['<=', '<']
+        : ['<', '<=']
+    );
+
     if (minElementId !== nil) {
       minMaxArgs.push(minElementId);
-      minSql = `AND $${nextArgId++} <= element_id`;
+      minSql = `AND $${nextArgId++} ${minCmp} element_id`;
     }
 
     if (maxElementId !== nil) {
       minMaxArgs.push(maxElementId);
-      maxSql = `AND element_id < $${nextArgId++}`;
+      maxSql = `AND element_id ${maxCmp} $${nextArgId++}`;
     }
 
     const res = await pgClient.query(
