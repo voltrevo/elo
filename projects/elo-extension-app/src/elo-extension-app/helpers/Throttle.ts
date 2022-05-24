@@ -24,7 +24,7 @@ export default class Throttle {
 
       setTimeoutOrUnload(
         () => this.runQueued(),
-        now - this.lastRun,
+        this.lastRun + this.minDelay - now,
       );
     }
   }
