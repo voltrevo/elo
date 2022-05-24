@@ -2,7 +2,7 @@ import * as io from 'io-ts';
 
 import AggregateStats, { initAggregateStats } from '../../elo-types/AggregateStats';
 import optional from '../../elo-types/optional';
-import Settings from '../sharedStorageTypes/Settings';
+import Settings, { defaultSettings } from '../sharedStorageTypes/Settings';
 
 const AccountRoot = io.type({
   userId: io.string,
@@ -25,11 +25,7 @@ export function initAccountRoot(userId: string): AccountRoot {
     email: undefined,
     googleAccount: undefined,
     eloLoginToken: undefined,
-    settings: {
-      liveStatsMode: 'count',
-      experimentalZoomSupport: undefined,
-      zoomRedirectToWebClient: undefined,
-    },
+    settings: defaultSettings,
     aggregateStats: initAggregateStats(),
     lastSessionKey: undefined,
   };

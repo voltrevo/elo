@@ -7,6 +7,7 @@ import ExtensionAppContext from '../ExtensionAppContext';
 import AccountRoot from '../../elo-extension-app/deviceStorage/AccountRoot';
 import FunctionalBarSelector from './FunctionalBarSelector';
 import nil from '../../common-pure/nil';
+import { defaultSettings } from '../../elo-extension-app/sharedStorageTypes/Settings';
 
 const SettingsPage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ExtensionAppContext);
@@ -14,13 +15,13 @@ const SettingsPage: React.FunctionComponent = () => {
   const [settings, setSettings] = React.useState<AccountRoot['settings']>();
 
   async function setSettingsFromStorage() {
-    const accountRoot = await appCtx.readAccountRoot();
+    const settingsRead = (await appCtx.readSettings()) ?? defaultSettings;
 
-    if (accountRoot === nil) {
+    if (settingsRead === nil) {
       return;
     }
 
-    setSettings(accountRoot.settings);
+    setSettings(settingsRead);
   }
 
   React.useEffect(() => {
@@ -50,14 +51,10 @@ const SettingsPage: React.FunctionComponent = () => {
                 return;
               }
 
-              const accountRoot = await appCtx.readAccountRoot();
-
-              if (accountRoot === nil) {
-                throw new Error('Expected account');
-              }
-
-              accountRoot.settings.liveStatsMode = selection;
-              await appCtx.writeAccountRoot(accountRoot);
+              await appCtx.writeSettings({
+                ...settings,
+                liveStatsMode: selection,
+              });
 
               await setSettingsFromStorage();
             }}
@@ -79,18 +76,13 @@ const SettingsPage: React.FunctionComponent = () => {
                 return;
               }
 
-              const accountRoot = await appCtx.readAccountRoot();
-
-              if (accountRoot === nil) {
-                throw new Error('Expected account');
-              }
-
-              accountRoot.settings.experimentalZoomSupport = (selection === 'on'
-                ? true
-                : undefined
-              );
-
-              await appCtx.writeAccountRoot(accountRoot);
+              await appCtx.writeSettings({
+                ...settings,
+                experimentalZoomSupport: (selection === 'on'
+                  ? true
+                  : undefined
+                ),
+              });
 
               await setSettingsFromStorage();
             }}

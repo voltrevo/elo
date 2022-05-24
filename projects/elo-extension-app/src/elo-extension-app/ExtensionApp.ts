@@ -22,6 +22,8 @@ import setAccountRootUserId from './setAccountRootUserId';
 import StorageClient from '../storage-client/StorageClient';
 import nil from '../common-pure/nil';
 import { initAggregateStats } from '../elo-types/AggregateStats';
+import RemoteStorage from './RemoteStorage';
+import Settings, { defaultSettings } from './sharedStorageTypes/Settings';
 
 type AccountRootWithToken = AccountRoot & { eloLoginToken: string };
 
@@ -34,7 +36,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   fillerSoundEwma = new EwmaCalculator(60, 60);
   fillerWordEwma = new EwmaCalculator(60, 60);
 
-  remoteStorage?: StorageClient;
+  remoteStorage?: RemoteStorage;
 
   sessionKey = RandomKey(); // FIXME
 
@@ -125,7 +127,9 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
         return nil;
       }
   
-      this.remoteStorage = await this.makeStorageClient(accountRoot.eloLoginToken);
+      this.remoteStorage = new RemoteStorage(
+        await this.makeStorageClient(accountRoot.eloLoginToken),
+      );
     }
 
     return this.remoteStorage;
@@ -540,5 +544,25 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   async getEmail() {
     const accountRoot = await this.readAccountRoot();
     return accountRoot?.email;
+  }
+
+  async readSettings() {
+    const rs = await this.RemoteStorage();
+
+    if (rs === nil) {
+      throw new Error('Not connected to remote storage');
+    }
+
+    return await rs.Settings().get();
+  }
+
+  async writeSettings(settings: Settings) {
+    const rs = await this.RemoteStorage();
+
+    if (rs === nil) {
+      throw new Error('Not connected to remote storage');
+    }
+
+    await rs.Settings().set(settings);
   }
 }

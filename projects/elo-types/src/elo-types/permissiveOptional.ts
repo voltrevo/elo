@@ -2,6 +2,10 @@ import * as io from 'io-ts';
 
 import nil from '../common-pure/nil';
 
+/**
+ * msgpack converts nil->null so we need this to do the reverse to give us the correct type when
+ * decoding the msgpack output
+ */
 export default function permissiveOptional<T extends io.Mixed>(type: T) {
   return new io.Type<io.TypeOf<T> | nil, io.TypeOf<T> | nil | null, unknown>(
     'permissiveOptional',

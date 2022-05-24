@@ -7,6 +7,7 @@ import { GoogleAuthResult } from '../elo-types/GoogleAuthResult';
 import AccountRoot from './deviceStorage/AccountRoot';
 import AggregateStats from '../elo-types/AggregateStats';
 import nil from '../common-pure/nil';
+import Settings from './sharedStorageTypes/Settings';
 
 const ProtocolRegistration = io.union([
   io.type({
@@ -44,6 +45,8 @@ export type Protocol = {
   readAccountRoot(): AccountRoot | nil;
   writeAccountRoot(newAccountRoot: AccountRoot): void;
   getAggregateStats(): AggregateStats;
+  readSettings(): Settings | nil;
+  writeSettings(settings: Settings): void;
 };
 
 export const protocolKeyMap: Record<keyof Protocol, true> = {
@@ -64,6 +67,8 @@ export const protocolKeyMap: Record<keyof Protocol, true> = {
   readAccountRoot: true,
   writeAccountRoot: true,
   getAggregateStats: true,
+  readSettings: true,
+  writeSettings: true,
 };
 
 export const protocolThirdPartyKeyMap = {

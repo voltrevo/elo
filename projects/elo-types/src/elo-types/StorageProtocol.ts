@@ -2,8 +2,6 @@ import * as io from 'io-ts';
 
 import ioBuffer from '../common-pure/ioBuffer';
 
-// msgpack converts nil->null so we need this to do the reverse to give us the correct type when
-// decoding the msgpack output
 import permissiveOptional from './permissiveOptional';
 
 export const SetCommand = io.type({
