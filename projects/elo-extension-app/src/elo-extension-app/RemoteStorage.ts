@@ -1,4 +1,5 @@
-import StorageClient, { StorageElement } from "../storage-client/StorageClient";
+import SessionStats from "../elo-types/SessionStats";
+import StorageClient, { StorageElement, StorageTimedCollection } from "../storage-client/StorageClient";
 import Settings from "./sharedStorageTypes/Settings";
 
 export default class RemoteStorage {
@@ -8,5 +9,9 @@ export default class RemoteStorage {
 
   Settings(): StorageElement<typeof Settings> {
     return this.storageClient.Element(Settings, 'settings');
+  }
+
+  Sessions(): StorageTimedCollection<typeof SessionStats> {
+    return this.storageClient.TimedCollection(SessionStats, 'sessions');
   }
 }

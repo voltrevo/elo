@@ -15,42 +15,21 @@ const ReportsPage: React.FunctionComponent = () => {
   const [sessions, setSessions] = React.useState<SessionStats[]>();
   const [page, setPage] = React.useState(0);
   const [pageCount, setPageCount] = React.useState<number>();
-  const pageKeys = React.useRef<(string | undefined)[]>([]);
+  const pageKeys = React.useRef<(number | nil)[]>([]);
 
   React.useEffect(() => {
     (async () => {
-      const accountRoot = await appCtx.readAccountRoot();
+      const now = Date.now();
+      const sessionPage = await appCtx.getSessionPage(pageSize, now);
 
-      if (accountRoot === nil) {
-        return;
-      }
+      pageKeys.current[0] = now;
 
-      const lastSessionKey = accountRoot.lastSessionKey;
-      pageKeys.current[0] = lastSessionKey;
+      setSessions(sessionPage.sessions);
 
-      setSessions(await loadSessionsFrom(lastSessionKey));
-
-      const aggStats = await appCtx.getAggregateStats();
-      setPageCount(Math.max(1, Math.ceil(aggStats.sessionCount / pageSize)));
+      const sessionCount = await appCtx.getSessionCount();
+      setPageCount(Math.max(1, Math.ceil(sessionCount / pageSize)));
     })();
   }, []);
-
-  async function loadSessionsFrom(lastSessionKey: string | undefined) {
-    const newSessions: SessionStats[] = [];
-
-    while (newSessions.length < pageSize && lastSessionKey !== undefined) {
-      const session = await pageCtx.deviceStorage.read(SessionStats, lastSessionKey);
-
-      if (session === undefined) {
-        break;
-      }
-
-      newSessions.push(session);
-      lastSessionKey = session.lastSessionKey;
-    }
-
-    return newSessions;
-  }
 
   return <Page classes={['reports-page']}>
     <h1>Reports</h1>
@@ -100,7 +79,8 @@ const ReportsPage: React.FunctionComponent = () => {
             return;
           }
 
-          setSessions(await loadSessionsFrom(key));
+          const sessionPage = await appCtx.getSessionPage(pageSize, key);
+          setSessions(sessionPage.sessions);
           setPage(page - 1);
 
           setTimeout(() => {
@@ -112,15 +92,23 @@ const ReportsPage: React.FunctionComponent = () => {
       <div
         className={`pagination-link ${(sessions?.[sessions.length - 1]?.lastSessionKey === undefined) && 'disabled'}`}
         onClick={async (evt) => {
-          const lastSessionKey = sessions?.[sessions.length - 1]?.lastSessionKey;
+          const earliestStartOnPage = sessions?.[sessions.length - 1]?.start;
 
-          if (lastSessionKey === undefined) {
+          if (earliestStartOnPage === nil) {
             return;
           }
 
-          const newSessions = await loadSessionsFrom(lastSessionKey);
-          pageKeys.current[page + 1] = lastSessionKey;
-          setSessions(newSessions);
+          // TODO: Try going past the last page
+
+          const sessionPage = await appCtx.getSessionPage(pageSize, earliestStartOnPage);
+          let key = sessionPage.sessions[0]?.start;
+
+          if (key) {
+            key += 5000;
+          }
+
+          pageKeys.current[page + 1] = key;
+          setSessions(sessionPage.sessions);
           setPage(page + 1);
 
           setTimeout(() => {

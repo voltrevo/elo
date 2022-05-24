@@ -1,5 +1,5 @@
 import EwmaCalculator from './EwmaCalculator';
-import Protocol, { ConnectionEvent, ProtocolLoginCredentials, ProtocolRegistration } from './Protocol';
+import Protocol, { ConnectionEvent, ProtocolLoginCredentials, ProtocolRegistration, SessionPage } from './Protocol';
 import SessionStats, { initSessionStats } from '../elo-types/SessionStats';
 import DeviceStorage, { anonymousAccountRootKey, RandomKey } from './deviceStorage/DeviceStorage';
 import UiState from './UiState';
@@ -19,11 +19,12 @@ import mergeAccountRoots from './mergeAccountRoots';
 import accumulateStats from './accumulateStats';
 import DeviceStorageView from './deviceStorage/DeviceStorageView';
 import setAccountRootUserId from './setAccountRootUserId';
-import StorageClient from '../storage-client/StorageClient';
+import StorageClient, { StorageElement } from '../storage-client/StorageClient';
 import nil from '../common-pure/nil';
 import { initAggregateStats } from '../elo-types/AggregateStats';
 import RemoteStorage from './RemoteStorage';
 import Settings, { defaultSettings } from './sharedStorageTypes/Settings';
+import Throttle from './helpers/Throttle';
 
 type AccountRootWithToken = AccountRoot & { eloLoginToken: string };
 
@@ -37,6 +38,8 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   fillerWordEwma = new EwmaCalculator(60, 60);
 
   remoteStorage?: RemoteStorage;
+  remoteSession?: StorageElement<typeof SessionStats>;
+  writeRemoteSessionThrottle = new Throttle(30_000);
   cachedSettings?: Settings;
 
   sessionKey = RandomKey(); // FIXME
@@ -148,8 +151,6 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     (globalThis as any).eloExtensionApp = this;
 
     const sessionStats = this.getSessionStats(accountRoot.userId);
-    sessionStats.lastSessionKey = accountRoot.lastSessionKey;
-    accountRoot.lastSessionKey = this.sessionKey;
 
     const eloLoginToken = accountRoot.eloLoginToken;
 
@@ -169,17 +170,6 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     sessionStats.sessionToken = sessionToken;
     sessionStats.userId = accountRoot.userId;
     await this.updateStats(0, 0);
-
-    const lastSession = (
-      sessionStats.lastSessionKey !== nil &&
-      await this.deviceStorage.read(SessionStats, sessionStats.lastSessionKey)
-    );
-
-    if (lastSession) {
-      accumulateStats(accountRoot.aggregateStats, lastSession);
-    }
-
-    await this.writeAccountRoot(accountRoot);
 
     return sessionToken;
   }
@@ -335,6 +325,15 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     }
   }
 
+  async getRemoteSession(): Promise<StorageElement<typeof SessionStats>> {
+    if (this.remoteSession === nil) {
+      const rs = await this.requireRemoteStorage();
+      this.remoteSession = await rs.Sessions().add();
+    }
+
+    return this.remoteSession;
+  }
+
   async updateStats(speakingTime: number, audioTime: number) {
     if (this.sessionStats === nil) {
       return;
@@ -345,12 +344,17 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     this.sessionStats.speakingTime += speakingTime;
     this.sessionStats.audioTime += audioTime;
 
-    await this.deviceStorage.write(SessionStats, this.sessionKey, this.sessionStats);
+    const remoteSession = await this.getRemoteSession();
+
+    this.writeRemoteSessionThrottle.maybeRun(() => {
+      remoteSession.set(this.sessionStats);
+    });
   }
 
   // The aggregateStats on the account root do not include the most recent session.
   // (This way as the session evolves the account root doesn't need to be constantly
   // updated.)
+  // TODO: remote storage
   async getAggregateStats() {
     const accountRoot = await this.readAccountRoot();
     
@@ -546,12 +550,18 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     return accountRoot?.email;
   }
 
-  async readSettings() {
+  async requireRemoteStorage() {
     const rs = await this.RemoteStorage();
 
     if (rs === nil) {
       throw new Error('Not connected to remote storage');
     }
+
+    return rs;
+  }
+
+  async readSettings() {
+    const rs = await this.requireRemoteStorage();
 
     const settings = await rs.Settings().get();
     this.cachedSettings = settings;
@@ -560,12 +570,42 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   async writeSettings(settings: Settings) {
-    const rs = await this.RemoteStorage();
-
-    if (rs === nil) {
-      throw new Error('Not connected to remote storage');
-    }
+    const rs = await this.requireRemoteStorage();
 
     await rs.Settings().set(settings);
+  }
+
+  async getSessionCount() {
+    const rs = await this.requireRemoteStorage();
+
+    return await rs.Sessions().count();
+  }
+
+  async getSessionPage(pageSize: number, beforeTime?: number) {
+    const collection = (await this.requireRemoteStorage()).Sessions();
+
+    const res: SessionPage = {
+      sessions: [],
+    };
+
+    if (beforeTime !== nil) {
+      // Times are a bit fuzzy so we pad it forward and filter
+      beforeTime += 5000;
+    }
+
+    for await (const session of collection.Range('descending', nil, beforeTime)) {
+      if (beforeTime !== nil && session.start >= beforeTime) {
+        continue;
+      }
+
+      if (res.sessions.length === pageSize) {
+        res.next = session.start;
+        break;
+      }
+
+      res.sessions.push(session);
+    }
+
+    return res;
   }
 }

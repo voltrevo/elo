@@ -8,6 +8,7 @@ import AccountRoot from './deviceStorage/AccountRoot';
 import AggregateStats from '../elo-types/AggregateStats';
 import nil from '../common-pure/nil';
 import Settings from './sharedStorageTypes/Settings';
+import SessionStats from '../elo-types/SessionStats';
 
 const ProtocolRegistration = io.union([
   io.type({
@@ -26,6 +27,11 @@ export type ProtocolLoginCredentials = (
   | { email: string; password: string }
   | { googleAccessToken: string }
 );
+
+export type SessionPage = {
+  sessions: SessionStats[],
+  next?: number,
+};
 
 export type Protocol = {
   notifyGetUserMediaCalled(): void;
@@ -47,6 +53,8 @@ export type Protocol = {
   getAggregateStats(): AggregateStats;
   readSettings(): Settings | nil;
   writeSettings(settings: Settings): void;
+  getSessionCount(): number;
+  getSessionPage(pageSize: number, beforeTime: number | nil): SessionPage;
 };
 
 export const protocolKeyMap: Record<keyof Protocol, true> = {
@@ -69,6 +77,8 @@ export const protocolKeyMap: Record<keyof Protocol, true> = {
   getAggregateStats: true,
   readSettings: true,
   writeSettings: true,
+  getSessionCount: true,
+  getSessionPage: true,
 };
 
 export const protocolThirdPartyKeyMap = {

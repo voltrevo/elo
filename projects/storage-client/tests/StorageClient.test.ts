@@ -223,7 +223,7 @@ describe("StorageClient", () => {
 
     let i = 0;
 
-    for await (const widget of widgets.Range()) {
+    for await (const widget of widgets.Range('ascending')) {
       assert(widget.label === `widget${i}`);
       assert(widget.serial === i);
       i++;
