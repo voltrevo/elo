@@ -103,6 +103,7 @@ const generalUserData = {
     minElementId: string | nil,
     maxElementId: string | nil,
     limit: number,
+    direction: 'ascending' | 'descending',
   ): Promise<{ elementId: string, data: Uint8Array }[]> => {
     const pgClient = dbOrClient instanceof Database
       ? await dbOrClient.PgClient()
@@ -131,6 +132,7 @@ const generalUserData = {
           collection_id = $2
           ${minSql}
           ${maxSql}
+        ${direction === 'ascending' ? '' : 'ORDER BY element_id DESC'}
         LIMIT $${nextArgId++}
       `,
       [
@@ -177,11 +179,7 @@ const generalUserData = {
 
     const count = res.rows[0].count;
 
-    if (typeof count !== 'number') {
-      throw new Error('Unexpected format in generalUserData.count');
-    }
-
-    return count;
+    return Number(count);
   },
 };
 

@@ -37,6 +37,7 @@ export const StorageProtocolTypeMap = {
       collectionId: io.string,
       minElementId: permissiveOptional(io.string),
       maxElementId: permissiveOptional(io.string),
+      direction: io.union([io.literal('ascending'), io.literal('descending')]),
     }),
     output: io.type({
       entries: io.array(io.tuple([io.string, ioBuffer])),
