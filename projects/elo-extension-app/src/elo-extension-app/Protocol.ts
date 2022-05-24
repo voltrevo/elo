@@ -30,7 +30,8 @@ export type ProtocolLoginCredentials = (
 
 export type SessionPage = {
   sessions: SessionStats[],
-  next?: number,
+  firstId?: string,
+  nextId?: string,
 };
 
 export type Protocol = {
@@ -54,7 +55,7 @@ export type Protocol = {
   readSettings(): Settings | nil;
   writeSettings(settings: Settings): void;
   getSessionCount(): number;
-  getSessionPage(pageSize: number, beforeTime: number | nil): SessionPage;
+  getSessionPage(pageSize: number, firstId: string | nil): SessionPage;
 };
 
 export const protocolKeyMap: Record<keyof Protocol, true> = {

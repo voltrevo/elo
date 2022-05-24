@@ -581,28 +581,20 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     return await rs.Sessions().count();
   }
 
-  async getSessionPage(pageSize: number, beforeTime?: number) {
+  async getSessionPage(pageSize: number, firstId?: string) {
     const collection = (await this.requireRemoteStorage()).Sessions();
 
     const res: SessionPage = {
       sessions: [],
     };
 
-    if (beforeTime !== nil) {
-      // Times are a bit fuzzy so we pad it forward and filter
-      beforeTime += 5000;
-    }
-
-    for await (const session of collection.Range('descending', nil, beforeTime)) {
-      if (beforeTime !== nil && session.start >= beforeTime) {
-        continue;
-      }
-
+    for await (const [id, session] of collection.collection.RangeEntries('descending', nil, firstId)) {
       if (res.sessions.length === pageSize) {
-        res.next = session.start;
+        res.nextId = id;
         break;
       }
 
+      res.firstId ??= id;
       res.sessions.push(session);
     }
 

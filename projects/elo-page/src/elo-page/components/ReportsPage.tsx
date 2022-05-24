@@ -15,14 +15,14 @@ const ReportsPage: React.FunctionComponent = () => {
   const [sessions, setSessions] = React.useState<SessionStats[]>();
   const [page, setPage] = React.useState(0);
   const [pageCount, setPageCount] = React.useState<number>();
-  const pageKeys = React.useRef<(number | nil)[]>([]);
+  const pageFirstIds = React.useRef<(string | nil)[]>([]);
 
   React.useEffect(() => {
     (async () => {
-      const now = Date.now();
-      const sessionPage = await appCtx.getSessionPage(pageSize, now);
+      const sessionPage = await appCtx.getSessionPage(pageSize, nil);
 
-      pageKeys.current[0] = now;
+      pageFirstIds.current[0] = sessionPage.firstId;
+      pageFirstIds.current[1] = sessionPage.nextId;
 
       setSessions(sessionPage.sessions);
 
@@ -71,9 +71,9 @@ const ReportsPage: React.FunctionComponent = () => {
     })()}
     <div className="pagination-footer">
       <div
-        className={`pagination-link ${!pageKeys.current[page - 1] && 'disabled'}`}
+        className={`pagination-link ${!pageFirstIds.current[page - 1] && 'disabled'}`}
         onClick={async (evt) => {
-          const key = pageKeys.current[page - 1];
+          const key = pageFirstIds.current[page - 1];
 
           if (key === undefined) {
             return;
@@ -92,22 +92,17 @@ const ReportsPage: React.FunctionComponent = () => {
       <div
         className={`pagination-link ${(sessions?.[sessions.length - 1]?.lastSessionKey === undefined) && 'disabled'}`}
         onClick={async (evt) => {
-          const earliestStartOnPage = sessions?.[sessions.length - 1]?.start;
+          const firstId = pageFirstIds.current[page + 1];
 
-          if (earliestStartOnPage === nil) {
+          if (firstId === nil) {
             return;
           }
 
           // TODO: Try going past the last page
 
-          const sessionPage = await appCtx.getSessionPage(pageSize, earliestStartOnPage);
-          let key = sessionPage.sessions[0]?.start;
+          const sessionPage = await appCtx.getSessionPage(pageSize, firstId);
 
-          if (key) {
-            key += 5000;
-          }
-
-          pageKeys.current[page + 1] = key;
+          pageFirstIds.current[page + 2] = sessionPage.nextId;
           setSessions(sessionPage.sessions);
           setPage(page + 1);
 
