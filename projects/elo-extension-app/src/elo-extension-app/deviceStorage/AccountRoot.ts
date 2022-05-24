@@ -2,17 +2,14 @@ import * as io from 'io-ts';
 
 import AggregateStats, { initAggregateStats } from '../../elo-types/AggregateStats';
 import optional from '../../elo-types/optional';
+import Settings from '../sharedStorageTypes/Settings';
 
 const AccountRoot = io.type({
   userId: io.string,
   email: optional(io.string),
   googleAccount: optional(io.string),
   eloLoginToken: optional(io.string),
-  settings: io.type({
-    liveStatsMode: io.string,
-    experimentalZoomSupport: optional(io.literal(true)),
-    zoomRedirectToWebClient: optional(io.boolean),
-  }),
+  settings: Settings,
   aggregateStats: AggregateStats,
   lastSessionKey: optional(io.string),
 
