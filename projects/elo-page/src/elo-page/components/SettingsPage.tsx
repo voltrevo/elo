@@ -4,15 +4,14 @@ import Page from './Page';
 import Section from './Section';
 import Field from './Field';
 import ExtensionAppContext from '../ExtensionAppContext';
-import AccountRoot from '../../elo-extension-app/deviceStorage/AccountRoot';
 import FunctionalBarSelector from './FunctionalBarSelector';
 import nil from '../../common-pure/nil';
-import { defaultSettings } from '../../elo-extension-app/sharedStorageTypes/Settings';
+import Settings, { defaultSettings } from '../../elo-extension-app/sharedStorageTypes/Settings';
 
 const SettingsPage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ExtensionAppContext);
 
-  const [settings, setSettings] = React.useState<AccountRoot['settings']>();
+  const [settings, setSettings] = React.useState<Settings>();
 
   async function setSettingsFromStorage() {
     const settingsRead = (await appCtx.readSettings()) ?? defaultSettings;

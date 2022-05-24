@@ -37,6 +37,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   fillerWordEwma = new EwmaCalculator(60, 60);
 
   remoteStorage?: RemoteStorage;
+  cachedSettings?: Settings;
 
   sessionKey = RandomKey(); // FIXME
 
@@ -318,8 +319,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   async updateMetrics() {
-    const accountRoot = await this.readAccountRoot();
-    let liveStatsMode = accountRoot?.settings?.liveStatsMode ?? 'count';
+    let liveStatsMode = (this.cachedSettings ?? await this.readSettings())?.liveStatsMode ?? 'count';
 
     const fillerSoundMetric = this.fillerSoundEwma.render(liveStatsMode);
     const fillerWordMetric = this.fillerWordEwma.render(liveStatsMode);
@@ -553,7 +553,10 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
       throw new Error('Not connected to remote storage');
     }
 
-    return await rs.Settings().get();
+    const settings = await rs.Settings().get();
+    this.cachedSettings = settings;
+
+    return settings;
   }
 
   async writeSettings(settings: Settings) {

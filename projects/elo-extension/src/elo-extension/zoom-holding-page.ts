@@ -18,17 +18,17 @@ import makeStorageClient from "./makeStorageClient";
     (eloLoginToken) => makeStorageClient(apiBase, eloLoginToken),
   );
 
-  const accountRoot = await extensionApp.readAccountRoot();
+  const settings = await extensionApp.readSettings();
 
   const parsedLocation = new URL(location.href);
   const inviteUrl = new URL(parsedLocation.searchParams.get('inviteUrl') ?? '');
 
-  if (accountRoot === nil) {
+  if (settings === nil) {
     console.error('Account root missing');
     return;
   }
 
-  if (accountRoot.settings.zoomRedirectToWebClient === false) {
+  if (settings.zoomRedirectToWebClient === false) {
     inviteUrl.searchParams.set('disableEloRedirect', 'true');
     location.href = inviteUrl.href;
     return;

@@ -3,13 +3,13 @@ import nil from "../common-pure/nil";
 import ExtensionApp from "../elo-extension-app/ExtensionApp";
 
 export default async function handleZoomExternalCapture(extensionApp: ExtensionApp) {
-  const accountRoot = await extensionApp.readAccountRoot();
+  const settings = await extensionApp.readSettings();
 
-  if (accountRoot === nil) {
+  if (settings === nil) {
     return;
   }
 
-  if (accountRoot.settings.experimentalZoomSupport !== true) {
+  if (settings.experimentalZoomSupport !== true) {
     return;
   }
 
