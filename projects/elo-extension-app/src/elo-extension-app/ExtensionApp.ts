@@ -115,6 +115,16 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     await this.storage.write(AccountRoot, root.accountRoot, accountRoot);
   }
 
+  async RemoteStorage() {
+    const accountRoot = await this.readAccountRoot();
+
+    if (accountRoot === nil) {
+      return nil;
+    }
+
+    return await this.makeStorageClient(accountRoot.eloLoginToken);
+  }
+
   getSessionStats(userId: string) {
     if (this.sessionStats === nil) {
       this.sessionStats = initSessionStats(userId, document.title, Date.now());
