@@ -21,10 +21,11 @@ import DeviceStorageView from './deviceStorage/DeviceStorageView';
 import setAccountRootUserId from './setAccountRootUserId';
 import StorageClient, { StorageElement } from '../storage-client/StorageClient';
 import nil from '../common-pure/nil';
-import { initAggregateStats } from '../elo-types/AggregateStats';
+import AggregateStats, { initAggregateStats } from '../elo-types/AggregateStats';
 import RemoteStorage from './RemoteStorage';
 import Settings, { defaultSettings } from './sharedStorageTypes/Settings';
 import Throttle from './helpers/Throttle';
+import delay from '../common-pure/delay';
 
 type AccountRootWithToken = AccountRoot & { eloLoginToken: string };
 
@@ -171,7 +172,50 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     sessionStats.userId = accountRoot.userId;
     await this.updateStats(0, 0);
 
+    setTimeout(() => this.housekeeping(), 100_000);
+
     return sessionToken;
+  }
+
+  async housekeeping() {
+    const rs = await this.requireRemoteStorage();
+    const aggregateStatsElement = rs.AggregateStats();
+    const unaggregatedSessionIds = rs.UnaggregatedSessionIds();
+    const sessions = rs.Sessions();
+
+    let aggregateStats = await aggregateStatsElement.get() ?? initAggregateStats();
+
+    let count = 0;
+    let limit = 10;
+
+    for await (const [sessionId] of unaggregatedSessionIds.RangeEntries('ascending')) {
+      const sessionElement = sessions.Element(sessionId);
+
+      const session = await sessionElement.get();
+
+      // Only if the session ended over an hour ago
+      // - we want to make sure the session has indeed ended and isn't still going, since
+      //   we only aggregate each session once
+      // - there's no rush since unaggregated sessions are still included when displaying
+      //   aggregations for the user
+      if (session) {
+        if (session.end < Date.now() - 3_600_000) {
+          accumulateStats(aggregateStats, session);
+          await unaggregatedSessionIds.Element(sessionId).set(nil);
+          await aggregateStatsElement.set(aggregateStats);
+        }
+      } else {
+        console.warn('Unaggregated session does not exist');
+        await unaggregatedSessionIds.Element(sessionId).set(nil);
+      }
+
+      if (++count >= limit) {
+        // If we actually hit this limit we can always do more later
+        break;
+      }
+
+      await delay(1000);
+    }
   }
 
   updateUi() {
@@ -329,6 +373,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     if (this.remoteSession === nil) {
       const rs = await this.requireRemoteStorage();
       this.remoteSession = await rs.Sessions().add();
+      await rs.UnaggregatedSessionIds().Element(this.remoteSession.elementId).set(true);
     }
 
     return this.remoteSession;
@@ -351,27 +396,32 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     });
   }
 
-  // The aggregateStats on the account root do not include the most recent session.
-  // (This way as the session evolves the account root doesn't need to be constantly
-  // updated.)
-  // TODO: remote storage
-  async getAggregateStats() {
-    const accountRoot = await this.readAccountRoot();
-    
-    if (accountRoot === nil) {
-      return initAggregateStats();
-    }
+  // The explictly stored aggregateStats doesn't include unaggregatedSessionIds, this adds them
+  // in so we're always up-to-date when we actually display aggregateStats to the user.
+  async getAggregateStats(): Promise<AggregateStats> {
+    const rs = await this.requireRemoteStorage();
+    const sessions = rs.Sessions();
 
-    const aggregateStats = accountRoot.aggregateStats;
+    let aggregateStats = (await rs.AggregateStats().get()) ?? initAggregateStats();
 
-    if (accountRoot.lastSessionKey === nil) {
-      return aggregateStats;
-    }
+    let count = 0;
+    let limit = 10;
 
-    const lastSession = await this.deviceStorage.read(SessionStats, accountRoot.lastSessionKey);
+    for await (const [sessionId] of rs.UnaggregatedSessionIds().RangeEntries('descending')) {
+      if (count >= limit) {
+        console.warn('Couldn\'t aggregate all stats');
+        break;
+      }
 
-    if (lastSession !== nil) {
-      accumulateStats(aggregateStats, lastSession);
+      const session = await sessions.Element(sessionId).get();
+
+      if (!session) {
+        console.warn('Unaggregated session does not exist');
+      } else {
+        accumulateStats(aggregateStats, session);
+      }
+
+      count++;
     }
 
     return aggregateStats;
