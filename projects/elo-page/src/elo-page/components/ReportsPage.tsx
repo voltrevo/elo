@@ -71,7 +71,7 @@ const ReportsPage: React.FunctionComponent = () => {
     })()}
     <div className="pagination-footer">
       <div
-        className={`pagination-link ${!pageFirstIds.current[page - 1] && 'disabled'}`}
+        className={`pagination-link ${page <= 0 && 'disabled'}`}
         onClick={async (evt) => {
           const key = pageFirstIds.current[page - 1];
 
@@ -90,15 +90,13 @@ const ReportsPage: React.FunctionComponent = () => {
       >&lt;</div>
       <div>{page + 1}/{pageCount}</div>
       <div
-        className={`pagination-link ${(sessions?.[sessions.length - 1]?.lastSessionKey === undefined) && 'disabled'}`}
+        className={`pagination-link ${((page + 1) >= (pageCount ?? 0)) && 'disabled'}`}
         onClick={async (evt) => {
           const firstId = pageFirstIds.current[page + 1];
 
           if (firstId === nil) {
             return;
           }
-
-          // TODO: Try going past the last page
 
           const sessionPage = await appCtx.getSessionPage(pageSize, firstId);
 
