@@ -138,7 +138,7 @@ const generalUserData = {
           collection_id = $2
           ${minSql}
           ${maxSql}
-        ${direction === 'ascending' ? '' : 'ORDER BY element_id DESC'}
+        ORDER BY element_id ${direction === 'ascending' ? 'ASC' : 'DESC'}
         LIMIT $${nextArgId++}
       `,
       [
