@@ -34,6 +34,8 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   fillerSoundEwma = new EwmaCalculator(60, 60);
   fillerWordEwma = new EwmaCalculator(60, 60);
 
+  remoteStorage?: StorageClient;
+
   sessionKey = RandomKey(); // FIXME
 
   constructor(
@@ -116,13 +118,17 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   async RemoteStorage() {
-    const accountRoot = await this.readAccountRoot();
+    if (!this.remoteStorage) {
+      const accountRoot = await this.readAccountRoot();
 
-    if (accountRoot === nil) {
-      return nil;
+      if (accountRoot === nil) {
+        return nil;
+      }
+  
+      this.remoteStorage = await this.makeStorageClient(accountRoot.eloLoginToken);
     }
 
-    return await this.makeStorageClient(accountRoot.eloLoginToken);
+    return this.remoteStorage;
   }
 
   getSessionStats(userId: string) {
@@ -361,19 +367,6 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     }
 
     return aggregateStats;
-  }
-
-  async setMetricPreference(preference: string) {
-    const accountRoot = await this.readAccountRoot();
-    
-    if (accountRoot === nil) {
-      throw new Error('Can\'t set metric preference without account');
-    }
-
-    accountRoot.settings.liveStatsMode = preference;
-    await this.writeAccountRoot(accountRoot);
-
-    return 'success';
   }
 
   async sendVerificationEmail(email: string) {
