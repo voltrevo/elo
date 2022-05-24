@@ -6,7 +6,7 @@ import ExtensionAppContext, { ThirdPartyExtensionAppContext } from '../elo-page/
 import EloPageContext, { initEloPageContext } from '../elo-page/EloPageContext';
 import config from './config';
 import ExtensionApp from '../elo-extension-app/ExtensionApp';
-import Storage from '../elo-extension-app/storage/Storage';
+import DeviceStorage from '../elo-extension-app/deviceStorage/DeviceStorage';
 import BackendApi from './BackendApi';
 import GoogleAuthApi from './GoogleAuthApi';
 import ZoomExternalCapture from './components/ZoomExternalCapture';
@@ -14,7 +14,7 @@ import connectGetUserMedia from './connectGetUserMedia';
 import makeStorageClient from './makeStorageClient';
 
 window.addEventListener('load', async () => {
-  const storage = await Storage.Create(Browser.storage.local, 'elo');
+  const deviceStorage = await DeviceStorage.Create(Browser.storage.local, 'elo');
 
   const apiBase = `${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`;
 
@@ -22,13 +22,13 @@ window.addEventListener('load', async () => {
     new BackendApi(`${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`),
     new GoogleAuthApi(config.googleOauthClientId),
     Browser.runtime.getURL('elo-page.html'),
-    storage,
+    deviceStorage,
     (eloLoginToken) => makeStorageClient(apiBase, eloLoginToken),
   ));
 
   (window as any).eloExtensionApp = eloExtensionApp;
 
-  const pageCtx = initEloPageContext(storage, config.featureFlags, '');
+  const pageCtx = initEloPageContext(deviceStorage, config.featureFlags, '');
   const container = document.querySelector('#zoom-external-capture-container') as HTMLDivElement;
 
   ReactDOM.render(

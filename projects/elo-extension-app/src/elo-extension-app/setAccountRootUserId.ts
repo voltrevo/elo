@@ -1,10 +1,10 @@
-import StorageView from '../elo-extension-app/storage/StorageView';
-import AccountRoot from '../elo-extension-app/storage/AccountRoot';
+import DeviceStorageView from './deviceStorage/DeviceStorageView';
+import AccountRoot from './deviceStorage/AccountRoot';
 import decode from '../elo-types/decode';
 import SessionStats from '../elo-types/SessionStats';
 
 export default async function setAccountRootUserId(
-  storageView: StorageView,
+  storageView: DeviceStorageView,
   accountRoot: AccountRoot,
   newUserId: string,
 ) {
@@ -12,7 +12,7 @@ export default async function setAccountRootUserId(
     return;
   }
 
-  const data = await storageView.rawStorageView.get();
+  const data = await storageView.rawDeviceStorageView.get();
 
   for (const key of Object.keys(data)) {
     if (!isSession(data[key])) {

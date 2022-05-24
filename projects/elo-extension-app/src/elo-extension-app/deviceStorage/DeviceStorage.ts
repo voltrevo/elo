@@ -1,9 +1,9 @@
 import * as io from 'io-ts';
 
 import base58 from '../../common-pure/base58';
-import IRawStorage from './IRawStorage';
+import IRawDeviceStorage from './IRawDeviceStorage';
 import runMigrations from './migrations/runMigrations';
-import StorageRoot, { initStorageRoot } from './StorageRoot';
+import DeviceStorageRoot, { initStorageRoot } from './DeviceStorageRoot';
 
 export const anonymousAccountRootKey = 'elo-user:anonymous';
 
@@ -13,12 +13,12 @@ export function RandomKey() {
   return base58.encode(buf);
 }
 
-export default class Storage {
-  private constructor(public rawStorage: IRawStorage, public rootKey: string) {}
+export default class DeviceStorage {
+  private constructor(public rawStorage: IRawDeviceStorage, public rootKey: string) {}
 
-  static async Create(rawStorage: IRawStorage, rootKey: string) {
+  static async Create(rawStorage: IRawDeviceStorage, rootKey: string) {
     await runMigrations(rawStorage)
-    return new Storage(rawStorage, rootKey);
+    return new DeviceStorage(rawStorage, rootKey);
   }
 
   async read<T extends io.Mixed>(type: T, key: string): Promise<io.TypeOf<T> | undefined> {
@@ -31,7 +31,7 @@ export default class Storage {
     const decodeResult = type.decode(readResult);
 
     if ('left' in decodeResult) {
-      throw new Error('Storage decode failed');
+      throw new Error('DeviceStorage decode failed');
     }
 
     return decodeResult.right;
@@ -41,12 +41,12 @@ export default class Storage {
     await this.rawStorage.set({ [key]: value });
   }
 
-  async readRoot(): Promise<StorageRoot> {
-    return await this.read(StorageRoot, this.rootKey) ?? initStorageRoot();
+  async readRoot(): Promise<DeviceStorageRoot> {
+    return await this.read(DeviceStorageRoot, this.rootKey) ?? initStorageRoot();
   }
 
-  async writeRoot(root: StorageRoot): Promise<void> {
-    await this.write(StorageRoot, this.rootKey, root);
+  async writeRoot(root: DeviceStorageRoot): Promise<void> {
+    await this.write(DeviceStorageRoot, this.rootKey, root);
   }
 
   async remove(keys: string[]): Promise<void> {

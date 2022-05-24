@@ -1,22 +1,22 @@
 import * as io from 'io-ts';
 
 import optional from '../../elo-types/optional';
-import storageVersion from './storageVersion';
+import deviceStorageVersion from './deviceStorageVersion';
 
-const StorageRoot = io.type({
+const DeviceStorageRoot = io.type({
   installTriggered: optional(io.literal(true)),
   accountRoot: optional(io.string),
   storageVersion: optional(io.number),
 });
 
-type StorageRoot = io.TypeOf<typeof StorageRoot>;
+type DeviceStorageRoot = io.TypeOf<typeof DeviceStorageRoot>;
 
-export function initStorageRoot(): StorageRoot {
+export function initStorageRoot(): DeviceStorageRoot {
   return {
     installTriggered: undefined,
     accountRoot: undefined,
-    storageVersion,
+    storageVersion: deviceStorageVersion,
   };
 }
 
-export default StorageRoot;
+export default DeviceStorageRoot;

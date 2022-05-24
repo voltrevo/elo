@@ -1,15 +1,15 @@
 import assert from "../../../common-pure/assert";
-import IRawStorage from "../IRawStorage";
-import storageVersion from "../storageVersion";
+import IRawDeviceStorage from "../IRawDeviceStorage";
+import deviceStorageVersion from "../deviceStorageVersion";
 import from0To1 from "./from0To1";
 
 const migrations = [
   from0To1,
 ];
 
-assert(migrations.length === storageVersion);
+assert(migrations.length === deviceStorageVersion);
 
-export default async function runMigrations(rawStorage: IRawStorage) {
+export default async function runMigrations(rawStorage: IRawDeviceStorage) {
   const root = (await rawStorage.get('elo'))['elo'];
 
   if (root === undefined) {
@@ -19,7 +19,7 @@ export default async function runMigrations(rawStorage: IRawStorage) {
 
   let currentVersion = root.storageVersion ?? 0;
 
-  while (currentVersion < storageVersion) {
+  while (currentVersion < deviceStorageVersion) {
     await migrations[currentVersion](rawStorage);
     currentVersion++;
   }

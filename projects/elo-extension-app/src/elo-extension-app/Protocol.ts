@@ -4,7 +4,7 @@ import { AnalysisFragment } from '../elo-types/Analysis';
 import Feedback from '../elo-types/Feedback';
 import UiState from './UiState';
 import { GoogleAuthResult } from '../elo-types/GoogleAuthResult';
-import AccountRoot from './storage/AccountRoot';
+import AccountRoot from './deviceStorage/AccountRoot';
 import AggregateStats from '../elo-types/AggregateStats';
 import nil from '../common-pure/nil';
 

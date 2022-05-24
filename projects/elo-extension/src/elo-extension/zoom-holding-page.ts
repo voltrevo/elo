@@ -1,7 +1,7 @@
 import Browser from "webextension-polyfill";
 import nil from "../common-pure/nil";
 import ExtensionApp from "../elo-extension-app/ExtensionApp";
-import Storage from '../elo-extension-app/storage/Storage';
+import DeviceStorage from '../elo-extension-app/deviceStorage/DeviceStorage';
 import BackendApi from "./BackendApi";
 import config from "./config";
 import GoogleAuthApi from "./GoogleAuthApi";
@@ -14,7 +14,7 @@ import makeStorageClient from "./makeStorageClient";
     new BackendApi(`${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`),
     new GoogleAuthApi(config.googleOauthClientId),
     Browser.runtime.getURL('elo-page.html'),
-    await Storage.Create(Browser.storage.local, 'elo'),
+    await DeviceStorage.Create(Browser.storage.local, 'elo'),
     (eloLoginToken) => makeStorageClient(apiBase, eloLoginToken),
   );
 

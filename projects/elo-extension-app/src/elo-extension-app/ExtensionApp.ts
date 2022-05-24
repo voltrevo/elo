@@ -1,7 +1,7 @@
 import EwmaCalculator from './EwmaCalculator';
 import Protocol, { ConnectionEvent, ProtocolLoginCredentials, ProtocolRegistration } from './Protocol';
 import SessionStats, { initSessionStats } from '../elo-types/SessionStats';
-import Storage, { anonymousAccountRootKey, RandomKey } from './storage/Storage';
+import DeviceStorage, { anonymousAccountRootKey, RandomKey } from './deviceStorage/DeviceStorage';
 import UiState from './UiState';
 import never from '../common-pure/never';
 import TaskQueue from '../common-pure/TaskQueue';
@@ -10,14 +10,14 @@ import Feedback from '../elo-types/Feedback';
 import { PromisishApi } from '../common-pure/protocolHelpers';
 import Registration from '../elo-types/Registration';
 import LoginCredentials from '../elo-types/LoginCredentials';
-import AccountRoot, { initAccountRoot } from './storage/AccountRoot';
+import AccountRoot, { initAccountRoot } from './deviceStorage/AccountRoot';
 import IBackendApi from './IBackendApi';
 import IGoogleAuthApi from './IGoogleAuthApi';
 import assert from '../common-pure/assert';
 import hardenPasswordViaWorker from '../elo-page/hardenPasswords/hardenPasswordViaWorker';
 import mergeAccountRoots from './mergeAccountRoots';
 import accumulateStats from './accumulateStats';
-import StorageView from './storage/StorageView';
+import DeviceStorageView from './deviceStorage/DeviceStorageView';
 import setAccountRootUserId from './setAccountRootUserId';
 import StorageClient from '../storage-client/StorageClient';
 import nil from '../common-pure/nil';
@@ -42,7 +42,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     public backendApi: IBackendApi,
     public googleAuthApi: IGoogleAuthApi,
     public dashboardUrl: string,
-    public storage: Storage,
+    public deviceStorage: DeviceStorage,
     public makeStorageClient: (eloLoginToken: string) => Promise<StorageClient>,
   ) {}
 
@@ -59,10 +59,10 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   async readAccountRoot(): Promise<AccountRootWithToken | nil> {
-    const root = await this.storage.readRoot();
+    const root = await this.deviceStorage.readRoot();
 
     if (!root.accountRoot) {
-      const existingAnonymousAccountRoot = await this.storage.read(
+      const existingAnonymousAccountRoot = await this.deviceStorage.read(
         AccountRoot,
         anonymousAccountRootKey,
       );
@@ -76,10 +76,10 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
       }
 
       root.accountRoot = anonymousAccountRootKey;
-      await this.storage.writeRoot(root);
+      await this.deviceStorage.writeRoot(root);
     }
 
-    const accountRoot = await this.storage.read(AccountRoot, root.accountRoot);
+    const accountRoot = await this.deviceStorage.read(AccountRoot, root.accountRoot);
 
     if (accountRoot === nil) {
       throw new Error('Failed to read account root');
@@ -104,7 +104,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   async writeAccountRoot(accountRoot: AccountRoot) {
-    const root = await this.storage.readRoot();
+    const root = await this.deviceStorage.readRoot();
 
     assert(root.accountRoot !== nil);
     assert(accountRoot.userId !== nil);
@@ -114,7 +114,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
       root.accountRoot.includes('anonymous')
     );
 
-    await this.storage.write(AccountRoot, root.accountRoot, accountRoot);
+    await this.deviceStorage.write(AccountRoot, root.accountRoot, accountRoot);
   }
 
   async RemoteStorage() {
@@ -167,7 +167,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
 
     const lastSession = (
       sessionStats.lastSessionKey !== nil &&
-      await this.storage.read(SessionStats, sessionStats.lastSessionKey)
+      await this.deviceStorage.read(SessionStats, sessionStats.lastSessionKey)
     );
 
     if (lastSession) {
@@ -341,7 +341,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     this.sessionStats.speakingTime += speakingTime;
     this.sessionStats.audioTime += audioTime;
 
-    await this.storage.write(SessionStats, this.sessionKey, this.sessionStats);
+    await this.deviceStorage.write(SessionStats, this.sessionKey, this.sessionStats);
   }
 
   // The aggregateStats on the account root do not include the most recent session.
@@ -360,7 +360,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
       return aggregateStats;
     }
 
-    const lastSession = await this.storage.read(SessionStats, accountRoot.lastSessionKey);
+    const lastSession = await this.deviceStorage.read(SessionStats, accountRoot.lastSessionKey);
 
     if (lastSession !== nil) {
       accumulateStats(aggregateStats, lastSession);
@@ -382,7 +382,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   async register(protocolRegistration: ProtocolRegistration) {
-    const storageView = new StorageView(this.storage);
+    const storageView = new DeviceStorageView(this.deviceStorage);
     const anonymousAccountRoot = await storageView.read(AccountRoot, anonymousAccountRootKey);
     const userIdHint = anonymousAccountRoot?.userId;
 
@@ -443,7 +443,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
 
   async login(protocolCredentials: ProtocolLoginCredentials) {
     let credentials: LoginCredentials;
-    const storageView = new StorageView(this.storage);
+    const storageView = new DeviceStorageView(this.deviceStorage);
 
     if ('password' in protocolCredentials) {
       credentials = {
@@ -531,9 +531,9 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     }
 
     if (accountRoot !== nil) {
-      const root = await this.storage.readRoot();
+      const root = await this.deviceStorage.readRoot();
       root.accountRoot = nil;
-      await this.storage.writeRoot(root);
+      await this.deviceStorage.writeRoot(root);
     }
   }
 

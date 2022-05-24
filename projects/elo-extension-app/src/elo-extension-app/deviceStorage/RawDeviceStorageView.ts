@@ -1,10 +1,10 @@
-import IRawStorage from './IRawStorage';
+import IRawDeviceStorage from './IRawDeviceStorage';
 
-export default class RawStorageView {
+export default class RawDeviceStorageView {
   callClear = false;
   newItems: Record<string, any> = {};
 
-  constructor(public rawStorage: IRawStorage) {}
+  constructor(public rawStorage: IRawDeviceStorage) {}
 
   async get(key?: string): Promise<Record<string, any>> {
     let result: Record<string, any> = {};

@@ -1,10 +1,10 @@
 import assert from '../../../common-pure/assert';
 import base58 from '../../../common-pure/base58';
-import IRawStorage from '../IRawStorage';
+import IRawDeviceStorage from '../IRawDeviceStorage';
 
 const anonymousAccountRootKey = 'elo-user:anonymous';
 
-export default async function from0To1(rawStorage: IRawStorage) {
+export default async function from0To1(rawStorage: IRawDeviceStorage) {
   const root = (await rawStorage.get('elo'))['elo'];
   const userId = root.userId;
   assert(typeof userId === 'string');

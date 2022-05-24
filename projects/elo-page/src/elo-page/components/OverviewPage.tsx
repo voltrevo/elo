@@ -33,8 +33,8 @@ import ExtensionAppContext from '../ExtensionAppContext';
 import addCommas from './helpers/addCommas';
 import AggregateStats from '../../elo-types/AggregateStats';
 import EloPageContext from '../EloPageContext';
-import Storage from '../../elo-extension-app/storage/Storage';
-import AccountRoot from '../../elo-extension-app/storage/AccountRoot';
+import DeviceStorage from '../../elo-extension-app/deviceStorage/DeviceStorage';
+import AccountRoot from '../../elo-extension-app/deviceStorage/AccountRoot';
 import SessionStats from '../../elo-types/SessionStats';
 
 Chart.register(
@@ -91,7 +91,7 @@ const OverviewPage: React.FunctionComponent = () => {
       setFeature(pickFeature(aggregateStats));
 
       if (accountRoot) {
-        setWeeklyStats(await getWeeklyStats(accountRoot.lastSessionKey, pageCtx.storage));
+        setWeeklyStats(await getWeeklyStats(accountRoot.lastSessionKey, pageCtx.deviceStorage));
       }
     })();
   }, []);
@@ -252,7 +252,7 @@ type WeeklyStats = {
   fillersHedges: number,
 }[];
 
-async function getWeeklyStats(sessionKey: string | undefined, storage: Storage): Promise<WeeklyStats> {
+async function getWeeklyStats(sessionKey: string | undefined, deviceStorage: DeviceStorage): Promise<WeeklyStats> {
   const now = Date.now();
   const thisWeek = getWeekNumber(now);
 
@@ -276,7 +276,7 @@ async function getWeeklyStats(sessionKey: string | undefined, storage: Storage):
   while (sessionKey !== undefined && !seenSessionKeys.has(sessionKey)) {
     seenSessionKeys.add(sessionKey);
 
-    const session = await storage.read(SessionStats, sessionKey);
+    const session = await deviceStorage.read(SessionStats, sessionKey);
 
     if (session === undefined) {
       break;

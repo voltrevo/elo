@@ -4,13 +4,13 @@ import * as React from 'react';
 import TypedEventEmitter from 'typed-emitter';
 import type { Config } from './config';
 
-import Storage from '../elo-extension-app/storage/Storage';
+import DeviceStorage from '../elo-extension-app/deviceStorage/DeviceStorage';
 import SessionStats from '../elo-types/SessionStats';
 
 type EloPageContext = ReturnType<typeof initEloPageContext>;
 
 export function initEloPageContext(
-  storage: Storage,
+  deviceStorage: DeviceStorage,
   featureFlags: Config['featureFlags'],
   initialPage: string,
 ) {
@@ -26,7 +26,7 @@ export function initEloPageContext(
 
   const context = {
     events,
-    storage,
+    deviceStorage,
     state,
     featureFlags,
     update: (updates: Partial<typeof state>) => {

@@ -2,11 +2,11 @@ import { initAggregateStats } from '../elo-types/AggregateStats';
 import decode from '../elo-types/decode';
 import SessionStats from '../elo-types/SessionStats';
 import accumulateStats from './accumulateStats';
-import AccountRoot from './storage/AccountRoot';
-import StorageView from './storage/StorageView';
+import AccountRoot from './deviceStorage/AccountRoot';
+import DeviceStorageView from './deviceStorage/DeviceStorageView';
 
 export default async function mergeAccountRoots(
-  storageView: StorageView,
+  storageView: DeviceStorageView,
   preferredAccountRoot: AccountRoot,
   secondaryAccountRoot: AccountRoot,
 ) {
@@ -25,13 +25,13 @@ export default async function mergeAccountRoots(
 }
 
 async function mergeSessionHistories(
-  storageView: StorageView,
+  storageView: DeviceStorageView,
   preferredAccountRoot: AccountRoot,
   secondaryAccountRoot: AccountRoot,
 ) {
   const allSessions: [string, SessionStats][] = [];
 
-  const data = await storageView.rawStorageView.get();
+  const data = await storageView.rawDeviceStorageView.get();
 
   for (const key of Object.keys(data)) {
     if (!isSession(data[key])) {

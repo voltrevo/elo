@@ -1,16 +1,16 @@
 import Browser from 'webextension-polyfill';
 
-import Storage from '../elo-extension-app/storage/Storage';
+import DeviceStorage from '../elo-extension-app/deviceStorage/DeviceStorage';
 import config from './config';
 
 Browser.runtime.onInstalled.addListener(async () => {
   if (config.featureFlags.authEnabled) {
-    const storage = await Storage.Create(Browser.storage.local, 'elo');
-    const root = await storage.readRoot();
+    const deviceStorage = await DeviceStorage.Create(Browser.storage.local, 'elo');
+    const root = await deviceStorage.readRoot();
 
     if (!root.installTriggered) {
       root.installTriggered = true;
-      await storage.writeRoot(root);
+      await deviceStorage.writeRoot(root);
       window.open(Browser.runtime.getURL('elo-page.html'));
     }
   }

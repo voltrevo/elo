@@ -4,7 +4,7 @@ import Page from './Page';
 import Section from './Section';
 import Field from './Field';
 import ExtensionAppContext from '../ExtensionAppContext';
-import AccountRoot from '../../elo-extension-app/storage/AccountRoot';
+import AccountRoot from '../../elo-extension-app/deviceStorage/AccountRoot';
 import FunctionalBarSelector from './FunctionalBarSelector';
 import nil from '../../common-pure/nil';
 

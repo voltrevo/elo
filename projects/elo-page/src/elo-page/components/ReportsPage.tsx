@@ -39,7 +39,7 @@ const ReportsPage: React.FunctionComponent = () => {
     const newSessions: SessionStats[] = [];
 
     while (newSessions.length < pageSize && lastSessionKey !== undefined) {
-      const session = await pageCtx.storage.read(SessionStats, lastSessionKey);
+      const session = await pageCtx.deviceStorage.read(SessionStats, lastSessionKey);
 
       if (session === undefined) {
         break;

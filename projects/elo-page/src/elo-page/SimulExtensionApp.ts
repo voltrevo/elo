@@ -8,7 +8,7 @@ import IGoogleAuthApi from '../elo-extension-app/IGoogleAuthApi';
 import IBackendApi, { LoginResult } from '../elo-extension-app/IBackendApi';
 import Registration from '../elo-types/Registration';
 import LoginCredentials from '../elo-types/LoginCredentials';
-import Storage from '../elo-extension-app/storage/Storage';
+import DeviceStorage from '../elo-extension-app/deviceStorage/DeviceStorage';
 import { keccak_256 } from 'js-sha3';
 import StorageSimulation from '../storage-client/StorageSimulation';
 import backendApiSpec from '../elo-types/backendApiSpec';
@@ -180,7 +180,7 @@ class SimulGoogleAuthApi implements IGoogleAuthApi {
   }
 }
 
-export default function SimulExtensionApp(storage: Storage): ExtensionApp {
+export default function SimulExtensionApp(deviceStorage: DeviceStorage): ExtensionApp {
   const storageSimulation = new StorageSimulation();
   const storageClientPromise = storageSimulation.connect();
 
@@ -188,7 +188,7 @@ export default function SimulExtensionApp(storage: Storage): ExtensionApp {
     new SimulBackendApi(),
     new SimulGoogleAuthApi(),
     'dashboard.html',
-    storage,
+    deviceStorage,
     () => storageClientPromise,
   );
 }

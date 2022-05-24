@@ -6,7 +6,7 @@ import PostMessageServer from '../elo-page/helpers/PostMessageServer';
 import BackendApi from './BackendApi';
 import GoogleAuthApi from './GoogleAuthApi';
 import config from './config';
-import Storage from '../elo-extension-app/storage/Storage';
+import DeviceStorage from '../elo-extension-app/deviceStorage/DeviceStorage';
 import handleZoomRedirects from './handleZoomRedirects';
 import handleZoomExternalCapture from './handleZoomExternalCapture';
 import makeStorageClient from './makeStorageClient';
@@ -38,7 +38,7 @@ eloExtension.appendChild(iconTag);
     new BackendApi(`${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`),
     new GoogleAuthApi(config.googleOauthClientId),
     Browser.runtime.getURL('elo-page.html'),
-    await Storage.Create(Browser.storage.local, 'elo'),
+    await DeviceStorage.Create(Browser.storage.local, 'elo'),
     (eloLoginToken) => makeStorageClient(apiBase, eloLoginToken),
   );
   

@@ -7,14 +7,14 @@ import ExtensionAppContext from '../elo-page/ExtensionAppContext';
 import EloPageContext, { initEloPageContext } from '../elo-page/EloPageContext';
 import config from './config';
 import ExtensionApp from '../elo-extension-app/ExtensionApp';
-import Storage from '../elo-extension-app/storage/Storage';
+import DeviceStorage from '../elo-extension-app/deviceStorage/DeviceStorage';
 import BackendApi from './BackendApi';
 import GoogleAuthApi from './GoogleAuthApi';
 import syncPageAndHash from '../elo-page/syncPageAndHash';
 import makeStorageClient from './makeStorageClient';
 
 window.addEventListener('load', async () => {
-  const storage = await Storage.Create(Browser.storage.local, 'elo');
+  const deviceStorage = await DeviceStorage.Create(Browser.storage.local, 'elo');
 
   const apiBase = `${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`;
 
@@ -22,16 +22,16 @@ window.addEventListener('load', async () => {
     new BackendApi(apiBase),
     new GoogleAuthApi(config.googleOauthClientId),
     Browser.runtime.getURL('elo-page.html'),
-    storage,
+    deviceStorage,
     (eloLoginToken) => makeStorageClient(apiBase, eloLoginToken),
   ));
 
   (window as any).eloExtensionApp = eloExtensionApp;
 
-  const pageCtx = initEloPageContext(storage, config.featureFlags, location.hash.slice(1));
+  const pageCtx = initEloPageContext(deviceStorage, config.featureFlags, location.hash.slice(1));
   syncPageAndHash(pageCtx);
 
-  const { accountRoot } = await pageCtx.storage.readRoot();
+  const { accountRoot } = await pageCtx.deviceStorage.readRoot();
   const needsAuth = config.featureFlags.authEnabled && !accountRoot;
   pageCtx.state.needsAuth = needsAuth;
 

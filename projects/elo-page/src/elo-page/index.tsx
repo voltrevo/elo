@@ -6,7 +6,7 @@ import { makeLocalExtensionAppClient } from './ExtensionAppClient';
 import ExtensionAppContext from './ExtensionAppContext';
 import EloPageContext, { initEloPageContext } from './EloPageContext';
 import SimulExtensionApp from './SimulExtensionApp';
-import Storage from '../elo-extension-app/storage/Storage';
+import DeviceStorage from '../elo-extension-app/deviceStorage/DeviceStorage';
 import RawStorage from './RawStorage';
 import syncPageAndHash from './syncPageAndHash';
 
@@ -15,16 +15,16 @@ window.addEventListener('load', async () => {
   document.body.appendChild(appDiv);
 
   const rawStorage = RawStorage();
-  const storage = await Storage.Create(rawStorage, 'elo');
+  const deviceStorage = await DeviceStorage.Create(rawStorage, 'elo');
 
-  const eloExtensionApp = SimulExtensionApp(storage);
+  const eloExtensionApp = SimulExtensionApp(deviceStorage);
   (window as any).eloExtensionApp = eloExtensionApp;
 
   const eloClient = makeLocalExtensionAppClient(eloExtensionApp);
-  const pageCtx = initEloPageContext(storage, config.featureFlags, location.hash.slice(1));
+  const pageCtx = initEloPageContext(deviceStorage, config.featureFlags, location.hash.slice(1));
   syncPageAndHash(pageCtx);
 
-  const { accountRoot } = await pageCtx.storage.readRoot();
+  const { accountRoot } = await pageCtx.deviceStorage.readRoot();
 
   pageCtx.state.needsAuth = (
     pageCtx.featureFlags.authEnabled &&

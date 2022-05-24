@@ -1,4 +1,4 @@
-import IRawStorage from "../elo-extension-app/storage/IRawStorage";
+import IRawDeviceStorage from "../elo-extension-app/deviceStorage/IRawDeviceStorage";
 import config from './config';
 
 const { sampleStorage } = config;
@@ -11,7 +11,7 @@ function addLocalKey(key: string) {
   localStorage.setItem(`isLocal:${key}`, "true");
 }
 
-export default function RawStorage(): IRawStorage {
+export default function RawStorage(): IRawDeviceStorage {
   return {
     async get(key) {
       if (key === undefined) {
