@@ -1,6 +1,7 @@
 import { Client as PgClient } from 'pg';
 
 import nil from "../../common-pure/nil";
+import notNil from '../../common-pure/notNil';
 import Database from '../Database';
 
 const generalUserData = {
@@ -103,32 +104,25 @@ const generalUserData = {
     minElementId: string | nil,
     maxElementId: string | nil,
     limit: number,
+    offset: number | nil,
     direction: 'ascending' | 'descending',
   ): Promise<{ elementId: string, data: Uint8Array }[]> => {
     const pgClient = dbOrClient instanceof Database
       ? await dbOrClient.PgClient()
       : dbOrClient;
+    
+    const args: (string | number)[] = [];
 
-    let minMaxArgs: string[] = [];
-    let minSql = '';
-    let maxSql = '';
-    let nextArgId = 3;
+    function addArg(a: string | number) {
+      args.push(a);
+      return `$${args.length}`;
+    }
 
     let [minCmp, maxCmp] = (
       direction === 'ascending'
         ? ['<=', '<']
         : ['<', '<=']
     );
-
-    if (minElementId !== nil) {
-      minMaxArgs.push(minElementId);
-      minSql = `AND $${nextArgId++} ${minCmp} (element_id COLLATE "C")`;
-    }
-
-    if (maxElementId !== nil) {
-      minMaxArgs.push(maxElementId);
-      maxSql = `AND (element_id COLLATE "C") ${maxCmp} $${nextArgId++}`;
-    }
 
     // Note the `COLLATE "C"` below. This enforces a case sensitive sort order which is necessary
     // for timed collections to perform correctly, because their element ids represent time that
@@ -144,19 +138,27 @@ const generalUserData = {
       `
         SELECT element_id, data FROM general_user_data
         WHERE
-          user_id = $1 AND
-          collection_id = $2
-          ${minSql}
-          ${maxSql}
+          user_id = ${addArg(userId)} AND
+          collection_id = ${addArg(collectionId)}
+          ${
+            minElementId === nil
+              ? ''
+              : `AND ${addArg(minElementId)} ${minCmp} (element_id COLLATE "C")`
+          }
+          ${
+            maxElementId === nil
+              ? ''
+              : `AND (element_id COLLATE "C") ${maxCmp} ${addArg(maxElementId)}`
+          }
         ORDER BY (element_id COLLATE "C") ${direction === 'ascending' ? 'ASC' : 'DESC'}
-        LIMIT $${nextArgId++}
+        LIMIT ${addArg(limit)}
+        ${
+          offset === nil
+            ? ''
+            : `OFFSET ${addArg(offset)}`
+        }
       `,
-      [
-        userId,
-        collectionId,
-        ...minMaxArgs,
-        limit,
-      ],
+      args,
     );
 
     return res.rows.map(r => {

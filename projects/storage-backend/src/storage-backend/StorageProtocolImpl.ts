@@ -77,7 +77,7 @@ export default function StorageProtocolImpl(db: Database, userId: string, userRo
 
       return {};
     },
-    getRange: async ({ collectionId, minElementId, maxElementId, direction }) => {
+    getRange: async ({ collectionId, minElementId, maxElementId, offset, direction }) => {
       const rows = await generalUserData.getRange(
         db,
         userId,
@@ -85,6 +85,7 @@ export default function StorageProtocolImpl(db: Database, userId: string, userRo
         minElementId,
         maxElementId,
         userRowLimit + 1,
+        offset,
         direction,
       );
 
