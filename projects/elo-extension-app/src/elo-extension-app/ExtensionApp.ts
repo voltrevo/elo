@@ -105,6 +105,31 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
       });
     }
 
+    if (!accountRoot.remoteMigrations) {
+      accountRoot.remoteMigrations = {
+        settings: undefined,
+      };
+    }
+
+    if (!accountRoot.remoteMigrations.settings) {
+      console.log('Migrating settings');
+
+      this.remoteStorage = new RemoteStorage(
+        await this.makeStorageClient(accountRoot.eloLoginToken),
+      );
+
+      const rs = this.remoteStorage;
+
+      const remoteSettings = await rs.Settings().get();
+
+      if (!remoteSettings) {
+        await rs.Settings().set(accountRoot.settings);
+      }
+
+      accountRoot.remoteMigrations.settings = true;
+      await this.writeAccountRoot(accountRoot);
+    }
+
     // This does nothing at runtime, but TypeScript is just not quite able to infer correctly
     // without specifying eloLoginToken again here.
     return { ...accountRoot, eloLoginToken: accountRoot.eloLoginToken };

@@ -12,6 +12,9 @@ const AccountRoot = io.type({
   settings: Settings,
   aggregateStats: AggregateStats,
   lastSessionKey: optional(io.string),
+  remoteMigrations: optional(io.type({
+    settings: optional(io.literal(true)),
+  })),
 
   // Warning: Please be mindful of the possible need to update mergeAccountRoots if the structure
   // of AccountRoot is changed.
@@ -28,6 +31,7 @@ export function initAccountRoot(userId: string): AccountRoot {
     settings: defaultSettings,
     aggregateStats: initAggregateStats(),
     lastSessionKey: undefined,
+    remoteMigrations: undefined,
   };
 }
 
