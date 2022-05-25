@@ -130,6 +130,16 @@ const generalUserData = {
       maxSql = `AND element_id ${maxCmp} $${nextArgId++}`;
     }
 
+    // Note the `COLLATE "C"` below. This enforces a case sensitive sort order which is necessary
+    // for timed collections to perform correctly, because their element ids represent time that
+    // has been obfuscated into a text representation. This representation preserves order but
+    // requires that case sensitivity is respected.
+    // I am extremely surprised that case sensitivity is not the default.
+    // This raises the question of whether the underlying query is performant when forcing case
+    // sensitivity. In theory the PK is an index which makes this efficient, but if case sensitivity
+    // is not the default then it is possible that index is not usable.
+    // While user collections are relatively small it's not hugely important, but in future the
+    // performance may be worth looking into. TODO.
     const res = await pgClient.query(
       `
         SELECT element_id, data FROM general_user_data
@@ -138,7 +148,7 @@ const generalUserData = {
           collection_id = $2
           ${minSql}
           ${maxSql}
-        ORDER BY element_id ${direction === 'ascending' ? 'ASC' : 'DESC'}
+        ORDER BY (element_id COLLATE "C") ${direction === 'ascending' ? 'ASC' : 'DESC'}
         LIMIT $${nextArgId++}
       `,
       [
