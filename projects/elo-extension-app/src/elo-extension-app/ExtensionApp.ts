@@ -23,11 +23,12 @@ import StorageClient, { StorageElement } from '../storage-client/StorageClient';
 import nil from '../common-pure/nil';
 import AggregateStats, { initAggregateStats } from '../elo-types/AggregateStats';
 import RemoteStorage from './RemoteStorage';
-import Settings, { defaultSettings } from './sharedStorageTypes/Settings';
+import Settings from './sharedStorageTypes/Settings';
 import Throttle from './helpers/Throttle';
 import delay from '../common-pure/delay';
+import remoteMigrations from './remoteMigrations';
 
-type AccountRootWithToken = AccountRoot & { eloLoginToken: string };
+export type AccountRootWithToken = AccountRoot & { eloLoginToken: string };
 
 export default class ExtensionApp implements PromisishApi<Protocol> {
   uiState = UiState();
@@ -105,34 +106,13 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
       });
     }
 
-    if (!accountRoot.remoteMigrations) {
-      accountRoot.remoteMigrations = {
-        settings: undefined,
-      };
-    }
+    // This does nothing important at runtime, but TypeScript is just not quite able to infer
+    // correctly without specifying eloLoginToken again here.
+    let accountRootWithToken = { ...accountRoot, eloLoginToken: accountRoot.eloLoginToken };
 
-    if (!accountRoot.remoteMigrations.settings) {
-      console.log('Migrating settings');
+    accountRootWithToken = await remoteMigrations(this, accountRootWithToken);
 
-      this.remoteStorage = new RemoteStorage(
-        await this.makeStorageClient(accountRoot.eloLoginToken),
-      );
-
-      const rs = this.remoteStorage;
-
-      const remoteSettings = await rs.Settings().get();
-
-      if (!remoteSettings) {
-        await rs.Settings().set(accountRoot.settings);
-      }
-
-      accountRoot.remoteMigrations.settings = true;
-      await this.writeAccountRoot(accountRoot);
-    }
-
-    // This does nothing at runtime, but TypeScript is just not quite able to infer correctly
-    // without specifying eloLoginToken again here.
-    return { ...accountRoot, eloLoginToken: accountRoot.eloLoginToken };
+    return accountRootWithToken;
   }
 
   async writeAccountRoot(accountRoot: AccountRoot) {
