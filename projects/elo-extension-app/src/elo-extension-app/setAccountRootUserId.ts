@@ -2,6 +2,7 @@ import DeviceStorageView from './deviceStorage/DeviceStorageView';
 import AccountRoot from './deviceStorage/AccountRoot';
 import decode from '../elo-types/decode';
 import SessionStats from '../elo-types/SessionStats';
+import isSession from './deviceStorage/isSession';
 
 export default async function setAccountRootUserId(
   storageView: DeviceStorageView,
@@ -28,15 +29,4 @@ export default async function setAccountRootUserId(
   }
 
   accountRoot.userId = newUserId;
-}
-
-function isSession(value: any) {
-  const keys = [
-    'title',
-    'start',
-    'end',
-    'speakingTime',
-  ];
-
-  return keys.every(k => k in value);
 }

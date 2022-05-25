@@ -28,6 +28,7 @@ import Throttle from './helpers/Throttle';
 import delay from '../common-pure/delay';
 import remoteMigrations from './remoteMigrations';
 import Lock from './Lock';
+import IDeviceStorage from './deviceStorage/IDeviceStorage';
 
 export type AccountRootWithToken = AccountRoot & { eloLoginToken: string };
 
@@ -133,8 +134,8 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     }
   }
 
-  async writeAccountRoot(accountRoot: AccountRoot) {
-    const root = await this.deviceStorage.readRoot();
+  async writeAccountRoot(accountRoot: AccountRoot, view: IDeviceStorage = this.deviceStorage) {
+    const root = await view.readRoot();
 
     assert(root.accountRoot !== nil);
     assert(accountRoot.userId !== nil);
@@ -144,7 +145,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
       root.accountRoot.includes('anonymous')
     );
 
-    await this.deviceStorage.write(AccountRoot, root.accountRoot, accountRoot);
+    await view.write(AccountRoot, root.accountRoot, accountRoot);
   }
 
   async RemoteStorage() {

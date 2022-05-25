@@ -3,8 +3,9 @@ import * as io from 'io-ts';
 import DeviceStorage from './DeviceStorage';
 import RawDeviceStorageView from "./RawDeviceStorageView";
 import DeviceStorageRoot, { initStorageRoot } from './DeviceStorageRoot';
+import IDeviceStorage from './IDeviceStorage';
 
-export default class DeviceStorageView {
+export default class DeviceStorageView implements IDeviceStorage {
   rootKey: string;
   rawDeviceStorageView: RawDeviceStorageView;
 
@@ -29,7 +30,7 @@ export default class DeviceStorageView {
     return decodeResult.right;
   }
 
-  write<T extends io.Mixed>(_type: T, key: string, value: io.TypeOf<T>): void {
+  async write<T extends io.Mixed>(_type: T, key: string, value: io.TypeOf<T>) {
     this.rawDeviceStorageView.set({ [key]: value });
   }
 
@@ -37,11 +38,11 @@ export default class DeviceStorageView {
     return await this.read(DeviceStorageRoot, this.rootKey) ?? initStorageRoot();
   }
 
-  writeRoot(root: DeviceStorageRoot): void {
+  async writeRoot(root: DeviceStorageRoot) {
     this.write(DeviceStorageRoot, this.rootKey, root);
   }
 
-  remove(keys: string[]): void {
+  async remove(keys: string[]) {
     this.rawDeviceStorageView.remove(keys);
   }
 

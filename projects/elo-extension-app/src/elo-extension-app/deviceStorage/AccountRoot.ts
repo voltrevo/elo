@@ -13,7 +13,20 @@ const AccountRoot = io.type({
   aggregateStats: AggregateStats,
   lastSessionKey: optional(io.string),
   remoteMigrations: optional(io.type({
-    settings: optional(io.literal(true)),
+    settings: optional(
+      io.type({
+        stage: io.literal('complete'),
+      }),
+    ),
+    sessions: optional(io.union([
+      io.type({
+        stage: io.literal('in-progress'),
+        detailKey: io.string,
+      }),
+      io.type({
+        stage: io.literal('complete'),
+      }),
+    ])),
   })),
 
   // Warning: Please be mindful of the possible need to update mergeAccountRoots if the structure

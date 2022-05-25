@@ -4,6 +4,7 @@ import base58 from '../../common-pure/base58';
 import IRawDeviceStorage from './IRawDeviceStorage';
 import runMigrations from './migrations/runMigrations';
 import DeviceStorageRoot, { initStorageRoot } from './DeviceStorageRoot';
+import IDeviceStorage from './IDeviceStorage';
 
 export const anonymousAccountRootKey = 'elo-user:anonymous';
 
@@ -13,7 +14,7 @@ export function RandomKey() {
   return base58.encode(buf);
 }
 
-export default class DeviceStorage {
+export default class DeviceStorage implements IDeviceStorage {
   private constructor(public rawStorage: IRawDeviceStorage, public rootKey: string) {}
 
   static async Create(rawStorage: IRawDeviceStorage, rootKey: string) {
