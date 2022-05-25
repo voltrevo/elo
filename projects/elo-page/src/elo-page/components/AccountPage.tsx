@@ -34,6 +34,7 @@ const AccountPage: React.FunctionComponent = () => {
 
                   delay(250).then(() => {
                     pageCtx.update({ hash: 'WelcomePage' });
+                    delay(0).then(() => location.reload());
                   });
                 }}
               >
@@ -57,20 +58,21 @@ const AccountPage: React.FunctionComponent = () => {
             </p>
           </div>
           <div className="button-column">
-              <AsyncButton
-                once={true}
-                onClick={async () => {
-                  await appCtx.logout();
-                  pageCtx.update({ needsAuth: true });
+            <AsyncButton
+              once={true}
+              onClick={async () => {
+                await appCtx.logout();
+                pageCtx.update({ needsAuth: true });
 
-                  delay(250).then(() => {
-                    pageCtx.update({ hash: 'WelcomePage' });
-                  });
-                }}
-              >
-                Create an Account
-              </AsyncButton>
-            </div>
+                delay(250).then(() => {
+                  pageCtx.update({ hash: 'WelcomePage' });
+                  delay(0).then(() => location.reload());
+                });
+              }}
+            >
+              Create an Account
+            </AsyncButton>
+          </div>
         </>
       }}/>
     </Section>
