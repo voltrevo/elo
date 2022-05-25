@@ -12,10 +12,18 @@ import SessionMigrationDetail from "./deviceStorage/SessionMigrationDetail";
 import ExtensionApp, { AccountRootWithToken } from "./ExtensionApp";
 import RemoteStorage from "./RemoteStorage";
 
+let called = false;
+
 export default async function remoteMigrations(
   app: ExtensionApp,
   accountRoot: AccountRootWithToken,
 ): Promise<AccountRootWithToken> {
+  if (called) {
+    return accountRoot;
+  }
+
+  called = true;
+
   accountRoot = await migrateSettings(app, accountRoot);
   accountRoot = await migrateSessions(app, accountRoot);
 
