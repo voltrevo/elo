@@ -1,7 +1,9 @@
 import assertExists from "../common-pure/assertExists";
 import delay from "../common-pure/delay";
 import nil from "../common-pure/nil";
+import { initAggregateStats } from "../elo-types/AggregateStats";
 import SessionStats from "../elo-types/SessionStats";
+import accumulateStats from "./accumulateStats";
 import AccountRoot from "./deviceStorage/AccountRoot";
 import { RandomKey } from "./deviceStorage/DeviceStorage";
 import DeviceStorageView from "./deviceStorage/DeviceStorageView";
@@ -64,6 +66,7 @@ async function migrateSessions(
 
     const detail: SessionMigrationDetail = {
       lastUsed: 0,
+      aggregationMigrated: false,
       sessionsMigrated: 0,
       migrations: [],
     };
@@ -132,9 +135,27 @@ async function incrementalSessionMigration(app: ExtensionApp) {
 
   if (Date.now() - detail.lastUsed < 60_000) {
     console.log('Avoiding concurrent incremental migration');
+    return;
   }
 
   await writeDetail();
+
+  if (!detail.aggregationMigrated) {
+    const aggregateStats = (await rs.AggregateStats().get()) ?? initAggregateStats();
+
+    for (const { localSessionKey } of detail.migrations) {
+      const localSession = await app.deviceStorage.read(SessionStats, localSessionKey);
+
+      if (localSession) {
+        accumulateStats(aggregateStats, localSession);
+      }
+    }
+
+    await rs.AggregateStats().set(aggregateStats);
+    detail.aggregationMigrated = true;
+    await writeDetail();
+  }
+
   const sessions = rs.Sessions();
 
   for (
@@ -142,8 +163,10 @@ async function incrementalSessionMigration(app: ExtensionApp) {
     Object.entries(detail.migrations).slice(detail.sessionsMigrated)
   ) {
     const i = Number(iStr);
+
     const localSession = await app.deviceStorage.read(SessionStats, localSessionKey);
     await sessions.Element(remoteSessionId).set(localSession);
+
     detail.sessionsMigrated = i + 1;
     await writeDetail();
     console.log(`Migrated ${i + 1}/${detail.migrations.length} sessions`);
