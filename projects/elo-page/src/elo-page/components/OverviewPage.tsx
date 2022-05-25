@@ -33,9 +33,10 @@ import ExtensionAppContext from '../ExtensionAppContext';
 import addCommas from './helpers/addCommas';
 import AggregateStats from '../../elo-types/AggregateStats';
 import EloPageContext from '../EloPageContext';
-import DeviceStorage from '../../elo-extension-app/deviceStorage/DeviceStorage';
-import AccountRoot from '../../elo-extension-app/deviceStorage/AccountRoot';
 import SessionStats from '../../elo-types/SessionStats';
+import ExtensionAppClient from '../ExtensionAppClient';
+import nil from '../../common-pure/nil';
+import { SessionPage } from '../../elo-extension-app/Protocol';
 
 Chart.register(
   ArcElement,
@@ -91,7 +92,7 @@ const OverviewPage: React.FunctionComponent = () => {
       setFeature(pickFeature(aggregateStats));
 
       if (accountRoot) {
-        setWeeklyStats(await getWeeklyStats(accountRoot.lastSessionKey, pageCtx.deviceStorage));
+        setWeeklyStats(await getWeeklyStats(appCtx));
       }
     })();
   }, []);
@@ -252,7 +253,7 @@ type WeeklyStats = {
   fillersHedges: number,
 }[];
 
-async function getWeeklyStats(sessionKey: string | undefined, deviceStorage: DeviceStorage): Promise<WeeklyStats> {
+async function getWeeklyStats(appCtx: ReturnType<typeof ExtensionAppClient>): Promise<WeeklyStats> {
   const now = Date.now();
   const thisWeek = getWeekNumber(now);
 
@@ -270,31 +271,31 @@ async function getWeeklyStats(sessionKey: string | undefined, deviceStorage: Dev
   }
 
   const result: WeeklyStats = [];
+  let nextId: string | nil = nil;
 
-  const seenSessionKeys = new Set<string>();
+  sessionIteration:
+  while (true) {
+    const sessionPage: SessionPage = await appCtx.getSessionPage(30, nextId);
 
-  while (sessionKey !== undefined && !seenSessionKeys.has(sessionKey)) {
-    seenSessionKeys.add(sessionKey);
+    for (const session of sessionPage.sessions) {
+      const relativeWeek = getRelativeWeekIndex(session.start);
 
-    const session = await deviceStorage.read(SessionStats, sessionKey);
-
-    if (session === undefined) {
-      break;
+      if (relativeWeek === weekLabels.length) {
+        break sessionIteration;
+      }
+  
+      result[relativeWeek] = result[relativeWeek] ?? initWeekStats();
+  
+      result[relativeWeek].speakingTime += session.speakingTime;
+      result[relativeWeek].umsUhs += countUmsUhs(session);
+      result[relativeWeek].fillersHedges += countFillersHedges(session);
     }
 
-    const relativeWeek = getRelativeWeekIndex(session.start);
+    nextId = sessionPage.nextId;
 
-    if (relativeWeek === weekLabels.length) {
+    if (nextId === nil) {
       break;
     }
-
-    result[relativeWeek] = result[relativeWeek] ?? initWeekStats();
-
-    result[relativeWeek].speakingTime += session.speakingTime;
-    result[relativeWeek].umsUhs += countUmsUhs(session);
-    result[relativeWeek].fillersHedges += countFillersHedges(session);
-
-    sessionKey = session.lastSessionKey;
   }
 
   while (result.length < weekLabels.length) {
