@@ -56,15 +56,18 @@ export default class StorageClient {
     direction: 'ascending' | 'descending',
     minElementId?: string,
     maxElementId?: string,
+    offsetParam?: number,
   ): AsyncGenerator<[string, io.TypeOf<T>]> {
     let min = minElementId;
     let max = maxElementId;
+    let offset = offsetParam;
 
     while (true) {
       const { entries: encryptedEntries, nextElementId } = await this.rpcClient.getRange({
         collectionId,
         minElementId: min,
         maxElementId: max,
+        offset,
         direction,
       });
 
@@ -93,6 +96,8 @@ export default class StorageClient {
       } else {
         max = nextElementId;
       }
+
+      offset = nil;
     }
   }
 
@@ -140,26 +145,39 @@ export class StorageCollection<T extends io.Mixed> {
     return new StorageElement(this.client, this.elementType, this.collectionId, elementId);
   }
 
-  RangeEntries(
-    direction: 'ascending' | 'descending',
-    minElementId?: string,
-    maxElementId?: string,
-  ): AsyncGenerator<[string, io.TypeOf<T>]> {
+  RangeEntries({
+    direction = 'ascending',
+    min = nil,
+    max = nil,
+    offset = nil,
+  }: {
+    direction?: 'ascending' | 'descending',
+    min?: string,
+    max?: string,
+    offset?: number,
+  } = {}): AsyncGenerator<[string, io.TypeOf<T>]> {
     return this.client.fullGetRange(
       this.elementType,
       this.collectionId,
       direction,
-      minElementId,
-      maxElementId,
+      min,
+      max,
+      offset,
     );
   }
 
-  async* Range(
-    direction: 'ascending' | 'descending',
-    minElementId?: string,
-    maxElementId?: string,
-  ): AsyncGenerator<io.TypeOf<T>> {
-    for await (const [, element] of this.RangeEntries(direction, minElementId, maxElementId)) {
+  async* Range({
+    direction = 'ascending',
+    min = nil,
+    max = nil,
+    offset = nil,
+  } : {
+    direction?: 'ascending' | 'descending',
+    min?: string,
+    max?: string,
+    offset?: number,
+  } = {}): AsyncGenerator<io.TypeOf<T>> {
+    for await (const [, element] of this.RangeEntries({ direction, min, max, offset })) {
       yield element;
     }
   }
@@ -205,28 +223,40 @@ export class StorageTimedCollection<T extends io.Mixed> {
     return await this.collection.count();
   }
 
-  async* RangeEntries(
-    direction: 'ascending' | 'descending',
+  async* RangeEntries({
+    direction = 'ascending',
+    minTime = nil,
+    maxTime = nil,
+    offset = nil,
+  }: {
+    direction?: 'ascending' | 'descending',
     minTime?: number,
     maxTime?: number,
-  ): AsyncGenerator<[string, io.TypeOf<T>]> {
+    offset?: number,
+  } = {}): AsyncGenerator<[string, io.TypeOf<T>]> {
     const obfuscationSeed = await this.ObfuscationSeed();
 
-    for await (const entry of this.collection.RangeEntries(
+    for await (const entry of this.collection.RangeEntries({
       direction,
-      minTime === nil ? nil : ObfuscatedTimeId(obfuscationSeed, minTime, 0n),
-      maxTime === nil ? nil : ObfuscatedTimeId(obfuscationSeed, maxTime, 0n),
-    )) {
+      min: minTime === nil ? nil : ObfuscatedTimeId(obfuscationSeed, minTime, 0n),
+      max: maxTime === nil ? nil : ObfuscatedTimeId(obfuscationSeed, maxTime, 0n),
+    })) {
       yield entry;
     }
   }
 
-  async* Range(
-    direction: 'ascending' | 'descending',
+  async* Range({
+    direction = 'ascending',
+    minTime = nil,
+    maxTime = nil,
+    offset = nil,
+  }: {
+    direction?: 'ascending' | 'descending',
     minTime?: number,
     maxTime?: number,
-  ): AsyncGenerator<io.TypeOf<T>> {
-    for await (const [, element] of this.RangeEntries(direction, minTime, maxTime)) {
+    offset?: number,
+  } = {}): AsyncGenerator<io.TypeOf<T>> {
+    for await (const [, element] of this.RangeEntries({ direction, minTime, maxTime, offset })) {
       yield element;
     }
   }

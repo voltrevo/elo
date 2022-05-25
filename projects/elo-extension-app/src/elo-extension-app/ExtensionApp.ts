@@ -212,7 +212,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     let count = 0;
     let limit = 10;
 
-    for await (const [sessionId] of unaggregatedSessionIds.RangeEntries('ascending')) {
+    for await (const [sessionId] of unaggregatedSessionIds.RangeEntries({ direction: 'ascending' })) {
       const sessionElement = sessions.Element(sessionId);
 
       const session = await sessionElement.get();
@@ -431,7 +431,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     let count = 0;
     let limit = 10;
 
-    for await (const [sessionId] of rs.UnaggregatedSessionIds().RangeEntries('descending')) {
+    for await (const [sessionId] of rs.UnaggregatedSessionIds().RangeEntries({ direction: 'descending' })) {
       if (count >= limit) {
         console.warn('Couldn\'t aggregate all stats');
         break;
@@ -655,14 +655,17 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     return await rs.Sessions().count();
   }
 
-  async getSessionPage(pageSize: number, firstId?: string) {
+  async getSessionPage(pageSize: number, pageNumber: number) {
     const collection = (await this.requireRemoteStorage()).Sessions();
 
     const res: SessionPage = {
       entries: [],
     };
 
-    for await (const [id, session] of collection.collection.RangeEntries('descending', nil, firstId)) {
+    for await (const [id, session] of collection.collection.RangeEntries({
+      direction: 'descending',
+      offset: pageSize * (pageNumber - 1),
+    })) {
       if (res.entries.length === pageSize) {
         res.nextId = id;
         break;

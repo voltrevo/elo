@@ -35,7 +35,7 @@ const ReportsPage: React.FunctionComponent = () => {
     });
   }
 
-  async function getPage(p: number, depth = 0): Promise<SessionPage | nil> {
+  async function getPage(p: number): Promise<SessionPage | nil> {
     if (pageCache.current[p]) {
       return pageCache.current[p];
     }
@@ -44,25 +44,7 @@ const ReportsPage: React.FunctionComponent = () => {
       return await pagesLoading.current[p];
     }
 
-    if (depth >= 10) {
-      return nil;
-    }
-
-    if (p === 1) {
-      const promise = appCtx.getSessionPage(pageSize, nil);
-      pagesLoading.current[1] = promise;
-      const newSessionPage = await promise;
-      pageCache.current[1] = newSessionPage;
-      return newSessionPage;
-    }
-
-    const firstId = (await getPage(p - 1, depth + 1))?.nextId;
-
-    if (firstId === nil) {
-      return nil;
-    }
-
-    const promise = appCtx.getSessionPage(pageSize, firstId);
+    const promise = appCtx.getSessionPage(pageSize, p);
     pagesLoading.current[p] = promise;
     const newSessionPage = await promise;
     pageCache.current[p] = newSessionPage;

@@ -57,7 +57,7 @@ export type Protocol = {
   readSettings(): Settings | nil;
   writeSettings(settings: Settings): void;
   getSessionCount(): number;
-  getSessionPage(pageSize: number, firstId: string | nil): SessionPage;
+  getSessionPage(pageSize: number, pageNumber: number): SessionPage;
   getSession(sessionId: string): SessionStats | nil;
 };
 

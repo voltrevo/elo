@@ -271,11 +271,11 @@ async function getWeeklyStats(appCtx: ReturnType<typeof ExtensionAppClient>): Pr
   }
 
   const result: WeeklyStats = [];
-  let nextId: string | nil = nil;
+  let pageNumber = 1;
 
   sessionIteration:
   while (true) {
-    const sessionPage: SessionPage = await appCtx.getSessionPage(30, nextId);
+    const sessionPage: SessionPage = await appCtx.getSessionPage(30, pageNumber++);
 
     for (const { session } of sessionPage.entries) {
       const relativeWeek = getRelativeWeekIndex(session.start);
@@ -291,9 +291,7 @@ async function getWeeklyStats(appCtx: ReturnType<typeof ExtensionAppClient>): Pr
       result[relativeWeek].fillersHedges += countFillersHedges(session);
     }
 
-    nextId = sessionPage.nextId;
-
-    if (nextId === nil) {
+    if (sessionPage.nextId === nil) {
       break;
     }
   }
