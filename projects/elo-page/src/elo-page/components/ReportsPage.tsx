@@ -1,6 +1,6 @@
 import * as React from 'react';
 import nil from '../../common-pure/nil';
-import SessionStats from '../../elo-types/SessionStats';
+import { SessionPage } from '../../elo-extension-app/Protocol';
 
 import EloPageContext from '../EloPageContext';
 import ExtensionAppContext from '../ExtensionAppContext';
@@ -12,19 +12,19 @@ const pageSize = 15;
 const ReportsPage: React.FunctionComponent = () => {
   const pageCtx = React.useContext(EloPageContext);
   const appCtx = React.useContext(ExtensionAppContext);
-  const [sessions, setSessions] = React.useState<SessionStats[]>();
+  const [sessionPage, setSessionPage] = React.useState<SessionPage>();
   const [page, setPage] = React.useState(0);
   const [pageCount, setPageCount] = React.useState<number>();
   const pageFirstIds = React.useRef<(string | nil)[]>([]);
 
   React.useEffect(() => {
     (async () => {
-      const sessionPage = await appCtx.getSessionPage(pageSize, nil);
+      const newSessionPage = await appCtx.getSessionPage(pageSize, nil);
 
-      pageFirstIds.current[0] = sessionPage.firstId;
-      pageFirstIds.current[1] = sessionPage.nextId;
+      pageFirstIds.current[0] = newSessionPage.entries[0]?.id;
+      pageFirstIds.current[1] = newSessionPage.nextId;
 
-      setSessions(sessionPage.sessions);
+      setSessionPage(newSessionPage);
 
       const sessionCount = await appCtx.getSessionCount();
       setPageCount(Math.max(1, Math.ceil(sessionCount / pageSize)));
@@ -34,14 +34,14 @@ const ReportsPage: React.FunctionComponent = () => {
   return <Page classes={['reports-page']}>
     <h1>Reports</h1>
 
-    {!sessions && <>Loading...</>}
+    {!sessionPage && <>Loading...</>}
 
-    {sessions && (() => {
+    {sessionPage && (() => {
       const list: React.ReactElement[] = [];
 
       let month: string | undefined = undefined;
 
-      for (const session of sessions) {
+      for (const { id, session } of sessionPage.entries) {
         const sessionMonth = renderMonth(new Date(session.start));
 
         if (sessionMonth !== month) {
@@ -52,8 +52,8 @@ const ReportsPage: React.FunctionComponent = () => {
         list.push(<div
           className="session-item card"
           onClick={() => pageCtx.update({
-            page: 'SessionReportPage',
-            session,
+            hash: `SessionReportPage?id=${id}`,
+            cachedSession: { id, session },
           })}
         >
           <div className="title">
@@ -79,8 +79,8 @@ const ReportsPage: React.FunctionComponent = () => {
             return;
           }
 
-          const sessionPage = await appCtx.getSessionPage(pageSize, key);
-          setSessions(sessionPage.sessions);
+          const newSessionPage = await appCtx.getSessionPage(pageSize, key);
+          setSessionPage(newSessionPage);
           setPage(page - 1);
 
           setTimeout(() => {
@@ -98,10 +98,10 @@ const ReportsPage: React.FunctionComponent = () => {
             return;
           }
 
-          const sessionPage = await appCtx.getSessionPage(pageSize, firstId);
+          const newSessionPage = await appCtx.getSessionPage(pageSize, firstId);
 
-          pageFirstIds.current[page + 2] = sessionPage.nextId;
-          setSessions(sessionPage.sessions);
+          pageFirstIds.current[page + 2] = newSessionPage.nextId;
+          setSessionPage(newSessionPage);
           setPage(page + 1);
 
           setTimeout(() => {

@@ -6,20 +6,21 @@ import type { Config } from './config';
 
 import DeviceStorage from '../elo-extension-app/deviceStorage/DeviceStorage';
 import SessionStats from '../elo-types/SessionStats';
+import nil from '../common-pure/nil';
 
 type EloPageContext = ReturnType<typeof initEloPageContext>;
 
 export function initEloPageContext(
   deviceStorage: DeviceStorage,
   featureFlags: Config['featureFlags'],
-  initialPage: string,
+  initialHash: string,
 ) {
   const state = {
-    page: initialPage,
-    dialog: undefined as (React.ReactNode | undefined),
+    hash: initialHash,
+    dialog: undefined as (React.ReactNode | nil),
     test: 37,
     needsAuth: false,
-    session: undefined as (SessionStats | undefined),
+    cachedSession: undefined as ({ id: string, session: SessionStats | nil } | nil),
   };
 
   const events = new EventEmitter() as TypedEventEmitter<{ update(): void }>;

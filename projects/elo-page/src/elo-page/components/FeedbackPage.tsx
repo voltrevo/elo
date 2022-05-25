@@ -37,7 +37,7 @@ const FeedbackPage: React.FunctionComponent = () => {
           <Button
             onClick={() => {
               pageCtx.update({
-                page: needsAuth
+                hash: needsAuth
                   ? 'WelcomePage'
                   : 'OverviewPage'
               });

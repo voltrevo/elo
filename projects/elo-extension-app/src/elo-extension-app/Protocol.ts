@@ -29,8 +29,10 @@ export type ProtocolLoginCredentials = (
 );
 
 export type SessionPage = {
-  sessions: SessionStats[],
-  firstId?: string,
+  entries: {
+    id: string,
+    session: SessionStats,
+  }[],
   nextId?: string,
 };
 
@@ -56,6 +58,7 @@ export type Protocol = {
   writeSettings(settings: Settings): void;
   getSessionCount(): number;
   getSessionPage(pageSize: number, firstId: string | nil): SessionPage;
+  getSession(sessionId: string): SessionStats | nil;
 };
 
 export const protocolKeyMap: Record<keyof Protocol, true> = {
@@ -80,6 +83,7 @@ export const protocolKeyMap: Record<keyof Protocol, true> = {
   writeSettings: true,
   getSessionCount: true,
   getSessionPage: true,
+  getSession: true,
 };
 
 export const protocolThirdPartyKeyMap = {

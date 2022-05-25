@@ -31,9 +31,9 @@ window.addEventListener('load', async () => {
     accountRoot === undefined
   );
 
-  if (pageCtx.state.page === '') {
+  if (pageCtx.state.hash === '') {
     pageCtx.update({
-      page: pageCtx.state.needsAuth ? 'WelcomePage' : 'OverviewPage',
+      hash: pageCtx.state.needsAuth ? 'WelcomePage' : 'OverviewPage',
     });
   }
 

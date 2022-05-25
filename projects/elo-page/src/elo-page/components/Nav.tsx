@@ -6,44 +6,44 @@ import NavLink from './NavLink';
 
 const Nav: react.FunctionComponent = () => {
   const pageCtx = react.useContext(EloPageContext);
-  const page = useEloPageContext(s => s.page);
+  const hash = useEloPageContext(s => s.hash);
   const needsAuth = useEloPageContext(s => s.needsAuth);
 
   const links = needsAuth ? [
     {
       text: 'Welcome',
-      page: 'WelcomePage',
+      hash: 'WelcomePage',
       icon: <Star size={24}/>,
     },
     {
       text: 'Feedback',
-      page: 'FeedbackPage',
+      hash: 'FeedbackPage',
       icon: <Question size={24}/>,
     },
   ] : [
     {
       text: 'Overview',
-      page: 'OverviewPage',
+      hash: 'OverviewPage',
       icon: <ChartLine size={24}/>,
     },
     {
       text: 'Reports',
-      page: 'ReportsPage',
+      hash: 'ReportsPage',
       icon: <PresentationChart size={24}/>,
     },
     {
       text: 'Settings',
-      page: 'SettingsPage',
+      hash: 'SettingsPage',
       icon: <GearSix size={24}/>,
     },
     {
       text: 'Feedback',
-      page: 'FeedbackPage',
+      hash: 'FeedbackPage',
       icon: <Question size={24}/>,
     },
     {
       text: 'Account',
-      page: 'AccountPage',
+      hash: 'AccountPage',
       icon: <User size={24}/>,
     },
   ];
@@ -55,8 +55,8 @@ const Nav: react.FunctionComponent = () => {
       {links.map(link => (
         <NavLink
           icon={link.icon}
-          selected={link.page === page}
-          onClick={() => pageCtx.update({ page: link.page })}
+          selected={link.hash === hash}
+          onClick={() => pageCtx.update({ hash: link.hash })}
         >
           {link.text}
         </NavLink>

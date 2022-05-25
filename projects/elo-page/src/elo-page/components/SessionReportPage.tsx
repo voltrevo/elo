@@ -1,13 +1,41 @@
 import * as React from 'react';
+import nil from '../../common-pure/nil';
 
-import { useEloPageContext } from '../EloPageContext';
+import EloPageContext, { useEloPageContext } from '../EloPageContext';
+import ExtensionAppContext from '../ExtensionAppContext';
 import SessionDateTime from './helpers/SessionDateTime';
 
 const SessionReportPage: React.FunctionComponent = () => {
-  const maybeSession = useEloPageContext(s => s.session);
+  const appCtx = React.useContext(ExtensionAppContext);
+  const pageCtx = React.useContext(EloPageContext);
+  const cachedSession = useEloPageContext(s => s.cachedSession);
 
-  if (maybeSession === undefined) {
-    return <>Missing session</>;
+  const sessionId = useEloPageContext(state => {
+    const synthUrl = new URL(`http://example.com/${state.hash}`);
+    return synthUrl.searchParams.get('id') ?? nil;
+  });
+
+  if (sessionId === nil) {
+    return <>Missing sessionId</>;
+  }
+
+  if (cachedSession?.id !== sessionId) {
+    setTimeout(async () => {
+      pageCtx.update({
+        cachedSession: {
+          id: sessionId,
+          session: await appCtx.getSession(sessionId),
+        },
+      });
+    });
+
+    return <>Loading...</>;
+  }
+
+  const maybeSession = cachedSession.session;
+
+  if (maybeSession === nil) {
+    return <>Session not found</>;
   }
 
   const session = maybeSession;

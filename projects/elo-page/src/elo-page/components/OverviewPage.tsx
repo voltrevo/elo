@@ -277,7 +277,7 @@ async function getWeeklyStats(appCtx: ReturnType<typeof ExtensionAppClient>): Pr
   while (true) {
     const sessionPage: SessionPage = await appCtx.getSessionPage(30, nextId);
 
-    for (const session of sessionPage.sessions) {
+    for (const { session } of sessionPage.entries) {
       const relativeWeek = getRelativeWeekIndex(session.start);
 
       if (relativeWeek === weekLabels.length) {

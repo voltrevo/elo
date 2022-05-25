@@ -35,10 +35,10 @@ window.addEventListener('load', async () => {
   const needsAuth = config.featureFlags.authEnabled && !accountRoot;
   pageCtx.state.needsAuth = needsAuth;
 
-  if (pageCtx.state.page === '') {
+  if (pageCtx.state.hash === '') {
     pageCtx.update({
       needsAuth,
-      page: needsAuth ? 'WelcomePage' : 'OverviewPage',
+      hash: needsAuth ? 'WelcomePage' : 'OverviewPage',
     });
   }
 

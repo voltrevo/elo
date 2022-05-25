@@ -15,7 +15,11 @@ import SessionReportPage from './SessionReportPage';
 import SettingsPage from './SettingsPage';
 
 const EloPage: React.FunctionComponent = () => {
-  const page = useEloPageContext(state => state.page);
+  const page = useEloPageContext(state => {
+    const synthUrl = new URL(`http://example.com/${state.hash}`);
+    return synthUrl.pathname.slice(1);
+  });
+
   const dialog = useEloPageContext(state => state.dialog);
 
   const pageElement = (() => {

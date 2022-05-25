@@ -334,6 +334,6 @@ function proceed(pageCtx: EloPageContext) {
   pageCtx.update({ needsAuth: false });
 
   delay(250).then(() => {
-    pageCtx.update({ page: 'OverviewPage' });
+    pageCtx.update({ hash: 'OverviewPage' });
   });
 }

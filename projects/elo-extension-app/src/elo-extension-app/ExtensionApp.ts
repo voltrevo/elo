@@ -635,19 +635,24 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     const collection = (await this.requireRemoteStorage()).Sessions();
 
     const res: SessionPage = {
-      sessions: [],
+      entries: [],
     };
 
     for await (const [id, session] of collection.collection.RangeEntries('descending', nil, firstId)) {
-      if (res.sessions.length === pageSize) {
+      if (res.entries.length === pageSize) {
         res.nextId = id;
         break;
       }
 
-      res.firstId ??= id;
-      res.sessions.push(session);
+      res.entries.push({ id, session });
     }
 
     return res;
+  }
+
+  async getSession(id: string) {
+    const collection = (await this.requireRemoteStorage()).Sessions();
+
+    return await collection.Element(id).get();
   }
 }

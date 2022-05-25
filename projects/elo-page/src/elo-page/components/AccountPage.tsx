@@ -33,7 +33,7 @@ const AccountPage: React.FunctionComponent = () => {
                   pageCtx.update({ needsAuth: true });
 
                   delay(250).then(() => {
-                    pageCtx.update({ page: 'WelcomePage' });
+                    pageCtx.update({ hash: 'WelcomePage' });
                   });
                 }}
               >
@@ -64,7 +64,7 @@ const AccountPage: React.FunctionComponent = () => {
                   pageCtx.update({ needsAuth: true });
 
                   delay(250).then(() => {
-                    pageCtx.update({ page: 'WelcomePage' });
+                    pageCtx.update({ hash: 'WelcomePage' });
                   });
                 }}
               >
