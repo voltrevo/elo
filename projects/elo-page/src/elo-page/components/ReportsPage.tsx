@@ -1,8 +1,9 @@
 import * as React from 'react';
+import clamp from '../../common-pure/clamp';
 import nil from '../../common-pure/nil';
 import { SessionPage } from '../../elo-extension-app/Protocol';
 
-import EloPageContext from '../EloPageContext';
+import EloPageContext, { useEloPageContext } from '../EloPageContext';
 import ExtensionAppContext from '../ExtensionAppContext';
 import SessionDateTime from './helpers/SessionDateTime';
 import Page from './Page';
@@ -12,24 +13,90 @@ const pageSize = 15;
 const ReportsPage: React.FunctionComponent = () => {
   const pageCtx = React.useContext(EloPageContext);
   const appCtx = React.useContext(ExtensionAppContext);
-  const [sessionPage, setSessionPage] = React.useState<SessionPage>();
-  const [page, setPage] = React.useState(0);
   const [pageCount, setPageCount] = React.useState<number>();
-  const pageFirstIds = React.useRef<(string | nil)[]>([]);
+  const pageCache = React.useRef<(SessionPage | nil)[]>([]);
+  const pagesLoading = React.useRef<(Promise<SessionPage | nil> | nil)[]>([]);
+  const lastRenderedPageNumber = React.useRef<number>();
+  const scrollTarget = React.useRef<HTMLElement>();
+  const [, setRandom] = React.useState<number>();
+
+  const pageNumber = useEloPageContext(state => {
+    const synthUrl = new URL(`http://example.com/${state.hash}`);
+    const p = Number(synthUrl.searchParams.get('p'));
+
+    return Number.isFinite(p) ? clamp(1, p, pageCount ?? Infinity) : 1;
+  });
+
+  function setPageNumber(p: number) {
+    p = clamp(1, p, pageCount ?? Infinity);
+
+    pageCtx.update({
+      hash: `ReportsPage?p=${p}`,
+    });
+  }
+
+  async function getPage(p: number, depth = 0): Promise<SessionPage | nil> {
+    if (pageCache.current[p]) {
+      return pageCache.current[p];
+    }
+
+    if (pagesLoading.current[p]) {
+      return await pagesLoading.current[p];
+    }
+
+    if (depth >= 10) {
+      return nil;
+    }
+
+    if (p === 1) {
+      const promise = appCtx.getSessionPage(pageSize, nil);
+      pagesLoading.current[1] = promise;
+      const newSessionPage = await promise;
+      pageCache.current[1] = newSessionPage;
+      return newSessionPage;
+    }
+
+    const firstId = (await getPage(p - 1, depth + 1))?.nextId;
+
+    if (firstId === nil) {
+      return nil;
+    }
+
+    const promise = appCtx.getSessionPage(pageSize, firstId);
+    pagesLoading.current[p] = promise;
+    const newSessionPage = await promise;
+    pageCache.current[p] = newSessionPage;
+    return newSessionPage;
+  }
 
   React.useEffect(() => {
     (async () => {
-      const newSessionPage = await appCtx.getSessionPage(pageSize, nil);
+      const [, sessionCount] = await Promise.all([
+        getPage(pageNumber),
+        await appCtx.getSessionCount(),
+      ]);
 
-      pageFirstIds.current[0] = newSessionPage.entries[0]?.id;
-      pageFirstIds.current[1] = newSessionPage.nextId;
-
-      setSessionPage(newSessionPage);
-
-      const sessionCount = await appCtx.getSessionCount();
       setPageCount(Math.max(1, Math.ceil(sessionCount / pageSize)));
     })();
   }, []);
+
+  const sessionPage = pageCache.current[pageNumber];
+
+  if (sessionPage && lastRenderedPageNumber.current !== pageNumber) {
+    lastRenderedPageNumber.current = pageNumber;
+    scrollTarget.current?.scrollIntoView();
+    scrollTarget.current = nil;
+  }
+
+  if (!sessionPage) {
+    setTimeout(async () => {
+      if (await getPage(pageNumber) !== nil) {
+        // FIXME: The way this page works has gotten messy. This technique for manually
+        // re-rendering should currently be ok but the pattern risks nasty render loops.
+        setRandom(Math.random());
+      }
+    });
+  }
 
   return <Page classes={['reports-page']}>
     <h1>Reports</h1>
@@ -71,42 +138,18 @@ const ReportsPage: React.FunctionComponent = () => {
     })()}
     <div className="pagination-footer">
       <div
-        className={`pagination-link ${page <= 0 && 'disabled'}`}
+        className={`pagination-link ${pageNumber <= 1 && 'disabled'}`}
         onClick={async (evt) => {
-          const key = pageFirstIds.current[page - 1];
-
-          if (key === undefined) {
-            return;
-          }
-
-          const newSessionPage = await appCtx.getSessionPage(pageSize, key);
-          setSessionPage(newSessionPage);
-          setPage(page - 1);
-
-          setTimeout(() => {
-            (evt.target as HTMLDivElement).scrollIntoView();
-          });
+          setPageNumber(pageNumber - 1);
+          scrollTarget.current = evt.target as HTMLElement;
         }}
       >&lt;</div>
-      <div>{page + 1}/{pageCount}</div>
+      <div>{pageNumber}/{pageCount}</div>
       <div
-        className={`pagination-link ${((page + 1) >= (pageCount ?? 0)) && 'disabled'}`}
+        className={`pagination-link ${((pageNumber) >= (pageCount ?? 0)) && 'disabled'}`}
         onClick={async (evt) => {
-          const firstId = pageFirstIds.current[page + 1];
-
-          if (firstId === nil) {
-            return;
-          }
-
-          const newSessionPage = await appCtx.getSessionPage(pageSize, firstId);
-
-          pageFirstIds.current[page + 2] = newSessionPage.nextId;
-          setSessionPage(newSessionPage);
-          setPage(page + 1);
-
-          setTimeout(() => {
-            (evt.target as HTMLDivElement).scrollIntoView();
-          });
+          setPageNumber(pageNumber + 1);
+          scrollTarget.current = evt.target as HTMLElement;
         }}
       >&gt;</div>
     </div>
