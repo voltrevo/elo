@@ -27,6 +27,7 @@ import Settings from './sharedStorageTypes/Settings';
 import Throttle from './helpers/Throttle';
 import delay from '../common-pure/delay';
 import remoteMigrations from './remoteMigrations';
+import Lock from './Lock';
 
 export type AccountRootWithToken = AccountRoot & { eloLoginToken: string };
 
@@ -43,6 +44,8 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   remoteSession?: StorageElement<typeof SessionStats>;
   writeRemoteSessionThrottle = new Throttle(30_000);
   cachedSettings?: Settings;
+
+  readAccountRootLock?: Lock;
 
   sessionKey = RandomKey(); // FIXME
 
@@ -67,52 +70,67 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   }
 
   async readAccountRoot(): Promise<AccountRootWithToken | nil> {
-    const root = await this.deviceStorage.readRoot();
+    while (this.readAccountRootLock) {
+      await this.readAccountRootLock.wait();
+    }
 
-    if (!root.accountRoot) {
-      const existingAnonymousAccountRoot = await this.deviceStorage.read(
-        AccountRoot,
-        anonymousAccountRootKey,
-      );
+    const lock = new Lock();
+    this.readAccountRootLock = lock;
 
-      if (!existingAnonymousAccountRoot) {
-        // This is where anonymous accounts used to be generated. We don't do
-        // that anymore. This is the meaning of readAccountRoot returning nil -
-        // the user doesn't have an account, and the app might need to prompt
-        // the user to create one.
-        return nil;
+    try {
+      const root = await this.deviceStorage.readRoot();
+
+      if (!root.accountRoot) {
+        const existingAnonymousAccountRoot = await this.deviceStorage.read(
+          AccountRoot,
+          anonymousAccountRootKey,
+        );
+
+        if (!existingAnonymousAccountRoot) {
+          // This is where anonymous accounts used to be generated. We don't do
+          // that anymore. This is the meaning of readAccountRoot returning nil -
+          // the user doesn't have an account, and the app might need to prompt
+          // the user to create one.
+          return nil;
+        }
+
+        root.accountRoot = anonymousAccountRootKey;
+        await this.deviceStorage.writeRoot(root);
       }
 
-      root.accountRoot = anonymousAccountRootKey;
-      await this.deviceStorage.writeRoot(root);
+      const accountRoot = await this.deviceStorage.read(AccountRoot, root.accountRoot);
+
+      if (accountRoot === nil) {
+        throw new Error('Failed to read account root');
+      }
+
+      if (accountRoot.eloLoginToken === nil) {
+        const grant = await this.backendApi.grantTokenForAnonymousUserId({
+          userId: accountRoot.userId,
+        });
+
+        accountRoot.eloLoginToken = grant.eloLoginToken;
+        await this.writeAccountRoot(accountRoot);
+
+        await this.backendApi.acceptTokenForAnonymousUserId({
+          eloLoginToken: grant.eloLoginToken,
+        });
+      }
+
+      // This does nothing important at runtime, but TypeScript is just not quite able to infer
+      // correctly without specifying eloLoginToken again here.
+      let accountRootWithToken = { ...accountRoot, eloLoginToken: accountRoot.eloLoginToken };
+
+      accountRootWithToken = await remoteMigrations(this, accountRootWithToken);
+
+      return accountRootWithToken;
+    } finally {
+      if (this.readAccountRootLock === lock) {
+        this.readAccountRootLock = nil;
+      }
+
+      lock.release();
     }
-
-    const accountRoot = await this.deviceStorage.read(AccountRoot, root.accountRoot);
-
-    if (accountRoot === nil) {
-      throw new Error('Failed to read account root');
-    }
-
-    if (accountRoot.eloLoginToken === nil) {
-      const grant = await this.backendApi.grantTokenForAnonymousUserId({
-        userId: accountRoot.userId,
-      });
-
-      accountRoot.eloLoginToken = grant.eloLoginToken;
-      await this.writeAccountRoot(accountRoot);
-
-      await this.backendApi.acceptTokenForAnonymousUserId({
-        eloLoginToken: grant.eloLoginToken,
-      });
-    }
-
-    // This does nothing important at runtime, but TypeScript is just not quite able to infer
-    // correctly without specifying eloLoginToken again here.
-    let accountRootWithToken = { ...accountRoot, eloLoginToken: accountRoot.eloLoginToken };
-
-    accountRootWithToken = await remoteMigrations(this, accountRootWithToken);
-
-    return accountRootWithToken;
   }
 
   async writeAccountRoot(accountRoot: AccountRoot) {
