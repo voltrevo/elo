@@ -122,12 +122,12 @@ const generalUserData = {
 
     if (minElementId !== nil) {
       minMaxArgs.push(minElementId);
-      minSql = `AND $${nextArgId++} ${minCmp} element_id`;
+      minSql = `AND $${nextArgId++} ${minCmp} (element_id COLLATE "C")`;
     }
 
     if (maxElementId !== nil) {
       minMaxArgs.push(maxElementId);
-      maxSql = `AND element_id ${maxCmp} $${nextArgId++}`;
+      maxSql = `AND (element_id COLLATE "C") ${maxCmp} $${nextArgId++}`;
     }
 
     // Note the `COLLATE "C"` below. This enforces a case sensitive sort order which is necessary
