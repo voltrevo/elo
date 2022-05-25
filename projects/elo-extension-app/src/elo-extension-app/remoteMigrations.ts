@@ -90,7 +90,7 @@ async function migrateSessions(
     const wholeStorage = await deviceStorageView.rawDeviceStorageView.get();
 
     for (const [key, value] of Object.entries(wholeStorage)) {
-      if (isSession(value)) {
+      if (isSession(value) && value.userId === accountRoot.userId) {
         detail.migrations.push({
           localSessionKey: key,
           remoteSessionId: await rs.Sessions().ElementId(value.start),
