@@ -66,7 +66,10 @@ const ReportsPage: React.FunctionComponent = () => {
 
   if (sessionPage && lastRenderedPageNumber.current !== pageNumber) {
     lastRenderedPageNumber.current = pageNumber;
-    scrollTarget.current?.scrollIntoView();
+    
+    const st = scrollTarget.current;
+    setTimeout(() => st?.scrollIntoView());
+    
     scrollTarget.current = nil;
   }
 
