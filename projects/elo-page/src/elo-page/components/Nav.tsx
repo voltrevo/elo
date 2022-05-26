@@ -16,7 +16,7 @@ const Nav: react.FunctionComponent = () => {
     (async () => {
       setIsStaffMember(await appCtx.isStaffMember());
     })();
-  }, []);
+  }, [needsAuth]);
 
   const links = needsAuth ? [
     {
