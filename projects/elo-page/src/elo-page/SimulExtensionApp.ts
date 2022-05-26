@@ -134,17 +134,10 @@ class SimulBackendApi implements IBackendApi {
     return { verified: code === keccak_256(email).slice(0, 6) };
   }
 
-  grantTokenForAnonymousUserId(
-    _body: io.TypeOf<Spec['grantTokenForAnonymousUserId']['Request']>,
-  ): never {
-    throw new Error('Not implemented');
-  }
-
-  acceptTokenForAnonymousUserId(
-    _body: io.TypeOf<Spec['acceptTokenForAnonymousUserId']['Request']>,
-  ): never {
-    throw new Error('Not implemented');
-  }
+  grantTokenForAnonymousUserId(): never { throw new Error('Not implemented'); }
+  acceptTokenForAnonymousUserId(): never { throw new Error('Not implemented'); }
+  monthlyStats(): never { throw new Error('Not implemented'); }
+  isStaffMember(): never { throw new Error('Not implemented'); }
 }
 
 class SimulGoogleAuthApi implements IGoogleAuthApi {

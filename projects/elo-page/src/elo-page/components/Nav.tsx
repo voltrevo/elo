@@ -1,13 +1,22 @@
-import { ChartLine, Gear, GearSix, PresentationChart, Question, Star, User } from 'phosphor-react';
+import { ChartLine, GearSix, PresentationChart, Question, Star, User, UsersFour } from 'phosphor-react';
 import * as react from 'react';
 import EloPageContext, { useEloPageContext } from '../EloPageContext';
+import ExtensionAppContext from '../ExtensionAppContext';
 
 import NavLink from './NavLink';
 
 const Nav: react.FunctionComponent = () => {
+  const appCtx = react.useContext(ExtensionAppContext);
   const pageCtx = react.useContext(EloPageContext);
   const hash = useEloPageContext(s => s.hash);
   const needsAuth = useEloPageContext(s => s.needsAuth);
+  const [isStaffMember, setIsStaffMember] = react.useState<boolean>();
+
+  react.useEffect(() => {
+    (async () => {
+      setIsStaffMember(await appCtx.isStaffMember());
+    })();
+  }, []);
 
   const links = needsAuth ? [
     {
@@ -47,6 +56,14 @@ const Nav: react.FunctionComponent = () => {
       icon: <User size={24}/>,
     },
   ];
+
+  if (isStaffMember) {
+    links.push({
+      text: 'User Stats',
+      hash: 'UserStatsPage',
+      icon: <UsersFour size={24}/>,
+    });
+  }
 
   return <div className="nav">
     <div className="logo-box"/>

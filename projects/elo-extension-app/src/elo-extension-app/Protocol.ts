@@ -59,6 +59,7 @@ export type Protocol = {
   getSessionCount(): number;
   getSessionPage(pageSize: number, pageNumber: number): SessionPage;
   getSession(sessionId: string): SessionStats | nil;
+  isStaffMember(): boolean;
 };
 
 export const protocolKeyMap: Record<keyof Protocol, true> = {
@@ -84,6 +85,7 @@ export const protocolKeyMap: Record<keyof Protocol, true> = {
   getSessionCount: true,
   getSessionPage: true,
   getSession: true,
+  isStaffMember: true,
 };
 
 export const protocolThirdPartyKeyMap = {

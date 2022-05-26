@@ -47,6 +47,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   cachedSettings?: Settings;
 
   readAccountRootLock?: Lock;
+  isStaffMember_?: boolean;
 
   sessionKey = RandomKey(); // FIXME
 
@@ -681,5 +682,21 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     const collection = (await this.requireRemoteStorage()).Sessions();
 
     return await collection.Element(id).get();
+  }
+
+  async isStaffMember(): Promise<boolean> {
+    const accountRoot =  await this.readAccountRoot();
+
+    if (accountRoot === nil) {
+      return false;
+    }
+
+    if (this.isStaffMember_ === nil) {
+      this.isStaffMember_ = await this.backendApi.isStaffMember({
+        eloLoginToken: accountRoot.eloLoginToken,
+      });
+    }
+
+    return this.isStaffMember_;
   }
 }

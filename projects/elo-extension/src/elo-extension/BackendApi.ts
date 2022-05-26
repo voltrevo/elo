@@ -86,4 +86,12 @@ export default class BackendApi implements IBackendApi {
   acceptTokenForAnonymousUserId(body: io.TypeOf<Spec['acceptTokenForAnonymousUserId']['Request']>) {
     return this.genericCall('acceptTokenForAnonymousUserId', body);
   }
+
+  monthlyStats(body: io.TypeOf<Spec['monthlyStats']['Request']>) {
+    return this.genericCall('monthlyStats', body);
+  }
+
+  isStaffMember(body: io.TypeOf<Spec['isStaffMember']['Request']>) {
+    return this.genericCall('isStaffMember', body);
+  }
 }
