@@ -81,6 +81,11 @@ const backendApiSpec = {
       sessions: io.number,
     })),
   },
+
+  isStaffMember: {
+    Request: io.type({ eloLoginToken: io.string }),
+    Response: io.boolean,
+  },
 };
 
 export default backendApiSpec;
