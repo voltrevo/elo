@@ -240,6 +240,7 @@ export class StorageTimedCollection<T extends io.Mixed> {
       direction,
       min: minTime === nil ? nil : ObfuscatedTimeId(obfuscationSeed, minTime, 0n),
       max: maxTime === nil ? nil : ObfuscatedTimeId(obfuscationSeed, maxTime, 0n),
+      offset,
     })) {
       yield entry;
     }
