@@ -29,6 +29,8 @@ import delay from '../common-pure/delay';
 import remoteMigrations from './remoteMigrations';
 import Lock from './Lock';
 import IDeviceStorage from './deviceStorage/IDeviceStorage';
+import BackendApi from '../elo-extension/BackendApi';
+import assertExists from '../common-pure/assertExists';
 
 export type AccountRootWithToken = AccountRoot & { eloLoginToken: string };
 
@@ -698,5 +700,11 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     }
 
     return this.isStaffMember_;
+  }
+
+  async getMonthlyStats(): ReturnType<IBackendApi['monthlyStats']> {
+    return this.backendApi.monthlyStats({
+      eloLoginToken: assertExists(await this.readAccountRoot()).eloLoginToken,
+    });
   }
 }

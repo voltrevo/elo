@@ -13,6 +13,7 @@ import Field from './Field';
 import OverviewPage from './OverviewPage';
 import SessionReportPage from './SessionReportPage';
 import SettingsPage from './SettingsPage';
+import UserStatsPage from './UserStatsPage';
 
 const EloPage: React.FunctionComponent = () => {
   const page = useEloPageContext(state => {
@@ -49,6 +50,10 @@ const EloPage: React.FunctionComponent = () => {
 
     if (page === 'SessionReportPage') {
       return <SessionReportPage />;
+    }
+
+    if (page === 'UserStatsPage') {
+      return <UserStatsPage />;
     }
 
     return <Page classes={['form-page']}>

@@ -9,6 +9,8 @@ import AggregateStats from '../elo-types/AggregateStats';
 import nil from '../common-pure/nil';
 import Settings from './sharedStorageTypes/Settings';
 import SessionStats from '../elo-types/SessionStats';
+import IBackendApi from './IBackendApi';
+import AsyncReturnType from '../common-pure/AsyncReturnType';
 
 const ProtocolRegistration = io.union([
   io.type({
@@ -60,6 +62,7 @@ export type Protocol = {
   getSessionPage(pageSize: number, pageNumber: number): SessionPage;
   getSession(sessionId: string): SessionStats | nil;
   isStaffMember(): boolean;
+  getMonthlyStats(): AsyncReturnType<IBackendApi['monthlyStats']>;
 };
 
 export const protocolKeyMap: Record<keyof Protocol, true> = {
@@ -86,6 +89,7 @@ export const protocolKeyMap: Record<keyof Protocol, true> = {
   getSessionPage: true,
   getSession: true,
   isStaffMember: true,
+  getMonthlyStats: true,
 };
 
 export const protocolThirdPartyKeyMap = {
