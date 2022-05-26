@@ -94,6 +94,8 @@ export default UserStatsPage;
 const charts = new WeakMap<HTMLCanvasElement, Chart>();
 
 function renderChart(chartRef: HTMLCanvasElement, monthlyStats: MonthlyStats) {
+  monthlyStats = monthlyStats.slice().reverse();
+
   const lines = [
     {
       key: 'activeUsers' as const,
