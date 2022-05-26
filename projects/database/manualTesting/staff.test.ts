@@ -8,15 +8,9 @@ import config from "./config";
   const db = new Database(config.pgConnString);
 
   try {
-    await users.insert(db, {
-      id: 'fake-id3',
-      email: 'email3',
-      password_hash: 'hash',
-      password_salt: 'salt',
-      oauth_providers: [],
-    });
-  
-    console.log(await users.lookup(db, { id: 'fake-id3' }));
+    console.log(
+      await users.lookupStaffEmail(db, 'asdf') ?? '(not staff)'
+    );
   } finally {
     await db.disconnect();
   }
