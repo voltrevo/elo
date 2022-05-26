@@ -2,7 +2,7 @@ import crypto from 'crypto';
 
 import base58 from '../../common-pure/base58';
 import never from '../../common-pure/never';
-import { insertUser, lookupUser } from '../../database/queries/users';
+import users from '../../database/queries/users';
 import checkEmailVerification from '../checkEmailVerification';
 import fetchGoogleTokenInfo from '../fetchGoogleTokenInfo';
 import hashPassword from '../hashPassword';
@@ -83,7 +83,7 @@ const registerRoute: RouteDefinition<'register'> = async (
     : null;
 
   try {
-    await insertUser(db, {
+    await users.insert(db, {
       id: userId,
       email,
       password_hash,
@@ -92,8 +92,8 @@ const registerRoute: RouteDefinition<'register'> = async (
     });
   } catch (error) {
     const existingUser = (
-      await lookupUser(db, { email }) ??
-      (userIdHint && await lookupUser(db, { id: userIdHint }))
+      await users.lookup(db, { email }) ??
+      (userIdHint && await users.lookup(db, { id: userIdHint }))
     );
 
     if (existingUser) {

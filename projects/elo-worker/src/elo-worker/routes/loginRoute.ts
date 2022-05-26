@@ -1,5 +1,5 @@
 import never from '../../common-pure/never';
-import { lookupUser } from '../../database/queries/users';
+import users from '../../database/queries/users';
 import fetchGoogleTokenInfo from '../fetchGoogleTokenInfo';
 import hashPassword from '../hashPassword';
 import { RouteDefinition } from './routeSystem';
@@ -9,7 +9,7 @@ const loginRoute: RouteDefinition<'login'> = async (
   loginCredentials,
 ) => {
   if ('email' in loginCredentials) {
-    const existingUser = await lookupUser(db, { email: loginCredentials.email });
+    const existingUser = await users.lookup(db, { email: loginCredentials.email });
 
     const success = (
       existingUser &&
@@ -62,7 +62,7 @@ const loginRoute: RouteDefinition<'login'> = async (
       };
     }
 
-    const existingUser = await lookupUser(db, { email: tokenInfo.email });
+    const existingUser = await users.lookup(db, { email: tokenInfo.email });
 
     if (!existingUser) {
       return {

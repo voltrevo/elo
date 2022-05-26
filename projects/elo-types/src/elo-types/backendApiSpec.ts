@@ -70,6 +70,17 @@ const backendApiSpec = {
     Request: io.type({ eloLoginToken: io.string }),
     Response: io.type({}),
   },
+
+  monthlyStats: {
+    Request: io.type({ eloLoginToken: io.string }),
+    Response: io.array(io.type({
+      month: io.string,
+      activeUsers: io.number,
+      spokenHours: io.number,
+      streamedHours: io.number,
+      sessions: io.number,
+    })),
+  },
 };
 
 export default backendApiSpec;

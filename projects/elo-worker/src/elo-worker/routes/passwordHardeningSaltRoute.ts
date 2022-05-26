@@ -1,5 +1,5 @@
 import { keccak256 } from 'js-sha3';
-import { lookupUser } from '../../database/queries/users';
+import users from '../../database/queries/users';
 import checkEmailVerification from '../checkEmailVerification';
 import { generateUserId, validateUserId } from '../userIds';
 import { RouteDefinition } from './routeSystem';
@@ -24,7 +24,7 @@ const passwordHardeningSaltRoute: RouteDefinition<'passwordHardeningSalt'> = asy
     }
   }
 
-  const existingUser = await lookupUser(db, { email });
+  const existingUser = await users.lookup(db, { email });
 
   const userId = (
     existingUser?.id ??

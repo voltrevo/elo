@@ -3,6 +3,7 @@ import acceptTokenForAnonymousUserIdRoute from './acceptTokenForAnonymousUserIdR
 import checkVerificationEmailRoute from './checkVerificationEmailRoute';
 import grantTokenForAnonymousUserIdRoute from './grantTokenForAnonymousUserIdRoute';
 import loginRoute from './loginRoute';
+import monthlyStatsRoute from './monthlyStatsRoute';
 import passwordHardeningSaltRoute from './passwordHardeningSaltRoute';
 import registerRoute from './registerRoute';
 import { RouteDefinition } from './routeSystem';
@@ -24,6 +25,7 @@ const allRouteDefinitions: {
   checkVerificationEmail: checkVerificationEmailRoute,
   grantTokenForAnonymousUserId: grantTokenForAnonymousUserIdRoute,
   acceptTokenForAnonymousUserId: acceptTokenForAnonymousUserIdRoute,
+  monthlyStats: monthlyStatsRoute,
 };
 
 export default allRouteDefinitions;

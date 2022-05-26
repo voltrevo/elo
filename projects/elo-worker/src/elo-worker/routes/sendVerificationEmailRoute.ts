@@ -1,6 +1,6 @@
 import Range from '../../common-pure/Range';
 import { upsertEmailVerification } from '../../database/queries/emailVerification';
-import { lookupUser } from '../../database/queries/users';
+import users from '../../database/queries/users';
 import { RouteDefinition } from './routeSystem';
 
 const verificationCodeAlphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -9,7 +9,7 @@ const sendVerificationEmailRoute: RouteDefinition<'sendVerificationEmail'> = asy
   { db, emailService },
   { email },
 ) => {
-  const existingUser = await lookupUser(db, { email });
+  const existingUser = await users.lookup(db, { email });
 
   if (existingUser) {
     await emailService.send('notifications', {
