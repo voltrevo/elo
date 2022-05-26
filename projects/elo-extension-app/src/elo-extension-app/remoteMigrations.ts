@@ -83,7 +83,7 @@ async function migrateSessions(
       await app.makeStorageClient(accountRoot.eloLoginToken),
     );
 
-    const rs = app.remoteStorage;
+    const sessions = app.remoteStorage.Sessions();
 
     const deviceStorageView = new DeviceStorageView(app.deviceStorage);
 
@@ -93,7 +93,7 @@ async function migrateSessions(
       if (isSession(value) && value.userId === accountRoot.userId) {
         detail.migrations.push({
           localSessionKey: key,
-          remoteSessionId: await rs.Sessions().ElementId(value.start),
+          remoteSessionId: await sessions.ElementId(value.start),
         });
       }
     }
