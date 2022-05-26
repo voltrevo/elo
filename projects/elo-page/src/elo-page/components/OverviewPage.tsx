@@ -88,7 +88,7 @@ const OverviewPage: React.FunctionComponent = () => {
       const accountRoot = await appCtx.readAccountRoot();
 
       setSessionCount(aggregateStats.sessionCount);
-      setHoursSpoken(Math.floor(aggregateStats.speakingTime / 3600));
+      setHoursSpoken(aggregateStats.speakingTime / 3600);
       setFeature(pickFeature(aggregateStats));
 
       if (accountRoot) {
