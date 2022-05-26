@@ -15,7 +15,10 @@ export default async function handleZoomExternalCapture(extensionApp: ExtensionA
 
   const isZoomDesktopLauncher = (
     (location.host === 'zoom.us' || location.host.endsWith('.zoom.us')) &&
-    location.pathname.startsWith('/j/')
+    (
+      location.pathname.startsWith('/j/') ||
+      location.pathname.startsWith('/s/')
+    )
   );
 
   if (!isZoomDesktopLauncher) {
