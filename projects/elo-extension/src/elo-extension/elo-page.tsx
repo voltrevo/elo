@@ -48,6 +48,6 @@ window.addEventListener('load', async () => {
         <EloPage/>
       </EloPageContext.Provider>
     </ExtensionAppContext.Provider>,
-    document.body,
+    document.getElementById('react-container'),
   );
 });

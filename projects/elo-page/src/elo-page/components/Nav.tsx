@@ -54,6 +54,7 @@ const Nav: react.FunctionComponent = () => {
     <div className="links">
       {links.map(link => (
         <NavLink
+          key={link.text}
           icon={link.icon}
           selected={link.hash === hash}
           onClick={() => pageCtx.update({ hash: link.hash })}

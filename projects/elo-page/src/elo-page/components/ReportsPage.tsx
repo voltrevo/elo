@@ -98,10 +98,11 @@ const ReportsPage: React.FunctionComponent = () => {
 
         if (sessionMonth !== month) {
           month = sessionMonth;
-          list.push(<div className="month">{month}</div>);
+          list.push(<div key={month} className="month">{month}</div>);
         }
 
         list.push(<div
+          key={id}
           className="session-item card"
           onClick={() => pageCtx.update({
             hash: `SessionReportPage?id=${id}`,

@@ -5,6 +5,15 @@ body {
   margin: 0;
 }
 
+#react-container {
+  position: fixed;
+  left: 0;
+  top: 0;
+  overflow: auto;
+  width: 100vw;
+  height: 100vh;
+}
+
 .elo-page {
   font-size: 18px;
   width: 100vw;

@@ -26,6 +26,7 @@ const FunctionalBarSelector: React.FunctionComponent<Props> = (
     <div className={['bar-selector', ...classes].join(' ')}>
       {options.map(option => (
         <div
+          key={option}
           className={`cell ${option === selection && 'selected'}`}
           onClick={async () => {
             if (progressState === 'loading') {
