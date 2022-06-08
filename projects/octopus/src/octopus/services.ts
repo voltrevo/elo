@@ -1,5 +1,6 @@
 import assert from '../common-pure/assert';
 import ExplicitAny from '../common-pure/ExplicitAny';
+import decode from '../elo-types/decode';
 import storageBackendService from '../storage-backend/storageBackendService';
 import zoomBackendService from '../zoom-backend/zoomBackendService';
 import octopusService from './octopusService';
@@ -18,14 +19,27 @@ export type NamedServiceConfig = {
   config: unknown,
 };
 
-export async function runService(nsc: NamedServiceConfig) {
-  console.log('running', nsc.instanceName ?? nsc.name);
+export async function checkService(nsc: NamedServiceConfig) {
+  console.log('checking', nsc.instanceName ?? nsc.name);
   assert(Object.keys(services).includes(nsc.name));
   const name = nsc.name as keyof Services;
-  assert(services[name].Config.is(nsc.config));
+  const config = decode(services[name].Config, nsc.config);
   console.log('  ✅ config');
 
-  return await services[name].run(nsc.config as ExplicitAny);
+  const check = services[name].check;
+
+  if (check) {
+    await check(config as ExplicitAny);
+    console.log('  ✅ checked');
+  }
+}
+
+export async function runService(nsc: NamedServiceConfig) {
+  console.log('running', nsc.instanceName ?? nsc.name);
+
+  return await services[nsc.name as keyof Services].run(
+    nsc.config as ExplicitAny,
+  );
 }
 
 export default services;
