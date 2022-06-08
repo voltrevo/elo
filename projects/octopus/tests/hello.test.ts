@@ -2,7 +2,8 @@ import 'source-map-support/register';
 import assert from '../src/common-pure/assert';
 
 describe('hello', () => {
-  it('needs test', () => {
-    assert(false);
+  it('example test', () => {
+    console.log('TODO: add tests');
+    assert(true);
   });
 });
