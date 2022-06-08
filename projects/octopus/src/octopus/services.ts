@@ -2,6 +2,7 @@ import assert from '../common-pure/assert';
 import ExplicitAny from '../common-pure/ExplicitAny';
 import eloSlackAutomationService from '../elo-slack-automation/eloSlackAutomationService';
 import decode from '../elo-types/decode';
+import eloWorkerService from '../elo-worker/eloWorkerService';
 import storageBackendService from '../storage-backend/storageBackendService';
 import zoomBackendService from '../zoom-backend/zoomBackendService';
 import octopusService from './octopusService';
@@ -11,6 +12,7 @@ const services = {
   [zoomBackendService.name]: zoomBackendService,
   [octopusService.name]: octopusService,
   [eloSlackAutomationService.name]: eloSlackAutomationService,
+  [eloWorkerService.name]: eloWorkerService,
 };
 
 type Services = typeof services;

@@ -1,4 +1,5 @@
 build/*.tar.gz
+analyzer/venv
 config.json
 
 adhocTesting

@@ -5,7 +5,15 @@ ENV DEBIAN_FRONTEND="noninteractive" TZ="Etc/UTC"
 
 # Install system packages
 RUN apt update -y
-RUN apt install -y curl xz-utils
+RUN apt install -y ffmpeg curl python3-venv build-essential python3-dev
+
+# Set up python
+WORKDIR /app/analyzer
+ADD analyzer /app/analyzer
+ENV PATH="/app/analyzer/venv/bin:${PATH}"
+RUN python3 -m venv venv
+RUN pip install -U pip
+RUN pip install -r requirements.txt
 
 # Install nodejs
 WORKDIR /data
@@ -17,6 +25,7 @@ RUN curl -LO https://truststore.pki.rds.amazonaws.com/ap-southeast-2/ap-southeas
 
 # Add remaining files
 ADD . /app
+RUN ln -s /app/data/models.tflite /data/models.tflite
 
 # Startup configuration
 WORKDIR /app
