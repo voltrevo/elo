@@ -1,38 +1,31 @@
-import * as io from 'io-ts';
+import assert from '../common-pure/assert';
 import ExplicitAny from '../common-pure/ExplicitAny';
-import optional from '../elo-types/optional';
-
 import storageBackendService from '../storage-backend/storageBackendService';
 import zoomBackendService from '../zoom-backend/zoomBackendService';
+import octopusService from './octopusService';
 
 const services = {
   [storageBackendService.name]: storageBackendService,
   [zoomBackendService.name]: zoomBackendService,
+  [octopusService.name]: octopusService,
 };
 
 type Services = typeof services;
 
 export type NamedServiceConfig = {
-  [Name in keyof Services]: {
-    name: Name,
-    instanceName?: string,
-    config: Services[Name]['Config'],
-  }
-}[keyof Services];
-
-export const NamedServiceConfig: io.Type<NamedServiceConfig> = io.union(
-  Object.values(services).map(
-    ({ name, Config }) => io.type({
-      name: io.literal(name),
-      instanceName: optional(io.string),
-      config: Config,
-    }),
-  ) as ExplicitAny,
-);
+  name: string,
+  instanceName?: string,
+  config: unknown,
+};
 
 export async function runService(nsc: NamedServiceConfig) {
-  console.log('starting', nsc.instanceName ?? nsc.name);
-  return await services[nsc.name].run(nsc.config as ExplicitAny);
+  console.log('running', nsc.instanceName ?? nsc.name);
+  assert(Object.keys(services).includes(nsc.name));
+  const name = nsc.name as keyof Services;
+  assert(services[name].Config.is(nsc.config));
+  console.log('  ✅ config');
+
+  return await services[name].run(nsc.config as ExplicitAny);
 }
 
 export default services;

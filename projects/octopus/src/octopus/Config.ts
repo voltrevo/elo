@@ -1,10 +1,18 @@
 import * as io from 'io-ts';
-
-import { NamedServiceConfig } from './services';
+import optional from '../elo-types/optional';
 
 export const Config = io.type({
   startupMessage: io.string,
-  services: io.array(NamedServiceConfig),
+  services: io.array(
+    // Using a wide type here so we can do a narrow check explicitly when
+    // processing services instead.
+    // This simplifies our type information.
+    io.type({
+      name: io.string,
+      instanceName: optional(io.string),
+      config: io.unknown,
+    }),
+  ),
 });
 
 export type Config = io.TypeOf<typeof Config>;
