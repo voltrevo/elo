@@ -13,10 +13,13 @@
   "private": true,
   "dependencies": {
     "@koa/cors": "^3.1.0",
+    "@msgpack/msgpack": "^2.7.2",
+    "@types/branca": "^0.4.0",
     "@types/koa-bodyparser": "^4.3.5",
     "@types/koa-route": "^3.2.5",
     "@types/koa__cors": "^3.1.1",
     "@types/pg": "^8.6.4",
+    "branca": "^0.5.0",
     "fp-ts": "^2.12.1",
     "io-ts": "^2.2.16",
     "io-ts-reporters": "^2.0.1",

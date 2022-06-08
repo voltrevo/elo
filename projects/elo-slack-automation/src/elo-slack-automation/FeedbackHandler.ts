@@ -3,13 +3,13 @@ import route from 'koa-route';
 import reporter from 'io-ts-reporters';
 import * as slack from 'slack';
 
-import config from './config';
 import validateUserId from './validateUserId';
 import type Database from '../database/Database';
 import Feedback from '../elo-types/Feedback';
 import optional from '../elo-types/optional';
 import { insertFeedback } from '../database/queries/feedback';
 import nil from '../common-pure/nil';
+import Config from './Config';
 
 type Handler = Parameters<typeof route.post>[1];
 
@@ -18,7 +18,7 @@ const FeedbackBody = io.type({
   feedback: Feedback,
 });
 
-export default function FeedbackHandler(db: Database): Handler {
+export default function FeedbackHandler(config: Config, db: Database): Handler {
   return async (ctx) => {
     const decodeResult = FeedbackBody.decode(ctx.request.body);
 
@@ -30,7 +30,7 @@ export default function FeedbackHandler(db: Database): Handler {
 
     const { userId, feedback } = decodeResult.right;
 
-    if (userId !== nil && !validateUserId(userId)) {
+    if (userId !== nil && !validateUserId(config.userIdGenerationSecret, userId)) {
       ctx.status = 403;
       return;
     }

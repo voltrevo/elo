@@ -1,9 +1,8 @@
 import { keccak256 } from 'js-sha3';
 
 import base58 from '../common-pure/base58';
-import config from './config';
 
-export default function validateUserId(userId: string) {
+export default function validateUserId(userIdGenerationSecret: string, userId: string) {
   let userIdBuf: Uint8Array;
 
   try {
@@ -16,7 +15,7 @@ export default function validateUserId(userId: string) {
     return false;
   }
 
-  const checksum = generateChecksum(userIdBuf.slice(0, 16));
+  const checksum = generateChecksum(userIdGenerationSecret, userIdBuf.slice(0, 16));
 
   if (checksum.some((byte, i) => userIdBuf[16 + i] !== byte)) {
     return false;
@@ -25,9 +24,9 @@ export default function validateUserId(userId: string) {
   return true;
 }
 
-export function generateChecksum(data: Uint8Array) {
+export function generateChecksum(userIdGenerationSecret: string, data: Uint8Array) {
   const hash = keccak256.create();
-  hash.update(config.userIdGenerationSecret);
+  hash.update(userIdGenerationSecret);
   hash.update(data);
 
   return new Uint8Array(hash.arrayBuffer().slice(0, 4));

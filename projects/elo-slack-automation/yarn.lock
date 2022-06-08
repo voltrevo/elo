@@ -9,6 +9,11 @@
   dependencies:
     vary "^1.1.2"
 
+"@msgpack/msgpack@^2.7.2":
+  version "2.7.2"
+  resolved "https://registry.yarnpkg.com/@msgpack/msgpack/-/msgpack-2.7.2.tgz#f34b8aa0c49f0dd55eb7eba577081299cbf3f90b"
+  integrity sha512-rYEi46+gIzufyYUAoHDnRzkWGxajpD9vVXFQ3g1vbjrBm6P7MBmm+s/fqPa46sxa+8FOUdEuRQKaugo5a4JWpw==
+
 "@scarf/scarf@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@scarf/scarf/-/scarf-1.1.1.tgz#d8b9f20037b3a37dbf8dcdc4b3b72f9285bfce35"
@@ -27,6 +32,13 @@
   integrity sha512-ALYone6pm6QmwZoAgeyNksccT9Q4AWZQ6PvfwR37GT6r6FWUPguq6sUmNGSMV2Wr761oQoBxwGGa6DR5o1DC9g==
   dependencies:
     "@types/connect" "*"
+    "@types/node" "*"
+
+"@types/branca@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@types/branca/-/branca-0.4.0.tgz#879f939296d02b33a433a9d1f31ec0de87f51c48"
+  integrity sha512-gUKTWTC9Mme2kCvr3hSQG86v6U1OyW4otLrE2WJ6GeUW4JHhzej6TCSUeqpf9H9jkyWsQ1G9HZPaQc7YPIGTPw==
+  dependencies:
     "@types/node" "*"
 
 "@types/connect@*":
@@ -173,6 +185,20 @@ accepts@^1.3.5:
     mime-types "~2.1.34"
     negotiator "0.6.3"
 
+base-x@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/base-x/-/base-x-4.0.0.tgz#d0e3b7753450c73f8ad2389b5c018a4af7b2224a"
+  integrity sha512-FuwxlW4H5kh37X/oW59pwTzzTKRzfrrQwhmyspRM7swOEZcHtDZSCt45U6oKgtuFE+WYPblePMVIPR4RZrh/hw==
+
+branca@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/branca/-/branca-0.5.0.tgz#923bf2eaa7d83d76221dd2f50e3c7d53ddd3dc66"
+  integrity sha512-+pFdcuMULjnmiH5PMrKEzVtYkPMIEFVwZD4whEPTZ1d90GXPVKjeAN3JfZwq3AFB5CJvz+jCOzxEtNvyUj74iQ==
+  dependencies:
+    base-x "^4.0.0"
+    bufferpack "^0.0.6"
+    libsodium-wrappers "^0.5.2"
+
 buffer-from@^1.0.0:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/buffer-from/-/buffer-from-1.1.2.tgz#2b146a6fd72e80b4f55d255f35ed59a3a9a41bd5"
@@ -182,6 +208,11 @@ buffer-writer@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/buffer-writer/-/buffer-writer-2.0.0.tgz#ce7eb81a38f7829db09c873f2fbb792c0c98ec04"
   integrity sha512-a7ZpuTZU1TRtnwyCNW3I5dc0wWNC3VR9S++Ewyk2HHZdrO3CQJqSpd+95Us590V6AL7JqUAH2IwZ/398PmNFgw==
+
+bufferpack@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/bufferpack/-/bufferpack-0.0.6.tgz#fb3d8738a0e1e4e03bcff99f9a75f9ec18a9d73e"
+  integrity sha512-MTWvLHElqczrIVhge9qHtqgNigJFyh0+tCDId5yCbFAfuekHWIG+uAgvoHVflwrDPuY/e47JE1ki5qcM7w4uLg==
 
 bytes@3.1.2:
   version "3.1.2"
@@ -469,6 +500,18 @@ koa@^2.13.4:
     statuses "^1.5.0"
     type-is "^1.6.16"
     vary "^1.1.2"
+
+libsodium-wrappers@^0.5.2:
+  version "0.5.4"
+  resolved "https://registry.yarnpkg.com/libsodium-wrappers/-/libsodium-wrappers-0.5.4.tgz#0059bf219c3a37b228f823342399b1607a4c5ba4"
+  integrity sha512-dAYsfQgh6XwR4I65y7T5qDgb2XNKDpzXEXz229sDplaJfnAuIBTHBYlQ44jL5DIS4cCUspE3+g0kF4/Xe8286A==
+  dependencies:
+    libsodium "0.5.4"
+
+libsodium@0.5.4:
+  version "0.5.4"
+  resolved "https://registry.yarnpkg.com/libsodium/-/libsodium-0.5.4.tgz#874413435ee40c512dd59ea6db9b75970f8aec02"
+  integrity sha512-s1TQ2V23JvGby1gnCQEQncTNTGck/rtJPPA8c0TiBo9z9TpT4eUk5zThte8H1TkdoKQznneqZqyoqdrwu2btWw==
 
 media-typer@0.3.0:
   version "0.3.0"
