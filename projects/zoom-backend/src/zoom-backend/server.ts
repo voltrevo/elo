@@ -1,24 +1,8 @@
-import Koa from 'koa';
-import cors from '@koa/cors';
-import bodyParser from 'koa-bodyparser';
-
 import launch from './helpers/launch';
 import loadConfig from './loadConfig';
-import defineRoutes from './defineRoutes';
+import run from './run';
 
-launch(async (emit) => {
-  const koaApp = new Koa();
+launch(async () => {
   const config = await loadConfig();
-
-  koaApp.use(cors());
-  koaApp.use(bodyParser());
-
-  defineRoutes({ koaApp, config });
-
-  const { host, port } = config;
-
-  await new Promise(resolve => koaApp.listen(port, host, () => { resolve(null); }));
-  emit(`Serving http on ${host}:${port}`);
-
-  await new Promise(() => {});
+  await run(config);
 });
