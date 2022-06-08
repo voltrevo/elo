@@ -1,8 +1,8 @@
-import launch from './helpers/launch';
+import 'source-map-support/register';
+
 import loadConfig from './loadConfig';
+import run from './run';
 
-launch(async (emit) => {
-  const config = await loadConfig();
-
-  emit(config.startupMessage);
-});
+(async () => {
+  await run(await loadConfig());
+})().catch(console.error);

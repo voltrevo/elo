@@ -15,6 +15,7 @@ type Services = typeof services;
 export type NamedServiceConfig = {
   [Name in keyof Services]: {
     name: Name,
+    instanceName?: string,
     config: Services[Name]['Config'],
   }
 }[keyof Services];
@@ -30,6 +31,7 @@ export const NamedServiceConfig: io.Type<NamedServiceConfig> = io.union(
 );
 
 export async function runService(nsc: NamedServiceConfig) {
+  console.log('starting', nsc.instanceName ?? nsc.name);
   return await services[nsc.name].run(nsc.config as ExplicitAny);
 }
 
