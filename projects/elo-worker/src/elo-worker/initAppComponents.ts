@@ -3,7 +3,6 @@ import fs from 'fs/promises';
 import Koa from 'koa';
 import websockify from 'koa-websocket';
 
-import loadConfig from './loadConfig';
 import Database from '../database/Database';
 import StatsGatherer from './StatsGatherer';
 import AppComponents from './AppComponents';
@@ -11,10 +10,9 @@ import TokenBicoder from './TokenBicoder';
 import SessionTokenData from './SessionTokenData';
 import EloLoginTokenData from './EloLoginTokenData';
 import EmailService from './EmailService';
+import Config from './Config';
 
-export default async function initAppComponents(): Promise<AppComponents> {
-  const config = await loadConfig();
-
+export default async function initAppComponents(config: Config): Promise<AppComponents> {
   const db = new Database(config.pgConnString);
   const statsGatherer = new StatsGatherer({ db });
 

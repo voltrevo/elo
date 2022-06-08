@@ -1,33 +1,8 @@
-import cors from '@koa/cors';
-import bodyParser from 'koa-bodyparser';
-
 import launch from './helpers/launch';
-import defineRoutes from './routes/defineRoutes';
-import initAppComponents from './initAppComponents';
+import loadConfig from './loadConfig';
+import run from './run';
 
-launch(async (emit) => {
-  const appComponents = await initAppComponents();
-
-  const { config, koaApp } = appComponents;
-
-  koaApp.use(cors());
-
-  const bodyParserHandler = bodyParser();
-
-  koaApp.use(async (ctx, next) => {
-    if (ctx.path === '/analyze') {
-      await next();
-    } else {
-      return await bodyParserHandler(ctx, next);
-    }
-  });
-
-  defineRoutes(appComponents);
-
-  const { host, port } = config;
-
-  await new Promise(resolve => koaApp.listen(port, host, () => { resolve(null); }));
-  emit(`Serving ${config.https ? 'https' : 'http'} on ${host}:${port}`);
-
-  await new Promise(() => {});
+launch(async () => {
+  const config = await loadConfig();
+  await run(config);
 });
