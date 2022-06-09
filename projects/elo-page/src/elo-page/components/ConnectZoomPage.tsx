@@ -16,8 +16,8 @@ const ConnectZoomPage: React.FunctionComponent = () => {
     <Section>
       <h1>Connect with Zoom?</h1>
       <div>
-        In order to use Elo in Zoom meetings, we need your permission to detect
-        when those meetings happen.
+        In order to use Elo in Zoom meetings, we need to connect to your Zoom
+        account.
       </div>
       <div>
         If you change your mind later, you can update this in Settings.
