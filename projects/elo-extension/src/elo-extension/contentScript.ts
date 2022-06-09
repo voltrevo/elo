@@ -10,6 +10,7 @@ import DeviceStorage from '../elo-extension-app/deviceStorage/DeviceStorage';
 import handleZoomRedirects from './handleZoomRedirects';
 import handleZoomExternalCapture from './handleZoomExternalCapture';
 import makeStorageClient from './makeStorageClient';
+import handleZoomAuth from './handleZoomAuth';
 
 const eloExtension = document.createElement('div');
 eloExtension.id = 'elo-extension';
@@ -60,6 +61,8 @@ eloExtension.appendChild(iconTag);
   if (config.featureFlags.zoomExternalCapture) {
     await handleZoomExternalCapture(extensionApp);
   }
+
+  await handleZoomAuth();
 })().catch(
   console.error
 );

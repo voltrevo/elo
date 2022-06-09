@@ -30,18 +30,46 @@ const ConnectZoomPage: React.FunctionComponent = () => {
           onClick={async () => {
             const margin = 0.04 * window.innerWidth;
 
-            window.open(
-              config.zoomConnectionUrl,
-              undefined,
-              [
-                `width=${window.innerWidth - 2 * margin}`,
-                `height=${window.innerHeight - 2 * margin}`,
-                `left=${window.screenLeft + margin}`,
-                `top=${window.screenTop + margin}`,
-              ].join(',')
-            );
+            const zoomAuthCode = await new Promise((resolve, reject) => {
+              let closePollingId: number | undefined = undefined;
 
-            throw new Error('Not implemented');
+              function messageHandler(evt: MessageEvent) {
+                const code = evt.data?.zoomAuthCode;
+
+                if (typeof code === 'string') {
+                  cleanup();
+                  resolve(code);
+                }
+              }
+
+              function cleanup() {
+                window.removeEventListener('message', messageHandler);
+                window.clearInterval(closePollingId);
+              }
+
+              window.addEventListener('message', messageHandler);
+
+              const zoomAuthPopup = window.open(
+                config.zoomConnectionUrl,
+                undefined,
+                [
+                  `width=${window.innerWidth - 2 * margin}`,
+                  `height=${window.innerHeight - 2 * margin}`,
+                  `left=${window.screenLeft + margin}`,
+                  `top=${window.screenTop + margin}`,
+                ].join(',')
+              );
+  
+              if (zoomAuthPopup) {
+                closePollingId = setInterval(() => {
+                  if (zoomAuthPopup.closed) {
+                    reject(new Error('Connection window closed'));
+                  }
+                }, 200) as unknown as number;
+              }
+            });
+
+            console.log({ zoomAuthCode });
           }}
         >
           Connect

@@ -53,7 +53,9 @@
       "https://preprod.meet.sandbox.google.com/*",
       "https://meet.jit.si/*",
       "https://meet.tokbox.com/*",
-      "https://*.zoom.us/*"
+      "https://opentokdemo.tokbox.com/*",
+      "https://*.zoom.us/*",
+      "https://*.get-elo.com/*"
     ],
     "js": ["contentScript.bundle.js"],
     "run_at": "document_start"
