@@ -1,0 +1,48 @@
+import * as React from 'react';
+
+import ExtensionAppContext from '../ExtensionAppContext';
+import EloPageContext from '../EloPageContext';
+import AsyncButton from './AsyncButton';
+import Button from './Button';
+import Page from './Page';
+import Section from './Section';
+
+const ConnectZoomPage: React.FunctionComponent = () => {
+  const pageCtx = React.useContext(EloPageContext);
+  const appCtx = React.useContext(ExtensionAppContext);
+
+  return <Page classes={['form-page', 'welcome-page']}>
+    <Section>
+      <h1>Connect with Zoom?</h1>
+      <div>
+        In order to use Elo in Zoom meetings, we need your permission to detect
+        when those meetings happen.
+      </div>
+      <div>
+        If you change your mind later, you can update this in Settings.
+      </div>
+    </Section>
+    <Section>
+      <div className="button-column">
+        <AsyncButton
+          primary={true}
+          onClick={async () => {
+            throw new Error('Not implemented');
+          }}
+        >
+          Connect
+        </AsyncButton>
+        <Button
+          primary={false}
+          onClick={() => {
+            pageCtx.update({ hash: 'OverviewPage' });
+          }}
+        >
+          Maybe Later
+        </Button>
+      </div>
+    </Section>
+  </Page>;
+};
+
+export default ConnectZoomPage;
