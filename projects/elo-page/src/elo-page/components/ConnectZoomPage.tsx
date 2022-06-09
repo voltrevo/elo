@@ -20,6 +20,10 @@ const ConnectZoomPage: React.FunctionComponent = () => {
         account.
       </div>
       <div>
+        This step is optional. Elo is already enabled for a variety of other
+        meeting platforms including Google Meet and web-based Zoom.
+      </div>
+      <div>
         If you change your mind later, you can update this in Settings.
       </div>
     </Section>
