@@ -267,6 +267,17 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     this.uiState.active = true;
     await this.activate(accountRoot);
     this.updateUi();
+
+    if (config.upgradePrompt?.enabled) {
+      const res = await fetch(`https://${config.hostAndPort}/version`);
+      
+      if (res.status >= 400) {
+        console.error('Upgrade prompt is enabled but getting /version failed', res);
+      } else if (await res.text() !== config.upgradePrompt.version) {
+        this.uiState.notifyUpgrade = true;
+        this.updateUi();
+      }
+    }
   }
 
   async getSessionToken() {
