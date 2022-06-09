@@ -3,6 +3,7 @@ import * as io from 'io-ts';
 export const Config = io.type({
   host: io.string,
   port: io.number,
+  verificationToken: io.string,
 });
 
 export type Config = io.TypeOf<typeof Config>;
