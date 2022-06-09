@@ -6,6 +6,7 @@ import AsyncButton from './AsyncButton';
 import Button from './Button';
 import Page from './Page';
 import Section from './Section';
+import config from '../../elo-extension/config';
 
 const ConnectZoomPage: React.FunctionComponent = () => {
   const pageCtx = React.useContext(EloPageContext);
@@ -27,6 +28,19 @@ const ConnectZoomPage: React.FunctionComponent = () => {
         <AsyncButton
           primary={true}
           onClick={async () => {
+            const margin = 0.04 * window.innerWidth;
+
+            window.open(
+              config.zoomConnectionUrl,
+              undefined,
+              [
+                `width=${window.innerWidth - 2 * margin}`,
+                `height=${window.innerHeight - 2 * margin}`,
+                `left=${window.screenLeft + margin}`,
+                `top=${window.screenTop + margin}`,
+              ].join(',')
+            );
+
             throw new Error('Not implemented');
           }}
         >

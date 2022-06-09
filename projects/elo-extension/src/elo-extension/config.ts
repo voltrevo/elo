@@ -14,6 +14,7 @@ export const Config = io.type({
     enabled: io.boolean,
     version: io.string,
   })),
+  zoomConnectionUrl: io.string,
 });
 
 export type Config = io.TypeOf<typeof Config>;
