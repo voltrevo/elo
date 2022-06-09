@@ -20,12 +20,14 @@ pushd elo/projects/octopus
   yarn test
   ./scripts/build-docker.sh
   mv build/octopus-*.tar.gz "$SCRIPT_DIR"/octopus-build/.
+  git rev-parse HEAD | head -c7 >"$SCRIPT_DIR"/octopus-build/VERSION
   mv build/meta-* "$SCRIPT_DIR"/octopus-build/.
 popd
 
 pushd elo/projects/elo-extension
   yarn
   cp "$SCRIPT_DIR"/"$CLIENT_CONFIG_ID" config.json
+  sed -i "s/SED_REPLACE__VERSION/$(git rev-parse HEAD | head -c7)/g" config.json
   yarn build
   yarn test
   pushd build

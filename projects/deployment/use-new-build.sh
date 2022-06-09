@@ -10,9 +10,6 @@ cd "$SCRIPT_DIR"
 PROJECT=$(cat octopus-build/meta-*/PROJECT)
 TAG=$(cat octopus-build/meta-*/TAG)
 
-echo "PROJECT: $PROJECT"
-echo "TAG: $TAG"
-
 EXISTING=$(docker ps | grep -o 'octopus-[^ ]*' || true)
 
 if [[ ${#EXISTING} -ne 0 ]]

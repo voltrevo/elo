@@ -1,0 +1,7 @@
+{
+  /* Complete other sections manually */
+  "upgradePrompt": {
+    "enabled": true,
+    "version": "SED_REPLACE__VERSION"
+  }
+}

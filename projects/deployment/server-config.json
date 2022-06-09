@@ -1,0 +1,6 @@
+{
+  "startupMessage": "octopus is starting...",
+  "services": [
+    /* Configure services */
+  ]
+}
