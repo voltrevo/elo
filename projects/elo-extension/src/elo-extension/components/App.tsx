@@ -5,7 +5,7 @@ import UiState from '../../elo-extension-app/UiState';
 import CollapseIcon from './CollapseIcon';
 import ExpandIcon from './ExpandIcon';
 import PopoutIcon from './PopoutIcon';
-import AccountMissingNotification from './AccountMissingNotification';
+import WidgetNotification from './WidgetNotification';
 
 const App: React.FunctionComponent = () => {
   const contentApp = React.useContext(ThirdPartyExtensionAppContext);
@@ -236,7 +236,16 @@ const App: React.FunctionComponent = () => {
     return <>
       <CollapseIcon onAction={() => { setCollapsed(true); }}/>
       <PopoutIcon onAction={() => { openDashboard(); }}/>
-      {uiState.notifyMissingAccount && <AccountMissingNotification onAction={() => { openDashboard(); }}/>}
+      {uiState.notifyMissingAccount && (
+        <WidgetNotification onAction={() => { openDashboard(); }}>
+          Please register or log in
+        </WidgetNotification>
+      )}
+      {uiState.notifyUpgrade && (
+        <WidgetNotification onAction={() => { contentApp.upgrade(); }}>
+          Upgrade available
+        </WidgetNotification>
+      )}
       <div className="body">
         <div className="left spacer">
           <div className="word-box-container spacer">

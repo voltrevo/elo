@@ -63,6 +63,7 @@ export type Protocol = {
   getSession(sessionId: string): SessionStats | nil;
   isStaffMember(): boolean;
   getMonthlyStats(): AsyncReturnType<IBackendApi['monthlyStats']>;
+  upgrade(): void;
 };
 
 export const protocolKeyMap: Record<keyof Protocol, true> = {
@@ -90,6 +91,7 @@ export const protocolKeyMap: Record<keyof Protocol, true> = {
   getSession: true,
   isStaffMember: true,
   getMonthlyStats: true,
+  upgrade: true,
 };
 
 export const protocolThirdPartyKeyMap = {
@@ -99,6 +101,7 @@ export const protocolThirdPartyKeyMap = {
   getUiState: true,
   getDashboardUrl: true,
   getSessionToken: true,
+  upgrade: true,
 };
 
 export type ThirdPartyProtocol = {

@@ -1,6 +1,7 @@
 import * as io from 'io-ts';
 import reporter from 'io-ts-reporters';
 import ExtensionFeatureFlags from '../elo-types/ExtensionFeatureFlags';
+import optional from '../elo-types/optional';
 
 const configJson = require("../../../../config.json");
 
@@ -9,6 +10,10 @@ export const Config = io.type({
   hostAndPort: io.string,
   featureFlags: ExtensionFeatureFlags,
   googleOauthClientId: io.string,
+  upgradePrompt: optional(io.type({
+    enabled: io.boolean,
+    version: io.string,
+  })),
 });
 
 export type Config = io.TypeOf<typeof Config>;

@@ -3,6 +3,7 @@ type UiState = {
 
   active: boolean;
   notifyMissingAccount: boolean;
+  notifyUpgrade: boolean;
   loading: boolean;
   word?: string;
 
@@ -22,6 +23,7 @@ function UiState(): UiState {
 
     active: false,
     notifyMissingAccount: false,
+    notifyUpgrade: false,
     loading: false,
 
     fillerSoundBox: {

@@ -31,6 +31,7 @@ import Lock from './Lock';
 import IDeviceStorage from './deviceStorage/IDeviceStorage';
 import BackendApi from '../elo-extension/BackendApi';
 import assertExists from '../common-pure/assertExists';
+import config from '../elo-extension/config';
 
 export type AccountRootWithToken = AccountRoot & { eloLoginToken: string };
 
@@ -706,5 +707,9 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     return this.backendApi.monthlyStats({
       eloLoginToken: assertExists(await this.readAccountRoot()).eloLoginToken,
     });
+  }
+
+  upgrade() {
+    window.open(`https://${config.hostAndPort}`);
   }
 }
