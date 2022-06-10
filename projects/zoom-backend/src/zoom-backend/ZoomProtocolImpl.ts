@@ -34,15 +34,23 @@ export default function ZoomProtocolImpl(config: Config, _userId: string): ZoomP
       assert(typeof refresh_token === 'string');
 
       const meRes = await fetch('https://api.zoom.us/v2/users/me', {
-        method: 'POST',
+        method: 'GET',
         headers: {
-          Authorization: `Bearer ${refresh_token}`,
+          Authorization: `Bearer ${access_token}`,
         },
       });
 
-      console.log({ zoomUser: await meRes.json() });
+      const zoomUser = await meRes.json();
+      const { id } = zoomUser;
+      assert(typeof id === 'string');
 
-      throw new Error('Not implemented');
+      // TODO: Database stuff:
+      // - Record the current presence status
+      // - Persist the tokens and their expiration info
+
+      return {
+        zoomId: zoomUser.id,
+      };
     },
   };
 
