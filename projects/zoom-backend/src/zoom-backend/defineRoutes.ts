@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
 
 import route from 'koa-route';
+import assert from '../common-pure/assert';
+import zoomConnections from '../database/queries/zoomConnections';
 
 import AppComponents from './AppComponents';
 import ZoomRpcHandler from './ZoomRpcHandler';
@@ -17,10 +19,17 @@ export default function defineRoutes(appComponents: AppComponents) {
       return;
     }
 
-    console.log('POST /zoom-webhook', {
-      ip: ctx.ip,
-      headers: ctx.request.headers,
-    }, JSON.stringify(ctx.request.body, null, 2));
+    const { id, presence_status, date_time } = ctx.request.body.payload.object;
+    assert(typeof id === 'string');
+    assert(typeof presence_status === 'string');
+    assert(typeof date_time === 'string');
+
+    await zoomConnections.updatePresence(
+      database,
+      id,
+      presence_status,
+      new Date(date_time),
+    );
 
     ctx.status = 200;
   }));
