@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Zoom OAuth Redirect</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+
+  <style>
+    /*
+      The MIT License (MIT)
+
+      Copyright (c) 2022 by Jhey (https://codepen.io/jh3y/pen/bGGZgWj)
+
+      Permission is hereby granted, free of charge, to any person obtaining a copy
+      of this software and associated documentation files (the "Software"), to deal
+      in the Software without restriction, including without limitation the rights
+      to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+      copies of the Software, and to permit persons to whom the Software is
+      furnished to do so, subject to the following conditions:
+
+      The above copyright notice and this permission notice shall be included in all
+      copies or substantial portions of the Software.
+
+      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+      IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+      FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+      AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+      LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+      OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+      SOFTWARE.
+    */
+
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      align-items: center;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    :root {
+      --dot-size: 5;
+      --speed: 1.5;
+      --radius: 10;
+      --center-size: 5;
+      --rotation: -25;
+      --ring-radius: 8;
+      --ring-thickness: 0.75;
+      --bg: #ffbfb3;
+    }
+    .loader {
+      position: relative;
+      height: calc(var(--dot-size) * var(--center-size) * 1px);
+      width: calc(var(--dot-size) * var(--center-size) * 1px);
+      -webkit-animation: turn calc(var(--speed) * 20s) calc(var(--speed) * -2s) infinite linear;
+              animation: turn calc(var(--speed) * 20s) calc(var(--speed) * -2s) infinite linear;
+      transition: opacity 200ms;
+    }
+    .loader:before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      background: var(--bg);
+      height: 100%;
+      width: 100%;
+      transform: translate(-50%, -50%);
+      border-radius: 100%;
+      animation: pulse calc(var(--speed) * 1s) infinite alternate-reverse;
+    }
+    .dot {
+      height: calc(var(--dot-size) * 1px);
+      width: calc(var(--dot-size) * 1px);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(calc((360 / 8) * var(--index) * 1deg)) translate(0, calc(var(--dot-size) * var(--radius) * 1px));
+    }
+    .dot:after,
+    .dot:before {
+      content: '';
+      border-radius: 100%;
+      box-sizing: border-box;
+      position: absolute;
+      background: none;
+      top: 50%;
+      left: 50%;
+      -webkit-animation-duration: calc(var(--speed) * 1s);
+              animation-duration: calc(var(--speed) * 1s);
+      -webkit-animation-delay: calc((8 - var(--index)) * (var(--speed) / 8) * -1s);
+              animation-delay: calc((8 - var(--index)) * (var(--speed) / 8) * -1s);
+      -webkit-animation-iteration-count: infinite;
+              animation-iteration-count: infinite;
+      -webkit-animation-timing-function: ease-in-out;
+              animation-timing-function: ease-in-out;
+      -webkit-animation-fill-mode: both;
+              animation-fill-mode: both;
+      transform: translate(-50%, -50%) scale(var(--scale));
+    }
+    .dot:after {
+      --dot-size: 5;
+      --ring-thickness: 0.75;
+      --ring-radius: 8;
+      --scale: 0;
+      -webkit-animation-name: load;
+              animation-name: load;
+      border: calc(var(--dot-size) * var(--ring-thickness) * 1px) solid var(--bg);
+      height: calc(var(--dot-size) * var(--ring-radius) * 1px);
+      width: calc(var(--dot-size) * var(--ring-radius) * 1px);
+    }
+    .dot:before {
+      --scale: 1;
+      -webkit-animation-name: fade;
+              animation-name: fade;
+      background: var(--bg);
+      height: 100%;
+      width: 100%;
+    }
+    @-webkit-keyframes fade {
+      0% {
+        opacity: 1;
+      }
+      85%, 100% {
+        opacity: 0.2;
+      }
+    }
+    @keyframes fade {
+      0% {
+        opacity: 1;
+      }
+      85%, 100% {
+        opacity: 0.2;
+      }
+    }
+    @-webkit-keyframes load {
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+      }
+      85%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+      }
+    }
+    @keyframes load {
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+      }
+      85%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+      }
+    }
+    @-webkit-keyframes pulse {
+      to {
+        opacity: 0.35;
+      }
+    }
+    @keyframes pulse {
+      to {
+        opacity: 0.35;
+      }
+    }
+    @-webkit-keyframes turn {
+      to {
+        transform: rotate(-360deg);
+      }
+    }
+    @keyframes turn {
+      to {
+        transform: rotate(-360deg);
+      }
+    }
+  </style>
+
+</head>
+<body>
+  <div class="loader" style="--bg: hsl(0, 0%, 50%); opacity: 0">
+    <div class="dot" style="--index: 0"></div>
+    <div class="dot" style="--index: 1"></div>
+    <div class="dot" style="--index: 2"></div>
+    <div class="dot" style="--index: 3"></div>
+    <div class="dot" style="--index: 4"></div>
+    <div class="dot" style="--index: 5"></div>
+    <div class="dot" style="--index: 6"></div>
+    <div class="dot" style="--index: 7"></div>
+  </div>
+
+  <script>
+    setTimeout(() => {
+      for (const loader of document.querySelectorAll('.loader')) {
+        loader.style.opacity = 1;
+      }
+    }, 1000);
+  </script>
+
+</body>
+</html>

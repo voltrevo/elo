@@ -38,5 +38,6 @@ docker run \
   "$PROJECT":"$TAG"
 
 mv octopus-build/extension.zip /var/www2/html/.
+mv octopus-build/origin-pages/* /var/www2/html/.
 
 rm -rf octopus-build

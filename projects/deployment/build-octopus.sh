@@ -34,6 +34,8 @@ pushd elo/projects/elo-extension
     zip -r extension.zip extension
     mv extension.zip "$SCRIPT_DIR"/octopus-build/.
   popd
+  mkdir -p "$SCRIPT_DIR"/octopus-build/origin-pages
+  cp origin-pages/* "$SCRIPT_DIR"/octopus-build/origin-pages/.
 popd
 
 rm -rf elo
