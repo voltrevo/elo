@@ -11,6 +11,7 @@ import ErrorData from '../common-pure/ErrorData';
 import ZoomProtocolImpl from './ZoomProtocolImpl';
 import { ZoomProtocolTypeMap } from '../elo-types/ZoomProtocol';
 import Config from './Config';
+import Database from '../database/Database';
 
 type Handler = Parameters<typeof route.post>[1];
 
@@ -22,6 +23,7 @@ const RpcBody = io.type({
 
 export default function ZoomRpcHandler(
   config: Config,
+  database: Database,
   loginTokenBicoder: TokenBicoder<EloLoginTokenData>,
 ): Handler {
   return async (ctx) => {
@@ -65,7 +67,7 @@ export default function ZoomRpcHandler(
     const input = decode(ZoomProtocolTypeMap[method].input, body.input);
 
     const userId = loginDecodeResult.userId;
-    const zoom = ZoomProtocolImpl(config, userId);
+    const zoom = ZoomProtocolImpl(config, database, userId);
 
     let output;
 

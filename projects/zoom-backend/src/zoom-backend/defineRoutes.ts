@@ -6,7 +6,9 @@ import AppComponents from './AppComponents';
 import ZoomRpcHandler from './ZoomRpcHandler';
 
 export default function defineRoutes(appComponents: AppComponents) {
-  const { koaApp, config, loginTokenBicoder } = appComponents;
+  const {
+    koaApp, config, loginTokenBicoder, database,
+  } = appComponents;
 
   koaApp.use(route.post('/zoom-webhook', async ctx => {
     if (ctx.request.headers.authorization !== config.verificationToken) {
@@ -23,5 +25,5 @@ export default function defineRoutes(appComponents: AppComponents) {
     ctx.status = 200;
   }));
 
-  koaApp.use(route.post('/zoom/rpc', ZoomRpcHandler(config, loginTokenBicoder)));
+  koaApp.use(route.post('/zoom/rpc', ZoomRpcHandler(config, database, loginTokenBicoder)));
 }

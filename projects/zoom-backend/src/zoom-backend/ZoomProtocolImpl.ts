@@ -1,13 +1,20 @@
 import fetch from 'isomorphic-fetch';
 import assert from '../common-pure/assert';
+import nil from '../common-pure/nil';
 
 import { PromisifyApi } from '../common-pure/protocolHelpers';
+import Database from '../database/Database';
+import zoomConnections from '../database/queries/zoomConnections';
 import ZoomProtocol from '../elo-types/ZoomProtocol';
 import Config from './Config';
 
 export type ZoomProtocolImpl = PromisifyApi<ZoomProtocol>;
 
-export default function ZoomProtocolImpl(config: Config, _userId: string): ZoomProtocolImpl {
+export default function ZoomProtocolImpl(
+  config: Config,
+  db: Database,
+  userId: string,
+): ZoomProtocolImpl {
   const impl: ZoomProtocolImpl = {
     hello: async () => ({
       message: 'world',
@@ -41,16 +48,19 @@ export default function ZoomProtocolImpl(config: Config, _userId: string): ZoomP
       });
 
       const zoomUser = await meRes.json();
-      const { id } = zoomUser;
+      const { id, email } = zoomUser;
       assert(typeof id === 'string');
+      assert(typeof email === 'string');
 
-      // TODO: Database stuff:
-      // - Record the current presence status
-      // - Persist the tokens and their expiration info
+      await zoomConnections.upsert(db, {
+        user_id: userId,
+        zoom_id: id,
+        zoom_email: email,
+        presence_status: nil,
+        presence_update_time: nil,
+      });
 
-      return {
-        zoomId: zoomUser.id,
-      };
+      return {};
     },
   };
 

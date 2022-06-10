@@ -12,6 +12,7 @@ export const Config = io.type({
     secret: io.string,
     redirectUri: io.string,
   }),
+  pgConnString: io.string,
 });
 
 export type Config = io.TypeOf<typeof Config>;

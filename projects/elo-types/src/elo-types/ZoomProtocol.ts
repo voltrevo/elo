@@ -9,7 +9,7 @@ export const ZoomProtocolTypeMap = {
   },
   connect: {
     input: io.type({ zoomAuthCode: io.string }),
-    output: io.type({ zoomId: io.string }),
+    output: io.type({}),
   },
 };
 

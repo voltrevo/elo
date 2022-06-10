@@ -755,10 +755,6 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
 
   async connectZoom(zoomAuthCode: string) {
     const rpc = await this.requireRpc();
-
-    const { zoomId } = await rpc.zoom.connect({ zoomAuthCode });
-
-    // TODO: Also get email so we can show the user what their zoom email is
-    console.log({ zoomId });
+    await rpc.zoom.connect({ zoomAuthCode });
   }
 }
