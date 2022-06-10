@@ -17,7 +17,5 @@ export default async function handleZoomAuth() {
       },
       new URL(Browser.runtime.getURL('/')).origin,
     );
-
-    window.close();
   }
 }

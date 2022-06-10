@@ -42,7 +42,13 @@ const ConnectZoomPage: React.FunctionComponent = () => {
 
                 if (typeof code === 'string') {
                   cleanup();
-                  resolve(code);
+
+                  try {
+                    (evt.source as Window).close();
+                    resolve(code);
+                  } catch (error) {
+                    reject(error);
+                  }
                 }
               }
 
@@ -67,6 +73,7 @@ const ConnectZoomPage: React.FunctionComponent = () => {
               if (zoomAuthPopup) {
                 closePollingId = setInterval(() => {
                   if (zoomAuthPopup.closed) {
+                    cleanup();
                     reject(new Error('Connection window closed'));
                   }
                 }, 200) as unknown as number;
