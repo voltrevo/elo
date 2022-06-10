@@ -64,6 +64,7 @@ export type Protocol = {
   isStaffMember(): boolean;
   getMonthlyStats(): AsyncReturnType<IBackendApi['monthlyStats']>;
   upgrade(): void;
+  connectZoom(zoomAuthCode: string): void;
 };
 
 export const protocolKeyMap: Record<keyof Protocol, true> = {
@@ -92,6 +93,7 @@ export const protocolKeyMap: Record<keyof Protocol, true> = {
   isStaffMember: true,
   getMonthlyStats: true,
   upgrade: true,
+  connectZoom: true,
 };
 
 export const protocolThirdPartyKeyMap = {

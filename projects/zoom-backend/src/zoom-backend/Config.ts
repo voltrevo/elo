@@ -7,6 +7,10 @@ export const Config = io.type({
   secrets: io.type({
     tokenEncryption: io.string,
   }),
+  zoomApp: io.type({
+    id: io.string,
+    secret: io.string,
+  }),
 });
 
 export type Config = io.TypeOf<typeof Config>;

@@ -752,4 +752,10 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   upgrade() {
     window.open(`https://${config.hostAndPort}`);
   }
+
+  async connectZoom(zoomAuthCode: string) {
+    const rpc = await this.requireRpc();
+
+    rpc.zoom.connect({ zoomAuthCode });
+  }
 }

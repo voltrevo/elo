@@ -34,7 +34,7 @@ const ConnectZoomPage: React.FunctionComponent = () => {
           onClick={async () => {
             const margin = 0.04 * window.innerWidth;
 
-            const zoomAuthCode = await new Promise((resolve, reject) => {
+            const zoomAuthCode = await new Promise<string>((resolve, reject) => {
               let closePollingId: number | undefined = undefined;
 
               function messageHandler(evt: MessageEvent) {
@@ -80,7 +80,7 @@ const ConnectZoomPage: React.FunctionComponent = () => {
               }
             });
 
-            console.log({ zoomAuthCode });
+            await appCtx.connectZoom(zoomAuthCode);
           }}
         >
           Connect

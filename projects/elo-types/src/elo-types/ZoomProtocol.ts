@@ -7,6 +7,10 @@ export const ZoomProtocolTypeMap = {
       message: io.string,
     }),
   },
+  connect: {
+    input: io.type({ zoomAuthCode: io.string }),
+    output: io.type({}),
+  },
 };
 
 export type ZoomProtocolInput<M extends keyof typeof ZoomProtocolTypeMap> = io.TypeOf<(typeof ZoomProtocolTypeMap)[M]["input"]>;

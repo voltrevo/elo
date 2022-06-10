@@ -10,6 +10,7 @@ import EloLoginTokenData from '../common-backend/EloLoginTokenData';
 import ErrorData from '../common-pure/ErrorData';
 import ZoomProtocolImpl from './ZoomProtocolImpl';
 import { ZoomProtocolTypeMap } from '../elo-types/ZoomProtocol';
+import Config from './Config';
 
 type Handler = Parameters<typeof route.post>[1];
 
@@ -20,6 +21,7 @@ const RpcBody = io.type({
 });
 
 export default function ZoomRpcHandler(
+  config: Config,
   loginTokenBicoder: TokenBicoder<EloLoginTokenData>,
 ): Handler {
   return async (ctx) => {
@@ -63,7 +65,7 @@ export default function ZoomRpcHandler(
     const input = decode(ZoomProtocolTypeMap[method].input, body.input);
 
     const userId = loginDecodeResult.userId;
-    const zoom = ZoomProtocolImpl(userId);
+    const zoom = ZoomProtocolImpl(config, userId);
 
     let output;
 
