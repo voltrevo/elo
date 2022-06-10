@@ -6,6 +6,7 @@ import BackendApi from "./BackendApi";
 import config from "./config";
 import GoogleAuthApi from "./GoogleAuthApi";
 import makeStorageClient from "./makeStorageClient";
+import ZoomBackendRpc from "../elo-extension-app/ZoomBackendRpc";
 
 (async () => {
   const apiBase = `${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`;
@@ -16,6 +17,9 @@ import makeStorageClient from "./makeStorageClient";
     Browser.runtime.getURL('elo-page.html'),
     await DeviceStorage.Create(Browser.storage.local, 'elo'),
     (eloLoginToken) => makeStorageClient(apiBase, eloLoginToken),
+    (eloLoginToken) => ({
+      zoom: new ZoomBackendRpc(`${apiBase}/zoom/rpc`, eloLoginToken),
+    }),
   );
 
   const settings = await extensionApp.readSettings();

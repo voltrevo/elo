@@ -183,5 +183,6 @@ export default function SimulExtensionApp(deviceStorage: DeviceStorage): Extensi
     'dashboard.html',
     deviceStorage,
     () => storageClientPromise,
+    () => { throw new Error('Not implemented'); }
   );
 }

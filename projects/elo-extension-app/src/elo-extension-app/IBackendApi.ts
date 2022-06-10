@@ -1,6 +1,7 @@
 import * as io from 'io-ts';
 
 import backendApiSpec from "../elo-types/backendApiSpec";
+import ZoomBackendRpc from './ZoomBackendRpc';
 
 type Spec = typeof backendApiSpec;
 

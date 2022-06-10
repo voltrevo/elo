@@ -32,6 +32,7 @@ import IDeviceStorage from './deviceStorage/IDeviceStorage';
 import BackendApi from '../elo-extension/BackendApi';
 import assertExists from '../common-pure/assertExists';
 import config from '../elo-extension/config';
+import IRpc from './IRpc';
 
 export type AccountRootWithToken = AccountRoot & { eloLoginToken: string };
 
@@ -45,6 +46,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   fillerWordEwma = new EwmaCalculator(60, 60);
 
   remoteStorage?: RemoteStorage;
+  rpc?: IRpc;
   remoteSession?: StorageElement<typeof SessionStats>;
   writeRemoteSessionThrottle = new Throttle(30_000);
   cachedSettings?: Settings;
@@ -60,7 +62,10 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     public dashboardUrl: string,
     public deviceStorage: DeviceStorage,
     public makeStorageClient: (eloLoginToken: string) => Promise<StorageClient>,
-  ) {}
+    public makeRpc: (eloLoginToken: string) => IRpc,
+  ) {
+    (window as any).eea = this;
+  }
 
   async UserId() {
     const accountRoot = await this.readAccountRoot();
@@ -647,6 +652,30 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     }
 
     return rs;
+  }
+
+  async Rpc() {
+    if (!this.rpc) {
+      const accountRoot = await this.readAccountRoot();
+
+      if (accountRoot === nil) {
+        return nil;
+      }
+  
+      this.rpc = this.makeRpc(accountRoot.eloLoginToken);
+    }
+
+    return this.rpc;
+  }
+
+  async requireRpc() {
+    const rpc = await this.Rpc();
+
+    if (rpc === nil) {
+      throw new Error('Not connected to remote storage');
+    }
+
+    return rpc;
   }
 
   async readSettings() {

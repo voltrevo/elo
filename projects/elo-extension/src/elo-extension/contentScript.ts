@@ -11,6 +11,7 @@ import handleZoomRedirects from './handleZoomRedirects';
 import handleZoomExternalCapture from './handleZoomExternalCapture';
 import makeStorageClient from './makeStorageClient';
 import handleZoomAuth from './handleZoomAuth';
+import ZoomBackendRpc from '../elo-extension-app/ZoomBackendRpc';
 
 const eloExtension = document.createElement('div');
 eloExtension.id = 'elo-extension';
@@ -41,6 +42,9 @@ eloExtension.appendChild(iconTag);
     Browser.runtime.getURL('elo-page.html'),
     await DeviceStorage.Create(Browser.storage.local, 'elo'),
     (eloLoginToken) => makeStorageClient(apiBase, eloLoginToken),
+    (eloLoginToken) => ({
+      zoom: new ZoomBackendRpc(`${apiBase}/zoom/rpc`, eloLoginToken),
+    }),
   );
   
   new PostMessageServer(

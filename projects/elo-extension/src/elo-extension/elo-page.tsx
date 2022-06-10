@@ -12,6 +12,7 @@ import BackendApi from './BackendApi';
 import GoogleAuthApi from './GoogleAuthApi';
 import syncPageAndHash from '../elo-page/syncPageAndHash';
 import makeStorageClient from './makeStorageClient';
+import ZoomBackendRpc from '../elo-extension-app/ZoomBackendRpc';
 
 window.addEventListener('load', async () => {
   const deviceStorage = await DeviceStorage.Create(Browser.storage.local, 'elo');
@@ -24,6 +25,9 @@ window.addEventListener('load', async () => {
     Browser.runtime.getURL('elo-page.html'),
     deviceStorage,
     (eloLoginToken) => makeStorageClient(apiBase, eloLoginToken),
+    (eloLoginToken) => ({
+      zoom: new ZoomBackendRpc(`${apiBase}/zoom/rpc`, eloLoginToken),
+    }),
   ));
 
   (window as any).eloExtensionApp = eloExtensionApp;
