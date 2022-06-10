@@ -48,13 +48,13 @@ export default function ZoomProtocolImpl(
       });
 
       const zoomUser = await meRes.json();
-      const { id, email } = zoomUser;
-      assert(typeof id === 'string');
+      const { account_id, email } = zoomUser;
+      assert(typeof account_id === 'string');
       assert(typeof email === 'string');
 
       await zoomConnections.upsert(db, {
         user_id: userId,
-        zoom_id: id,
+        zoom_id: account_id,
         zoom_email: email,
         presence_status: nil,
         presence_update_time: nil,

@@ -19,14 +19,15 @@ export default function defineRoutes(appComponents: AppComponents) {
       return;
     }
 
-    const { id, presence_status, date_time } = ctx.request.body.payload.object;
-    assert(typeof id === 'string');
+    const { account_id } = ctx.request.body.payload;
+    const { presence_status, date_time } = ctx.request.body.payload.object;
+    assert(typeof account_id === 'string');
     assert(typeof presence_status === 'string');
     assert(typeof date_time === 'string');
 
     await zoomConnections.updatePresence(
       database,
-      id,
+      account_id,
       presence_status,
       new Date(date_time),
     );
