@@ -12,7 +12,16 @@ export default async function run(config: Config) {
   const koaApp = new Koa();
 
   koaApp.use(cors());
-  koaApp.use(bodyParser());
+
+  const bodyParserHandler = bodyParser();
+
+  koaApp.use(async (ctx, next) => {
+    if (ctx.path === '/zoom/rpc') {
+      await next();
+    } else {
+      return await bodyParserHandler(ctx, next);
+    }
+  });
 
   const loginTokenBicoder = new TokenBicoder(
     config.secrets.tokenEncryption,
