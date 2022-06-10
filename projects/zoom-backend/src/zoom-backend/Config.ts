@@ -10,6 +10,7 @@ export const Config = io.type({
   zoomApp: io.type({
     id: io.string,
     secret: io.string,
+    redirectUri: io.string,
   }),
 });
 

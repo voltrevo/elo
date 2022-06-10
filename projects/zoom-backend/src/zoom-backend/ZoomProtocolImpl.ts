@@ -1,4 +1,5 @@
 import fetch from 'isomorphic-fetch';
+import assert from '../common-pure/assert';
 
 import { PromisifyApi } from '../common-pure/protocolHelpers';
 import ZoomProtocol from '../elo-types/ZoomProtocol';
@@ -16,11 +17,9 @@ export default function ZoomProtocolImpl(config: Config, _userId: string): ZoomP
 
       zoomUrl.searchParams.set('grant_type', 'authorization_code');
       zoomUrl.searchParams.set('code', zoomAuthCode);
+      zoomUrl.searchParams.set('redirect_uri', config.zoomApp.redirectUri);
 
-      // TODO: Can I just not set this?
-      zoomUrl.searchParams.set('redirect_uri', 'https://abcd.example.com');
-
-      const res = await fetch(zoomUrl.toString(), {
+      const tokenRes = await fetch(zoomUrl.toString(), {
         method: 'POST',
         headers: {
           Authorization: `Basic ${Buffer.from([
@@ -30,8 +29,18 @@ export default function ZoomProtocolImpl(config: Config, _userId: string): ZoomP
         },
       });
 
-      const token = await res.text();
-      console.log({ token });
+      const { access_token, refresh_token } = await tokenRes.json();
+      assert(typeof access_token === 'string');
+      assert(typeof refresh_token === 'string');
+
+      const meRes = await fetch('https://api.zoom.us/v2/users/me', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${refresh_token}`,
+        },
+      });
+
+      console.log({ zoomUser: await meRes.json() });
 
       throw new Error('Not implemented');
     },
