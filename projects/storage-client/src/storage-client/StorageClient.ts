@@ -9,6 +9,7 @@ import decode from '../elo-types/decode';
 import buffersEqual from '../common-pure/buffersEqual';
 import base58 from '../common-pure/base58';
 import ObfuscatedTimeId, { TrailValue } from './ObfuscatedTimeId';
+import deepNullToNil from '../common-pure/deepNullToNil';
 
 export default class StorageClient {
   constructor(
@@ -39,7 +40,7 @@ export default class StorageClient {
     const key = await this.keyCalculator.calculateKey(keyHash);
     const buf = decryptWithKeyHash(key, encryptedBuf);
 
-    const untypedElement = msgpack.decode(buf);
+    const untypedElement = deepNullToNil(msgpack.decode(buf));
 
     const element = decode(type, untypedElement);
 
@@ -76,7 +77,7 @@ export default class StorageClient {
         const key = await this.keyCalculator.calculateKey(keyHash);
         const buf = decryptWithKeyHash(key, encryptedBuf);
     
-        const untypedElement = msgpack.decode(buf);
+        const untypedElement = deepNullToNil(msgpack.decode(buf));
     
         const element = decode(type, untypedElement);
     

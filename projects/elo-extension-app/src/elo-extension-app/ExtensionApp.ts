@@ -776,7 +776,7 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
           throw new Error('Not connected');
         }
 
-        console.log({ presenceResult });
+        console.log(JSON.stringify({ presenceResult }));
         longPoll = { differentFrom: presenceResult.presence?.value };
       }
     })();
