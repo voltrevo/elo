@@ -766,4 +766,9 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
 
     return zoomEmail;
   }
+
+  async disconnectZoom() {
+    const rpc = await this.requireRpc();
+    await rpc.zoom.disconnect({});
+  }
 }

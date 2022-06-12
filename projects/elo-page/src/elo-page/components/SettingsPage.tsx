@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Pencil } from 'phosphor-react';
+import { Trash } from 'phosphor-react';
 
 import Page from './Page';
 import Section from './Section';
@@ -102,13 +102,13 @@ const SettingsPage: React.FunctionComponent = () => {
                   style={{
                     cursor: 'pointer',
                   }}
-                  onClick={() => {
-                    pageCtx.update({
-                      dialog: <ChangeZoomConnectionDialog/>,
-                    });
+                  onClick={async () => {
+                    setZoomConnection(nil);
+                    await appCtx.disconnectZoom();
+                    setZoomConnection({ zoomEmail: nil });
                   }}
                 >
-                  <Pencil size={24}/>
+                  <Trash size={24}/>
                 </div>
               </div>
             </>}

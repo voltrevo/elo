@@ -65,6 +65,9 @@ export default function ZoomProtocolImpl(
 
       return { zoomEmail: email };
     },
+    disconnect: async () => {
+      await zoomConnections.remove(db, userId);
+    },
     lookupZoomEmail: async () => {
       const maybeConn = await zoomConnections.lookup(db, userId);
 

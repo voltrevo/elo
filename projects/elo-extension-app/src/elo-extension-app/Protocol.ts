@@ -66,6 +66,7 @@ export type Protocol = {
   upgrade(): void;
   connectZoom(zoomAuthCode: string): string;
   lookupZoomEmail(): string | nil;
+  disconnectZoom(): void;
 };
 
 export const protocolKeyMap: Record<keyof Protocol, true> = {
@@ -96,6 +97,7 @@ export const protocolKeyMap: Record<keyof Protocol, true> = {
   upgrade: true,
   connectZoom: true,
   lookupZoomEmail: true,
+  disconnectZoom: true,
 };
 
 export const protocolThirdPartyKeyMap = {
