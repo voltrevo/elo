@@ -11,7 +11,7 @@ export const ZoomProtocolTypeMap = {
   },
   connect: {
     input: io.type({ zoomAuthCode: io.string }),
-    output: io.type({}),
+    output: io.type({ zoomEmail: io.string }),
   },
   lookupZoomEmail: {
     input: io.type({}),

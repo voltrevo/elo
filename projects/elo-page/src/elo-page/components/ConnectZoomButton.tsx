@@ -4,7 +4,10 @@ import config from '../../elo-extension/config';
 import ExtensionAppContext from '../ExtensionAppContext';
 import AsyncButton from './AsyncButton';
 
-const ConnectZoomButton: React.FunctionComponent<{ primary: boolean }> = ({ primary }) => {
+const ConnectZoomButton: React.FunctionComponent<{
+  primary: boolean,
+  onSuccess: (zoomEmail: string) => void,
+}> = ({ primary, onSuccess }) => {
   const appCtx = React.useContext(ExtensionAppContext);
 
   return (
@@ -59,7 +62,8 @@ const ConnectZoomButton: React.FunctionComponent<{ primary: boolean }> = ({ prim
           }
         });
 
-        await appCtx.connectZoom(zoomAuthCode);
+        const zoomEmail = await appCtx.connectZoom(zoomAuthCode);
+        onSuccess(zoomEmail);
       }}
     >
       Connect

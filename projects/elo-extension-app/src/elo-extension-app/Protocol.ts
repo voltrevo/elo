@@ -64,7 +64,7 @@ export type Protocol = {
   isStaffMember(): boolean;
   getMonthlyStats(): AsyncReturnType<IBackendApi['monthlyStats']>;
   upgrade(): void;
-  connectZoom(zoomAuthCode: string): void;
+  connectZoom(zoomAuthCode: string): string;
   lookupZoomEmail(): string | nil;
 };
 

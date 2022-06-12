@@ -6,6 +6,7 @@ import Button from './Button';
 import Page from './Page';
 import Section from './Section';
 import ConnectZoomButton from './ConnectZoomButton';
+import delay from '../../common-pure/delay';
 
 const ConnectZoomPage: React.FunctionComponent = () => {
   const pageCtx = React.useContext(EloPageContext);
@@ -28,7 +29,10 @@ const ConnectZoomPage: React.FunctionComponent = () => {
     </Section>
     <Section>
       <div className="button-column">
-        <ConnectZoomButton primary={true}/>
+        <ConnectZoomButton primary={true} onSuccess={async () => {
+          await delay(250);
+          pageCtx.update({ hash: 'OverviewPage' });
+        }}/>
         <Button
           primary={false}
           onClick={() => {

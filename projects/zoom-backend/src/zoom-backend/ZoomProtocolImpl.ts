@@ -63,7 +63,7 @@ export default function ZoomProtocolImpl(
         presence_update_time: nil,
       });
 
-      return {};
+      return { zoomEmail: email };
     },
     lookupZoomEmail: async () => {
       const maybeConn = await zoomConnections.lookup(db, userId);

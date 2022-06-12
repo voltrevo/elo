@@ -79,12 +79,14 @@ const SettingsPage: React.FunctionComponent = () => {
           <div>
             Zoom Connection
           </div>
-          <div>
+          <div style={{ textAlign: 'right' }}>
             {zoomConnection === nil && <>
               <LoadingSpinner/>
             </>}
             {zoomConnection && zoomConnection.zoomEmail === nil && <>
-              <ConnectZoomButton primary={false}/>
+              <ConnectZoomButton primary={false} onSuccess={(zoomEmail) => {
+                setZoomConnection({ zoomEmail });
+              }}/>
             </>}
             {zoomConnection && zoomConnection.zoomEmail !== nil && <>
               <div style={{
