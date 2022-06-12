@@ -1,6 +1,7 @@
 import Browser from 'webextension-polyfill';
-import nil from '../common-pure/nil';
 
+import assert from '../common-pure/assert';
+import nil from '../common-pure/nil';
 import DeviceStorage from '../elo-extension-app/deviceStorage/DeviceStorage';
 import config from './config';
 import makeExtensionApp from './makeExtensionApp';
@@ -48,7 +49,7 @@ Browser.browserAction.onClicked.addListener(() => {
       const timeSinceUpdated = Date.now() - (+presenceResult.presence.lastUpdated);
 
       if (timeSinceUpdated < 30000) {
-        startExternalCapture();
+        runExternalCapture();
       }
 
       return;
@@ -73,7 +74,7 @@ Browser.browserAction.onClicked.addListener(() => {
       }
 
       if (presenceResult.presence?.value === 'In_Meeting') {
-        startExternalCapture();
+        runExternalCapture();
         break;
       }
 
@@ -81,8 +82,10 @@ Browser.browserAction.onClicked.addListener(() => {
     }
   });
 
-  function startExternalCapture() {
-    window.open(
+  async function runExternalCapture() {
+    const rpc = await extensionApp.requireRpc();
+
+    const externalCaptureWindow = window.open(
       Browser.runtime.getURL('/zoom-external-capture.html'),
       undefined,
       [
@@ -92,5 +95,15 @@ Browser.browserAction.onClicked.addListener(() => {
         'top=100',
       ].join(',')
     );
+
+    assert(externalCaptureWindow !== null);
+
+    try {
+      await rpc.zoom.presence({ longPoll: { differentFrom: 'In_Meeting' } });
+    } catch (error) {
+      console.error(error);
+    }
+
+    externalCaptureWindow.close();
   }
 })().catch(console.error);

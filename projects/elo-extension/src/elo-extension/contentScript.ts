@@ -47,7 +47,7 @@ eloExtension.appendChild(iconTag);
   }
 
   if (config.featureFlags.zoomExternalCapture) {
-    await handleZoomExternalCapture(extensionApp);
+    await handleZoomExternalCapture();
   }
 
   await handleZoomAuth();
