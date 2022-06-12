@@ -40,5 +40,13 @@ export default function defineRoutes(appComponents: AppComponents) {
     ctx.status = 200;
   }));
 
-  koaApp.use(route.post('/zoom/rpc', ZoomRpcHandler(config, database, loginTokenBicoder)));
+  koaApp.use(route.post(
+    '/zoom/rpc',
+    ZoomRpcHandler(
+      config,
+      database,
+      presenceEvents,
+      loginTokenBicoder,
+    ),
+  ));
 }

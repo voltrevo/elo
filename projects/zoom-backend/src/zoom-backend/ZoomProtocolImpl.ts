@@ -7,6 +7,7 @@ import { PromisishApi } from '../common-pure/protocolHelpers';
 import Database from '../database/Database';
 import zoomConnections from '../database/queries/zoomConnections';
 import ZoomProtocol from '../elo-types/ZoomProtocol';
+import type AppComponents from './AppComponents';
 import Config from './Config';
 
 export type ZoomProtocolImpl = PromisishApi<ZoomProtocol>;
@@ -14,6 +15,7 @@ export type ZoomProtocolImpl = PromisishApi<ZoomProtocol>;
 export default function ZoomProtocolImpl(
   config: Config,
   db: Database,
+  presenceEvents: AppComponents['presenceEvents'],
   userId: string,
 ): ZoomProtocolImpl {
   const impl: ZoomProtocolImpl = {
@@ -63,36 +65,96 @@ export default function ZoomProtocolImpl(
 
       return {};
     },
-    presence: async ({ differentFrom }) => {
-      if (differentFrom !== nil) {
-        throw new Error('Not implemented: presence long polling');
-      }
+    presence: async ({ longPoll }) => {
+      const maybeConn = await zoomConnections.lookup(db, userId);
 
-      const conn = await zoomConnections.lookup(db, userId);
-
-      if (conn === nil) {
+      if (maybeConn === nil) {
         return { connected: false };
       }
+
+      const conn = maybeConn;
 
       const {
         presence_status,
         presence_update_time,
       } = conn;
 
-      if (presence_status === nil || presence_update_time === nil) {
+      const presence = (presence_status === nil || presence_update_time === nil
+        ? nil
+        : {
+          value: presence_status,
+          lastUpdated: presence_update_time,
+        }
+      );
+
+      if (!longPoll || longPoll.differentFrom !== presence?.value) {
         return {
           connected: true,
-          presence: nil,
+          presence,
         };
       }
 
-      return {
-        connected: true,
-        presence: {
-          value: presence_status,
-          lastUpdated: presence_update_time,
-        },
-      };
+      return await new Promise((resolve) => {
+        const newPresenceHandler = (
+          newPresence: {
+            value: string;
+            lastUpdated: Date;
+          },
+        ) => {
+          if (newPresence.value !== longPoll.differentFrom) {
+            cleanup();
+
+            resolve({
+              connected: true,
+              presence: newPresence,
+            });
+          }
+        };
+
+        const pleaseRetryHandle = setTimeout(() => {
+          cleanup();
+          resolve('please-retry');
+        }, 60000);
+
+        const retestHandle = setTimeout(async () => {
+          const retryConn = await zoomConnections.lookup(db, userId);
+
+          const newPresence = (
+            (
+              retryConn &&
+              retryConn.presence_status &&
+              retryConn.presence_update_time
+            )
+              ? {
+                value: retryConn.presence_status,
+                lastUpdated: retryConn.presence_update_time,
+              }
+              : nil
+          );
+
+          if (newPresence && newPresence.value !== longPoll.differentFrom) {
+            console.warn([
+              'Hit this case covering a zoom status race condition which is',
+              'not ideal and should not be very unlikely',
+            ].join(' '));
+
+            cleanup();
+
+            resolve({
+              connected: true,
+              presence: newPresence,
+            });
+          }
+        }, 5000);
+
+        presenceEvents.on(conn.zoom_id, newPresenceHandler);
+
+        function cleanup() {
+          clearTimeout(pleaseRetryHandle);
+          clearTimeout(retestHandle);
+          presenceEvents.off(conn.zoom_id, newPresenceHandler);
+        }
+      });
     },
   };
 

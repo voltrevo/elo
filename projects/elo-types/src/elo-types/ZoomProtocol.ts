@@ -16,7 +16,9 @@ export const ZoomProtocolTypeMap = {
   },
   presence: {
     input: io.type({
-      differentFrom: permissiveOptional(io.string),
+      longPoll: permissiveOptional(io.type({
+        differentFrom: permissiveOptional(io.string),
+      })),
     }),
     output: io.union([
       io.type({
