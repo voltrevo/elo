@@ -3,6 +3,7 @@ import * as msgpack from '@msgpack/msgpack';
 import StorageProtocol, { StorageProtocolInput, StorageProtocolOutput, StorageProtocolTypeMap } from "../elo-types/StorageProtocol";
 import { PromisifyApi } from "../common-pure/protocolHelpers";
 import decode from '../elo-types/decode';
+import deepNullToNil from '../common-pure/deepNullToNil';
 
 export type IStorageRpcClient = PromisifyApi<StorageProtocol>;
 
@@ -43,6 +44,6 @@ export default class StorageRpcClient implements IStorageRpcClient {
       throw new Error(await response.text());
     }
 
-    return msgpack.decode(await response.arrayBuffer());
+    return deepNullToNil(msgpack.decode(await response.arrayBuffer()));
   }
 }

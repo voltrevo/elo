@@ -1,11 +1,10 @@
 import * as io from 'io-ts';
-
-import permissiveOptional from '../../elo-types/permissiveOptional';
+import optional from '../../elo-types/optional';
 
 const Settings = io.type({
   liveStatsMode: io.string,
-  experimentalZoomSupport: permissiveOptional(io.literal(true)),
-  zoomRedirectToWebClient: permissiveOptional(io.boolean),
+  experimentalZoomSupport: optional(io.literal(true)),
+  zoomRedirectToWebClient: optional(io.boolean),
 });
 
 type Settings = io.TypeOf<typeof Settings>;

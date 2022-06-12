@@ -1,13 +1,12 @@
 import * as io from 'io-ts';
 
 import ioBuffer from '../common-pure/ioBuffer';
-
-import permissiveOptional from './permissiveOptional';
+import optional from './optional';
 
 export const SetCommand = io.type({
   collectionId: io.string,
   elementId: io.string,
-  element: permissiveOptional(ioBuffer),
+  element: optional(ioBuffer),
 });
 
 export type SetCommand = io.TypeOf<typeof SetCommand>;
@@ -19,7 +18,7 @@ export const StorageProtocolTypeMap = {
       elementId: io.string,
     }),
     output: io.type({
-      element: permissiveOptional(ioBuffer),
+      element: optional(ioBuffer),
     }),
   },
   set: {
@@ -35,14 +34,14 @@ export const StorageProtocolTypeMap = {
   getRange: {
     input: io.type({
       collectionId: io.string,
-      minElementId: permissiveOptional(io.string),
-      maxElementId: permissiveOptional(io.string),
-      offset: permissiveOptional(io.number),
+      minElementId: optional(io.string),
+      maxElementId: optional(io.string),
+      offset: optional(io.number),
       direction: io.union([io.literal('ascending'), io.literal('descending')]),
     }),
     output: io.type({
       entries: io.array(io.tuple([io.string, ioBuffer])),
-      nextElementId: permissiveOptional(io.string),
+      nextElementId: optional(io.string),
     }),
   },
   count: {

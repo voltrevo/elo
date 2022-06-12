@@ -1,7 +1,6 @@
 import * as io from 'io-ts';
 import * as ioTypes from 'io-ts-types';
-
-import permissiveOptional from './permissiveOptional';
+import optional from './optional';
 
 export const ZoomProtocolTypeMap = {
   hello: {
@@ -16,8 +15,8 @@ export const ZoomProtocolTypeMap = {
   },
   presence: {
     input: io.type({
-      longPoll: permissiveOptional(io.type({
-        differentFrom: permissiveOptional(io.string),
+      longPoll: optional(io.type({
+        differentFrom: optional(io.string),
       })),
     }),
     output: io.union([
@@ -26,7 +25,7 @@ export const ZoomProtocolTypeMap = {
       }),
       io.type({
         connected: io.literal(true),
-        presence: permissiveOptional(io.type({
+        presence: optional(io.type({
           value: io.string,
           lastUpdated: ioTypes.date,
         })),

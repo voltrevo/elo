@@ -2,16 +2,17 @@ import * as io from 'io-ts';
 import * as ioTypes from 'io-ts-types';
 
 import Database from '../Database';
-import permissiveOptional from '../../elo-types/permissiveOptional';
 import nil from '../../common-pure/nil';
 import decode from '../../elo-types/decode';
+import optional from '../../elo-types/optional';
+import deepNullToNil from '../../common-pure/deepNullToNil';
 
 const ZoomConnection = io.type({
   user_id: io.string,
   zoom_id: io.string,
   zoom_email: io.string,
-  presence_status: permissiveOptional(io.string),
-  presence_update_time: permissiveOptional(ioTypes.date)
+  presence_status: optional(io.string),
+  presence_update_time: optional(ioTypes.date)
 });
 
 type ZoomConnection = io.TypeOf<typeof ZoomConnection>;
@@ -82,7 +83,7 @@ const zoomConnections = {
       return nil;
     }
   
-    return decode(ZoomConnection, result);
+    return decode(ZoomConnection, deepNullToNil(result));
   },
 
   updatePresence: async (

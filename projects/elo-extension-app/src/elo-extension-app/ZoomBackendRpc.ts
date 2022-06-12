@@ -1,6 +1,7 @@
 import * as msgpack from '@msgpack/msgpack';
 
-import { PromisifyApi, PromisishApi } from "../common-pure/protocolHelpers";
+import deepNullToNil from '../common-pure/deepNullToNil';
+import { PromisifyApi } from "../common-pure/protocolHelpers";
 import decode from '../elo-types/decode';
 import ZoomProtocol, { ZoomProtocolInput, ZoomProtocolOutput, ZoomProtocolTypeMap } from '../elo-types/ZoomProtocol';
 
@@ -40,6 +41,6 @@ export default class ZoomBackendRpc implements IZoomBackendRpc {
       throw new Error(await response.text());
     }
 
-    return msgpack.decode(await response.arrayBuffer());
+    return deepNullToNil(msgpack.decode(await response.arrayBuffer()));
   }
 }

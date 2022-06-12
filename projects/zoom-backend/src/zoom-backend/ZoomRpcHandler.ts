@@ -13,6 +13,7 @@ import { ZoomProtocolTypeMap } from '../elo-types/ZoomProtocol';
 import Config from './Config';
 import Database from '../database/Database';
 import AppComponents from './AppComponents';
+import deepNullToNil from '../common-pure/deepNullToNil';
 
 type Handler = Parameters<typeof route.post>[1];
 
@@ -41,7 +42,7 @@ export default function ZoomRpcHandler(
       return;
     }
 
-    const body = decode(RpcBody, msgpack.decode(rawBody));
+    const body = decode(RpcBody, deepNullToNil(msgpack.decode(rawBody)));
 
     const loginDecodeResult = loginTokenBicoder.decode(body.eloLoginToken);
 

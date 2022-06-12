@@ -1,9 +1,9 @@
 import * as io from 'io-ts';
-import permissiveOptional from './permissiveOptional';
+import optional from './optional';
 
 const SessionStats = io.type({
-  lastSessionKey: permissiveOptional(io.string),
-  sessionToken: permissiveOptional(io.string),
+  lastSessionKey: optional(io.string),
+  sessionToken: optional(io.string),
   userId: io.string,
   title: io.string,
   start: io.number,

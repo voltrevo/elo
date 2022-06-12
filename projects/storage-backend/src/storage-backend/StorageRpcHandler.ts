@@ -12,6 +12,7 @@ import ErrorData from '../common-pure/ErrorData';
 import StorageProtocolImpl from './StorageProtocolImpl';
 import { StorageProtocolTypeMap } from '../elo-types/StorageProtocol';
 import errorHasTag from '../common-pure/errorHasTag';
+import deepNullToNil from '../common-pure/deepNullToNil';
 
 type Handler = Parameters<typeof route.post>[1];
 
@@ -39,7 +40,7 @@ export default function StorageRpcHandler(
       return;
     }
 
-    const body = decode(RpcBody, msgpack.decode(rawBody));
+    const body = decode(RpcBody, deepNullToNil(msgpack.decode(rawBody)));
 
     const loginDecodeResult = loginTokenBicoder.decode(body.eloLoginToken);
 
