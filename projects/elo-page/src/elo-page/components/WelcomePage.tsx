@@ -14,6 +14,7 @@ import delay from '../../common-pure/delay';
 import Section from './Section';
 import Field from './Field';
 import errorHasTag from '../../common-pure/errorHasTag';
+import nil from '../../common-pure/nil';
 
 const WelcomePage: React.FunctionComponent = () => {
   const pageCtx = React.useContext(EloPageContext);
@@ -140,7 +141,9 @@ function LoginForm() {
               email,
               password: passwd,
             });
-            proceed(pageCtx);
+
+            const zoomEmail = await appCtx.lookupZoomEmail();
+            proceed(pageCtx, zoomEmail);
           }}
         >
           Log In
@@ -320,7 +323,7 @@ function RegisterSegment({
         once={true}
         onClick={async () => {
           await onClick();
-          proceed(pageCtx);
+          proceed(pageCtx, nil);
         }}
         enabled={enabled}
       >
@@ -330,10 +333,12 @@ function RegisterSegment({
   </Section>;
 }
 
-function proceed(pageCtx: EloPageContext) {
+function proceed(pageCtx: EloPageContext, zoomEmail: string | nil) {
   pageCtx.update({ needsAuth: false });
 
   delay(250).then(() => {
-    pageCtx.update({ hash: 'ConnectZoomPage' });
+    pageCtx.update({
+      hash: zoomEmail === nil ? 'ConnectZoomPage' : 'OverviewPage',
+    });
   });
 }
