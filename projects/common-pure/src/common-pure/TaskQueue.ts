@@ -1,3 +1,5 @@
+declare const console: any;
+
 export default class TaskQueue {
   #tasks: (() => void)[] = [];
 
