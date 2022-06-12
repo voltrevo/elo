@@ -1,6 +1,8 @@
 import ExplicitAny from './ExplicitAny';
 import nil from './nil';
 
+const nullPrototype = Object.getPrototypeOf({});
+
 export default function deepNullToNil(value: unknown): unknown {
   if (typeof value !== 'object') {
     return value;
@@ -14,11 +16,15 @@ export default function deepNullToNil(value: unknown): unknown {
     return value.map(deepNullToNil);
   }
 
-  let res: Record<string, unknown> = {};
+  if (Object.getPrototypeOf(value) === nullPrototype) {
+    let res: Record<string, unknown> = {};
 
-  for (const key of Object.keys(value)) {
-    res[key] = deepNullToNil((value as ExplicitAny)[key]);
+    for (const key of Object.keys(value)) {
+      res[key] = deepNullToNil((value as ExplicitAny)[key]);
+    }
+  
+    return res;
   }
 
-  return res;
+  return value;
 }
