@@ -14,7 +14,7 @@ type AppComponents = {
 
   // TODO: When zoom-backend no longer fits into a single process, we need to be
   // able to listen and emit these events across the platform
-  events: TypedEmitter<
+  presenceEvents: TypedEmitter<
     Record<string, (presence: {
       value: string,
       lastUpdated: Date,

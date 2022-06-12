@@ -9,7 +9,7 @@ import ZoomRpcHandler from './ZoomRpcHandler';
 
 export default function defineRoutes(appComponents: AppComponents) {
   const {
-    koaApp, config, loginTokenBicoder, database, events,
+    koaApp, config, loginTokenBicoder, database, presenceEvents,
   } = appComponents;
 
   koaApp.use(route.post('/zoom-webhook', async ctx => {
@@ -32,7 +32,7 @@ export default function defineRoutes(appComponents: AppComponents) {
       new Date(date_time),
     );
 
-    events.emit(account_id, {
+    presenceEvents.emit(account_id, {
       value: presence_status,
       lastUpdated: new Date(date_time),
     });
