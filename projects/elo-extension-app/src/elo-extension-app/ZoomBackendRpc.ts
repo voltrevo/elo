@@ -1,10 +1,10 @@
 import * as msgpack from '@msgpack/msgpack';
 
-import { PromisishApi } from "../common-pure/protocolHelpers";
+import { PromisifyApi, PromisishApi } from "../common-pure/protocolHelpers";
 import decode from '../elo-types/decode';
 import ZoomProtocol, { ZoomProtocolInput, ZoomProtocolOutput, ZoomProtocolTypeMap } from '../elo-types/ZoomProtocol';
 
-export type IZoomBackendRpc = PromisishApi<ZoomProtocol>;
+export type IZoomBackendRpc = PromisifyApi<ZoomProtocol>;
 
 export default class ZoomBackendRpc implements IZoomBackendRpc {
   constructor(

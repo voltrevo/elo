@@ -1,5 +1,8 @@
-export type Promisify<T> = T extends Promise<unknown> ? T : Promise<T>;
 export type Unwrap<T> = T extends { wrap: unknown } ? T['wrap'] : never;
+
+export type PromisifyImpl<T> = T extends { wrap: Promise<unknown> } ? T['wrap'] : Promise<Unwrap<T>>;
+export type Promisify<T> = PromisifyImpl<{ wrap: T }>;
+
 export type PromisishImpl<T> = T extends { wrap: Promise<unknown> } ? T['wrap'] : Unwrap<T> | Promise<Unwrap<T>>;
 export type Promisish<T> = PromisishImpl<{ wrap: T }>;
 

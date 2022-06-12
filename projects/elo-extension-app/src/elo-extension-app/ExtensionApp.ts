@@ -33,6 +33,7 @@ import BackendApi from '../elo-extension/BackendApi';
 import assertExists from '../common-pure/assertExists';
 import config from '../elo-extension/config';
 import IRpc from './IRpc';
+import AsyncReturnType from '../common-pure/AsyncReturnType';
 
 export type AccountRootWithToken = AccountRoot & { eloLoginToken: string };
 
@@ -756,5 +757,28 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   async connectZoom(zoomAuthCode: string) {
     const rpc = await this.requireRpc();
     await rpc.zoom.connect({ zoomAuthCode });
+
+    (async () => {
+      let longPoll: {
+          differentFrom: string | undefined;
+      } | nil = nil;
+
+      while (true) {
+        const presenceResult: AsyncReturnType<typeof rpc.zoom.presence> = (
+          await rpc.zoom.presence({ longPoll })
+        );
+
+        if (presenceResult === 'please-retry') {
+          continue;
+        }
+
+        if (presenceResult.connected === false) {
+          throw new Error('Not connected');
+        }
+
+        console.log({ presenceResult });
+        longPoll = { differentFrom: presenceResult.presence?.value };
+      }
+    })();
   }
 }
