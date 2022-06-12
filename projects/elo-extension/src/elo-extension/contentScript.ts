@@ -1,17 +1,12 @@
 import Browser from 'webextension-polyfill';
-import ExtensionApp from '../elo-extension-app/ExtensionApp';
 import { protocolThirdPartyKeyMap } from '../elo-extension-app/Protocol';
 
 import PostMessageServer from '../elo-page/helpers/PostMessageServer';
-import BackendApi from './BackendApi';
-import GoogleAuthApi from './GoogleAuthApi';
 import config from './config';
-import DeviceStorage from '../elo-extension-app/deviceStorage/DeviceStorage';
 import handleZoomRedirects from './handleZoomRedirects';
 import handleZoomExternalCapture from './handleZoomExternalCapture';
-import makeStorageClient from './makeStorageClient';
 import handleZoomAuth from './handleZoomAuth';
-import ZoomBackendRpc from '../elo-extension-app/ZoomBackendRpc';
+import makeExtensionApp from './makeExtensionApp';
 
 const eloExtension = document.createElement('div');
 eloExtension.id = 'elo-extension';
@@ -34,18 +29,7 @@ iconTag.style.display = 'none';
 eloExtension.appendChild(iconTag);
 
 (async () => {
-  const apiBase = `${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`;
-
-  const extensionApp = new ExtensionApp(
-    new BackendApi(`${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`),
-    new GoogleAuthApi(config.googleOauthClientId),
-    Browser.runtime.getURL('elo-page.html'),
-    await DeviceStorage.Create(Browser.storage.local, 'elo'),
-    (eloLoginToken) => makeStorageClient(apiBase, eloLoginToken),
-    (eloLoginToken) => ({
-      zoom: new ZoomBackendRpc(`${apiBase}/zoom/rpc`, eloLoginToken),
-    }),
-  );
+  const extensionApp = await makeExtensionApp();
   
   new PostMessageServer(
     'elo',
