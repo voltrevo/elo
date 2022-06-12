@@ -78,7 +78,7 @@ const SettingsPage: React.FunctionComponent = () => {
           <div>
             Zoom Connection
           </div>
-          <div style={{ textAlign: 'right' }}>
+          <div>
             {zoomConnection === nil && <>
               <LoadingSpinner/>
             </>}
@@ -94,7 +94,6 @@ const SettingsPage: React.FunctionComponent = () => {
                 display: 'flex',
                 flexDirection: 'row',
                 gap: '0.5em',
-                justifyContent: 'end',
               }}>
                 <div>{zoomConnection.zoomEmail}</div>
                 <div
