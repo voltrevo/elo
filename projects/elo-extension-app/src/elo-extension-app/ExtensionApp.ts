@@ -757,28 +757,12 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
   async connectZoom(zoomAuthCode: string) {
     const rpc = await this.requireRpc();
     await rpc.zoom.connect({ zoomAuthCode });
+  }
 
-    (async () => {
-      let longPoll: {
-          differentFrom: string | undefined;
-      } | nil = nil;
+  async lookupZoomEmail() {
+    const rpc = await this.requireRpc();
+    const { zoomEmail } = await rpc.zoom.lookupZoomEmail({});
 
-      while (true) {
-        const presenceResult: AsyncReturnType<typeof rpc.zoom.presence> = (
-          await rpc.zoom.presence({ longPoll })
-        );
-
-        if (presenceResult === 'please-retry') {
-          continue;
-        }
-
-        if (presenceResult.connected === false) {
-          throw new Error('Not connected');
-        }
-
-        console.log(JSON.stringify({ presenceResult }));
-        longPoll = { differentFrom: presenceResult.presence?.value };
-      }
-    })();
+    return zoomEmail;
   }
 }

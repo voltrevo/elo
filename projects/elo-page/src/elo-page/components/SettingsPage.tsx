@@ -7,11 +7,18 @@ import ExtensionAppContext from '../ExtensionAppContext';
 import FunctionalBarSelector from './FunctionalBarSelector';
 import nil from '../../common-pure/nil';
 import Settings, { defaultSettings } from '../../elo-extension-app/sharedStorageTypes/Settings';
+import ConnectZoomButton from './ConnectZoomButton';
+import LoadingSpinner from './LoadingSpinner';
 
 const SettingsPage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ExtensionAppContext);
 
   const [settings, setSettings] = React.useState<Settings>();
+
+  const [
+    zoomConnection,
+    setZoomConnection,
+  ] = React.useState<{ zoomEmail: string | nil }>();
 
   async function setSettingsFromStorage() {
     const settingsRead = (await appCtx.readSettings()) ?? defaultSettings;
@@ -24,7 +31,12 @@ const SettingsPage: React.FunctionComponent = () => {
   }
 
   React.useEffect(() => {
-    setSettingsFromStorage();
+    (async () => {
+      setSettingsFromStorage();
+
+      const zoomEmail = await appCtx.lookupZoomEmail();
+      setZoomConnection({ zoomEmail });
+    })();
   }, []);
 
   return <Page classes={['form-page', 'settings-page']}>
@@ -61,31 +73,19 @@ const SettingsPage: React.FunctionComponent = () => {
         </Field>
         <Field>
           <div>
-            Experimental Zoom Support
+            Zoom Connection
           </div>
-          <FunctionalBarSelector
-            options={['off', 'on']}
-            displayMap={{
-              off: 'Off',
-              on: 'On',
-            }}
-            selection={settings.experimentalZoomSupport ? 'on' : 'off'}
-            onSelect={async (selection) => {
-              if (selection === undefined) {
-                return;
-              }
-
-              await appCtx.writeSettings({
-                ...settings,
-                experimentalZoomSupport: (selection === 'on'
-                  ? true
-                  : undefined
-                ),
-              });
-
-              await setSettingsFromStorage();
-            }}
-          />
+          <div>
+            {zoomConnection === nil && <>
+              <LoadingSpinner/>
+            </>}
+            {zoomConnection && zoomConnection.zoomEmail === nil && <>
+              <ConnectZoomButton primary={false}/>
+            </>}
+            {zoomConnection && zoomConnection.zoomEmail !== nil && <>
+              <div>{zoomConnection.zoomEmail}</div>
+            </>}
+          </div>
         </Field>
       </>}
     </Section>

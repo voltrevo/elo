@@ -3,6 +3,8 @@ import optional from '../../elo-types/optional';
 
 const Settings = io.type({
   liveStatsMode: io.string,
+
+  // No longer used
   experimentalZoomSupport: optional(io.literal(true)),
   zoomRedirectToWebClient: optional(io.boolean),
 });

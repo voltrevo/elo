@@ -65,6 +65,13 @@ export default function ZoomProtocolImpl(
 
       return {};
     },
+    lookupZoomEmail: async () => {
+      const maybeConn = await zoomConnections.lookup(db, userId);
+
+      return {
+        zoomEmail: maybeConn?.zoom_email,
+      };
+    },
     presence: async ({ longPoll }) => {
       const maybeConn = await zoomConnections.lookup(db, userId);
 

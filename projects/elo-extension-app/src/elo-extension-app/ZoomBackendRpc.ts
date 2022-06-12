@@ -15,6 +15,7 @@ export default class ZoomBackendRpc implements IZoomBackendRpc {
 
   hello = this.createMethod('hello');
   connect = this.createMethod('connect');
+  lookupZoomEmail = this.createMethod('lookupZoomEmail');
   presence = this.createMethod('presence');
 
   private createMethod<M extends keyof typeof ZoomProtocolTypeMap>(method: M) {

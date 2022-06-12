@@ -65,6 +65,7 @@ export type Protocol = {
   getMonthlyStats(): AsyncReturnType<IBackendApi['monthlyStats']>;
   upgrade(): void;
   connectZoom(zoomAuthCode: string): void;
+  lookupZoomEmail(): string | nil;
 };
 
 export const protocolKeyMap: Record<keyof Protocol, true> = {
@@ -94,6 +95,7 @@ export const protocolKeyMap: Record<keyof Protocol, true> = {
   getMonthlyStats: true,
   upgrade: true,
   connectZoom: true,
+  lookupZoomEmail: true,
 };
 
 export const protocolThirdPartyKeyMap = {

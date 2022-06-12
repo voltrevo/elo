@@ -13,6 +13,12 @@ export const ZoomProtocolTypeMap = {
     input: io.type({ zoomAuthCode: io.string }),
     output: io.type({}),
   },
+  lookupZoomEmail: {
+    input: io.type({}),
+    output: io.type({
+      zoomEmail: optional(io.string),
+    }),
+  },
   presence: {
     input: io.type({
       longPoll: optional(io.type({
@@ -32,7 +38,7 @@ export const ZoomProtocolTypeMap = {
       }),
       io.literal('please-retry'),
     ]),
-  }
+  },
 };
 
 export type ZoomProtocolInput<M extends keyof typeof ZoomProtocolTypeMap> = io.TypeOf<(typeof ZoomProtocolTypeMap)[M]["input"]>;
