@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND="noninteractive" TZ="Etc/UTC"
 
 # Install system packages
 RUN apt update -y
-RUN apt install -y ffmpeg curl python3-venv build-essential python3-dev
+RUN apt install -y ffmpeg curl python3-venv build-essential python3-dev vim
 
 # Set up python
 WORKDIR /app/analyzer
