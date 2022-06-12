@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Pencil } from 'phosphor-react';
 
 import Page from './Page';
 import Section from './Section';
@@ -83,7 +84,17 @@ const SettingsPage: React.FunctionComponent = () => {
               <ConnectZoomButton primary={false}/>
             </>}
             {zoomConnection && zoomConnection.zoomEmail !== nil && <>
-              <div>{zoomConnection.zoomEmail}</div>
+              <div style={{
+                fontSize: '1.5em',
+                lineHeight: '1.5em',
+                display: 'flex',
+                flexDirection: 'row',
+                gap: '0.5em',
+                justifyContent: 'end',
+              }}>
+                <div>{zoomConnection.zoomEmail}</div>
+                <div><Pencil size={24}/></div>
+              </div>
             </>}
           </div>
         </Field>
