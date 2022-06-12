@@ -1,10 +1,10 @@
 import * as msgpack from '@msgpack/msgpack';
 
-import { PromisifyApi } from "../common-pure/protocolHelpers";
+import { PromisishApi } from "../common-pure/protocolHelpers";
 import decode from '../elo-types/decode';
 import ZoomProtocol, { ZoomProtocolInput, ZoomProtocolOutput, ZoomProtocolTypeMap } from '../elo-types/ZoomProtocol';
 
-export type IZoomBackendRpc = PromisifyApi<ZoomProtocol>;
+export type IZoomBackendRpc = PromisishApi<ZoomProtocol>;
 
 export default class ZoomBackendRpc implements IZoomBackendRpc {
   constructor(
@@ -14,6 +14,7 @@ export default class ZoomBackendRpc implements IZoomBackendRpc {
 
   hello = this.createMethod('hello');
   connect = this.createMethod('connect');
+  presence = this.createMethod('presence');
 
   private createMethod<M extends keyof typeof ZoomProtocolTypeMap>(method: M) {
     return async (input: ZoomProtocolInput<M>): Promise<ZoomProtocolOutput<M>> => {
