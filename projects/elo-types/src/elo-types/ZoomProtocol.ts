@@ -1,4 +1,7 @@
 import * as io from 'io-ts';
+import * as ioTypes from 'io-ts-types';
+
+import permissiveOptional from './permissiveOptional';
 
 export const ZoomProtocolTypeMap = {
   hello: {
@@ -11,6 +14,24 @@ export const ZoomProtocolTypeMap = {
     input: io.type({ zoomAuthCode: io.string }),
     output: io.type({}),
   },
+  presence: {
+    input: io.type({
+      differentFrom: permissiveOptional(io.string),
+    }),
+    output: io.union([
+      io.type({
+        connected: io.literal(false),
+      }),
+      io.type({
+        connected: io.literal(true),
+        presence: permissiveOptional(io.type({
+          value: io.string,
+          lastUpdated: ioTypes.date,
+        })),
+      }),
+      io.literal('please-retry'),
+    ]),
+  }
 };
 
 export type ZoomProtocolInput<M extends keyof typeof ZoomProtocolTypeMap> = io.TypeOf<(typeof ZoomProtocolTypeMap)[M]["input"]>;

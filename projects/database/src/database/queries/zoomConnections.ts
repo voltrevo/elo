@@ -4,6 +4,7 @@ import * as ioTypes from 'io-ts-types';
 import Database from '../Database';
 import permissiveOptional from '../../elo-types/permissiveOptional';
 import nil from '../../common-pure/nil';
+import decode from '../../elo-types/decode';
 
 const ZoomConnection = io.type({
   user_id: io.string,
@@ -59,6 +60,29 @@ const zoomConnections = {
         presence_update_time,
       ],
     );
+  },
+
+  lookup: async (
+    db: Database,
+    user_id: string,
+  ) => {
+    const pgClient = await db.PgClient();
+
+    const res = await pgClient.query(
+      `
+        SELECT * FROM zoom_connections
+        WHERE user_id = $1
+      `,
+      [user_id],
+    );
+  
+    const result = res.rows[0];
+  
+    if (result === nil) {
+      return nil;
+    }
+  
+    return decode(ZoomConnection, result);
   },
 
   updatePresence: async (

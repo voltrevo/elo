@@ -1,14 +1,15 @@
 import fetch from 'isomorphic-fetch';
+
 import assert from '../common-pure/assert';
 import nil from '../common-pure/nil';
 
-import { PromisifyApi } from '../common-pure/protocolHelpers';
+import { PromisishApi } from '../common-pure/protocolHelpers';
 import Database from '../database/Database';
 import zoomConnections from '../database/queries/zoomConnections';
 import ZoomProtocol from '../elo-types/ZoomProtocol';
 import Config from './Config';
 
-export type ZoomProtocolImpl = PromisifyApi<ZoomProtocol>;
+export type ZoomProtocolImpl = PromisishApi<ZoomProtocol>;
 
 export default function ZoomProtocolImpl(
   config: Config,
@@ -61,6 +62,37 @@ export default function ZoomProtocolImpl(
       });
 
       return {};
+    },
+    presence: async ({ differentFrom }) => {
+      if (differentFrom !== nil) {
+        throw new Error('Not implemented: presence long polling');
+      }
+
+      const conn = await zoomConnections.lookup(db, userId);
+
+      if (conn === nil) {
+        return { connected: false };
+      }
+
+      const {
+        presence_status,
+        presence_update_time,
+      } = conn;
+
+      if (presence_status === nil || presence_update_time === nil) {
+        return {
+          connected: true,
+          presence: nil,
+        };
+      }
+
+      return {
+        connected: true,
+        presence: {
+          value: presence_status,
+          lastUpdated: presence_update_time,
+        },
+      };
     },
   };
 
