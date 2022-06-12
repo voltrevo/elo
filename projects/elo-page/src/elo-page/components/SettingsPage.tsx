@@ -10,9 +10,12 @@ import nil from '../../common-pure/nil';
 import Settings, { defaultSettings } from '../../elo-extension-app/sharedStorageTypes/Settings';
 import ConnectZoomButton from './ConnectZoomButton';
 import LoadingSpinner from './LoadingSpinner';
+import EloPageContext from '../EloPageContext';
+import ChangeZoomConnectionDialog from './ChangeZoomConnectionDialog';
 
 const SettingsPage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ExtensionAppContext);
+  const pageCtx = React.useContext(EloPageContext);
 
   const [settings, setSettings] = React.useState<Settings>();
 
@@ -93,7 +96,18 @@ const SettingsPage: React.FunctionComponent = () => {
                 justifyContent: 'end',
               }}>
                 <div>{zoomConnection.zoomEmail}</div>
-                <div><Pencil size={24}/></div>
+                <div
+                  style={{
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => {
+                    pageCtx.update({
+                      dialog: <ChangeZoomConnectionDialog/>,
+                    });
+                  }}
+                >
+                  <Pencil size={24}/>
+                </div>
               </div>
             </>}
           </div>

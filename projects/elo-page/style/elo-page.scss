@@ -665,6 +665,14 @@ body {
     font-size: 1em;
   }
 
+  .change-zoom-connection-dialog {
+    background-color: white;
+    width: 700px;
+    border-radius: $standard-border-radius;
+    padding: 20px;
+    font-size: 1em;
+  }
+
   &.zoom-external-capture {
     padding: 1em;
     box-sizing: border-box;
