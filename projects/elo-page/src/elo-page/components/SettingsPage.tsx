@@ -11,7 +11,6 @@ import Settings, { defaultSettings } from '../../elo-extension-app/sharedStorage
 import ConnectZoomButton from './ConnectZoomButton';
 import LoadingSpinner from './LoadingSpinner';
 import EloPageContext from '../EloPageContext';
-import ChangeZoomConnectionDialog from './ChangeZoomConnectionDialog';
 
 const SettingsPage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ExtensionAppContext);
