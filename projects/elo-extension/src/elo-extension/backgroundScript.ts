@@ -26,12 +26,22 @@ Browser.browserAction.onClicked.addListener(() => {
 (async () => {
   const extensionApp = await makeExtensionApp();
 
+  let state: 'inactive' | 'checking' | 'active' = 'inactive';
+
+  let messageStart = Infinity;
+
   Browser.runtime.onMessage.addListener(async (message: unknown) => {
     if (message !== 'zoom-might-start') {
       return;
     }
 
-    const messageStart = Date.now();
+    messageStart = Date.now();
+
+    if (state !== 'inactive') {
+      return;
+    }
+
+    state = 'checking';
 
     const rpc = await extensionApp.Rpc();
 
@@ -83,6 +93,8 @@ Browser.browserAction.onClicked.addListener(() => {
   });
 
   async function runExternalCapture() {
+    assert(state === 'checking');
+    state = 'active';
     const rpc = await extensionApp.requireRpc();
 
     const externalCaptureWindow = window.open(
@@ -105,5 +117,6 @@ Browser.browserAction.onClicked.addListener(() => {
     }
 
     externalCaptureWindow.close();
+    state = 'inactive';
   }
 })().catch(console.error);
