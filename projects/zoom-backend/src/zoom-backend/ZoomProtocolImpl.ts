@@ -111,10 +111,16 @@ export default function ZoomProtocolImpl(
           }
         };
 
-        const pleaseRetryHandle = setTimeout(() => {
-          cleanup();
-          resolve('please-retry');
-        }, 60000);
+        const pleaseRetryHandle = setTimeout(
+          () => {
+            cleanup();
+            resolve('please-retry');
+          },
+
+          // A bit less than a minute to avoid nginx's default gateway timeout
+          // of one minute
+          50000,
+        );
 
         const retestHandle = setTimeout(async () => {
           const retryConn = await zoomConnections.lookup(db, userId);
