@@ -1,8 +1,8 @@
 import Config from './Config';
-// import Database from '../database/Database';
+import Database from '../database/Database';
 
-export default async function run(_config: Config) {
-  // const database = new Database(config.pgConnString);
+export default async function run(config: Config) {
+  const database = new Database(config.pgConnString);
 
-  console.log(`TODO: Run sql queries`);
+  console.log('TODO: Run sql queries');
 }
