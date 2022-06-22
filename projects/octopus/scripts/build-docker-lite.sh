@@ -7,7 +7,7 @@ SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]:-$0}"; )" &> /dev/null && 
 PROJECT="octopus-lite"
 TAG="git-$(git rev-parse HEAD | head -c7)"
 
-docker build . -t "$PROJECT":"$TAG"
+docker build . -f Dockerfile.lite -t "$PROJECT":"$TAG"
 rm -f build/"$PROJECT"-"$TAG".tar*
 docker save "$PROJECT":"$TAG" --output build/"$PROJECT"-"$TAG".tar
 gzip build/"$PROJECT"-"$TAG".tar
