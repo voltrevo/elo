@@ -1,5 +1,5 @@
 dataclasses==0.6
-numpy==1.19.4
+numpy==1.22.0
 pkg_resources==0.0.0
 stt==1.0.0
 typing-extensions==3.10.0.2
