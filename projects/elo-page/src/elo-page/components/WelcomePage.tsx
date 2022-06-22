@@ -52,7 +52,7 @@ const WelcomePage: React.FunctionComponent = () => {
             
             try {
               await appCtx.login({ googleAccessToken: authResult.token });
-              proceed(pageCtx);
+              proceed(pageCtx, nil);
             } catch (error) {
               if (errorHasTag(error, 'wrong-auth')) {
                 throw new Error([
