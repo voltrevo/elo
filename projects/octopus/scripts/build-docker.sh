@@ -2,14 +2,14 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]:-$0}"; )" &> /dev/null && pwd 2> /dev/null; )";
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-$0}")" &>/dev/null && pwd 2>/dev/null)"
 
 rm -rf "$SCRIPT_DIR"/../analyzer
 cp -a "$SCRIPT_DIR"/../../elo-worker/analyzer "$SCRIPT_DIR"/../analyzer
 
 rm -rf "$SCRIPT_DIR"/../data
 mkdir "$SCRIPT_DIR"/../data
-cp "$HOME"/data/elo/models.tflite  "$SCRIPT_DIR"/../data/models.tflite
+cp "$HOME"/data/elo/models.tflite "$SCRIPT_DIR"/../data/models.tflite
 
 PROJECT="octopus"
 TAG="git-$(git rev-parse HEAD | head -c7)-model-$(shasum -a 256 data/models.tflite | head -c7)"
