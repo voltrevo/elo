@@ -52,7 +52,8 @@ const WelcomePage: React.FunctionComponent = () => {
             
             try {
               await appCtx.login({ googleAccessToken: authResult.token });
-              proceed(pageCtx, nil);
+              const zoomEmail = await appCtx.lookupZoomEmail();
+              proceed(pageCtx, zoomEmail);
             } catch (error) {
               if (errorHasTag(error, 'wrong-auth')) {
                 throw new Error([
@@ -333,12 +334,23 @@ function RegisterSegment({
   </Section>;
 }
 
-function proceed(pageCtx: EloPageContext, zoomEmail: string | nil) {
+async function proceed(pageCtx: EloPageContext, zoomEmail: string | nil) {
   pageCtx.update({ needsAuth: false });
 
-  delay(250).then(() => {
-    pageCtx.update({
-      hash: zoomEmail === nil ? 'ConnectZoomPage' : 'OverviewPage',
-    });
-  });
+  await delay(250);
+
+  let hash = zoomEmail === nil ? 'ConnectZoomPage' : 'OverviewPage';
+
+  if (
+    hash === 'ConnectZoomPage' &&
+    pageCtx.featureFlags.zoomSpecialActivationRequired
+  ) {
+    const storageRoot = await pageCtx.deviceStorage.readRoot();
+
+    if (!storageRoot.zoomSpecialActivation) {
+      hash = 'OverviewPage';
+    }
+  }
+
+  pageCtx.update({ hash });
 }

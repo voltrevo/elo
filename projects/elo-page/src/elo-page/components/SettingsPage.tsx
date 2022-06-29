@@ -23,6 +23,11 @@ const SettingsPage: React.FunctionComponent = () => {
     setZoomConnection,
   ] = React.useState<{ zoomEmail: string | nil }>();
 
+  const [
+    zoomSpecialActivation,
+    setZoomSpecialActivation,
+  ] = React.useState<true>();
+
   async function setSettingsFromStorage() {
     const settingsRead = (await appCtx.readSettings()) ?? defaultSettings;
 
@@ -39,8 +44,16 @@ const SettingsPage: React.FunctionComponent = () => {
 
       const zoomEmail = await appCtx.lookupZoomEmail();
       setZoomConnection({ zoomEmail });
+
+      const storageRoot = await pageCtx.deviceStorage.readRoot();
+      setZoomSpecialActivation(storageRoot.zoomSpecialActivation);
     })();
   }, []);
+
+  const zoomEnabled = (
+    !pageCtx.featureFlags.zoomSpecialActivationRequired ||
+    zoomSpecialActivation
+  );
 
   return <Page classes={['form-page', 'settings-page']}>
     <Section>
@@ -74,7 +87,7 @@ const SettingsPage: React.FunctionComponent = () => {
             }}
           />
         </Field>
-        <Field>
+        {zoomEnabled && <Field>
           <div>
             Zoom Connection
           </div>
@@ -111,7 +124,7 @@ const SettingsPage: React.FunctionComponent = () => {
               </div>
             </>}
           </div>
-        </Field>
+        </Field>}
       </>}
     </Section>
   </Page>;
