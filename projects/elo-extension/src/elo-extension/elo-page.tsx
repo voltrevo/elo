@@ -13,9 +13,12 @@ import GoogleAuthApi from './GoogleAuthApi';
 import syncPageAndHash from '../elo-page/syncPageAndHash';
 import makeStorageClient from './makeStorageClient';
 import ZoomBackendRpc from '../elo-extension-app/ZoomBackendRpc';
+import handleZoomSpecialActivation from './handleZoomSpecialActivation';
 
 window.addEventListener('load', async () => {
   const deviceStorage = await DeviceStorage.Create(Browser.storage.local, 'elo');
+
+  handleZoomSpecialActivation(deviceStorage);
 
   const apiBase = `${config.tls ? 'https:' : 'http:'}//${config.hostAndPort}`;
 
