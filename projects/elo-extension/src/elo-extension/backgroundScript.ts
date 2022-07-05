@@ -111,7 +111,17 @@ Browser.browserAction.onClicked.addListener(() => {
     assert(externalCaptureWindow !== null);
 
     try {
-      await rpc.zoom.presence({ longPoll: { differentFrom: 'In_Meeting' } });
+      while (true) {
+        const res = await rpc.zoom.presence({
+          longPoll: { differentFrom: 'In_Meeting' },
+        });
+
+        if (res === 'please-retry') {
+          continue;
+        }
+
+        break;
+      }
     } catch (error) {
       console.error(error);
     }
