@@ -1,16 +1,72 @@
 import * as React from 'react';
+
 import clamp from '../../common-pure/clamp';
 import nil from '../../common-pure/nil';
 import { SessionPage } from '../../elo-extension-app/Protocol';
-
 import EloPageContext, { useEloPageContext } from '../EloPageContext';
 import ExtensionAppContext from '../ExtensionAppContext';
+import AsyncButton from './AsyncButton';
+import Field from './Field';
+import FunctionalBarSelector from './FunctionalBarSelector';
 import SessionDateTime from './helpers/SessionDateTime';
 import Page from './Page';
+import Section from './Section';
+import EloDatePicker from './EloDatePicker';
+import { initAggregateStats } from '../../elo-types/AggregateStats';
+import accumulateStats from '../../elo-extension-app/accumulateStats';
 
 const pageSize = 15;
 
 const ReportsPage: React.FunctionComponent = () => {
+  const pageCtx = React.useContext(EloPageContext);
+
+  const selectedView: 'sessions' | 'range' = useEloPageContext(state => {
+    const synthUrl = new URL(`http://example.com/${state.hash}`);
+    const view = synthUrl.searchParams.get('v');
+
+    switch (view) {
+      case 'sessions':
+        return 'sessions';
+      case 'range':
+        return 'range';
+      case null:
+        return 'sessions';
+
+      default:
+        console.warn('Unrecognized view:', view);
+        return 'sessions';
+    }
+  });
+
+  return (
+    <Page classes={['reports-page']}>
+      <h1>Reports</h1>
+
+      <Section>
+        <FunctionalBarSelector
+          options={['sessions', 'range']}
+          selection={selectedView}
+          onSelect={(sel) => pageCtx.update({ hash: `ReportsPage?v=${sel}` })}
+          displayMap={{
+            sessions: 'Sessions',
+            range: 'Range',
+          }}
+        />
+      </Section>
+
+      <Section>
+        {{
+          sessions: () => <BySession />,
+          range: () => <ByRange />,
+        }[selectedView]()}
+      </Section>
+    </Page>
+  );
+};
+
+export default ReportsPage;
+
+const BySession: React.FunctionComponent = () => {
   const pageCtx = React.useContext(EloPageContext);
   const appCtx = React.useContext(ExtensionAppContext);
   const [pageCount, setPageCount] = React.useState<number>();
@@ -66,10 +122,10 @@ const ReportsPage: React.FunctionComponent = () => {
 
   if (sessionPage && lastRenderedPageNumber.current !== pageNumber) {
     lastRenderedPageNumber.current = pageNumber;
-    
+
     const st = scrollTarget.current;
     setTimeout(() => st?.scrollIntoView());
-    
+
     scrollTarget.current = nil;
   }
 
@@ -83,9 +139,7 @@ const ReportsPage: React.FunctionComponent = () => {
     });
   }
 
-  return <Page classes={['reports-page']}>
-    <h1>Reports</h1>
-
+  return <>
     {!sessionPage && <>Loading...</>}
 
     {sessionPage && (() => {
@@ -139,7 +193,133 @@ const ReportsPage: React.FunctionComponent = () => {
         }}
       >&gt;</div>
     </div>
-  </Page>;
+  </>;
+};
+
+const ByRange: React.FunctionComponent = () => {
+  const appCtx = React.useContext(ExtensionAppContext);
+
+  const [fromDate, setFromDate] = React.useState(
+    new Date(Date.now() - 29 * 86_400_000),
+  );
+
+  const [toDate, setToDate] = React.useState(new Date());
+
+  return <div className="by-range inner-form">
+    <Field>
+      <div>From</div>
+      <div>
+        <EloDatePicker
+          value={fromDate}
+          onChange={(newValue) => {
+            if (newValue !== nil) {
+              setFromDate(newValue);
+            }
+          }}
+        />
+      </div>
+    </Field>
+    <Field>
+      <div>To</div>
+      <div>
+        <EloDatePicker
+          value={toDate}
+          onChange={(newValue) => {
+            if (newValue !== nil) {
+              setToDate(newValue);
+            }
+          }}
+        />
+      </div>
+    </Field>
+    <Field>
+      <div>Sessions</div>
+      <div>123</div>
+    </Field>
+    <div className="presets">
+      <div
+        className="card"
+        onClick={() => {
+          setFromDate(new Date(Date.now() - 29 * 86_400_000));
+          setToDate(new Date());
+        }}
+      >
+        Last 30 Days
+      </div>
+      <div
+        className="card"
+        onClick={() => {
+          setFromDate(new Date(Date.now() - 89 * 86_400_000));
+          setToDate(new Date());
+        }}
+      >
+        Last 90 Days
+      </div>
+      <div
+        className="card"
+        onClick={() => {
+          const from = new Date();
+          from.setDate(1);
+
+          let to = new Date(Number(from) + 40 * 86_400_000);
+          to.setDate(1);
+          to = new Date(Number(to) - 86_400_000);
+
+          setFromDate(from);
+          setToDate(to);
+        }}
+      >
+        This Month
+      </div>
+      <div
+        className="card"
+        onClick={() => {
+          let from = new Date();
+          from.setDate(1);
+          from = new Date(Number(from) - 86_400_000);
+          from.setDate(1);
+
+          let to = new Date(Number(from) + 40 * 86_400_000);
+          to.setDate(1);
+          to = new Date(Number(to) - 86_400_000);
+
+          setFromDate(from);
+          setToDate(to);
+        }}
+      >
+        Last Month
+      </div>
+    </div>
+    <div className="button-column">
+      <AsyncButton onClick={async () => {
+        const minDate = new Date(fromDate);
+        minDate.setHours(0);
+        minDate.setMinutes(0);
+        minDate.setSeconds(0);
+        minDate.setMilliseconds(0);
+
+        let maxDate = new Date(toDate);
+        maxDate.setHours(0);
+        maxDate.setMinutes(0);
+        maxDate.setSeconds(0);
+        maxDate.setMilliseconds(0);
+        maxDate = new Date(Number(maxDate) + 86_400_000);
+
+        const sessions = await appCtx.getSessionRange({
+          minTime: Number(minDate),
+          maxTime: Number(maxDate),
+        });
+
+        const aggregateStats = initAggregateStats();
+
+        for (const session of sessions) {
+          accumulateStats(aggregateStats, session);
+        }
+
+        console.log({ aggregateStats });
+      }}>Generate</AsyncButton>
+    </div>
+  </div>;
 };
 
 function renderMonth(t: Date) {
@@ -160,5 +340,3 @@ function renderMonth(t: Date) {
 
   return `${months[t.getMonth()]} ${t.getFullYear()}`;
 }
-
-export default ReportsPage;

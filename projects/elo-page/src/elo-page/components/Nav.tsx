@@ -1,4 +1,6 @@
-import { ChartLine, GearSix, PresentationChart, Question, Star, User, UsersFour } from 'phosphor-react';
+import {
+  ChartLine, GearSix, PresentationChart, Question, Star, User, UsersFour,
+} from 'phosphor-react';
 import * as react from 'react';
 import EloPageContext, { useEloPageContext } from '../EloPageContext';
 import ExtensionAppContext from '../ExtensionAppContext';
@@ -17,6 +19,8 @@ const Nav: react.FunctionComponent = () => {
       setIsStaffMember(await appCtx.isStaffMember());
     })();
   }, [needsAuth]);
+
+  const hashBase = hash.split('?')[0];
 
   const links = needsAuth ? [
     {
@@ -73,7 +77,7 @@ const Nav: react.FunctionComponent = () => {
         <NavLink
           key={link.text}
           icon={link.icon}
-          selected={link.hash === hash}
+          selected={link.hash === hashBase}
           onClick={() => pageCtx.update({ hash: link.hash })}
         >
           {link.text}

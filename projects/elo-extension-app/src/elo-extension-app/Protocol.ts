@@ -58,8 +58,9 @@ export type Protocol = {
   getAggregateStats(): AggregateStats;
   readSettings(): Settings | nil;
   writeSettings(settings: Settings): void;
-  getSessionCount(): number;
+  getSessionCount(from?: number, to?: number): number;
   getSessionPage(pageSize: number, pageNumber: number): SessionPage;
+  getSessionRange(opt: { minTime?: number, maxTime?: number }): SessionStats[];
   getSession(sessionId: string): SessionStats | nil;
   isStaffMember(): boolean;
   getMonthlyStats(): AsyncReturnType<IBackendApi['monthlyStats']>;
@@ -91,6 +92,7 @@ export const protocolKeyMap: Record<keyof Protocol, true> = {
   writeSettings: true,
   getSessionCount: true,
   getSessionPage: true,
+  getSessionRange: true,
   getSession: true,
   isStaffMember: true,
   getMonthlyStats: true,

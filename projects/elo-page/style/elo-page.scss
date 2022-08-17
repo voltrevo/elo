@@ -130,7 +130,6 @@ body {
     flex-direction: column;
     gap: 2.5em;
     max-width: 700px;
-    flex-direction: column;
     margin-left: auto;
     margin-right: auto;
     text-align: left;
@@ -170,62 +169,27 @@ body {
       height: 5em;
     }
 
-    .field {
-      font-size: 1.5em;
+    .button-column {
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
+      width: 350px;
+      align-self: center;
+      gap: 1em;
+      text-align: center;
 
-      > * {
-        flex: 1;
-
-        > div {
-          padding: 0.5em 1em;
-        }
-      }
-
-      input[type="text"], input[type="password"] {
-        padding: 0.625em;
-        font-size: 0.75em;
-        font-weight: 300;
-        width: 100%;
-        height: 100%;
-        outline: none;
-        border: 1px solid $less-faint-line-color;
-
-        &:focus {
-          border: 1px solid black;
-        }
-
-        border-radius: $standard-border-radius;
-      }
-
-      .field-text-wrapper {
-        position: relative;
-        padding: 0;
-        height: 100%;
-
-        input {
-          position: absolute;
-        }
-
-        .field-icon {
-          display: inline-block;
-          height: 100%;
-          position: absolute;
-          right: 0.7em;
-          vertical-align: middle;
-          pointer-events: none;
-
-          .vertical-helper {
-            padding: 0;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-          }
-        }
+      div {
+        justify-content: center;
       }
     }
+  }
+
+  .inner-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
 
     .button-column {
       display: flex;
@@ -238,6 +202,35 @@ body {
       div {
         justify-content: center;
       }
+    }
+  }
+
+  .by-range {
+    margin-top: 2em;
+
+    .presets {
+      display: flex;
+      flex-direction: row;
+      gap: 1em;
+
+      * {
+        flex-grow: 1;
+        flex-basis: 0;
+        text-align: center;
+
+        user-select: none;
+        cursor: pointer;
+
+        background-color: white;
+
+        &:active {
+          filter: brightness(97%);
+        }
+      }
+    }
+
+    .button-column {
+      margin-top: 2em;
     }
   }
 
@@ -680,6 +673,10 @@ body {
       font-size: 1.5em;
     }
 
+    > .section:last-child {
+      margin-top: 1em;
+    }
+
     .list-container {
       display: flex;
       flex-direction: column;
@@ -712,6 +709,65 @@ body {
 
         &.disabled {
           color: grey;
+        }
+      }
+    }
+  }
+
+  .field {
+    font-size: 1.5em;
+    display: flex;
+    flex-direction: row;
+
+    > * {
+      flex: 1;
+      display: flex;
+      align-items: center;
+
+      > div {
+        padding: 0.5em 1em;
+      }
+    }
+
+    input[type="text"], input[type="password"] {
+      padding: 0.625em;
+      font-size: 0.75em;
+      font-weight: 300;
+      width: 100%;
+      height: 100%;
+      outline: none;
+      border: 1px solid $less-faint-line-color;
+
+      &:focus {
+        border: 1px solid black;
+      }
+
+      border-radius: $standard-border-radius;
+    }
+
+    .field-text-wrapper {
+      position: relative;
+      padding: 0;
+      height: 100%;
+
+      input {
+        position: absolute;
+      }
+
+      .field-icon {
+        display: inline-block;
+        height: 100%;
+        position: absolute;
+        right: 0.7em;
+        vertical-align: middle;
+        pointer-events: none;
+
+        .vertical-helper {
+          padding: 0;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
         }
       }
     }

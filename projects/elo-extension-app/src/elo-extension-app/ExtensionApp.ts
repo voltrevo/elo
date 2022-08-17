@@ -722,6 +722,18 @@ export default class ExtensionApp implements PromisishApi<Protocol> {
     return res;
   }
 
+  async getSessionRange(opt: { minTime?: number, maxTime?: number }) {
+    const collection = (await this.requireRemoteStorage()).Sessions();
+
+    const sessions: SessionStats[] = [];
+
+    for await (const session of collection.Range(opt)) {
+      sessions.push(session);
+    }
+
+    return sessions;
+  }
+
   async getSession(id: string) {
     const collection = (await this.requireRemoteStorage()).Sessions();
 
