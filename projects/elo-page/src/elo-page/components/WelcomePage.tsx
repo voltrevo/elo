@@ -15,6 +15,7 @@ import Section from './Section';
 import Field from './Field';
 import errorHasTag from '../../common-pure/errorHasTag';
 import nil from '../../common-pure/nil';
+import onEnter from './helpers/onEnter';
 
 const WelcomePage: React.FunctionComponent = () => {
   const pageCtx = React.useContext(EloPageContext);
@@ -170,6 +171,8 @@ function RegistrationForm() {
     correct: boolean,
   }>();
 
+  const sendVerificationEmailBtn = React.useRef<HTMLDivElement>();
+
   const validEmailAndPassword = Boolean(email && passwd && passwd === confirmPasswd);
   const validSentEmail = validEmailAndPassword && email === sentEmail;
 
@@ -180,6 +183,7 @@ function RegistrationForm() {
         <input
           type="text"
           onInput={(evt: React.ChangeEvent<HTMLInputElement>) => setEmail(evt.target.value)}
+          {...onEnter(() => sendVerificationEmailBtn.current?.click())}
         />
       </Field>
       <Field>
@@ -187,6 +191,7 @@ function RegistrationForm() {
         <input
           type="password"
           onInput={(evt: React.ChangeEvent<HTMLInputElement>) => setPasswd(evt.target.value)}
+          {...onEnter(() => sendVerificationEmailBtn.current?.click())}
         />
       </Field>
       <Field>
@@ -194,10 +199,12 @@ function RegistrationForm() {
         <input
           type="password"
           onInput={(evt: React.ChangeEvent<HTMLInputElement>) => setConfirmPasswd(evt.target.value)}
+          {...onEnter(() => sendVerificationEmailBtn.current?.click())}
         />
       </Field>
       <div className="button-column">
         <AsyncButton
+          ref_={r => { sendVerificationEmailBtn.current = r; }}
           key={validEmailAndPassword && email || ''}
           enabled={validEmailAndPassword}
           defaultResult={email === sentEmail ? 'success' : undefined}

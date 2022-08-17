@@ -1,6 +1,7 @@
 import { CheckCircle, Circle, CircleNotch, XCircle } from 'phosphor-react';
 import * as react from 'react';
 
+import nil from '../../common-pure/nil';
 import Button from './Button';
 
 type Props = {
@@ -9,6 +10,8 @@ type Props = {
   onClick: () => Promise<void>;
   once?: boolean;
   defaultResult?: 'success' | 'error';
+  className?: string;
+  ref_?: (r: HTMLDivElement | nil) => void;
 };
 
 const AsyncButton: react.FunctionComponent<Props> = (props) => {
@@ -21,6 +24,8 @@ const AsyncButton: react.FunctionComponent<Props> = (props) => {
   const finished = once && result === 'success';
 
   return <Button
+    ref_={props.ref_}
+    className={props.className}
     enabled={!loading && !finished && props.enabled}
     primary={props.primary}
     onClick={async () => {
