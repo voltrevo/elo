@@ -16,12 +16,9 @@ const Button: react.FunctionComponent<Props> = (props) => {
   const primary = props.primary !== false;
 
   return <div
-    ref={r => {
-      props.ref_?.(r ?? nil);
-      console.log('Ref callback', r);
-    }}
+    ref={r => { props.ref_?.(r ?? nil); }}
     {...classes(
-      `button`,
+      'button',
       primary ? 'primary' : '',
       enabled ? '' : 'disabled',
       props.className,
@@ -35,7 +32,7 @@ const Button: react.FunctionComponent<Props> = (props) => {
     }}
   >
     {props.children}
-  </div>
+  </div>;
 };
 
 export default Button;

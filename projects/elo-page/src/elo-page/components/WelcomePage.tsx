@@ -1,5 +1,8 @@
 import * as React from 'react';
 
+import {
+  CheckCircle, Circle, CircleNotch, XCircle,
+} from 'phosphor-react';
 import ExtensionAppContext from '../ExtensionAppContext';
 import EloPageContext from '../EloPageContext';
 import AsyncButton from './AsyncButton';
@@ -8,7 +11,6 @@ import Page from './Page';
 import BarSelector from './BarSelector';
 import ResendEmailDialog from './ResendEmailDialog';
 import switch_ from '../../common-pure/switch_';
-import { CheckCircle, Circle, CircleNotch, XCircle } from 'phosphor-react';
 import TermsAndConditionsDialog from './TermsAndConditionsDialog';
 import delay from '../../common-pure/delay';
 import Section from './Section';
@@ -46,11 +48,11 @@ const WelcomePage: React.FunctionComponent = () => {
             const authResult = await appCtx.googleAuth();
 
             if (!authResult.detail.verified_email) {
-              throw new Error(`Verified google account but its email address is unverified.`);
+              throw new Error('Verified google account but its email address is unverified.');
             }
 
             setGoogleAccessToken(authResult.token);
-            
+
             try {
               await appCtx.login({ googleAccessToken: authResult.token });
               const zoomEmail = await appCtx.lookupZoomEmail();
@@ -59,7 +61,7 @@ const WelcomePage: React.FunctionComponent = () => {
               if (errorHasTag(error, 'wrong-auth')) {
                 throw new Error([
                   `It looks like you (${authResult.detail.email}) already have an account but`,
-                  `haven't authorized logging in via Google. Maybe try email?`
+                  'haven\'t authorized logging in via Google. Maybe try email?',
                 ].join(' '));
               }
 
@@ -81,8 +83,7 @@ const WelcomePage: React.FunctionComponent = () => {
       </div>
     </Section>
 
-    
-    {authMethod === 'password' &&  <>
+    {authMethod === 'password' && <>
       <Section>
         <BarSelector
           options={['register', 'login']}
@@ -118,6 +119,8 @@ function LoginForm() {
   const [email, setEmail] = React.useState('');
   const [passwd, setPasswd] = React.useState('');
 
+  const loginBtn = React.useRef<HTMLDivElement>();
+
   return <>
     <Section>
       <Field>
@@ -125,6 +128,7 @@ function LoginForm() {
         <input
           type="text"
           onInput={(evt: React.ChangeEvent<HTMLInputElement>) => setEmail(evt.target.value)}
+          {...onEnter(() => loginBtn.current?.click())}
         />
       </Field>
       <Field>
@@ -132,10 +136,12 @@ function LoginForm() {
         <input
           type="password"
           onInput={(evt: React.ChangeEvent<HTMLInputElement>) => setPasswd(evt.target.value)}
+          {...onEnter(() => loginBtn.current?.click())}
         />
       </Field>
       <div className="button-column">
         <AsyncButton
+          ref_={r => loginBtn.current = r}
           once={true}
           enabled={Boolean(email && passwd)}
           onClick={async () => {
@@ -172,6 +178,7 @@ function RegistrationForm() {
   }>();
 
   const sendVerificationEmailBtn = React.useRef<HTMLDivElement>();
+  const registerBtn = React.useRef<HTMLDivElement>();
 
   const validEmailAndPassword = Boolean(email && passwd && passwd === confirmPasswd);
   const validSentEmail = validEmailAndPassword && email === sentEmail;
@@ -227,7 +234,10 @@ function RegistrationForm() {
     {validSentEmail && <Section>
       <Field>
         <div>Verification Code</div>
-        <div className="field-text-wrapper">
+        <div
+          className="field-text-wrapper"
+          {...onEnter(() => registerBtn?.current?.click())}
+        >
           <input
             type="text"
             onInput={async (evt: React.ChangeEvent<HTMLInputElement>) => {
@@ -277,6 +287,7 @@ function RegistrationForm() {
       </Field>
     </Section>}
     {validSentEmail && <RegisterSegment
+      btnRef={(r) => { registerBtn.current = r; }}
       onClick={async () => {
         await appCtx.register({
           email,
@@ -311,9 +322,11 @@ function ServiceForm({ email, googleAccessToken }: { email: string, googleAccess
 function RegisterSegment({
   onClick,
   enabled = true,
+  btnRef,
 }: {
   onClick: () => Promise<void>;
   enabled?: boolean;
+  btnRef?: (r: HTMLDivElement | nil) => void;
 }) {
   const pageCtx = React.useContext(EloPageContext);
 
@@ -321,13 +334,14 @@ function RegisterSegment({
     <div className="tos-notice">
       By clicking <b>Register</b> below, you are agreeing to Elo's&nbsp;
       <a onClick={() => {
-        pageCtx.update({ dialog: <TermsAndConditionsDialog/> })
+        pageCtx.update({ dialog: <TermsAndConditionsDialog/> });
       }}>
         Terms and Conditions
       </a>.
     </div>
     <div className="button-column">
       <AsyncButton
+        ref_={btnRef}
         once={true}
         onClick={async () => {
           await onClick();
