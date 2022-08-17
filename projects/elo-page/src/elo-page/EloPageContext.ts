@@ -7,6 +7,7 @@ import type { Config } from './config';
 import DeviceStorage from '../elo-extension-app/deviceStorage/DeviceStorage';
 import SessionStats from '../elo-types/SessionStats';
 import nil from '../common-pure/nil';
+import AggregateStats from '../elo-types/AggregateStats';
 
 type EloPageContext = ReturnType<typeof initEloPageContext>;
 
@@ -21,6 +22,11 @@ export function initEloPageContext(
     test: 37,
     needsAuth: false,
     cachedSession: undefined as ({ id: string, session: SessionStats | nil } | nil),
+    rangeReport: nil as nil | {
+      fromDate: Date;
+      toDate: Date;
+      stats: AggregateStats;
+    },
   };
 
   const events = new EventEmitter() as TypedEventEmitter<{ update(): void }>;

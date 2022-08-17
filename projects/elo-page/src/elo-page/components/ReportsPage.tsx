@@ -198,6 +198,7 @@ const BySession: React.FunctionComponent = () => {
 
 const ByRange: React.FunctionComponent = () => {
   const appCtx = React.useContext(ExtensionAppContext);
+  const pageCtx = React.useContext(EloPageContext);
 
   const [fromDate, setFromDate] = React.useState(
     new Date(Date.now() - 29 * 86_400_000),
@@ -206,36 +207,6 @@ const ByRange: React.FunctionComponent = () => {
   const [toDate, setToDate] = React.useState(new Date());
 
   return <div className="by-range inner-form">
-    <Field>
-      <div>From</div>
-      <div>
-        <EloDatePicker
-          value={fromDate}
-          onChange={(newValue) => {
-            if (newValue !== nil) {
-              setFromDate(newValue);
-            }
-          }}
-        />
-      </div>
-    </Field>
-    <Field>
-      <div>To</div>
-      <div>
-        <EloDatePicker
-          value={toDate}
-          onChange={(newValue) => {
-            if (newValue !== nil) {
-              setToDate(newValue);
-            }
-          }}
-        />
-      </div>
-    </Field>
-    <Field>
-      <div>Sessions</div>
-      <div>123</div>
-    </Field>
     <div className="presets">
       <div
         className="card"
@@ -290,6 +261,25 @@ const ByRange: React.FunctionComponent = () => {
         Last Month
       </div>
     </div>
+    <div className="date-range-row">
+      <EloDatePicker
+        value={fromDate}
+        onChange={(newValue) => {
+          if (newValue !== nil) {
+            setFromDate(newValue);
+          }
+        }}
+      />
+      <div>to</div>
+      <EloDatePicker
+        value={toDate}
+        onChange={(newValue) => {
+          if (newValue !== nil) {
+            setToDate(newValue);
+          }
+        }}
+      />
+    </div>
     <div className="button-column">
       <AsyncButton onClick={async () => {
         const minDate = new Date(fromDate);
@@ -316,7 +306,14 @@ const ByRange: React.FunctionComponent = () => {
           accumulateStats(aggregateStats, session);
         }
 
-        console.log({ aggregateStats });
+        pageCtx.update({
+          rangeReport: {
+            fromDate,
+            toDate,
+            stats: aggregateStats,
+          },
+          hash: 'RangeReportPage',
+        });
       }}>Generate</AsyncButton>
     </div>
   </div>;

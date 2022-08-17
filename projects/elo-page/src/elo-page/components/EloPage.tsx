@@ -15,6 +15,7 @@ import SessionReportPage from './SessionReportPage';
 import SettingsPage from './SettingsPage';
 import UserStatsPage from './UserStatsPage';
 import ConnectZoomPage from './ConnectZoomPage';
+import RangeReportPage from './RangeReportPage';
 
 const EloPage: React.FunctionComponent = () => {
   const page = useEloPageContext(state => {
@@ -59,6 +60,10 @@ const EloPage: React.FunctionComponent = () => {
 
     if (page === 'ConnectZoomPage') {
       return <ConnectZoomPage />;
+    }
+
+    if (page === 'RangeReportPage') {
+      return <RangeReportPage />;
     }
 
     return <Page classes={['form-page']}>
