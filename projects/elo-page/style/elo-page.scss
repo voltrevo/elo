@@ -270,7 +270,7 @@ body {
   .page-content {
     flex-grow: 1;
     overflow-y: auto;
-    background-color: hsl(0, 0, 98);
+    background-color: hsl(0, 0%, 98%);
 
     > div {
       border-left: 1px solid $faint-line-color;
@@ -398,7 +398,7 @@ body {
     }
 
     &.disabled {
-      background-color: hsl(0, 0, 95);
+      background-color: hsl(0, 0%, 95%);
       color: grey;
       border: 1px solid grey;
 
@@ -432,7 +432,7 @@ body {
         display: inline-block;
         border-radius: $standard-border-radius;
         padding: 0.5em 1em;
-        background-color: hsl(0, 0, 95);
+        background-color: hsl(0, 0%, 95%);
       }
     }
   }
@@ -611,7 +611,7 @@ body {
           display: inline-block;
           border-radius: $standard-border-radius;
           padding: 0.5em 1em;
-          background-color: hsl(0, 0, 95);
+          background-color: hsl(0, 0%, 95%);
         }
       }
 
