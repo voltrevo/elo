@@ -8,6 +8,7 @@ import BarSelector from './BarSelector';
 import Button from './Button';
 import Page from './Page';
 import Section from './Section';
+import onEnter from './helpers/onEnter';
 
 const FeedbackPage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ExtensionAppContext);
@@ -19,6 +20,8 @@ const FeedbackPage: React.FunctionComponent = () => {
   const [emailInterest, setEmailInterest] = React.useState(false);
   const [email, setEmail] = React.useState('');
   const [autoReply, setAutoReply] = React.useState<string>();
+
+  const submitBtn = React.useRef<HTMLDivElement>();
 
   const needsAuth = useEloPageContext(s => s.needsAuth);
 
@@ -50,7 +53,14 @@ const FeedbackPage: React.FunctionComponent = () => {
     </Page>;
   }
 
-  return <Page classes={['form-page', 'feedback-page']}>
+  return <Page
+    classes={['form-page', 'feedback-page']}
+    {...onEnter(evt => {
+      if (evt.metaKey) {
+        submitBtn.current?.click();
+      }
+    })}
+  >
     <Section>
       <h1>Feedback</h1>
       Thanks for taking a moment to do this. It means a lot to us.
@@ -121,21 +131,25 @@ const FeedbackPage: React.FunctionComponent = () => {
 
     <Section>
       <div className="button-column">
-        <AsyncButton once={true} onClick={async () => {
-          const sendFeedbackResult = await appCtx.sendFeedback({
-            sentiment,
-            positive: positiveEmojis.includes(sentiment ?? ''),
-            negative: negativeEmojis.includes(sentiment ?? ''),
-            message: message || undefined,
-            anonymous,
-            emailInterest: !anonymous && emailInterest,
-            email: anonymous ? undefined : email,
-          });
+        <AsyncButton
+          ref_={r => submitBtn.current = r}
+          once={true}
+          onClick={async () => {
+            const sendFeedbackResult = await appCtx.sendFeedback({
+              sentiment,
+              positive: positiveEmojis.includes(sentiment ?? ''),
+              negative: negativeEmojis.includes(sentiment ?? ''),
+              message: message || undefined,
+              anonymous,
+              emailInterest: !anonymous && emailInterest,
+              email: anonymous ? undefined : email,
+            });
 
-          delay(500).then(() => {
-            setAutoReply(sendFeedbackResult);
-          });
-        }}>
+            delay(500).then(() => {
+              setAutoReply(sendFeedbackResult);
+            });
+          }}
+        >
           Submit
         </AsyncButton>
       </div>
