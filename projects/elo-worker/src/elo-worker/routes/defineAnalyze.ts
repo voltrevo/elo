@@ -1,7 +1,7 @@
 import { Readable } from 'stream';
 
 import route from 'koa-route';
-import uuid from 'uuid';
+import * as uuid from 'uuid';
 
 import analyze, { analyzeRaw } from '../analyze';
 import AppComponents from '../AppComponents';

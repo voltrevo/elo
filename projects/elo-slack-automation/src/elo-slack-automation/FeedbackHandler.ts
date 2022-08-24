@@ -2,7 +2,7 @@ import * as io from 'io-ts';
 import route from 'koa-route';
 import reporter from 'io-ts-reporters';
 import * as slack from 'slack';
-import uuid from 'uuid';
+import * as uuid from 'uuid';
 
 import validateUserId from './validateUserId';
 import type Database from '../database/Database';

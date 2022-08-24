@@ -1,7 +1,7 @@
 import * as io from 'io-ts';
 import reporter from 'io-ts-reporters';
 import route from 'koa-route';
-import uuid from 'uuid';
+import * as uuid from 'uuid';
 
 import backendApiSpec from '../../elo-types/backendApiSpec';
 import AppComponents from '../AppComponents';
