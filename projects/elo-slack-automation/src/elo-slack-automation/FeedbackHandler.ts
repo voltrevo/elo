@@ -2,6 +2,7 @@ import * as io from 'io-ts';
 import route from 'koa-route';
 import reporter from 'io-ts-reporters';
 import * as slack from 'slack';
+import uuid from 'uuid';
 
 import validateUserId from './validateUserId';
 import type Database from '../database/Database';
@@ -24,7 +25,9 @@ export default function FeedbackHandler(config: Config, db: Database): Handler {
 
     if ('left' in decodeResult) {
       ctx.status = 400;
-      ctx.body = reporter.report(decodeResult);
+      const id = uuid.v4();
+      console.error(id, reporter.report(decodeResult));
+      ctx.body = { type: 'error', message: id };
       return;
     }
 
