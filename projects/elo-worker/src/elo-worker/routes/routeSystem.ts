@@ -1,7 +1,8 @@
 import * as io from 'io-ts';
 import reporter from 'io-ts-reporters';
-
 import route from 'koa-route';
+import uuid from 'uuid';
+
 import backendApiSpec from '../../elo-types/backendApiSpec';
 import AppComponents from '../AppComponents';
 
@@ -29,7 +30,9 @@ export function attachRoute<Path extends keyof Spec>(
 
     if ('left' in decodeResult) {
       ctx.status = 400;
-      ctx.body = reporter.report(decodeResult);
+      const id = uuid.v4();
+      console.error(id, reporter.report(decodeResult));
+      ctx.body = { type: 'error', message: id };
       return;
     }
 
