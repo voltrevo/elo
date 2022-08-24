@@ -3,7 +3,11 @@ import { upsertEmailVerification } from '../../database/queries/emailVerificatio
 import users from '../../database/queries/users';
 import { RouteDefinition } from './routeSystem';
 
-const verificationCodeAlphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const verificationCodeAlphabet = [
+  'ABCDEFGHJKLMNPQRSTUVWXYZ',
+  'abcdefghijkmnopqrstuvwxyz',
+  '123456789',
+].join('');
 
 const sendVerificationEmailRoute: RouteDefinition<'sendVerificationEmail'> = async (
   { db, emailService },
@@ -40,7 +44,7 @@ const sendVerificationEmailRoute: RouteDefinition<'sendVerificationEmail'> = asy
     return { ok: {} };
   }
 
-  const code = Range(6).map(
+  const code = Range(8).map(
     () => verificationCodeAlphabet[
       Math.floor(Math.random() * verificationCodeAlphabet.length)
     ],

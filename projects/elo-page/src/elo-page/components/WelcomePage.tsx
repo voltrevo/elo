@@ -1,8 +1,8 @@
 import * as React from 'react';
-
 import {
   CheckCircle, Circle, CircleNotch, XCircle,
 } from 'phosphor-react';
+
 import ExtensionAppContext from '../ExtensionAppContext';
 import EloPageContext from '../EloPageContext';
 import AsyncButton from './AsyncButton';
@@ -244,7 +244,7 @@ function RegistrationForm() {
               const newCode = evt.target.value;
               setVerificationCode(newCode);
 
-              if (newCode.length === 6) {
+              if (newCode.length === 8) {
                 const currentEmail = email;
                 const currentCode = newCode;
                 const correct = (await appCtx.checkVerificationEmail(email, newCode)).verified;
@@ -261,7 +261,7 @@ function RegistrationForm() {
             <div className="vertical-helper">
               {switch_<React.ReactNode>(
                 [
-                  [verificationCode.length === 6, switch_(
+                  [verificationCode.length === 8, switch_(
                     [
                       [
                         (
