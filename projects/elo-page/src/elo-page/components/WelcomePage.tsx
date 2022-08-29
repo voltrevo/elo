@@ -141,7 +141,7 @@ function LoginForm() {
       </Field>
       <div className="button-column">
         <AsyncButton
-          ref_={r => loginBtn.current = r}
+          ref_={r => { loginBtn.current = r; }}
           once={true}
           enabled={Boolean(email && passwd)}
           onClick={async () => {
@@ -360,18 +360,7 @@ async function proceed(pageCtx: EloPageContext, zoomEmail: string | nil) {
 
   await delay(250);
 
-  let hash = zoomEmail === nil ? 'ConnectZoomPage' : 'OverviewPage';
-
-  if (
-    hash === 'ConnectZoomPage' &&
-    pageCtx.featureFlags.zoomSpecialActivationRequired
-  ) {
-    const storageRoot = await pageCtx.deviceStorage.readRoot();
-
-    if (!storageRoot.zoomSpecialActivation) {
-      hash = 'OverviewPage';
-    }
-  }
-
-  pageCtx.update({ hash });
+  pageCtx.update({
+    hash: zoomEmail === nil ? 'ConnectZoomPage' : 'OverviewPage',
+  });
 }

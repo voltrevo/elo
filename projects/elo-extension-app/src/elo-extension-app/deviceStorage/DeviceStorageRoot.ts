@@ -7,7 +7,6 @@ const DeviceStorageRoot = io.type({
   installTriggered: optional(io.literal(true)),
   accountRoot: optional(io.string),
   storageVersion: optional(io.number),
-  zoomSpecialActivation: optional(io.literal(true)),
 });
 
 type DeviceStorageRoot = io.TypeOf<typeof DeviceStorageRoot>;
@@ -17,7 +16,6 @@ export function initStorageRoot(): DeviceStorageRoot {
     installTriggered: undefined,
     accountRoot: undefined,
     storageVersion: deviceStorageVersion,
-    zoomSpecialActivation: undefined,
   };
 }
 

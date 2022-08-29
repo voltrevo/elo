@@ -10,11 +10,9 @@ import nil from '../../common-pure/nil';
 import Settings, { defaultSettings } from '../../elo-extension-app/sharedStorageTypes/Settings';
 import ConnectZoomButton from './ConnectZoomButton';
 import LoadingSpinner from './LoadingSpinner';
-import EloPageContext from '../EloPageContext';
 
 const SettingsPage: React.FunctionComponent = () => {
   const appCtx = React.useContext(ExtensionAppContext);
-  const pageCtx = React.useContext(EloPageContext);
 
   const [settings, setSettings] = React.useState<Settings>();
 
@@ -22,11 +20,6 @@ const SettingsPage: React.FunctionComponent = () => {
     zoomConnection,
     setZoomConnection,
   ] = React.useState<{ zoomEmail: string | nil }>();
-
-  const [
-    zoomSpecialActivation,
-    setZoomSpecialActivation,
-  ] = React.useState<true>();
 
   async function setSettingsFromStorage() {
     const settingsRead = (await appCtx.readSettings()) ?? defaultSettings;
@@ -44,16 +37,8 @@ const SettingsPage: React.FunctionComponent = () => {
 
       const zoomEmail = await appCtx.lookupZoomEmail();
       setZoomConnection({ zoomEmail });
-
-      const storageRoot = await pageCtx.deviceStorage.readRoot();
-      setZoomSpecialActivation(storageRoot.zoomSpecialActivation);
     })();
   }, []);
-
-  const zoomEnabled = (
-    !pageCtx.featureFlags.zoomSpecialActivationRequired ||
-    zoomSpecialActivation
-  );
 
   return <Page classes={['form-page', 'settings-page']}>
     <Section>
@@ -87,7 +72,7 @@ const SettingsPage: React.FunctionComponent = () => {
             }}
           />
         </Field>
-        {zoomEnabled && <Field>
+        <Field>
           <div>
             Zoom Connection
           </div>
@@ -124,7 +109,7 @@ const SettingsPage: React.FunctionComponent = () => {
               </div>
             </>}
           </div>
-        </Field>}
+        </Field>
       </>}
     </Section>
   </Page>;
