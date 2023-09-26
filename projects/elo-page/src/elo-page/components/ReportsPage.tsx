@@ -6,7 +6,6 @@ import { SessionPage } from '../../elo-extension-app/Protocol';
 import EloPageContext, { useEloPageContext } from '../EloPageContext';
 import ExtensionAppContext from '../ExtensionAppContext';
 import AsyncButton from './AsyncButton';
-import Field from './Field';
 import FunctionalBarSelector from './FunctionalBarSelector';
 import SessionDateTime from './helpers/SessionDateTime';
 import Page from './Page';
@@ -14,13 +13,14 @@ import Section from './Section';
 import EloDatePicker from './EloDatePicker';
 import { initAggregateStats } from '../../elo-types/AggregateStats';
 import accumulateStats from '../../elo-extension-app/accumulateStats';
+import download from '../../elo-extension-app/helpers/download';
 
 const pageSize = 15;
 
 const ReportsPage: React.FunctionComponent = () => {
   const pageCtx = React.useContext(EloPageContext);
 
-  const selectedView: 'sessions' | 'range' = useEloPageContext(state => {
+  const selectedView: 'sessions' | 'range' | 'raw' = useEloPageContext(state => {
     const synthUrl = new URL(`http://example.com/${state.hash}`);
     const view = synthUrl.searchParams.get('v');
 
@@ -29,6 +29,8 @@ const ReportsPage: React.FunctionComponent = () => {
         return 'sessions';
       case 'range':
         return 'range';
+      case 'raw':
+        return 'raw';
       case null:
         return 'sessions';
 
@@ -44,12 +46,13 @@ const ReportsPage: React.FunctionComponent = () => {
 
       <Section>
         <FunctionalBarSelector
-          options={['sessions', 'range']}
+          options={['sessions', 'range', 'raw']}
           selection={selectedView}
           onSelect={(sel) => pageCtx.update({ hash: `ReportsPage?v=${sel}` })}
           displayMap={{
             sessions: 'Sessions',
             range: 'Range',
+            raw: 'Raw',
           }}
         />
       </Section>
@@ -58,6 +61,7 @@ const ReportsPage: React.FunctionComponent = () => {
         {{
           sessions: () => <BySession />,
           range: () => <ByRange />,
+          raw: () => <RawDownload />,
         }[selectedView]()}
       </Section>
     </Page>
@@ -315,6 +319,30 @@ const ByRange: React.FunctionComponent = () => {
           hash: 'RangeReportPage',
         });
       }}>Generate</AsyncButton>
+    </div>
+  </div>;
+};
+
+const RawDownload: React.FunctionComponent = () => {
+  const appCtx = React.useContext(ExtensionAppContext);
+
+  return <div className="by-range inner-form">
+    <div className="button-column">
+      <AsyncButton onClick={async () => {
+        const sessions = await appCtx.getSessionRange({});
+
+        const aggregateStats = initAggregateStats();
+
+        for (const session of sessions) {
+          accumulateStats(aggregateStats, session);
+        }
+
+        download(
+          'elo-data.json',
+          'application/json',
+          JSON.stringify({ aggregateStats, sessions }, null, 2),
+        );
+      }}>Download All Raw Data</AsyncButton>
     </div>
   </div>;
 };
